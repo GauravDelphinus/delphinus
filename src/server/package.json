@@ -1,0 +1,26 @@
+{
+  "name": "delphinus",
+  "version": "1.0.0",
+  "description": "Social App that allows users to share their creations",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "social",
+    "creativity",
+    "filters",
+    "captions"
+  ],
+  "author": "EzeeIdeas",
+  "license": "ISC",
+  "dependencies": {
+    "async": "^1.5.0",
+    "body-parser": "^1.14.2",
+    "cookie-parser": "^1.4.0",
+    "ejs": "^2.3.4",
+    "express": "^4.13.3",
+    "mongodb": "^2.1.2",
+    "oauth": "^0.9.14"
+  }
+}

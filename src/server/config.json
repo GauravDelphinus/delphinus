@@ -1,0 +1,11 @@
+{
+	"port": "8080",
+	"request_token_url": "https://api.twitter.com/oauth/request_token",
+	"access_token_url": "https://api.twitter.com/oauth/access_token",
+	"authorize_url": "https://twitter.com/oauth/authorize",
+	"consumer_key": "W96sO2rC3pw4ZmuZmVXRQBClG",
+	"consumer_secret": "Uy45aoQCRE9agq481kq6luFtwCeA2vgQBpEfhnxYmokGeJVXT8",
+	"oauth_version": "1.0",
+	"oauth_signature": "HMAC-SHA1",
+	"oauth_callback": "http://88fd8640.ngrok.io/request-token"
+}
