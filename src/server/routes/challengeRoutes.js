@@ -65,7 +65,8 @@ var routes = function(db) {
 		.get(function(req, res){
 
 			/**
-				GET the specific challenge node data.
+				GET the specific challenge node data.  
+				Returns a single JSON object of type challenge
 			**/
 
 			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId + " RETURN c;";
@@ -77,7 +78,7 @@ var routes = function(db) {
     			console.log(result.data); // delivers an array of query results
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
-    			res.json(result.data);
+    			res.json(result.data[0]);
 			});
 		})
 
@@ -85,6 +86,7 @@ var routes = function(db) {
 
 			/**
 				PUT the specific challenge.  Replace the data with the incoming values.
+				Returns the updated JSON object.
 			**/
 
 			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId;
@@ -105,7 +107,7 @@ var routes = function(db) {
     			console.log(result.data); // delivers an array of query results
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
-    			res.json(result.data);
+    			res.json(result.data[0]);
 			});
 		})
 
@@ -113,6 +115,7 @@ var routes = function(db) {
 
 			/**
 				PATCH the specific challenge.  Update some properties of the challenge.
+				Returns the updated JSON object.
 			**/
 
 			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId;
@@ -152,11 +155,11 @@ var routes = function(db) {
     			console.log(result.data); // delivers an array of query results
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
-    			res.json(result.data);
+    			res.json(result.data[0]);
 			});
 
 		})
-		
+
 		.delete(function(req, res){
 			
 			/**

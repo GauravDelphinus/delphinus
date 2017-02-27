@@ -15,6 +15,10 @@ module.exports = function() {
 	var app = express();
 	
 
+	// Set the view engine to ejs
+	app.set('view engine', 'ejs');
+
+
 	// Add cookie parsing functionality to our Express app
 	app.use(require('cookie-parser')());
 
@@ -96,12 +100,17 @@ db.cypherQuery("MATCH (n:Challenge) WHERE ID(n) = 2 RETURN n", function(err, res
 		});
 */
 
-/*
-	app.get("/challenge/:uid", function(req, res) {
 
-		res.render("challenge", {id: req.params.uid});
+	app.get("/challenge/:challengeId", function(req, res) {
+
+		console.log("passing challenge ID " + req.params.challengeId + " to res.render");
+		res.render("challenge", {challengeId: req.params.challengeId});
 	});
-*/
+
+	app.get("/data/challenges/images/:imageName", function(req, res){
+		// TODO - this would ultimately process the image before sending it.  E.g., watermark, etc.
+		res.sendFile(__dirname + "/data/challenges/images/" + req.params.imageName);
+	});
 
 
 /*

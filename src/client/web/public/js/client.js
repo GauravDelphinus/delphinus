@@ -1,6 +1,6 @@
 $(document).ready(function(){
-	console.log("document.ready called, id is " + id);
-	$.getJSON('/challenge' + findGetParameter("id"), parseChallenge);
+	console.log("document.ready called, id is " + challengeId);
+	$.getJSON('/api/challenges/' + challengeId, parseChallenge);
 
 /*
 	//set up form submit
@@ -13,10 +13,11 @@ $(document).ready(function(){
 });
 
 function parseChallenge(challenge) {
+	console.log("parseChallenge called, challenge.title = " + challenge.title);
 	$("#challenge").empty();
-	$("#challenge").append($("<img>").attr("src", this.image));
-	$("#challenge").append($("<p>").text(this.title));
-	$("#challenge").append($("<p>").text(this.created));
+	$("#challenge").append($("<img>").attr("src", challenge.image));
+	$("#challenge").append($("<p>").text(challenge.title));
+	$("#challenge").append($("<p>").text(challenge.created));
 
 	/*
 	$.each(challenge, function(){
@@ -24,17 +25,4 @@ function parseChallenge(challenge) {
 		$("#challenge").append($("<p>").text(this.caption));
 	});
 	*/
-}
-
-function findGetParameter(parameterName) {
-    var result = null,
-        tmp = [];
-    location.search
-    .substr(1)
-        .split("&")
-        .forEach(function (item) {
-        tmp = item.split("=");
-        if (tmp[0] === parameterName) result = decodeURIComponent(tmp[1]);
-    });
-    return result;
 }
