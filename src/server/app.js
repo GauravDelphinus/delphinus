@@ -41,8 +41,8 @@ module.exports = function() {
 	app.use("/api/challenges", challengeRouter);
 
 	// 2 - Entry Router
-	//var entryRouter = require("./routes/entryRoutes")();
-	//app.use("/api/entries", entryRouter);
+	var entryRouter = require("./routes/entryRoutes")(db);
+	app.use("/api/entries", entryRouter);
 
 	/**
 		FILE ROUTERS
@@ -51,88 +51,37 @@ module.exports = function() {
 		from the browser client and not with explicit client code.
 	**/
 
-	// Serve static files in public directory
-	app.use(express.static(__dirname + '/public'));
-
-
-	// Start listening for requests
-	app.listen(config.port, function() {
-		console.log("Listening on port " + config.port);
-	});
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-	
-db.cypherQuery("MATCH (n:Challenge) WHERE ID(n) = 2 RETURN n", function(err, result){
-    if(err) throw err;
-
-    console.log(result.data); // delivers an array of query results
-    console.log(result.columns); // delivers an array of names of objects getting returned
-});
-*/
-
-/*
-
-	app.get("/challenge/:uid", function(req, res, next) {
-
-		res.redirect("/challenge.html" + "?" + "id=" + req.params.uid);
-
-		});
-*/
-
-
+	// 1 - Challenge Page
 	app.get("/challenge/:challengeId", function(req, res) {
-
-		console.log("passing challenge ID " + req.params.challengeId + " to res.render");
 		res.render("challenge", {challengeId: req.params.challengeId});
 	});
 
+	// 2 - Challenge Image
 	app.get("/data/challenges/images/:imageName", function(req, res){
 		// TODO - this would ultimately process the image before sending it.  E.g., watermark, etc.
 		res.sendFile(__dirname + "/data/challenges/images/" + req.params.imageName);
 	});
 
+	// 3 - Entry Page
+	app.get("/entry/:entryId", function(req, res) {
+		res.render("entry", {entryId: req.params.entryId});
+	});
 
-/*
-db.cypherQuery("MATCH (n:Challenge) WHERE ID(n) = " + req.params.uid + " RETURN n", function(err, result){
-    if(err) throw err;
+	// 4 - Entry Image
+	app.get("/data/entries/images/:imageName", function(req, res) {
+		// TODO - this would ultimately process the image before sending it.  For entries, it will probably
+		// not need to story the image itself, but the steps that need to be performed on the challenge image
+		res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
+	});
 
-    console.log(result.data); // delivers an array of query results
-    console.log(result.columns); // delivers an array of names of objects getting returned
+	/**
+		STATIC ROUTERS
+		Serve static files in public directory
+	**/
+	app.use(express.static(__dirname + '/public'));
 
-    res.json(result.data);
-});
-*/
-
-/*
-		var json = {image: 'https://s-media-cache-ak0.pinimg.com/736x/c4/36/db/c436db9164ba3b0c6ce807c011d11987.jpg',
-			title: 'I can.  I will.  End of story.',
-			created: '2013:12:10:03:02:10+08:00'};
-		res.json(json);
-		*/
-	
-	
-
-
-
+	// Finally, start listening for requests
+	app.listen(config.port, function() {
+		console.log("Listening on port " + config.port);
+	});
 }

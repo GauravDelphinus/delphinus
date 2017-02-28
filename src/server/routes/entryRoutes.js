@@ -1,15 +1,17 @@
 var express = require("express");
 
 var routes = function(db) {
-	var challengeRouter = express.Router();
 
-	challengeRouter.route("/") // ROUTER FOR /api/challenges
+	var entryRouter = express.Router();
+
+	entryRouter.route("/")
 
 		.get(function(req, res){
 
-			/** 
-				GET challenges matching the query paramters.
-				Typical call would be a GET to the URL /api/challenges?param1=value1&param2=value2 etc.
+			/**
+				GET entries that match the given query parameters.
+
+				Typical call would be a GET to the URL /api/entries?param1=value1&param2=value2 etc.
 
 				Currently supported query paramters:
 				1. search = <search query> - return all challenges matching the search query in their titles
@@ -23,7 +25,7 @@ var routes = function(db) {
 				effect will be an intersection.
 			**/
 
-			var cypherQuery = "MATCH (n:Challenge) RETURN n;";
+			var cypherQuery = "MATCH (n:Entry) RETURN n;";
 
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -39,14 +41,15 @@ var routes = function(db) {
 		.post(function(req, res){
 
 			/**
-				POST a new challenge node.
+				POST a new entry node, and link it to a Challenge node.
 			**/
 
-			var cypherQuery = "CREATE (n:Challenge {" +
-							"image : '" + req.body.image + "'," +
+			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.body.challengeId + 
+							" CREATE (e:Entry {" +
+							"steps : '" + req.body.steps + "'," +
 							"created : '" + req.body.created + "'," + 
-							"title : '" + req.body.title + "'" +
-							"} );";
+							"caption : '" + req.body.caption + "'" +
+							"} )-[r:PART_OF]->(c);";
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
@@ -58,16 +61,16 @@ var routes = function(db) {
 			});
 		});
 
-	challengeRouter.route("/:challengeId") // ROUTER FOR /api/challenges/<id>
+	entryRouter.route("/:entryId")
 
 		.get(function(req, res){
 
 			/**
-				GET the specific challenge node data.  
-				Returns a single JSON object of type challenge
+				GET the specific entry node data.  
+				Returns a single JSON object of type entry
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId + " RETURN c;";
+			var cypherQuery = "MATCH (e:Entry) WHERE id(e) = " + req.params.entryId + " RETURN e;";
 
 			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -83,20 +86,20 @@ var routes = function(db) {
 		.put(function(req, res){
 
 			/**
-				PUT the specific challenge.  Replace the data with the incoming values.
+				PUT the specific entry.  Replace the data with the incoming values.
 				Returns the updated JSON object.
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId;
+			var cypherQuery = "MATCH (e:Challenge) WHERE id(e) = " + req.params.entryId;
 
 			cypherQuery += " SET ";
 
 			// In PUT requests, the missing properties should be Removed from the node.  Hence, setting them to NULL
-			cypherQuery += " c.image = " + ((req.body.image) ? ("'" + req.body.image + "'") : "NULL") + " , ";
-			cypherQuery += " c.created = " + ((req.body.created) ? ("'" + req.body.created + "'") : "NULL") + " , ";
-			cypherQuery += " c.title = " + ((req.body.title) ? ("'" + req.body.title + "'") : "NULL") + " ";
+			cypherQuery += " e.steps = " + ((req.body.steps) ? ("'" + req.body.steps + "'") : "NULL") + " , ";
+			cypherQuery += " e.created = " + ((req.body.created) ? ("'" + req.body.created + "'") : "NULL") + " , ";
+			cypherQuery += " e.caption = " + ((req.body.caption) ? ("'" + req.body.caption + "'") : "NULL") + " ";
 
-			cypherQuery += " RETURN c;";
+			cypherQuery += " RETURN e;";
 
 			console.log("PUT received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -112,11 +115,11 @@ var routes = function(db) {
 		.patch(function(req, res){
 
 			/**
-				PATCH the specific challenge.  Update some properties of the challenge.
+				PATCH the specific entry.  Update some properties of the entry.
 				Returns the updated JSON object.
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId;
+			var cypherQuery = "MATCH (e:Challenge) WHERE id(e) = " + req.params.entryId;
 
 			cypherQuery += " SET ";
 
@@ -124,7 +127,7 @@ var routes = function(db) {
 			// in tact with their current values.
 			var addComma = false;
 			if (req.body.image) {
-				cypherQuery += " c.image = '" + req.body.image + "' ";
+				cypherQuery += " e.steps = '" + req.body.steps + "' ";
 				addComma = true;
 			}
 
@@ -132,7 +135,7 @@ var routes = function(db) {
 				if (addComma) {
 					cypherQuery += " , ";
 				}
-				cypherQuery += " c.created = '" + req.body.created + "' ";
+				cypherQuery += " e.created = '" + req.body.created + "' ";
 				addComma = true;
 			}
 
@@ -140,11 +143,11 @@ var routes = function(db) {
 				if (addComma) {
 					cypherQuery += " , ";
 				}
-				cypherQuery += " c.title = '" + req.body.title + "' ";
+				cypherQuery += " e.title = '" + req.body.title + "' ";
 				addComma = true;
 			}
 
-			cypherQuery += " RETURN c;";
+			cypherQuery += " RETURN e;";
 
 			console.log("PATCH received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -164,7 +167,7 @@ var routes = function(db) {
 				DELETE will permantently delete the specified node.  Call with Caution!
 			**/
 
-			var cypherQuery = "MATCH (c: Challenge) WHERE id(c) = '" + req.params.challengeId + "' DELETE c;";
+			var cypherQuery = "MATCH (e: Challenge) WHERE id(e) = '" + req.params.challengeId + "' DELETE e;";
 			console.log("DELETE received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
@@ -176,8 +179,7 @@ var routes = function(db) {
 			});
 		});
 
-
-	return challengeRouter;
+	return entryRouter;
 };
 
 module.exports = routes;
