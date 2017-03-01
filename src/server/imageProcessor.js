@@ -6,15 +6,15 @@ module.exports = {
 
 	/**
 		Apply the given steps on top of the image provided.
-		Creates a new image with the steps applied, and returns
-		a temporary path containing the new image.
+		Creates a new image with the steps applied, and passes
+		the path to the callback function on success.
 
 		The caller is responsible for disposing of the returned
 		image once it has finished processing it.
 	**/
-	applyStepsToImage : function(image, steps, next) {
+	applyStepsToImage : function(imagePath, steps, next) {
 
-		var sourceImage = __dirname + image;  //input image full path
+		var sourceImage = __dirname + imagePath;  //input image full path
 		//var outputImage = 
 
 		var tmp = require('tmp');
@@ -22,6 +22,7 @@ module.exports = {
 		tmp.tmpName(function _tempNameGenerated(err, path) {
     		if (err) throw err;
  
+ 			/*
     		if (steps = "black-and-white") {
 				gm(sourceImage)
 				.colorspace("GRAY")
@@ -31,8 +32,24 @@ module.exports = {
 					next(0, path);
 				});
 			}
+			*/
+
+			if (steps = "black-and-white") {
+				var image = gm(sourceImage)
+						.colorspace("GRAY");
+
+				writeImage(image, path, next);
+			}
 		});
-
-
 	}
 };
+
+function writeImage(image, imagePath, next) {
+
+	image.write(imagePath, function(err) {
+		if (err) throw err;
+
+		next(0, imagePath);
+	});
+
+}
