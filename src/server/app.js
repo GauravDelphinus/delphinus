@@ -4,6 +4,10 @@ module.exports = function() {
 	var bodyParser = require('body-parser');
 	var neo4j = require("node-neo4j");
 	var async = require('async');
+	var fs = require("fs");
+
+	var dataUtils = require("./dataUtils");
+	var imageProcessor = require("./imageProcessor");
 
 	// Initialize the Neo4j Graph Database
 	var db = new neo4j("http://neo4j:Puzz1e$$@localhost:7474");
@@ -68,11 +72,37 @@ module.exports = function() {
 	});
 
 	// 4 - Entry Image
-	app.get("/data/entries/images/:imageName", function(req, res) {
+	app.get("/data/entries/images/:entryId", function(req, res) {
 		// TODO - this would ultimately process the image before sending it.  For entries, it will probably
 		// not need to story the image itself, but the steps that need to be performed on the challenge image
-		res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
+		//res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
+
+		dataUtils.getImageDataForEntry(db, 4, function(err, imageData){
+			if (err) throw err;
+
+			imageProcessor.applyStepsToImage(imageData.imagePath, imageData.steps, function(err, image){
+				console.log("err is " + err);
+				if (err) throw err;
+
+				console.log("calling res.sendFile with " + image);
+				res.sendFile(image, function(err) {
+					if (err) throw err;
+
+					//dispose off the file
+					fs.unlink(image, function(err) {
+						if (err) throw err;
+					});
+				});
+			});
+		});
 	});
+
+
+	/////. TESTING TESTING
+	
+
+	/////. TESTING TESTING
+
 
 	/**
 		STATIC ROUTERS

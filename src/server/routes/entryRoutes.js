@@ -79,7 +79,9 @@ var routes = function(db) {
     			console.log(result.data); // delivers an array of query results
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
-    			res.json(result.data[0]);
+    			var entryObject = result.data[0];
+    			entryObject.image = "/data/entries/images/" + req.params.entryId;
+    			res.json(entryObject);
 			});
 		})
 
