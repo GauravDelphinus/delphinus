@@ -48,6 +48,10 @@ module.exports = function() {
 	var entryRouter = require("./routes/entryRoutes")(db);
 	app.use("/api/entries", entryRouter);
 
+	// 3 - Filter Router
+	var filterRouter = require("./routes/filterRoutes")(db);
+	app.use("/api/filters", filterRouter);
+
 	/**
 		FILE ROUTERS
 		This is the list of file routers that allow for serving of file
@@ -61,9 +65,27 @@ module.exports = function() {
 	});
 
 	// 2 - Challenge Image
+	/*
 	app.get("/data/challenges/images/:imageName", function(req, res){
 		// TODO - this would ultimately process the image before sending it.  E.g., watermark, etc.
 		res.sendFile(__dirname + "/data/challenges/images/" + req.params.imageName);
+	});
+	*/
+
+	app.get("/challenges/images/:challengeId", function(req, res) {
+		// TODO - this would ultimately process the image before sending it.  For entries, it will probably
+		// not need to story the image itself, but the steps that need to be performed on the challenge image
+		//res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
+
+
+		dataUtils.getImageDataForChallenge(db, req.params.challengeId, function(err, image){
+			if (err) throw err;
+
+			console.log("calling res.sendFile with " + image);
+			res.sendFile(__dirname + "/" + image, function(err) {
+				if (err) throw err;
+			});
+		});
 	});
 
 	// 3 - Entry Page
@@ -72,12 +94,12 @@ module.exports = function() {
 	});
 
 	// 4 - Entry Image
-	app.get("/data/entries/images/:entryId", function(req, res) {
+	app.get("/entries/images/:entryId", function(req, res) {
 		// TODO - this would ultimately process the image before sending it.  For entries, it will probably
 		// not need to story the image itself, but the steps that need to be performed on the challenge image
 		//res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
 
-		dataUtils.getImageDataForEntry(db, 4, function(err, imageData){
+		dataUtils.getImageDataForEntry(db, req.params.entryId, function(err, imageData){
 			if (err) throw err;
 
 			imageProcessor.applyStepsToImage(imageData.imagePath, imageData.steps, function(err, image){
@@ -95,6 +117,11 @@ module.exports = function() {
 				});
 			});
 		});
+	});
+
+	// 5 - Challenge - New Entry
+	app.get("/challenge/:challengeId/newEntry", function(req, res){
+		res.render("newentry", {challengeId: req.params.challengeId});
 	});
 
 

@@ -9,6 +9,32 @@ module.exports = {
 
 	},
 
+		/**
+		Given an Entry ID, fetch the details of the image
+		that forms this entry.  This includes:
+		- Original Image from the Challenge
+		- List of steps to be performed on the image
+
+		Returns an object of this form:
+		{
+			imagePath : "/path/to/original/image/from/server/root",
+			steps : "steps to perform"
+		}
+	**/
+	getImageDataForChallenge : function(db, challengeId, next) {
+		var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + challengeId + " RETURN c.image;";
+
+		console.log("cypherQuery is " + cypherQuery);
+		db.cypherQuery(cypherQuery, function(err, result){
+	    	if(err) throw err;
+
+			var image = result.data[0];
+
+	    	next(0, image);
+		});
+
+	},
+
 	/**
 		Given an Entry ID, fetch the details of the image
 		that forms this entry.  This includes:

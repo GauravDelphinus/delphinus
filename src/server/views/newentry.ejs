@@ -1,0 +1,28 @@
+<html>
+<head>
+<title>Delphinus - New Entry</title>
+</head>
+<body>
+<div id="newentry">
+<img id="newentryimage" />
+</div>
+	<b>Preset Filters</b>
+	<input type="radio" id="radioPaint" name="preset" value="paint">Paint<br>
+	<input type="radio" id="radioGrayscale" name="preset" value="grayscale">Grayscale<br>
+	<input type="radio" id="radioCharcoal" name="preset" value="charcoal">Charcoal<br>
+	<input type="radio" id="radioMosaic" name="preset" value="mosaic">Mosaic<br>
+	<input type="radio" id="radioNegative" name="preset" value="negative">Negative<br>
+	<input type="radio" id="radioSolarize" name="preset" value="solarize">Solarize<br>
+	<input type="radio" id="radioMonochrome" name="preset" value="monochrome">Monochrome<br>
+	<input type="radio" id="radioSwirl" name="preset" value="swirl">Swirl<br>
+	<input type="radio" id="radioWave" name="preset" value="wave">Wave<br>
+	<input type="radio" id="radioSpread" name="preset" value="spread">Spread<br>
+  <input type="submit" id="apply" value="Apply">
+
+<script>
+	var challengeId = <%= challengeId %>;
+</script>
+<script src="/js/jquery-3.1.1.min.js"></script>
+<script src="/js/newentry.js"></script>
+</body>
+</html>
