@@ -4,23 +4,52 @@ $(document).ready(function(){
 
 	document.getElementById("apply").onclick = applyChanges;
 	//$.getJSON('/api/filters/apply/' + challengeId, parseEntry);
+
+	$(":checkbox").change(applyChanges);
 });
 
 function applyChanges() {
+	//alert("applyChanges called");
 	var jsonObj = {};
 	jsonObj.imageSource = "challengeId"; // Can be "url" | "challenge" | "blob"
 										// url is path to any web url
 										// challengeId is the challengeId
 										// blob is the base64 encoded version of the image data itself
 	jsonObj.imageData = challengeId;
-	jsonObj.filters = [{type: "effects", "effectType" : "preset"}];
+	jsonObj.filters = [];
 
-	if ($("#radioPaint").prop("checked")) {
-		jsonObj.filters[0].preset = "paint";
+	var i = 0;
+	if ($("#checkPaint").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "paint"};
 	}
-	if ($("#radioGrayscale").prop("checked")) {
-		jsonObj.filters[0].preset = "grayscale";
+	if ($("#checkGrayscale").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "grayscale"};
 	}
+	if ($("#checkMosaic").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "mosaic"};
+	}
+	if ($("#checkNegative").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "negative"};
+	}
+	if ($("#checkSolarize").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "solarize"};
+	}
+	if ($("#checkMonochrome").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "monochrome"};
+	}
+	if ($("#checkSwirl").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "swirl"};
+	}
+	if ($("#checkWave").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "wave"};
+	}
+	if ($("#checkSpread").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "spread"};
+	}
+	if ($("#checkCharcoal").prop("checked")) {
+		jsonObj.filters[i++] = {type: "effects", effectType: "preset", preset: "charcoal"};
+	}
+
 
 	//alert("json is " + JSON.stringify(jsonObj));
 

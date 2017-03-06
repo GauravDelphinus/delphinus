@@ -588,6 +588,30 @@ module.exports = {
     					if (filters[i].preset == "paint") {
 	    					image.paint(10);
     					}
+    					if (filters[i].preset == "mosaic") {
+    						image.mosaic();
+    					}
+    					if (filters[i].preset == "negative") {
+    						image.negative();
+    					}
+    					if (filters[i].preset == "solarize") {
+    						image.solarize(50);
+    					}
+    					if (filters[i].preset == "monochrome") {
+    						image.monochrome();
+    					}
+    					if (filters[i].preset == "swirl") {
+    						image.swirl(10);
+    					}
+    					if (filters[i].preset == "wave") {
+    						image.wave(10, 10);
+    					}
+    					if (filters[i].preset == "spread") {
+    						image.spread(5);
+    					}
+    					if (filters[i].preset == "charcoal") {
+    						image.charcoal(5);
+    					}
     				}
     			}
 			}
