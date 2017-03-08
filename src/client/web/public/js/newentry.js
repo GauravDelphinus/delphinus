@@ -63,7 +63,9 @@ function applyChanges() {
 			//alert("success, data is " + jsonData);
 			//var jsonData = $.parseJSON(data);
 			//alert("image received: " + jsonData.image);
-			$("#newentryimage").attr("src", jsonData.image);
+
+			//$("#newentryimage").attr("src", jsonData.image);
+			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
 		},
 		error: function(jsonData) {
 			//alert("error, data is " + jsonData);

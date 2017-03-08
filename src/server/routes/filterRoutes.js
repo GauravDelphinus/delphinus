@@ -1,5 +1,6 @@
 var express = require("express");
 var dataUtils = require("../dataUtils");
+var fs = require("fs");
 
 var routes = function(db) {
 
@@ -23,19 +24,19 @@ var routes = function(db) {
 
 				sourceImagePath = __dirname + "/../" + image;
 
-				imageProcessor.applyFiltersToImage(sourceImagePath, req.body.filters, true, function(err, imagePath){
+				imageProcessor.applyFiltersToImage(sourceImagePath, req.body.filters, function(err, imagePath){
 					if (err) throw err;
 
-					//remove the local prefix from the imagePath, if any
-					var pos = imagePath.indexOf("/public/");
-					if (pos >= 0) {
-						imagePath = imagePath.slice(pos + 7);
-					}
-					console.log("calling res.send with imagePath " + imagePath);
-					var json = "{ 'image' : '" + imagePath + "' }";
-					var jsonObj = { 'image' : imagePath };
+					//send the image as a base64 encoded image blob
+					var imageBlob = fs.readFileSync(imagePath); //TODO - change to async
+					var imageBase64 = new Buffer(imageBlob).toString('base64');
+					var jsonObj = {"imageData" : imageBase64};
 					res.setHeader('Content-Type', 'application/json');
-					res.send(JSON.stringify(jsonObj)); //, function(err) {
+					res.send(JSON.stringify(jsonObj));
+
+					//dispose off the temp file
+					console.log("disposing off " + imagePath);
+					fs.unlink(imagePath);
 				});
 			});
 		} else if (req.body.imageSource == "url") {

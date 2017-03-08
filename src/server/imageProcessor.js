@@ -559,15 +559,14 @@ module.exports = {
 	Set public = true if you want the returned output image path to be publicly accessible
 	TODO - figure out how to use the public argument, and how to purge the file if set to public.
 	**/
-	applyFiltersToImage : function(sourceImage, filters, public, next) {
+	applyFiltersToImage : function(sourceImage, filters, next) {
 
 		console.log("applyFiltersToImage: imagePath is " + sourceImage);
 
 		var tmp = require('tmp');
 
-		tmp.tmpName({ dir: __dirname + "/public/tmp" }, function _tempNameGenerated(err, path) {
 
-		//tmp.tmpName(function _tempNameGenerated(err, path) {
+		tmp.tmpName(function _tempNameGenerated(err, path) {
     		if (err) throw err;
 
     		// initialize the image
@@ -616,30 +615,6 @@ module.exports = {
     			}
 			}
 			writeImage(image, path, next);
-
-
-    		/*
-    		//loop through filters
-    		var numFilters = filters.length;
-    		for (var i = 0; i < numFilters; i++) {
-    			console.log("filters type = " + filters[i].type);
-    			if (filters[i].type == "effects") {
-    				console.log("filters effectType = " + filters[i].effectType);
-    				if (filters[i].effectType == "preset") {
-    					console.log("filters preset = " + filters[i].preset);
-    					if (filters[i].preset == "paint") {
-    						var image = gm(sourceImage)
-    							.paint(10);
-    						writeImage(image, path, next);
-    					} else if (filters[i].preset == "grayscale") {
-    						var image = gm(sourceImage)
-    							.colorspace("GRAY");
-    						writeImage(image, path, next);
-    					}
-    				}
-    			}
-			}
-			*/
 		});
 	}
 };
