@@ -11,12 +11,13 @@ module.exports = function() {
 
 	// Initialize the Neo4j Graph Database
 	var db = new neo4j("http://neo4j:Puzz1e$$@localhost:7474");
-
-	//var url = require('url');
-	//var querystring = require('querystring');
 	
 	var config = require('./config');
 	var app = express();
+
+	// Set global variable called 'appRoot' to store the Node JS root directory
+	var path = require('path');
+	global.appRoot = path.resolve(__dirname);
 	
 
 	// Set the view engine to ejs
@@ -27,7 +28,8 @@ module.exports = function() {
 	app.use(require('cookie-parser')());
 
 	// Parse JSON body and store result in req.body
-	app.use(bodyParser.json());
+	app.use(bodyParser.json({limit: "50mb"})); //make sure we can handle large messages that include images.  The actual value may require fine tuning later
+	app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 
 	/**
 		API ROUTERS
@@ -65,24 +67,20 @@ module.exports = function() {
 	});
 
 	// 2 - Challenge Image
-	/*
-	app.get("/data/challenges/images/:imageName", function(req, res){
-		// TODO - this would ultimately process the image before sending it.  E.g., watermark, etc.
-		res.sendFile(__dirname + "/data/challenges/images/" + req.params.imageName);
-	});
-	*/
-
 	app.get("/challenges/images/:challengeId", function(req, res) {
-		// TODO - this would ultimately process the image before sending it.  For entries, it will probably
-		// not need to story the image itself, but the steps that need to be performed on the challenge image
-		//res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
-
-
-		dataUtils.getImageDataForChallenge(db, req.params.challengeId, function(err, image){
+		/**
+			The /challenges/images/challengeId route returns the actual original image
+			for that challenge Id.  That is the only legal way for the client to retrieve
+			the challenge Image.  The actual image is stored under /data/challenges/images/<random name>
+			path, and the random name is stored in the neo4j db entry for that challenge node.
+		**/
+		dataUtils.getImageDataForChallenge(db, req.params.challengeId, function(err, image, imageType){
 			if (err) throw err;
 
+			var challengeImagesDir = __dirname + "/data/challenges/images/";
 			console.log("calling res.sendFile with " + image);
-			res.sendFile(__dirname + "/" + image, function(err) {
+			res.set('Content-Type', 'image/' + imageType);
+			res.sendFile(challengeImagesDir + image, function(err) {
 				if (err) throw err;
 			});
 		});
@@ -124,6 +122,11 @@ module.exports = function() {
 		res.render("newentry", {challengeId: req.params.challengeId});
 	});
 
+
+	// 6 - New Challenge
+	app.get("/newChallenge", function(req, res){
+		res.render("newchallenge");
+	});
 
 	/////. TESTING TESTING
 	

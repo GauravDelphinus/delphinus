@@ -10,27 +10,27 @@ module.exports = {
 	},
 
 		/**
-		Given an Entry ID, fetch the details of the image
-		that forms this entry.  This includes:
-		- Original Image from the Challenge
-		- List of steps to be performed on the image
+		Given an Challenge ID, fetch the details of the image
+		that was posted for that challenge.  This includes:
+		- Name of the image (random name stored under /data/challenges/images/<name>)
+		- Image Type (as originally posted - eg. jpeg, gif, png, etc.)
 
-		Returns an object of this form:
-		{
-			imagePath : "/path/to/original/image/from/server/root",
-			steps : "steps to perform"
-		}
+		Calls the function in the last argument with 3 parameters - err, imageName and imageType.
 	**/
 	getImageDataForChallenge : function(db, challengeId, next) {
-		var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + challengeId + " RETURN c.image;";
+		var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + challengeId + " RETURN c.imageType, c.image;";
 
 		console.log("cypherQuery is " + cypherQuery);
 		db.cypherQuery(cypherQuery, function(err, result){
 	    	if(err) throw err;
 
-			var image = result.data[0];
+	    	var row = result.data[0].toString();
+	    	console.log("row is " + row);
+	    	var dataArray = row.split(",");
+	    	var imageType = dataArray[0];
+	    	var image = dataArray[1];
 
-	    	next(0, image);
+	    	next(0, image, imageType);
 		});
 
 	},

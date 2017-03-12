@@ -1,0 +1,34 @@
+<html>
+<head>
+<title>Delphinus - New Challenge</title>
+</head>
+<body>
+
+<img id="newchallengeimage" />
+	
+<b>Select Image:</b><br>
+<div id="drop_zone">Drop files here</div>
+<input type="file" id="files" name="files[]" value="Browse"><br>
+<output id="list"></output>
+<br><br>
+
+<b>Enter Caption:</b><br>
+<textarea rows="2" id="caption">Enter your caption here</textarea><br>
+
+<b>Enter Tags:</b><br>
+
+<b>Enter Mood:</b><br>
+<select id="moods">
+<option value="funny">Funny</option>
+<option value="hilarious">Hilarious</option>
+<option value="serious">Serious</option>
+<option value="sad">Sad</option>
+<option value="comforting">Comforting</option>
+</select>
+
+<button type="button" id="postChallenge">Post!<br>
+
+<script src="/js/jquery-3.1.1.min.js"></script>
+<script src="/js/newchallenge.js"></script>
+</body>
+</html>

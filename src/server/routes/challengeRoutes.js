@@ -1,4 +1,6 @@
 var express = require("express");
+var tmp = require("tmp");
+var path = require("path");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -42,19 +44,46 @@ var routes = function(db) {
 				POST a new challenge node.
 			**/
 
-			var cypherQuery = "CREATE (n:Challenge {" +
-							"image : '" + req.body.image + "'," +
+			// Store the incoming base64 encoded image into a local image file first
+			var fs = require('fs');
+			var imageDataURI = req.body.imageDataURI;
+			var regex = /^data:.+\/(.+);base64,(.*)$/;
+
+			var matches = imageDataURI.match(regex);
+			var ext = matches[1].toLowerCase();
+			var data = matches[2];
+			var buffer = new Buffer(data, 'base64');
+
+			var baseDir = global.appRoot + "/data/challenges/images/";
+
+			//Create random name for new image file
+			tmp.tmpName({ dir: baseDir }, function _tempNameGenerated(err, fullpath) {
+    			if (err) throw err;
+ 
+ 				var name = path.parse(fullpath).base;
+    			console.log("Created temporary filename: ", fullpath);
+
+    			fs.writeFileSync(fullpath, buffer);
+
+    			//console.log(JSON.stringify(req.body));
+    			
+				var cypherQuery = "CREATE (n:Challenge {" +
+							"image : '" + name + "'," +
+							"imageType : '" + ext + "'," + 
 							"created : '" + req.body.created + "'," + 
-							"title : '" + req.body.title + "'" +
-							"} );";
-			console.log("Running cypherQuery: " + cypherQuery);
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+							"title : '" + req.body.caption + "'" +
+							"}) RETURN n;";
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+				console.log("Running cypherQuery: " + cypherQuery);
+				
+				db.cypherQuery(cypherQuery, function(err, result){
+    				if(err) throw err;
 
-    			res.json(result.data[0]);
+    				console.log(result.data); // delivers an array of query results
+
+    				res.json(result.data[0]);
+				});
+				
 			});
 		});
 
@@ -76,6 +105,8 @@ var routes = function(db) {
     			console.log(result.data); // delivers an array of query results
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
+    			//image is /challenges/images/challengeId which in turn will be mapped to the actual image by the separate route
+    			result.data[0].image = "/challenges/images/" + req.params.challengeId;
     			res.json(result.data[0]);
 			});
 		})
