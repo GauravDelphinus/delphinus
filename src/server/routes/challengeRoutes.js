@@ -1,6 +1,7 @@
 var express = require("express");
 var tmp = require("tmp");
 var path = require("path");
+var confi = require("../config");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -54,7 +55,7 @@ var routes = function(db) {
 			var data = matches[2];
 			var buffer = new Buffer(data, 'base64');
 
-			var baseDir = global.appRoot + "/data/challenges/images/";
+			var baseDir = global.appRoot + config.path.challengeImages;
 
 			//Create random name for new image file
 			tmp.tmpName({ dir: baseDir }, function _tempNameGenerated(err, fullpath) {

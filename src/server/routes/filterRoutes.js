@@ -1,6 +1,7 @@
 var express = require("express");
 var dataUtils = require("../dataUtils");
 var fs = require("fs");
+var config = require("../config");
 
 var routes = function(db) {
 
@@ -22,7 +23,7 @@ var routes = function(db) {
 			dataUtils.getImageDataForChallenge(db, req.body.imageData, function(err, image){
 				if (err) throw err;
 
-				sourceImagePath = __dirname + "/../" + image;
+				sourceImagePath = global.appRoot + config.path.challengeImages + image;
 
 				imageProcessor.applyFiltersToImage(sourceImagePath, req.body.filters, function(err, imagePath){
 					if (err) throw err;
