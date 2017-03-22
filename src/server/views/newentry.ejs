@@ -6,18 +6,47 @@
 <div id="newentry">
 <img id="newentryimage" />
 </div>
-	<b>Preset Filters</b>
-	<input type="checkbox" id="checkPaint" name="preset" value="paint">Paint<br>
-	<input type="checkbox" id="checkGrayscale" name="preset" value="grayscale">Grayscale<br>
-	<input type="checkbox" id="checkCharcoal" name="preset" value="charcoal">Charcoal<br>
-	<input type="checkbox" id="checkMosaic" name="preset" value="mosaic">Mosaic<br>
-	<input type="checkbox" id="checkNegative" name="preset" value="negative">Negative<br>
-	<input type="checkbox" id="checkSolarize" name="preset" value="solarize">Solarize<br>
-	<input type="checkbox" id="checkMonochrome" name="preset" value="monochrome">Monochrome<br>
-	<input type="checkbox" id="checkSwirl" name="preset" value="swirl">Swirl<br>
-	<input type="checkbox" id="checkWave" name="preset" value="wave">Wave<br>
-	<input type="checkbox" id="checkSpread" name="preset" value="spread">Spread<br>
-  <input type="submit" id="apply" value="Apply">
+
+
+	<br>
+	<b>Effects</b><br>
+	<input type="radio" id="radioNone" name="effect" value="none"><b>None</b>
+	<input type="radio" id="radioPreset" name="effect" value="preset"><b>Preset</b>
+	<input type="radio" id="radioUserDefined" name="effect" value="user_defined"><b>User Defined</b>
+
+	<br>
+	<div id="presetSection">
+	<b>Preset Filters</b><br>
+	
+	<input type="radio" id="radioPaint" name="preset" value="paint"><b>Paint</b><input id="rangePaint" type="range" min="0" max="100" value="0" step="5"><span id="paintValue"></span><br>
+	<input type="radio" id="radioGrayscale" name="preset" value="grayscale"><b>Grayscale</b><br>
+	<input type="radio" id="radioCharcoal" name="preset" value="charcoal"><b>Charcoal</b><input id="rangeCharcoal" type="range" min="1" max="100" value="1" step="5"><span id="charcoalValue"></span><br>
+	<input type="radio" id="radioMosaic" name="preset" value="mosaic"><b>Mosaic</b><br>
+	<input type="radio" id="radioNegative" name="preset" value="negative"><b>Negative</b><br>
+	<input type="radio" id="radioSolarize" name="preset" value="solarize"><b>Solarize</b><input id="rangeSolarize" type="range" min="0" max="100" value="100" step="5"><span id="solarizeValue"></span><br>
+	<input type="radio" id="radioMonochrome" name="preset" value="monochrome"><b>Monochrome</b><br>
+	<input type="radio" id="radioSwirl" name="preset" value="swirl"><b>Swirl</b><input id="rangeSwirl" type="range" min="0" max="360" value="0" step="5"><span id="swirlValue"></span><br>
+	<input type="radio" id="radioWave" name="preset" value="wave"><b>Wave</b><br>Amplitude<input id="rangeWaveAmp" type="range" min="0" max="100" value="100" step="5"><span id="waveAmpValue"></span><br>Wavelength<input id="rangeWaveLength" type="range" min="0" max="100" value="100" step="5"><span id="waveLengthValue"></span><br>
+	<input type="radio" id="radioSpread" name="preset" value="spread"><b>Spread</b><input id="rangeSpread" type="range" min="0" max="100" value="0" step="5"><span id="spreadValue"></span><br>
+	</div>
+
+	<br>
+	<div id="userDefinedSection">
+	<b>User Defined Effects</b>
+	
+	user defined
+	</div>
+
+	<br>
+		<b>Settings</b><br>
+	<b>Contrast</b><input id="contrast" type="range" min="-100" max="100" value="0" step="5"><span id="contrastValue"></span><br>
+	<b>Brightness</b><input id="brightness" type="range" min="-100" max="100" value="0" step="5"><span id="brightnessValue"></span><br>
+	<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
+	<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
+
+
+	<br>
+  <input type="submit" id="apply" value="Post!">
 
 <script>
 	var challengeId = <%= challengeId %>;

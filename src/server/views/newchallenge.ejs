@@ -1,32 +1,31 @@
 <html>
 <head>
 <title>Delphinus - New Challenge</title>
+<link rel="stylesheet" type="text/css" href="/css/styles.css"
 </head>
 <body>
 
+<div class="title">New Challenge</div><br>
+
 <img id="newchallengeimage" />
 	
-<b>Select Image:</b><br>
-<div id="drop_zone">Drop files here</div>
-<input type="file" id="files" name="files[]" value="Browse"><br>
+<div class="sectionHeader">Challenge Image</div><br>
+<div class="selectImageSection">
+	<div id="dropzone" class="dropZone">Drop Image here</div>
+	<input type="file" id="files" class="fileBrowse" name="files[]" value="Browse"><br>
+</div>
 <output id="list"></output>
 <br><br>
 
-<b>Enter Caption:</b><br>
-<textarea rows="2" id="caption">Enter your caption here</textarea><br>
+<div class="sectionHeader">Caption</div><br>
+<div class="center">
+	<textarea rows="2" cols="50" class="textArea" id="caption">Enter your caption here</textarea><br>
+</div>
 
-<b>Enter Tags:</b><br>
-
-<b>Enter Mood:</b><br>
-<select id="moods">
-<option value="funny">Funny</option>
-<option value="hilarious">Hilarious</option>
-<option value="serious">Serious</option>
-<option value="sad">Sad</option>
-<option value="comforting">Comforting</option>
-</select>
-
-<button type="button" id="postChallenge">Post!<br>
+<br><br>
+<div class="center">
+	<button class="submitButton" id="postChallenge">Post!</button>
+</div>
 
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/newchallenge.js"></script>

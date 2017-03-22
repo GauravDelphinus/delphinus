@@ -1,10 +1,12 @@
 var express = require("express");
+var async = require("async");
+var dataUtils = require("../dataUtils");
 
 var routes = function(db) {
 
 	var entryRouter = express.Router();
 
-	entryRouter.route("/")
+	entryRouter.route("/") // ROUTER for /api/entries
 
 		.get(function(req, res){
 
@@ -44,21 +46,112 @@ var routes = function(db) {
 				POST a new entry node, and link it to a Challenge node.
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.body.challengeId + 
+
+			/**
+				First create the entry node.  Then later, link them to Filter nodes.
+			**/
+			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.body.challengeId +
 							" CREATE (e:Entry {" +
-							"steps : '" + req.body.steps + "'," +
-							"created : '" + req.body.created + "'," + 
-							"caption : '" + req.body.caption + "'" +
-							"} )-[r:PART_OF]->(c);";
-			console.log("Running cypherQuery: " + cypherQuery);
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+							"created : '" + req.body.created + "'" + 
+							"})-[:PART_OF]->(c) RETURN e;";
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+				console.log("Running cypherQuery: " + cypherQuery);
+				
+				db.cypherQuery(cypherQuery, function(err, result){
+    				if(err) throw err;
 
-    			res.json(result.data[0]);
-			});
+    				console.log(result.data); // delivers an array of query results
+    				var newEntryId = result.data[0]._id;
+
+    				//res.json(result.data[0]);
+
+    				/**
+						Next extract all the filters, decorations, layouts and artifacts, and create the
+						respective nodes, and link them to the entry node.
+					**/
+
+					var createFilterNodesFunctions = []; // array of functions that will create the Filter Nodes
+
+					// FILTERS
+					if (req.body.filters && (req.body.filters.constructor === Array)) {
+						for (var i = 0; i < req.body.filters.length; i++) {
+							var filter = req.body.filters[i];
+
+							if (filter.effects.type == "user_defined") {
+								var userDefinedFilterNodeId = parseInt(filter.effects.user_defined);
+								createFilterNodesFunctions.push(function(callback) {
+									callback(null, userDefinedFilterNodeId);
+								});
+							} else {
+								createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter));
+							}
+							/*
+							if (filter.type == "preset") {
+								// the value coming in the 'preset' value is the id of the Filter Node for the preset filter
+								nodeId = parseInt(filter.preset);
+								createFilterNodesFunctions.push(function(callback) {
+									console.log("preset function called, calling callback with nodeId = " + nodeId);
+									callback(null, nodeId);
+								});
+
+							} else if (filter.type == "user_defined") {
+								// the valu ecoming in the 'user_defined' value is the id of the Filter Node for the user defined filter
+								nodeId = parseInt(filter.user_defined);
+								createFilterNodesFunctions.push(function(callback) {
+									console.log("user_defined function called, calling callback with nodeId = " + nodeId);
+									callback(null, nodeId);
+								});
+							} else if (filter.type == "custom") {
+								
+								var createFilterQuery = "CREATE (f: Filter {" +
+														"type: 'custom', ";
+								createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter.custom));
+								
+
+							}
+							*/
+						}
+					}
+
+					// LAYOUTS
+
+					async.series(createFilterNodesFunctions, 
+						function(err, filterNodes) {
+
+							var cypherQuery = "MATCH (e:Entry) WHERE id(e) = " + newEntryId + "";
+							console.log("filterNodes, num values = " + filterNodes.length);
+							for (var i = 0; i < filterNodes.length; i++) {
+								console.log("filterNodes, " + i + " = " + filterNodes[i]);
+
+								// Now associate filters to the new entry
+								cypherQuery += " MATCH (f" + i + ":Filter) WHERE id(f" + i + ") = " + filterNodes[i] + "";
+							}
+
+							cypherQuery += " CREATE ";
+
+							for (var i = 0; i < filterNodes.length; i++) {
+								if (i > 0) {
+									cypherQuery += " , ";
+								}
+								cypherQuery += " (f" + i + ")<-[:USES {order : '" + i + "'}]-(e) ";
+							}
+
+							cypherQuery += ";";
+
+							console.log("cypherQuery is: " + cypherQuery);
+
+							db.cypherQuery(cypherQuery, function(err, result){
+    							if(err) throw err;
+
+    							var responseJSON = {};
+								responseJSON.entryId = newEntryId;
+								res.json(JSON.stringify(responseJSON));
+    						});
+							
+						});
+						});
+
+			
 		});
 
 	entryRouter.route("/:entryId")
@@ -80,7 +173,7 @@ var routes = function(db) {
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
     			var entryObject = result.data[0];
-    			entryObject.image = "/data/entries/images/" + req.params.entryId;
+    			entryObject.image = "/entries/images/" + req.params.entryId;
     			res.json(entryObject);
 			});
 		})

@@ -100,7 +100,7 @@ module.exports = function() {
 		dataUtils.getImageDataForEntry(db, req.params.entryId, function(err, imageData){
 			if (err) throw err;
 
-			imageProcessor.applyStepsToImage(imageData.imagePath, imageData.steps, function(err, image){
+			imageProcessor.applyFiltersToImage(imageData.image, imageData.filters, function(err, image){
 				console.log("err is " + err);
 				if (err) throw err;
 

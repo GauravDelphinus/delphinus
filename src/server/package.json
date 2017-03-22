@@ -15,7 +15,7 @@
   "author": "EzeeIdeas",
   "license": "ISC",
   "dependencies": {
-    "async": "^1.5.0",
+    "async": "^1.5.2",
     "body-parser": "^1.14.2",
     "cookie-parser": "^1.4.0",
     "ejs": "^2.3.4",

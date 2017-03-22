@@ -2,7 +2,7 @@ $(document).ready(function(){
 	 document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
 	   // Setup the dnd listeners.
-  var dropZone = document.getElementById('drop_zone');
+  var dropZone = document.getElementById('dropzone');
   dropZone.addEventListener('dragover', handleDragOver, false);
   dropZone.addEventListener('drop', handleFileDropped, false);
 
@@ -38,7 +38,7 @@ function handleFileSelect(evt) {
         return function(e) {
           // Render image.
           var span = document.createElement('span');
-          span.innerHTML = ['<img id="challengeImage" src="', e.target.result,
+          span.innerHTML = ['<img id="challengeImage" class="centerImage" src="', e.target.result,
                             '" title="', escape(theFile.name), '"/>'].join('');
           //alert("span is " + span);
           document.getElementById('list').insertBefore(span, null);

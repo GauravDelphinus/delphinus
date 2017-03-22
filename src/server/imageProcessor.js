@@ -445,63 +445,75 @@ module.exports = {
 		The caller is responsible for disposing of the returned
 		image once it has finished processing it.
 
-		filters is an array of this form:
+		We could have one of these types of objects representing the filers and decorations that need to be applied
+		on top of the image:
+		
+		filters
+		decorations
+		artifacts
+		layouts
 
-		filters = [
+		filters : [
 		{
-			type: effects,
-			effect-type: custom | preset | user-defined,
-			custom: {
-				brightness: <-100 to 100>,
-				hue: <0 to 100>,
-				gamma: <0 to 10>,
-				blur : { // Blur the image using the specified radius and optional standard deviation
-					type: default | gaussian | motion, // Type of blur.  In case of motion blur, the angle property is used if specified
-					radius : <number>,
-					sigma : <number>,
-					angle: <number> // used only in case of motion blur
-				},
-				contrast: <-100 to 100>,
-				saturation: <-100 to 100>,
-				sepia: on | off,
-				noise : { // Add or reduce noise in the image.  Expected to result in two commands - first set type, then set Noise radius
-					type: uniform | guassian | multiplicative | impulse | laplacian | poisson // Type of noise
-					radius: <number> // Radius used to adjust the effect of current noise type
-				},
-				sharpen { // Sharpen the given image
-					type: default | gaussian,  // gaussian uses the unsharp option)
-					radius: <number>,
-					sigma : <number> (optional)
-				}
-				// consider adding more options from the "Others" list below
+			effect_type: none | preset | user_defined;
+			preset: {
+					paint: <radius>
+					charcoal: on | off,
+					grayscale: on | off,
+					mosaic: on | off,
+					monochrome: on | off,
+					negative: on | off,
+					paint: <radius>,
+					solarize: on | off,
+					spread: <value>,
+					swirl: <value>,
+					wave: <size>m
+					//other custom types such as:
+					rain_day: <val>,
+					sunshine: <val>
 			}
-			preset: <one of the below>
-					- charcoal
-					- grayscale
-					- mosaic
-					- monochrome
-					- negative
-					- paint
-					- solarize
-					- spread
-					- swirl
-					- wave
-					- above list subject to review and could add more options after playing with it,
-			user-defined: <id>
-		},
+			user_defined: <id>
+
+			settings: {
+					brightness: <-100 to 100>,
+					hue: <0 to 100>,
+					gamma: <0 to 10>,
+					blur : { // Blur the image using the specified radius and optional standard deviation
+						type: default | gaussian | motion, // Type of blur.  In case of motion blur, the angle property is used if specified
+						radius : <number>,
+						sigma : <number>,
+						angle: <number> // used only in case of motion blur
+					},
+					contrast: <-100 to 100>,
+					saturation: <-100 to 100>,
+					sepia: on | off,
+					noise : { // Add or reduce noise in the image.  Expected to result in two commands - first set type, then set Noise radius
+						type: uniform | guassian | multiplicative | impulse | laplacian | poisson // Type of noise
+						radius: <number> // Radius used to adjust the effect of current noise type
+					},
+					sharpen { // Sharpen the given image
+						type: default | gaussian,  // gaussian uses the unsharp option)
+						radius: <number>,
+						sigma : <number> (optional)
+					}
+					// consider adding more options from the "Others" list below
+			}
+		}
+		],
+		decorations: [
 		{
-			type: decoration,
-			decoration-type: border,
+			type: border,
 			//one of decoration types below
 			border : { //Draw a border around the image, of the specified dimensions and color
 				width : <number>,
 				height : <number>,
 				color : <color>
 			}
-		},
+		}
+		],
+		artifacts: [
 		{
-			type: artifact,
-			artifact-type: banner | callout | freetext,
+			type: banner | callout | freetext,
 			banner: {
 				position: top | bottom,
 				font: {
@@ -529,10 +541,11 @@ module.exports = {
 				text: "text to draw",
 				background: <color> //allow for transparency
 			}
-		},
+		}
+		],
+		layouts: [
 		{
-			type: layout,
-			layout-type: size | rotation | crop | mirror | shear,
+			type: size | rotation | crop | mirror | shear,
 			//one of the items below
 			size: {
 				width: <number>,
@@ -554,6 +567,7 @@ module.exports = {
 				yDegrees: <number>
 			}
 		}
+		]
 	]
 
 	Set public = true if you want the returned output image path to be publicly accessible
@@ -562,6 +576,7 @@ module.exports = {
 	applyFiltersToImage : function(sourceImage, filters, next) {
 
 		console.log("applyFiltersToImage: imagePath is " + sourceImage);
+		console.log("filters: " + filters);
 
 		var tmp = require('tmp');
 
@@ -575,7 +590,54 @@ module.exports = {
     		//loop through filters
     		var numFilters = filters.length;
     		for (var i = 0; i < numFilters; i++) {
-    			console.log("filters type = " + filters[i].type);
+    			//console.log("filters type = " + filters[i].type);
+
+    			var filter = filters[i];
+
+    			// NOTE: the filter object sent to the image processor does *not* have the custom/preset/user_defined objects
+    			// because all those are normalized/resolved by the time the information reaches the image process.
+    			// The image processor expects actual settings, and does not need to worry about where they are coming from.
+    			// So the format here skips the custom/preset/user_defined level in the object hierarchy.
+    			console.log("filter is: " + filter);
+    			if (filter.settings) {
+
+    				// Brigthness, Saturation and Hue
+    				image.modulate(absoluteToPercentageChangeSigned(filter.settings.brightness), 
+    								absoluteToPercentageChangeSigned(filter.settings.saturation),
+    								absoluteToPercentageChangeSigned(filter.settings.hue));
+    						
+    				// Contrast
+    				image.contrast(absoluteToMultiplierSigned(filter.settings.contrast));
+    						
+    				// ADD MORE
+    			}
+
+    			if (filter.effects) {
+    				if (filter.effects.type == "preset") {
+    					if (filter.effects.preset == "paint") {
+    						image.paint(filter.effects.paint.radius);
+    					} else if (filter.effects.preset == "grayscale") {
+    						image.colorspace("GRAY");
+    					} else if (filter.effects.preset == "mosaic") {
+    						image.mosaic();
+    					} else if (filter.effects.preset == "negative") {
+    						image.negative();
+    					} else if (filter.effects.preset == "solarize") {
+    						image.solarize(filter.effects.solarize.threshold);
+    					} else if (filter.effects.preset == "monochrome") {
+    						image.monochrome();
+    					} else if (filter.effects.preset == "swirl") {
+    						image.swirl(filter.effects.swirl.degrees);
+    					} else if (filter.effects.preset == "wave") {
+    						image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
+    					} else if (filter.effects.preset == "spread") {
+    						image.spread(filter.effects.spread.amount);
+    					} else if (filter.effects.preset == "charcoal") {
+    						image.charcoal(filter.effects.charcoal.factor);
+    					}
+    				}
+    			}
+    			/*
     			if (filters[i].type == "effects") {
     				console.log("filters effectType = " + filters[i].effectType);
     				if (filters[i].effectType == "preset") {
@@ -613,6 +675,7 @@ module.exports = {
     					}
     				}
     			}
+    			*/
 			}
 			writeImage(image, path, next);
 		});
@@ -627,4 +690,33 @@ function writeImage(image, imagePath, next) {
 		next(0, imagePath);
 	});
 
+}
+
+/**
+	Convert from the -100 to 100 range to a %age change.
+
+	E.g., 0 -> 100%, -100 -> 0%, 100 -> 200%, etc.
+**/
+function absoluteToPercentageChangeSigned(absoluteValue) {
+	if (absoluteValue < -100) {
+		absoluteValue = -100;
+	} else if (absoluteValue > 100) {
+		absoluteValue = 100;
+	}
+
+	var percentageChange = absoluteValue + 100;
+
+	return percentageChange;
+}
+
+function absoluteToMultiplierSigned(absoluteValue) {
+	if (absoluteValue < -100) {
+		absoluteValue = -100;
+	} else if (absoluteValue > 100) {
+		absoluteValue = 100;
+	}
+
+	var multiplierValue = absoluteValue;
+
+	return multiplierValue;
 }

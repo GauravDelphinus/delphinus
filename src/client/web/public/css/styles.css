@@ -1,11 +1,62 @@
-.challengeTitle {
+.title {
+	text-align: center;
 	font-family: "Times New Roman", Times, serif;	
 	font-size: 40px;
 	font-weight: bold;
 }
 
-.challengeCreationDate {
+.creationDate {
 	font-family: "Times New Roman", Times, serif;
 	font-size: 30px;
 	font-style: italic;
+}
+
+.sectionHeader {
+	text-align: center;
+	font-family: "Times New Roman", Times, serif;	
+	font-size: 30px;
+	font-weight: bold;
+}
+
+.submitButton {
+	font: bold 24px arial;
+	font-weight: bold;
+	display: inline-block;
+	margin: auto;
+	text-align: center;
+}
+
+#dropzone {
+	position: relative;
+	border: 10px dotted gray;
+	border-radius: 20px;
+	color: gray;
+	font: bold 24px/200px arial;
+	height: 200px;
+	margin: 30px auto;
+	text-align: center;
+	width: 200px;
+}
+
+.selectImageSection {
+	margin: auto;
+	width: 60%;
+	text-align: center;
+	font: 24px/200px arial;
+}
+
+.textArea {
+	font: 24px arial;
+}
+
+.center {
+	margin: auto;
+	width: 60%;
+	text-align: center;
+}
+
+.centerImage {
+    display: block;
+    margin: auto;
+    width: 40%;
 }

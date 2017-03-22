@@ -1,7 +1,7 @@
 var express = require("express");
 var tmp = require("tmp");
 var path = require("path");
-var confi = require("../config");
+var config = require("../config");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();

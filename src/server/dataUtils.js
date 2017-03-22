@@ -1,3 +1,5 @@
+var config = require('./config');
+
 module.exports = {
 
 	/**
@@ -48,29 +50,179 @@ module.exports = {
 		}
 	**/
 	getImageDataForEntry : function(db, entryId, next) {
-		var cypherQuery = "MATCH (e:Entry) WHERE id(e) = " + entryId + " RETURN e.steps;";
 
-		db.cypherQuery(cypherQuery, function(err, result){
-	    	if(err) throw err;
-
-	    	console.log(result.data); // delivers an array of query results
-
-	    	var steps = result.data[0];
-
-	    	// Now fetch the corresponding Challenge entry, and extract the original image
-	    	var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry) WHERE id(e) = " + entryId + " RETURN c.image;"
-	    	db.cypherQuery(fetchChallengeQuery, function(err, output){
+		// First get the original image from the challenge
+		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry) WHERE id(e) = " + entryId + " RETURN c.image;"
+		db.cypherQuery(fetchChallengeQuery, function(err, output){
 	    		if (err) throw err;
 
 	    		console.log(output.data);
 	    		var image = output.data[0];
+	    		var imagePath = global.appRoot + config.path.challengeImages + image;
 
-	    		console.log("Image is " + image + ", Steps is " + steps);
+	    		console.log("Image is " + imagePath);
 
-	    		next(0, { "imagePath" : image, "steps" : steps});
+	    		// Now, get the filters attached to this image
+
+				var cypherQuery = "MATCH (e:Entry)-[u:USES]->(f:Filter) WHERE id(e) = " + entryId + " RETURN f ORDER BY u.order;";
+
+				db.cypherQuery(cypherQuery, function(err, result){
+	    			if(err) throw err;
+
+	    			console.log(result.data); // delivers an array of query results
+
+	    			var filtersFromDB = result.data;
+	    			var filters = [];
+
+	    			// Now construct the filters array in the JSON format
+	    			for (var i = 0; i < filtersFromDB.length; i++) {
+	    				var filterFromDB = filtersFromDB[i];
+	    				var filter = {};
+	    				filter.effects = {};
+
+	    				if (filterFromDB.effects_type == "none") {
+	    		
+	    					filter.effects.type = "none";
+	    				} else if (filterFromDB.effects_type == "preset") {
+	    					filter.effects.type = "preset";
+
+	    					if (filterFromDB.effects_preset == "paint") {
+	    						filter.effects.preset = "paint";
+	    						filter.effects.paint = {};
+	    						filter.effects.paint.radius = filterFromDB.effects_paint_radius;
+	    					} else if (filterFromDB.effects_preset == "monochrome") {
+	    						filter.effects.preset = "monochrome";
+	    					} else if (filterFromDB.effects_preset == "grayscale") {
+	    						filter.effects.preset = "grayscale";
+	    					} else if (filterFromDB.effects_preset == "mosaic") {
+	    						filter.effects.preset = "mosaic";
+	    					}
+
+	    					// ADD MORE
+	    				}
+
+	    				filter.settings = {};
+	    				filter.settings.brightness = filterFromDB.settings_brightness;
+	    				filter.settings.hue = filterFromDB.settings_hue;
+	    				filter.settings.saturation = filterFromDB.settings_saturation;
+	    				filter.settings.contrast = filterFromDB.settings_contrast;
+	    			
+
+	   					// ADD MORE
+
+	    				filters.push(filter);
+	    			}
+
+	    			next(0, { "image" : imagePath, "filters" : filters});
 	    	});
 
 		});
 
+	},
+
+	/**
+		Normalize / expand the filters array such that all indirect references
+		(such as filter node ids, etc.) are resolved to actual settings that can 
+		be processed by the Image Processor.
+	**/
+	normalizeFilters: function (filters, next) {
+		next(0, filters);
+	},
+
+	/**
+		Create a new filter Node in the db with the supplied information in JSON format.
+
+		Returns the id of the newly created node.
+
+		Format of JSON: (mapped from 'custom' object in the full JSON sent up by the client)
+			filter: {
+				settings: {
+					brightness: <-100 to 100>,
+					contrast: <-100 to 100>,
+					hue: <-100 to 100>,
+					gamma: <0 to 10>,
+					blur : { // Blur the image using the specified radius and optional standard deviation
+						type: default | gaussian | motion, // Type of blur.  In case of motion blur, the angle property is used if specified
+						radius : <number>,
+						sigma : <number>,
+						angle: <number> // used only in case of motion blur
+					},
+					saturation: <-100 to 100>,
+					sepia: on | off,
+					noise : { // Add or reduce noise in the image.  Expected to result in two commands - first set type, then set Noise radius
+						type: uniform | guassian | multiplicative | impulse | laplacian | poisson // Type of noise
+						radius: <number> // Radius used to adjust the effect of current noise type
+					},
+					sharpen { // Sharpen the given image
+						type: default | gaussian,  // gaussian uses the unsharp option)
+						radius: <number>,
+						sigma : <number> (optional)
+					}
+					// consider adding more options from the "Others" list below
+				}
+				effects: {
+					charcoal: on | off,
+					grayscale: on | off,
+					mosaic: on | off,
+					monochrome: on | off,
+					negative: on | off,
+					paint: <radius>,
+					solarize: on | off,
+					spread: <value>,
+					swirl: <value>,
+					wave: <size>
+				}
+			}
+	**/
+	createFilterNode : function(db, filter, callback) {
+		var cypherQuery = "CREATE (f:Filter {";
+
+		if (filter.effects.type == "none") {
+			cypherQuery += " effects_type : 'none' ";
+		} else if (filter.effects.type == "preset") {
+			cypherQuery += " effects_type : 'preset'";
+
+			if (filter.effects.preset == "paint") {
+				cypherQuery += ", effects_preset : 'paint' ";
+				cypherQuery += ", effects_paint_radius : " + filter.effects.paint.radius;
+			} else if (filter.effects.preset == "grayscale") {
+				cypherQuery += ", effects_preset : 'grayscale' ";
+			}
+			
+		} // TODO - careful about this case.  Can else every happen?  Maybe throw in that case?
+
+		if (filter.settings) {
+			cypherQuery += ", settings_brightness : " + ((filter.settings.brightness) ? (filter.settings.brightness) : (0));
+			cypherQuery += ", settings_contrast : " + ((filter.settings.contrast) ? (filter.settings.contrast) : (0));
+			cypherQuery += ", settings_hue : " + ((filter.settings.hue) ? (filter.settings.hue) : (0));
+			cypherQuery += ", settings_saturation: " + ((filter.settings.saturation) ? (filter.settings.saturation) : (0));
+		}
+		/// ADD MORE
+
+		cypherQuery += "}) RETURN f;";
+
+		console.log("Running cypherQuery: " + cypherQuery);
+				
+		db.cypherQuery(cypherQuery, function(err, result){
+    		if(err) throw err;
+
+    		console.log(result.data[0]); // delivers an array of query results
+
+    		var filterID = result.data[0]._id;
+			callback(null, filterID);
+		});
+	},
+
+	createDecorationNode : function(db, decorationJSON) {
+
+	},
+
+	createArtifactNode : function(db, artifactJSON) {
+
+	},
+
+	createLayoutNode : function(db, layoutJSON) {
+
 	}
+
 }
