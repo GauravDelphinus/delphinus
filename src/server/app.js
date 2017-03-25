@@ -61,6 +61,11 @@ module.exports = function() {
 		from the browser client and not with explicit client code.
 	**/
 
+	// 0 - Home Page
+	app.get("/", function(req, res) {
+		res.render("index");
+	});
+
 	// 1 - Challenge Page
 	app.get("/challenge/:challengeId", function(req, res) {
 		res.render("challenge", {challengeId: req.params.challengeId});

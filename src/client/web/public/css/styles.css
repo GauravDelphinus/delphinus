@@ -1,19 +1,26 @@
 .title {
 	text-align: center;
-	font-family: "Times New Roman", Times, serif;	
+	font-family: arial;	
 	font-size: 40px;
 	font-weight: bold;
 }
 
+.subTitle {
+	text-align: center;
+	font-family: arial;	
+	font-size: 30px;
+	font-weight: bold;
+}
+
 .creationDate {
-	font-family: "Times New Roman", Times, serif;
+	font-family: arial;
 	font-size: 30px;
 	font-style: italic;
 }
 
 .sectionHeader {
 	text-align: center;
-	font-family: "Times New Roman", Times, serif;	
+	font-family: arial;	
 	font-size: 30px;
 	font-weight: bold;
 }
@@ -36,6 +43,12 @@
 	margin: 30px auto;
 	text-align: center;
 	width: 200px;
+}
+
+.settingsBlock {
+	margin: auto;
+	width: 60%;
+	font: 24px arial;
 }
 
 .selectImageSection {

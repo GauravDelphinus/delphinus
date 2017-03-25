@@ -3,8 +3,10 @@ $(document).ready(function(){
 });
 
 function parseEntry(entry) {
-	$("#entry").empty();
-	$("#entry").append($("<img>").attr("src", entry.image));
-	$("#entry").append($("<p>").text(entry.caption));
-	$("#entry").append($("<p>").text(entry.created));
+
+	$("#entryImage").attr("src", entry.image);
+	$("#entryTitle").text("Entry: " + entryId);
+	$(document).prop("title", "Entry: " + entryId);
+	var date = new Date(parseInt(entry.created));
+	$("#entryCreationDate").text(date.toString());
 }
