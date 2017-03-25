@@ -24,7 +24,11 @@ $(document).ready(function(){
 
 	$("input[type=radio][name=preset]").change(applyChanges);
 
+
 	$("input[type=range]").change(applyChanges);
+
+	// Set default selection to 'preset'
+	//$("input:radio[name=effect]").filter("[value=none]").prop("checked", true);
 
 	$("input[type=radio][name=effect]").change(function() {
 		if (this.value == 'none') {

@@ -90,16 +90,39 @@ module.exports = {
 	    						filter.effects.preset = "paint";
 	    						filter.effects.paint = {};
 	    						filter.effects.paint.radius = filterFromDB.effects_paint_radius;
-	    					} else if (filterFromDB.effects_preset == "monochrome") {
-	    						filter.effects.preset = "monochrome";
 	    					} else if (filterFromDB.effects_preset == "grayscale") {
 	    						filter.effects.preset = "grayscale";
+	    					} else if (filterFromDB.effects_preset == "charcoal") {
+	    						filter.effects.preset = "charcoal";
+	    						filter.effects.charcoal = {};
+	    						filter.effects.charcoal.factor = filterFromDB.effects_charcoal_factor;
 	    					} else if (filterFromDB.effects_preset == "mosaic") {
 	    						filter.effects.preset = "mosaic";
+	    					} else if (filterFromDB.effects_preset == "negative") {
+	    						filter.effects.preset = "negative";
+	    					} else if (filterFromDB.effects_preset == "solarize") {
+	    						filter.effects.preset = "solarize";
+	    						filter.effects.solarize = {};
+	    						filter.effects.solarize.threshold = filterFromDB.effects_solarize_threshold;
+	    					} else if (filterFromDB.effects_preset == "monochrome") {
+	    						filter.effects.preset = "monochrome";
+	    					} else if (filterFromDB.effects_preset == "swirl") {
+	    						filter.effects.preset = "swirl";
+	    						filter.effects.swirl = {};
+	    						filter.effects.swirl.degrees = filterFromDB.effects_swirl_degrees;
+	    					} else if (filterFromDB.effects_preset == "wave") {
+	    						filter.effects.preset = "wave";
+	    						filter.effects.wave = {};
+	    						filter.effects.wave.amplitude = filterFromDB.effects_wave_amplitude;
+	    						filter.effects.wave.wavelength = filterFromDB.effects_wave_wavelength;
+	    					} else if (filterFromDB.effects_preset == "spread") {
+	    						filter.effects.preset = "spread";
+	    						filter.effects.spread = {};
+	    						filter.effects.spread.amount = filterFromDB.effects_spread_amount;
 	    					}
 
 	    					// ADD MORE
-	    				}
+	    				} 
 
 	    				filter.settings = {};
 	    				filter.settings.brightness = filterFromDB.settings_brightness;
@@ -187,6 +210,28 @@ module.exports = {
 				cypherQuery += ", effects_paint_radius : " + filter.effects.paint.radius;
 			} else if (filter.effects.preset == "grayscale") {
 				cypherQuery += ", effects_preset : 'grayscale' ";
+			} else if (filter.effects.preset == "charcoal") {
+				cypherQuery += ", effects_preset : 'charcoal' ";
+				cypherQuery += ", effects_charcoal_factor : " + filter.effects.charcoal.factor;
+			} else if (filter.effects.preset == "mosaic") {
+				cypherQuery += ", effects_preset : 'mosaic' ";
+			} else if (filter.effects.preset == "negative") {
+				cypherQuery += ", effects_preset : 'negative' ";
+			} else if (filter.effects.preset == "solarize") {
+				cypherQuery += ", effects_preset : 'solarize' ";
+				cypherQuery += ", effects_solarize_threshold : " + filter.effects.solarize.threshold;
+			} else if (filter.effects.preset == "monochrome") {
+				cypherQuery += ", effects_preset : 'monochrome' ";
+			} else if (filter.effects.preset == "swirl") {
+				cypherQuery += ", effects_preset : 'swirl' ";
+				cypherQuery += ", effects_swirl_degrees : " + filter.effects.swirl.degrees;
+			} else if (filter.effects.preset == "wave") {
+				cypherQuery += ", effects_preset : 'wave' ";
+				cypherQuery += ", effects_wave_amplitude : " + filter.effects.wave.amplitude;
+				cypherQuery += ", effects_wave_wavelength : " + filter.effects.wave.wavelength;
+			} else if (filter.effects.preset == "spread") {
+				cypherQuery += ", effects_preset : 'spread' ";
+				cypherQuery += ", effects_spread_amount : " + filter.effects.spread.amount;
 			}
 			
 		} // TODO - careful about this case.  Can else every happen?  Maybe throw in that case?

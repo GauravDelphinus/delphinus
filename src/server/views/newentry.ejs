@@ -10,14 +10,16 @@
 
 
 	<br>
-	<div id="presetSection" class="settingsBlock">
+	<div id="effectsSection" class="settingsBlock">
 		<span class="title">Effects</span><br>
 		<input type="radio" id="radioNone" name="effect" value="none"><b>None</b>
-		<input type="radio" id="radioPreset" name="effect" value="preset"><b>Preset</b>
+		<input type="radio" id="radioPreset" name="effect" value="preset" checked="checked"><b>Preset</b>
 		<input type="radio" id="radioUserDefined" name="effect" value="user_defined"><b>User Defined</b>
 
 		<br>
-		<div id="presetSection" class="settingsBlock">
+		<div id="presetSection" class="settingsSubBlock">
+
+		<br><br>
 		<span class="subTitle">Preset Filters</span><br>
 		
 		<input type="radio" id="radioPaint" name="preset" value="paint"><b>Paint</b><input id="rangePaint" type="range" min="0" max="100" value="0" step="5"><span id="paintValue"></span><br>
@@ -28,12 +30,12 @@
 		<input type="radio" id="radioSolarize" name="preset" value="solarize"><b>Solarize</b><input id="rangeSolarize" type="range" min="0" max="100" value="100" step="5"><span id="solarizeValue"></span><br>
 		<input type="radio" id="radioMonochrome" name="preset" value="monochrome"><b>Monochrome</b><br>
 		<input type="radio" id="radioSwirl" name="preset" value="swirl"><b>Swirl</b><input id="rangeSwirl" type="range" min="0" max="360" value="0" step="5"><span id="swirlValue"></span><br>
-		<input type="radio" id="radioWave" name="preset" value="wave"><b>Wave</b><br>Amplitude<input id="rangeWaveAmp" type="range" min="0" max="100" value="100" step="5"><span id="waveAmpValue"></span><br>Wavelength<input id="rangeWaveLength" type="range" min="0" max="100" value="100" step="5"><span id="waveLengthValue"></span><br>
+		<input type="radio" id="radioWave" name="preset" value="wave"><b>Wave</b>Amplitude<input id="rangeWaveAmp" type="range" min="0" max="100" value="100" step="5"><span id="waveAmpValue"></span><br>Wavelength<input id="rangeWaveLength" type="range" min="0" max="100" value="100" step="5"><span id="waveLengthValue"></span><br>
 		<input type="radio" id="radioSpread" name="preset" value="spread"><b>Spread</b><input id="rangeSpread" type="range" min="0" max="100" value="0" step="5"><span id="spreadValue"></span><br>
 		</div>
 
 		<br>
-		<div id="userDefinedSection" class="settingsBlock">
+		<div id="userDefinedSection" class="settingsSubBlock">
 		<span class="subTitle">User Defined Filters</span><br>
 		
 
@@ -50,7 +52,10 @@
 	</div>
 
 	<br>
-  <input type="submit" id="apply" value="Post!">
+<br><br>
+<div class="center">
+	<button class="submitButton" id="apply">Post Entry!</button>
+</div>
 
 <script>
 	var challengeId = <%= challengeId %>;

@@ -48,7 +48,13 @@
 .settingsBlock {
 	margin: auto;
 	width: 60%;
-	font: 24px arial;
+	font: 22px arial;
+}
+
+.settingsSubBlock {
+	margin: auto;
+	width: 100%;
+	font: 20px arial;
 }
 
 .selectImageSection {
