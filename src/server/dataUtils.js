@@ -80,56 +80,70 @@ module.exports = {
 	    				var filter = {};
 	    				filter.effects = {};
 
-	    				if (filterFromDB.effects_type == "none") {
+	    				if (filterFromDB.filterType == "none") {
 	    		
-	    					filter.effects.type = "none";
-	    				} else if (filterFromDB.effects_type == "preset") {
-	    					filter.effects.type = "preset";
+	    					// shouldn't happen
+	    					throw err;
+	    				} else if (filterFromDB.filterType == "custom") {
+	    					filter.type = "custom";
 
-	    					if (filterFromDB.effects_preset == "paint") {
-	    						filter.effects.preset = "paint";
+	    					filter.effects = {};
+
+	    					if (filterFromDB.effects_paint == "on") {
 	    						filter.effects.paint = {};
 	    						filter.effects.paint.radius = filterFromDB.effects_paint_radius;
-	    					} else if (filterFromDB.effects_preset == "grayscale") {
-	    						filter.effects.preset = "grayscale";
-	    					} else if (filterFromDB.effects_preset == "charcoal") {
-	    						filter.effects.preset = "charcoal";
+	    					}
+	    					if (filterFromDB.effects_grayscale == "on") {
+	    						filter.effects.grayscale = "on";
+	    					}
+	    					if (filterFromDB.effects_charcoal == "on") {
 	    						filter.effects.charcoal = {};
 	    						filter.effects.charcoal.factor = filterFromDB.effects_charcoal_factor;
-	    					} else if (filterFromDB.effects_preset == "mosaic") {
-	    						filter.effects.preset = "mosaic";
-	    					} else if (filterFromDB.effects_preset == "negative") {
-	    						filter.effects.preset = "negative";
-	    					} else if (filterFromDB.effects_preset == "solarize") {
-	    						filter.effects.preset = "solarize";
+	    					}
+	    					if (filterFromDB.effects_mosaic == "on") {
+	    						filter.effects.mosaic = "on";
+	    					}
+	    					if (filterFromDB.effects_negative == "on") {
+	    						filter.effects.negative = "on";
+	    					}
+	    					if (filterFromDB.effects_solarize == "on") {
 	    						filter.effects.solarize = {};
 	    						filter.effects.solarize.threshold = filterFromDB.effects_solarize_threshold;
-	    					} else if (filterFromDB.effects_preset == "monochrome") {
-	    						filter.effects.preset = "monochrome";
-	    					} else if (filterFromDB.effects_preset == "swirl") {
-	    						filter.effects.preset = "swirl";
+	    					}
+	    					if (filterFromDB.effects_monochrome == "on") {
+	    						filter.effects.monochrome = "on";
+	    					}
+	    					if (filterFromDB.effects_swirl == "on") {
 	    						filter.effects.swirl = {};
 	    						filter.effects.swirl.degrees = filterFromDB.effects_swirl_degrees;
-	    					} else if (filterFromDB.effects_preset == "wave") {
-	    						filter.effects.preset = "wave";
+	    					}
+	    					if (filterFromDB.effects_wave == "on") {
 	    						filter.effects.wave = {};
 	    						filter.effects.wave.amplitude = filterFromDB.effects_wave_amplitude;
 	    						filter.effects.wave.wavelength = filterFromDB.effects_wave_wavelength;
-	    					} else if (filterFromDB.effects_preset == "spread") {
-	    						filter.effects.preset = "spread";
+	    					}
+	    					if (filterFromDB.effects_spread == "on") {
 	    						filter.effects.spread = {};
 	    						filter.effects.spread.amount = filterFromDB.effects_spread_amount;
 	    					}
 
 	    					// ADD MORE
-	    				} 
 
-	    				filter.settings = {};
-	    				filter.settings.brightness = filterFromDB.settings_brightness;
-	    				filter.settings.hue = filterFromDB.settings_hue;
-	    				filter.settings.saturation = filterFromDB.settings_saturation;
-	    				filter.settings.contrast = filterFromDB.settings_contrast;
-	    			
+	    					filter.settings = {};
+
+	    					if (filterFromDB.settings_brightness == "on") {
+	    						filter.settings.brightness = { value: filterFromDB.settings_brightness_value};
+	    					}
+	    					if (filterFromDB.settings_hue == "on") {
+	    						filter.settings.hue = { value: filterFromDB.settings_hue_value};
+	    					}
+	    					if (filterFromDB.settings_saturation == "on") {
+	    						filter.settings.saturation = { value: filterFromDB.settings_saturation_value};
+	    					}
+	    					if (filterFromDB.settings_contrast == "on") {
+	    						filter.settings.contrast = { value: filterFromDB.settings_contrast_value};
+	    					}
+	    				} 
 
 	   					// ADD MORE
 
@@ -200,48 +214,74 @@ module.exports = {
 	createFilterNode : function(db, filter, callback) {
 		var cypherQuery = "CREATE (f:Filter {";
 
-		if (filter.effects.type == "none") {
-			cypherQuery += " effects_type : 'none' ";
-		} else if (filter.effects.type == "preset") {
-			cypherQuery += " effects_type : 'preset'";
+		if (filter.type == "none") {
+			// shouldn't be here.  Client shouldn't send this up at all, and there's no need to create
+			// a filter node.
+			throw err;
+		} else if (filter.type == "custom") {
+			cypherQuery += " filterType : 'custom'";
 
-			if (filter.effects.preset == "paint") {
-				cypherQuery += ", effects_preset : 'paint' ";
-				cypherQuery += ", effects_paint_radius : " + filter.effects.paint.radius;
-			} else if (filter.effects.preset == "grayscale") {
-				cypherQuery += ", effects_preset : 'grayscale' ";
-			} else if (filter.effects.preset == "charcoal") {
-				cypherQuery += ", effects_preset : 'charcoal' ";
-				cypherQuery += ", effects_charcoal_factor : " + filter.effects.charcoal.factor;
-			} else if (filter.effects.preset == "mosaic") {
-				cypherQuery += ", effects_preset : 'mosaic' ";
-			} else if (filter.effects.preset == "negative") {
-				cypherQuery += ", effects_preset : 'negative' ";
-			} else if (filter.effects.preset == "solarize") {
-				cypherQuery += ", effects_preset : 'solarize' ";
-				cypherQuery += ", effects_solarize_threshold : " + filter.effects.solarize.threshold;
-			} else if (filter.effects.preset == "monochrome") {
-				cypherQuery += ", effects_preset : 'monochrome' ";
-			} else if (filter.effects.preset == "swirl") {
-				cypherQuery += ", effects_preset : 'swirl' ";
-				cypherQuery += ", effects_swirl_degrees : " + filter.effects.swirl.degrees;
-			} else if (filter.effects.preset == "wave") {
-				cypherQuery += ", effects_preset : 'wave' ";
-				cypherQuery += ", effects_wave_amplitude : " + filter.effects.wave.amplitude;
-				cypherQuery += ", effects_wave_wavelength : " + filter.effects.wave.wavelength;
-			} else if (filter.effects.preset == "spread") {
-				cypherQuery += ", effects_preset : 'spread' ";
-				cypherQuery += ", effects_spread_amount : " + filter.effects.spread.amount;
+			if (filter.effects) {
+				if (filter.effects.paint && filter.effects.paint == "on") {
+					cypherQuery += ", effects_paint : 'on' ";
+					cypherQuery += ", effects_paint_radius : " + filter.effects.paint.radius;
+				}
+				if (filter.effects.grayscale && filter.effects.grayscale == "on") {
+					cypherQuery += ", effects_grayscale : 'on' ";
+				}
+				if (filter.effects.charcoal) {
+					cypherQuery += ", effects_charcoal : 'on' ";
+					cypherQuery += ", effects_charcoal_factor : " + filter.effects.charcoal.factor;
+				}
+				if (filter.effects.mosaic && filter.effects.mosaic == "on") {
+					cypherQuery += ", effects_mosaic : 'on' ";
+				}
+				if (filter.effects.negative && filter.effects.negative == "on") {
+					cypherQuery += ", effects_negative : 'on' ";
+				}
+				if (filter.effects.solarize) {
+					cypherQuery += ", effects_solarize : 'on' ";
+					cypherQuery += ", effects_solarize_threshold : " + filter.effects.solarize.threshold;
+				}
+				if (filter.effects.monochrome && filter.effects.monochrome == "on") {
+					cypherQuery += ", effects_monochrome : 'on' ";
+				}
+				if (filter.effects.swirl) {
+					cypherQuery += ", effects_swirl : 'on' ";
+					cypherQuery += ", effects_swirl_degrees : " + filter.effects.swirl.degrees;
+				}
+				if (filter.effects.wave) {
+					cypherQuery += ", effects_wave : 'on' ";
+					cypherQuery += ", effects_wave_amplitude : " + filter.effects.wave.amplitude;
+					cypherQuery += ", effects_wave_wavelength : " + filter.effects.wave.wavelength;
+				}
+				if (filter.effects.spread) {
+					cypherQuery += ", effects_spread : 'on' ";
+					cypherQuery += ", effects_spread_amount : " + filter.effects.spread.amount;
+				}
 			}
-			
+
+			if (filter.settings) {
+				if (filter.settings.brightness) {
+					cypherQuery += ", settings_brightness : 'on' ";
+					cypherQuery += ", settings_brightness_value : " + filter.settings.brightness.value;
+				}
+				if (filter.settings.contrast) {
+					cypherQuery += ", settings_contrast : 'on' ";
+					cypherQuery += ", settings_contrast_value : " + filter.settings.contrast.value;
+				}
+				if (filter.settings.hue) {
+					cypherQuery += ", settings_hue : 'on' ";
+					cypherQuery += ", settings_hue_value : " + filter.settings.hue.value;
+				}
+				if (filter.settings.saturation) {
+					cypherQuery += ", settings_saturation : 'on' ";
+					cypherQuery += ", settings_saturation_value : " + filter.settings.saturation.value;
+				}
+			}
 		} // TODO - careful about this case.  Can else every happen?  Maybe throw in that case?
 
-		if (filter.settings) {
-			cypherQuery += ", settings_brightness : " + ((filter.settings.brightness) ? (filter.settings.brightness) : (0));
-			cypherQuery += ", settings_contrast : " + ((filter.settings.contrast) ? (filter.settings.contrast) : (0));
-			cypherQuery += ", settings_hue : " + ((filter.settings.hue) ? (filter.settings.hue) : (0));
-			cypherQuery += ", settings_saturation: " + ((filter.settings.saturation) ? (filter.settings.saturation) : (0));
-		}
+		
 		/// ADD MORE
 
 		cypherQuery += "}) RETURN f;";

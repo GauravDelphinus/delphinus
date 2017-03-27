@@ -34,6 +34,8 @@ var routes = function(db) {
 	    			var filterFromClient = filtersFromClient[i];
 	    			var filter = {};
 
+	    			filter.type = filterFromClient.type;
+	    			
 	    			if (filterFromClient.settings) {
 	    				filter.settings = filterFromClient.settings;
 	    			} 

@@ -598,84 +598,78 @@ module.exports = {
     			// because all those are normalized/resolved by the time the information reaches the image process.
     			// The image processor expects actual settings, and does not need to worry about where they are coming from.
     			// So the format here skips the custom/preset/user_defined level in the object hierarchy.
-    			console.log("filter is: " + filter);
+    			console.log("filter is: " + JSON.stringify(filter));
     			if (filter.settings) {
 
     				// Brigthness, Saturation and Hue
-    				image.modulate(absoluteToPercentageChangeSigned(filter.settings.brightness), 
-    								absoluteToPercentageChangeSigned(filter.settings.saturation),
-    								absoluteToPercentageChangeSigned(filter.settings.hue));
+    				if (filter.settings.brightness || filter.settings.saturation || filter.settings.hue) {
+    					var brightness, hue, saturation;
+    					if (filter.settings.brightness) {
+    						// Brightness values are from -100 to 100, 0 meaning no change
+    						// Image Processor expects the values from -200% to 200%, 100% meaning no change
+    						brightness = absoluteToPercentageChangeSigned(filter.settings.brightness.value);
+    					} else {
+    						brightness = 100; // no change, 100%
+    					}
+
+    					if (filter.settings.saturation) {
+    						saturation = absoluteToPercentageChangeSigned(filter.settings.saturation.value);
+    					} else {
+    						saturation = 100; // no change, 100%
+    					}
+
+    					if (filter.settings.hue) {
+    						hue = absoluteToPercentageChangeSigned(filter.settings.hue.value);
+    					} else {
+    						hue = 100; // no change, 100%
+    					}
+
+    					// now, do the thing
+    					console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
+    					image.modulate(brightness, saturation, hue);
+    				}
+    		
     						
     				// Contrast
-    				image.contrast(absoluteToMultiplierSigned(filter.settings.contrast));
+    				if (filter.settings.contrast) {
+    					image.contrast(absoluteToMultiplierSigned(filter.settings.contrast.value));
+    				}
     						
     				// ADD MORE
     			}
 
     			if (filter.effects) {
-    				if (filter.effects.type == "preset") {
-    					if (filter.effects.preset == "paint") {
-    						image.paint(filter.effects.paint.radius);
-    					} else if (filter.effects.preset == "grayscale") {
-    						image.colorspace("GRAY");
-    					} else if (filter.effects.preset == "mosaic") {
-    						image.mosaic();
-    					} else if (filter.effects.preset == "negative") {
-    						image.negative();
-    					} else if (filter.effects.preset == "solarize") {
-    						image.solarize(filter.effects.solarize.threshold);
-    					} else if (filter.effects.preset == "monochrome") {
-    						image.monochrome();
-    					} else if (filter.effects.preset == "swirl") {
-    						image.swirl(filter.effects.swirl.degrees);
-    					} else if (filter.effects.preset == "wave") {
-    						image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
-    					} else if (filter.effects.preset == "spread") {
-    						image.spread(filter.effects.spread.amount);
-    					} else if (filter.effects.preset == "charcoal") {
-    						image.charcoal(filter.effects.charcoal.factor);
-    					}
+    				if (filter.effects.paint) {
+    					image.paint(filter.effects.paint.radius);
+    				}
+    				if (filter.effects.grayscale == "on") {
+    					image.colorspace("GRAY");
+    				}
+    				if (filter.effects.mosaic == "on") {
+    					image.mosaic();
+    				}
+    				if (filter.effects.negative == "on") {
+    					image.negative();
+    				}
+    				if (filter.effects.solarize) {
+    					image.solarize(filter.effects.solarize.threshold);
+    				}
+    				if (filter.effects.monochrome == "on") {
+    					image.monochrome();
+    				}
+    				if (filter.effects.swirl) {
+    					image.swirl(filter.effects.swirl.degrees);
+    				}
+    				if (filter.effects.wave) {
+    					image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
+    				}
+    				if (filter.effects.spread) {
+    					image.spread(filter.effects.spread.amount);
+    				}
+    				if (filter.effects.charcoal) {
+    					image.charcoal(filter.effects.charcoal.factor);
     				}
     			}
-    			/*
-    			if (filters[i].type == "effects") {
-    				console.log("filters effectType = " + filters[i].effectType);
-    				if (filters[i].effectType == "preset") {
-    					console.log("filters preset = " + filters[i].preset);
-
-    					if (filters[i].preset == "grayscale") {
-    						image.colorspace("GRAY");
-    					}
-    					if (filters[i].preset == "paint") {
-	    					image.paint(10);
-    					}
-    					if (filters[i].preset == "mosaic") {
-    						image.mosaic();
-    					}
-    					if (filters[i].preset == "negative") {
-    						image.negative();
-    					}
-    					if (filters[i].preset == "solarize") {
-    						image.solarize(50);
-    					}
-    					if (filters[i].preset == "monochrome") {
-    						image.monochrome();
-    					}
-    					if (filters[i].preset == "swirl") {
-    						image.swirl(10);
-    					}
-    					if (filters[i].preset == "wave") {
-    						image.wave(10, 10);
-    					}
-    					if (filters[i].preset == "spread") {
-    						image.spread(5);
-    					}
-    					if (filters[i].preset == "charcoal") {
-    						image.charcoal(5);
-    					}
-    				}
-    			}
-    			*/
 			}
 			writeImage(image, path, next);
 		});

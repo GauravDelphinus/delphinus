@@ -10,47 +10,55 @@
 
 
 	<br>
-	<div id="effectsSection" class="settingsBlock">
-		<span class="title">Effects</span><br>
-		<input type="radio" id="radioNone" name="effect" value="none"><b>None</b>
-		<input type="radio" id="radioPreset" name="effect" value="preset" checked="checked"><b>Preset</b>
-		<input type="radio" id="radioUserDefined" name="effect" value="user_defined"><b>User Defined</b>
-
-		<br>
-		<div id="presetSection" class="settingsSubBlock">
+	<div id="filterSection" class="settingsBlock">
+		<span class="title">Apply Filter</span><br>
+		<input type="radio" id="radioNone" name="filter" value="none"><b>None</b>
+		<input type="radio" id="radioPreset" name="filter" value="preset" checked="checked"><b>Preset</b>
+		<input type="radio" id="radioUserDefined" name="filter" value="user_defined"><b>User Defined</b>
+		<input type="radio" id="radioCustom" name="filter" value="custom"><b>Custom</b>
 
 		<br><br>
-		<span class="subTitle">Preset Filters</span><br>
-		
-		<input type="radio" id="radioPaint" name="preset" value="paint"><b>Paint</b><input id="rangePaint" type="range" min="0" max="100" value="0" step="5"><span id="paintValue"></span><br>
-		<input type="radio" id="radioGrayscale" name="preset" value="grayscale"><b>Grayscale</b><br>
-		<input type="radio" id="radioCharcoal" name="preset" value="charcoal"><b>Charcoal</b><input id="rangeCharcoal" type="range" min="1" max="100" value="1" step="5"><span id="charcoalValue"></span><br>
-		<input type="radio" id="radioMosaic" name="preset" value="mosaic"><b>Mosaic</b><br>
-		<input type="radio" id="radioNegative" name="preset" value="negative"><b>Negative</b><br>
-		<input type="radio" id="radioSolarize" name="preset" value="solarize"><b>Solarize</b><input id="rangeSolarize" type="range" min="0" max="100" value="100" step="5"><span id="solarizeValue"></span><br>
-		<input type="radio" id="radioMonochrome" name="preset" value="monochrome"><b>Monochrome</b><br>
-		<input type="radio" id="radioSwirl" name="preset" value="swirl"><b>Swirl</b><input id="rangeSwirl" type="range" min="0" max="360" value="0" step="5"><span id="swirlValue"></span><br>
-		<input type="radio" id="radioWave" name="preset" value="wave"><b>Wave</b>Amplitude<input id="rangeWaveAmp" type="range" min="0" max="100" value="100" step="5"><span id="waveAmpValue"></span><br>Wavelength<input id="rangeWaveLength" type="range" min="0" max="100" value="100" step="5"><span id="waveLengthValue"></span><br>
-		<input type="radio" id="radioSpread" name="preset" value="spread"><b>Spread</b><input id="rangeSpread" type="range" min="0" max="100" value="0" step="5"><span id="spreadValue"></span><br>
+		<div id="presetSection" class="settingsSubBlock">
+			<span class="subTitle">Preset Filters</span><br>
+
+			<input type="radio" id="radioRainyDay" name="preset" value="rainyDay"><b>Rainy Day</b>
+			<input type="radio" id="radioSolaris" name="preset" value="solaris"><b>Solaris</b>
+			<input type="radio" id="radioNightingale" name="preset" value="nightingale"><b>Nightingale</b>
+			<input type="radio" id="radioRedGlory" name="preset" value="redGlory"><b>Red Glory</b>
+			<input type="radio" id="radioComical" name="preset" value="comical"><b>Comical</b>
 		</div>
 
-		<br>
-		<div id="userDefinedSection" class="settingsSubBlock">
-		<span class="subTitle">User Defined Filters</span><br>
+
+		<div id="userDefinedSection" class="settingsSubBlock" style="display: none;">
+			<span class="subTitle">User Defined Filters</span><br>
+		</div>
+
+
+		<div id="customSection" class="settingsSubBlock" style="display: none;">
+			<span class="subTitle">Custom Filters</span><br>
+		
+			<span class="subTitle">Effects</span><br>
+			<input type="checkbox" id="radioPaint" name="effects" value="paint"><b>Paint</b><input id="rangePaint" type="range" min="0" max="100" value="0" step="5"><span id="paintValue"></span><br>
+			<input type="checkbox" id="radioGrayscale" name="effects" value="grayscale"><b>Grayscale</b><br>
+			<input type="checkbox" id="radioCharcoal" name="effects" value="charcoal"><b>Charcoal</b><input id="rangeCharcoal" type="range" min="1" max="100" value="1" step="5"><span id="charcoalValue"></span><br>
+			<input type="checkbox" id="radioMosaic" name="effects" value="mosaic"><b>Mosaic</b><br>
+			<input type="checkbox" id="radioNegative" name="effects" value="negative"><b>Negative</b><br>
+			<input type="checkbox" id="radioSolarize" name="effects" value="solarize"><b>Solarize</b><input id="rangeSolarize" type="range" min="0" max="100" value="100" step="5"><span id="solarizeValue"></span><br>
+			<input type="checkbox" id="radioMonochrome" name="effects" value="monochrome"><b>Monochrome</b><br>
+			<input type="checkbox" id="radioSwirl" name="effects" value="swirl"><b>Swirl</b><input id="rangeSwirl" type="range" min="0" max="360" value="0" step="5"><span id="swirlValue"></span><br>
+			<input type="checkbox" id="radioWave" name="effects" value="wave"><b>Wave</b>Amplitude<input id="rangeWaveAmp" type="range" min="0" max="100" value="100" step="5"><span id="waveAmpValue"></span><br>Wavelength<input id="rangeWaveLength" type="range" min="0" max="100" value="100" step="5"><span id="waveLengthValue"></span><br>
+			<input type="checkbox" id="radioSpread" name="effects" value="spread"><b>Spread</b><input id="rangeSpread" type="range" min="0" max="100" value="0" step="5"><span id="spreadValue"></span><br>
 		
 
+			<br>
+	
+			<span class="subTitle">Settings</span><br>
+			<b>Contrast</b><input id="contrast" type="range" min="-100" max="100" value="0" step="5"><span id="contrastValue"></span><br>
+			<b>Brightness</b><input id="brightness" type="range" min="-100" max="100" value="0" step="5"><span id="brightnessValue"></span><br>
+			<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
+			<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
 		</div>
 	</div>
-
-	<br>
-	<div id="settingsSection" class="settingsBlock">
-		<span class="title">Settings</span><br>
-		<b>Contrast</b><input id="contrast" type="range" min="-100" max="100" value="0" step="5"><span id="contrastValue"></span><br>
-		<b>Brightness</b><input id="brightness" type="range" min="-100" max="100" value="0" step="5"><span id="brightnessValue"></span><br>
-		<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
-		<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
-	</div>
-
 	<br>
 <br><br>
 <div class="center">

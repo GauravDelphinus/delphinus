@@ -64,6 +64,10 @@
 	font: 24px/200px arial;
 }
 
+.gridTable {
+	width: 100%;
+}
+
 .textArea {
 	font: 24px arial;
 }

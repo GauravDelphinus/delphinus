@@ -22,7 +22,7 @@ $(document).ready(function(){
 		applyChanges();
 	});
 
-	$("input[type=radio][name=preset]").change(applyChanges);
+	$("input[type=checkbox][name=effects]").change(applyChanges);
 
 
 	$("input[type=range]").change(applyChanges);
@@ -30,16 +30,23 @@ $(document).ready(function(){
 	// Set default selection to 'preset'
 	//$("input:radio[name=effect]").filter("[value=none]").prop("checked", true);
 
-	$("input[type=radio][name=effect]").change(function() {
+	$("input[type=radio][name=filter]").change(function() {
 		if (this.value == 'none') {
 			$("#presetSection").hide();
 			$("#userDefinedSection").hide();
+			$("#customSection").hide();
 		} else if (this.value == "preset") {
 			$("#presetSection").show();
 			$("#userDefinedSection").hide();
+			$("#customSection").hide();
 		} else if (this.value == "user_defined") {
 			$("#presetSection").hide();
 			$("#userDefinedSection").show();
+			$("#customSection").hide();
+		} else if (this.value == "custom") {
+			$("#presetSection").hide();
+			$("#userDefinedSection").hide();
+			$("#customSection").show();
 		}
 	});
 });
@@ -56,51 +63,80 @@ function constructJSONObject(jsonObj) {
 
 	var filter = {};
 
-	// ADD EFFECTS
-	filter.effects = {};
-	if ($("#radioNone").prop("checked")) { // NO EFFECTS
-		filter.effects.type = "none";
-	} else if ($("#radioPreset").prop("checked")) { // PRESET EFFECTS
-		filter.effects.type = "preset";
+	if ($("#radioNone").prop("checked")) { // NO FILTER
+		filter.type = "none";
+	} else if ($("#radioPreset").prop("checked")) { // PRESET FILTER
+		filter.type = "preset";
+
+		if ($("#radioRainyDay").prop("checked")) {
+			filter.preset = "rainy_day";
+		} else if ($("#radioSolaris").prop("checked")) {
+			filter.preset = "solaris";
+		} else if ($("#radioNightingale").prop("checked")) {
+			filter.preset = "nightingale";
+		} else if ($("#radioRedGlory").prop("checked")) {
+			filter.preset = "red_glory";
+		} else if ($("#radioComical").prop("checked")) {
+			filter.preset = "comical";
+		} 
+	} else if ($("#radioUserDefined").prop("checked")) { // USER DEFINED FILTER
+		filter.type = "user_defined";
+		filter.user_defined = "some_unique_name";
+	} else if ($("#radioCustom").prop("checked")) { // CUSTOM FILTER
+		filter.type = "custom";
+
+		// ADD EFFECTS
+		filter.effects = {};
 
 		if ($("#radioPaint").prop("checked")) {
-			filter.effects.preset = "paint";
 			filter.effects.paint = {radius: $("#rangePaint").val() };
-		} else if ($("#radioGrayscale").prop("checked")) {
-			filter.effects.preset = "grayscale";
-		} else if ($("#radioMosaic").prop("checked")) {
-			filter.effects.preset = "mosaic";
-		} else if ($("#radioNegative").prop("checked")) {
-			filter.effects.preset = "negative";
-		} else if ($("#radioSolarize").prop("checked")) {
-			filter.effects.preset = "solarize";
+		}
+		if ($("#radioGrayscale").prop("checked")) {
+			filter.effects.grayscale = "on";
+		}
+		if ($("#radioMosaic").prop("checked")) {
+			filter.effects.mosaic = "on";
+		}
+		if ($("#radioNegative").prop("checked")) {
+			filter.effects.negative = "on";
+		}
+		if ($("#radioSolarize").prop("checked")) {
 			filter.effects.solarize = {threshold: $("#rangeSolarize").val()};
-		} else if ($("#radioMonochrome").prop("checked")) {
-			filter.effects.preset = "monochrome";
-		} else if ($("#radioSwirl").prop("checked")) {
-			filter.effects.preset = "swirl";
+		}
+		if ($("#radioMonochrome").prop("checked")) {
+			filter.effects.monochrome = "on";
+		}
+		if ($("#radioSwirl").prop("checked")) {
 			filter.effects.swirl = {degrees: $("#rangeSwirl").val()};
-		} else if ($("#radioWave").prop("checked")) {
-			filter.effects.preset = "wave";
+		}
+		if ($("#radioWave").prop("checked")) {
 			filter.effects.wave = {amplitude : $("#rangeWaveAmp").val(), wavelength: $("#rangeWaveLength").val()};
-		} else if ($("#radioSpread").prop("checked")) {
-			filter.effects.preset = "spread";
+		}
+		if ($("#radioSpread").prop("checked")) {
 			filter.effects.spread = {amount : $("#rangeSpread").val()};
-		} else if ($("#radioCharcoal").prop("checked")) {
-			filter.effects.preset = "charcoal";
+		}
+		if ($("#radioCharcoal").prop("checked")) {
 			filter.effects.charcoal = {factor: $("#rangeCharcoal").val()};
 		}
-	} else if ($("#radioUserDefined").prop("checked")) { // USER DEFINED EFFECTS
-		filter.effects.type = "user_defined";
-		filter.effects.user_defined = 10; // ID of user defined filter
+
+		// ADD SETTINGS
+		filter.settings = {};
+
+		if ($("#contrast").val != $("#contrast").prop("defaultValue")) {
+			filter.settings.contrast = {value: $("#contrast").val()};
+		}
+		if ($("#brightness").val != $("#brightness").prop("defaultValue")) {
+			filter.settings.brightness = {value: $("#brightness").val()};
+		}
+		if ($("#hue").val != $("#hue").prop("defaultValue")) {
+			filter.settings.hue = {value: $("#hue").val()};
+		}
+		if ($("#saturation").val != $("#saturation").prop("defaultValue")) {
+			filter.settings.saturation = {value: $("#saturation").val()};
+		}
 	}
 
-	// ADD SETTINGS
-	filter.settings = {};
-	filter.settings.contrast = $("#contrast").val();
-	filter.settings.brightness = $("#brightness").val();
-	filter.settings.hue = $("#hue").val();
-	filter.settings.saturation = $("#saturation").val();
+	
 
 	jsonObj.filters.push(filter);
 }
@@ -109,6 +145,7 @@ function applyChanges() {
 	//alert("applyChanges called");
 	var jsonObj = {};
 	
+
 	constructJSONObject(jsonObj);
 
 	//alert("json is: " + JSON.stringify(jsonObj));
@@ -138,6 +175,8 @@ function applyChanges() {
 function postEntry() {
 	var jsonObj = {};
 
+	//alert("contrast default value is " + $("#contrast").prop("defaultValue") + ", actual selected value is " + $("#contrast").val());
+	
 	constructJSONObject(jsonObj);
 
 	$.ajax({

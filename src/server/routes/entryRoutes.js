@@ -27,7 +27,15 @@ var routes = function(db) {
 				effect will be an intersection.
 			**/
 
-			var cypherQuery = "MATCH (n:Entry) RETURN n;";
+			var cypherQuery;
+
+			// In case a challenge is mentioned, extract all entries linked to that challenge
+			if (req.query.challengeId) {
+				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge) WHERE id(c) = " + req.query.challengeId + " RETURN e;"
+			} else {
+				cypherQuery = "MATCH (n:Entry) RETURN n;";
+			}
+			
 
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){

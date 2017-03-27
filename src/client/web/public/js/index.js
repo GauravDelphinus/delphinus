@@ -2,6 +2,8 @@ $(document).ready(function(){
 	//console.log("document.ready called, id is " + challengeId);
 	$.getJSON('/api/challenges/', extractChallenges);
 	$.getJSON('/api/entries/', extractEntries);
+
+	$("#postChallenge").click(postChallenge);
 });
 
 function extractChallenges(challenges) {
@@ -50,4 +52,8 @@ function extractEntries(entries) {
 		}
 
 	}
+}
+
+function postChallenge() {
+	window.open("/newchallenge", "_self");
 }

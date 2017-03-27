@@ -45,18 +45,24 @@ var routes = function(db) {
 				POST a new challenge node.
 			**/
 
+			console.log("received POST on /api/challenges");
 			// Store the incoming base64 encoded image into a local image file first
 			var fs = require('fs');
 			var imageDataURI = req.body.imageDataURI;
 			var regex = /^data:.+\/(.+);base64,(.*)$/;
 
+			console.log("before match");
 			var matches = imageDataURI.match(regex);
+			console.log("after match");
 			var ext = matches[1].toLowerCase();
 			var data = matches[2];
-			var buffer = new Buffer(data, 'base64');
 
+			console.log("before creating buffer");
+			var buffer = new Buffer(data, 'base64');
+			console.log("after creating buffer");
 			var baseDir = global.appRoot + config.path.challengeImages;
 
+			console.log("calling tmpName with baseDir = " + baseDir);
 			//Create random name for new image file
 			tmp.tmpName({ dir: baseDir }, function _tempNameGenerated(err, fullpath) {
     			if (err) throw err;
