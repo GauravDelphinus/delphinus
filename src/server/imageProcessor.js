@@ -406,173 +406,38 @@ module.exports = {
 		The caller is responsible for disposing of the returned
 		image once it has finished processing it.
 	**/
-	applyStepsToImage : function(imagePath, steps, next) {
-
-		var sourceImage = __dirname + imagePath;  //input image full path
-		//var outputImage = 
-
+	applyStepsToImage : function(sourceImage, steps, next) {
 		var tmp = require('tmp');
 
+		console.log("applyStepsToImage: steps = " + JSON.stringify(steps));
 		tmp.tmpName(function _tempNameGenerated(err, path) {
     		if (err) throw err;
- 
- 			/*
-    		if (steps = "black-and-white") {
-				gm(sourceImage)
-				.colorspace("GRAY")
-				.write(path, function(err){
-					if (!err) console.log ("done!");
 
-					next(0, path);
-				});
-			}
-			*/
+    		// initialize the image
+    		var image = gm(sourceImage);
 
-			if (steps = "black-and-white") {
-				var image = gm(sourceImage)
-						.colorspace("GRAY");
+    		if (steps.layouts) {
+    			applyLayouts(image, steps.layouts);
+    		}
 
-				writeImage(image, path, next);
-			}
+    		if (steps.filters) {
+    			applyFilters(image, steps.filters);
+    		}
+
+    		if (steps.artifacts) {
+    			applyArtifacts(image, steps.artifacts);
+    		}
+
+    		if (steps.decorations) {
+    			applyDecorations(image, steps.decorations);
+    		}
+
+			writeImage(image, path, next);
 		});
 	},
 
-		/**
-		Apply the given filters on top of the image provided.
-		Creates a new image with the steps applied, and passes
-		the path to the callback function on success.
-
-		The caller is responsible for disposing of the returned
-		image once it has finished processing it.
-
-		We could have one of these types of objects representing the filers and decorations that need to be applied
-		on top of the image:
+	
 		
-		filters
-		decorations
-		artifacts
-		layouts
-
-		filters : [
-		{
-			effect_type: none | preset | user_defined;
-			preset: {
-					paint: <radius>
-					charcoal: on | off,
-					grayscale: on | off,
-					mosaic: on | off,
-					monochrome: on | off,
-					negative: on | off,
-					paint: <radius>,
-					solarize: on | off,
-					spread: <value>,
-					swirl: <value>,
-					wave: <size>m
-					//other custom types such as:
-					rain_day: <val>,
-					sunshine: <val>
-			}
-			user_defined: <id>
-
-			settings: {
-					brightness: <-100 to 100>,
-					hue: <0 to 100>,
-					gamma: <0 to 10>,
-					blur : { // Blur the image using the specified radius and optional standard deviation
-						type: default | gaussian | motion, // Type of blur.  In case of motion blur, the angle property is used if specified
-						radius : <number>,
-						sigma : <number>,
-						angle: <number> // used only in case of motion blur
-					},
-					contrast: <-100 to 100>,
-					saturation: <-100 to 100>,
-					sepia: on | off,
-					noise : { // Add or reduce noise in the image.  Expected to result in two commands - first set type, then set Noise radius
-						type: uniform | guassian | multiplicative | impulse | laplacian | poisson // Type of noise
-						radius: <number> // Radius used to adjust the effect of current noise type
-					},
-					sharpen { // Sharpen the given image
-						type: default | gaussian,  // gaussian uses the unsharp option)
-						radius: <number>,
-						sigma : <number> (optional)
-					}
-					// consider adding more options from the "Others" list below
-			}
-		}
-		],
-		decorations: [
-		{
-			type: border,
-			//one of decoration types below
-			border : { //Draw a border around the image, of the specified dimensions and color
-				width : <number>,
-				height : <number>,
-				color : <color>
-			}
-		}
-		],
-		artifacts: [
-		{
-			type: banner | callout | freetext,
-			banner: {
-				position: top | bottom,
-				font: {
-					font: "font name",
-					size: <number>,
-					color: <color>,
-					strokeWidth: <number>
-				},
-				text: "text to draw",
-			},
-			callout: {
-				position: {
-					x: <number>,
-					y: <number>,
-					width: <number>,
-					height: <number>
-				},
-				font: <same as banner>,
-				background: <color>, //allow for transparency
-				text: "text to draw"
-			},
-			freetext: {
-				position: <same as callout>,
-				font: <same as banner>,
-				text: "text to draw",
-				background: <color> //allow for transparency
-			}
-		}
-		],
-		layouts: [
-		{
-			type: size | rotation | crop | mirror | shear,
-			//one of the items below
-			size: {
-				width: <number>,
-				height: <number>, (optional)
-			},
-			rotation: { // Rotate an image by the angle of degrees, and fill the background color with the specified color
-				degrees: <number>,
-				color: <color>
-			},
-			crop: { // Crop the image at the given x,y and width,height
-				x: <number>,
-				y: <number>,
-				width: <number>,
-				height: <number>
-			},
-			mirror: flip | flop // Mirror the image vertically (flip) or horizontally (flop),
-			shear { // Shear the image
-				xDegrees: <number>,
-				yDegrees: <number>
-			}
-		}
-		]
-	]
-
-	Set public = true if you want the returned output image path to be publicly accessible
-	TODO - figure out how to use the public argument, and how to purge the file if set to public.
-	**/
 	applyFiltersToImage : function(sourceImage, filters, next) {
 
 		console.log("applyFiltersToImage: imagePath is " + sourceImage);
@@ -713,4 +578,309 @@ function absoluteToMultiplierSigned(absoluteValue) {
 	var multiplierValue = absoluteValue;
 
 	return multiplierValue;
+}
+
+/**
+	layouts: [
+	{		
+		// one or more of the items below
+		size: {
+			width: <number>,
+			height: <number>, (optional)
+		},
+		rotation: { // Rotate an image by the angle of degrees, and fill the background color with the specified color
+			degrees: <number>,
+			color: <color>
+		},
+		crop: { // Crop the image at the given x,y and width,height
+			width: <number>,
+			height: <number>,
+			x: <number>,
+			y: <number>
+		},
+		mirror: "flip" | "flop" // Mirror the image vertically (flip) or horizontally (flop),
+		shear { // Shear the image
+			xDegrees: <number>,
+			yDegrees: <number>
+		}
+	}
+	]
+**/
+function applyLayouts (image, layouts) {
+	//loop through layouts
+	var numLayouts = layouts.length;
+	for (var i = 0; i < numLayouts; i++) {
+
+		var layout = layouts[i];
+
+		if (layout.size) {
+			if (layout.size == "auto") {
+				// determine the best size for the image
+				// TODO - only call below if the size of the image is bigger than those values
+				image.resize(config.image.maxWidth, config.image.maxHeight);
+			} else if (layout.size == "custom" && layout.customSize) {
+				if (layout.customSize.height) {
+					image.resize(layout.customSize.width, layout.customSize.height);
+				} else {
+					image.resize(layout.customSize.width);
+				}
+			}
+		}
+
+		if (layout.rotation) {
+			image.rotate(layout.rotation.color, layout.rotation.degrees);
+		}
+
+		if (layout.crop) {
+			image.crop(layout.crop.width, layout.crop.height, layout.crop.x, layout.crop.y);
+		}
+
+		if (layout.mirror) {
+			if (layout.mirror == "flop") {
+				image.flop();
+			} else if (layout.mirror == "flip") {
+				image.flip();
+			}
+		}
+
+		if (layout.shear) {
+			image.shear(layout.shear.xDegrees, layout.shear.yDegrees);
+		}
+	}
+}
+
+/**
+	Apply the given filters on top of the image provided.
+	
+	Expected format of input filters
+
+	filters : [
+	{
+		type : preset | custom  // note: types of 'none' and 'user_defined', which are valid types sent up by the client,
+								// will get normalized.  'none' will not reach this function, and 'user_defined' will get
+								// converted to a 'custom' filter
+	},
+	{
+		type : preset,
+		preset :
+				// Exactly one of the following  
+				// refer newentry.js - the list below should be in sync with those listed in that file
+				rainy_day,
+				solaris,
+				nightingale,
+				red_glory,
+				comical
+	},
+	{
+		type : custom,
+		effects : {
+			
+			// One or more of the following
+
+			paint : {
+				radius: <value>
+			},
+			grayscale : "on",
+			mosaic : "on",
+			negative : "on",
+			solarize : {
+				threshold : <value>
+			},
+			monochrome: "on",
+			swirl : {
+				degrees : <value>
+			},
+			wave : {
+				amplitude : <value>,
+				wavelength : <value>
+			},
+			spread : {
+				amount : <value>
+			},
+			charcoal : {
+				factor : <value>
+			}
+		},
+		settings: {
+
+			// One or more of the following
+
+			contrast : {
+				value : <value>
+			},
+			brightness: {
+				value : <value>
+			},
+			hue: {
+				value : <value>
+			},
+			saturation: {
+				value : <value>
+			}
+
+			// TODO - review options below
+			gamma: <0 to 10>,
+			blur : { // Blur the image using the specified radius and optional standard deviation
+				type: default | gaussian | motion, // Type of blur.  In case of motion blur, the angle property is used if specified
+				radius : <number>,
+				sigma : <number>,
+				angle: <number> // used only in case of motion blur
+			},
+
+			sepia: on | off,
+			noise : { // Add or reduce noise in the image.  Expected to result in two commands - first set type, then set Noise radius
+				type: uniform | guassian | multiplicative | impulse | laplacian | poisson // Type of noise
+				radius: <number> // Radius used to adjust the effect of current noise type
+			},
+			sharpen { // Sharpen the given image
+				type: default | gaussian,  // gaussian uses the unsharp option)
+				radius: <number>,
+				sigma : <number> (optional)
+			}
+			// consider adding more options from the "Others" list below
+		}
+	}
+	]
+**/
+function applyFilters (image, filters) {
+
+	//loop through filters
+	var numFilters = filters.length;
+	for (var i = 0; i < numFilters; i++) {
+		//console.log("filters type = " + filters[i].type);
+
+		var filter = filters[i];
+
+		// NOTE: the filter object sent to the image processor does *not* have the custom/preset/user_defined objects
+		// because all those are normalized/resolved by the time the information reaches the image process.
+		// The image processor expects actual settings, and does not need to worry about where they are coming from.
+		// So the format here skips the custom/preset/user_defined level in the object hierarchy.
+		console.log("filter is: " + JSON.stringify(filter));
+		if (filter.settings) {
+
+			// Brigthness, Saturation and Hue
+			if (filter.settings.brightness || filter.settings.saturation || filter.settings.hue) {
+				var brightness, hue, saturation;
+				if (filter.settings.brightness) {
+					// Brightness values are from -100 to 100, 0 meaning no change
+					// Image Processor expects the values from -200% to 200%, 100% meaning no change
+					brightness = absoluteToPercentageChangeSigned(filter.settings.brightness.value);
+				} else {
+					brightness = 100; // no change, 100%
+				}
+
+				if (filter.settings.saturation) {
+					saturation = absoluteToPercentageChangeSigned(filter.settings.saturation.value);
+				} else {
+					saturation = 100; // no change, 100%
+				}
+
+				if (filter.settings.hue) {
+					hue = absoluteToPercentageChangeSigned(filter.settings.hue.value);
+				} else {
+					hue = 100; // no change, 100%
+				}
+
+				// now, do the thing
+				console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
+				image.modulate(brightness, saturation, hue);
+			}
+	
+					
+			// Contrast
+			if (filter.settings.contrast) {
+				image.contrast(absoluteToMultiplierSigned(filter.settings.contrast.value));
+			}
+					
+			// ADD MORE
+		}
+
+		if (filter.effects) {
+			if (filter.effects.paint) {
+				image.paint(filter.effects.paint.radius);
+			}
+			if (filter.effects.grayscale == "on") {
+				image.colorspace("GRAY");
+			}
+			if (filter.effects.mosaic == "on") {
+				image.mosaic();
+			}
+			if (filter.effects.negative == "on") {
+				image.negative();
+			}
+			if (filter.effects.solarize) {
+				image.solarize(filter.effects.solarize.threshold);
+			}
+			if (filter.effects.monochrome == "on") {
+				image.monochrome();
+			}
+			if (filter.effects.swirl) {
+				image.swirl(filter.effects.swirl.degrees);
+			}
+			if (filter.effects.wave) {
+				image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
+			}
+			if (filter.effects.spread) {
+				image.spread(filter.effects.spread.amount);
+			}
+			if (filter.effects.charcoal) {
+				image.charcoal(filter.effects.charcoal.factor);
+			}
+		}
+	}
+}
+
+/**
+	artifacts: [
+	{
+		type: banner | callout | freetext,
+		banner: {
+			position: top | bottom,
+			font: {
+				font: "font name",
+				size: <number>,
+				color: <color>,
+				strokeWidth: <number>
+			},
+			text: "text to draw",
+		},
+		callout: {
+			position: {
+				x: <number>,
+				y: <number>,
+				width: <number>,
+				height: <number>
+			},
+			font: <same as banner>,
+			background: <color>, //allow for transparency
+			text: "text to draw"
+		},
+		freetext: {
+			position: <same as callout>,
+			font: <same as banner>,
+			text: "text to draw",
+			background: <color> //allow for transparency
+		}
+	}
+	]
+**/
+function applyArtifacts (image, artifacts) {
+
+}
+
+/**
+		decorations: [
+		{
+			type: border,
+			//one of decoration types below
+			border : { //Draw a border around the image, of the specified dimensions and color
+				width : <number>,
+				height : <number>,
+				color : <color>
+			}
+		}
+		],
+**/
+function applyDecorations (image, decorations) {
+
 }

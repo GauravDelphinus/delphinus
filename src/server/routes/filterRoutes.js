@@ -8,7 +8,7 @@ var routes = function(db) {
 	var filterRouter = express.Router();
 	var imageProcessor = require("../imageProcessor");
 
-	filterRouter.route("/apply")
+	filterRouter.route("/apply") // /api/filters/apply ROUTE
 	.post(function(req, res){
 		console.log("received post, body is = " + req.body.filters);
 
@@ -25,6 +25,7 @@ var routes = function(db) {
 
 				sourceImagePath = global.appRoot + config.path.challengeImages + image;
 
+				/*
 				/// TODO - add "normalization" code for the json obj filters
 				var filtersFromClient = req.body.filters;
 	    		var filters = [];
@@ -46,24 +47,24 @@ var routes = function(db) {
 	    			
 	    			filters.push(filter);
 	    		}
+	    		*/
 
-	    		dataUtils.normalizeFilters(filters, function(err, normalizedFilters){
-	    			imageProcessor.applyFiltersToImage(sourceImagePath, normalizedFilters, function(err, imagePath){
-					if (err) throw err;
+	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
+	    			imageProcessor.applyStepsToImage(sourceImagePath, steps, function(err, imagePath){
+						if (err) throw err;
 
-					//send the image as a base64 encoded image blob
-					var imageBlob = fs.readFileSync(imagePath); //TODO - change to async
-					var imageBase64 = new Buffer(imageBlob).toString('base64');
-					var jsonObj = {"imageData" : imageBase64};
-					res.setHeader('Content-Type', 'application/json');
-					res.send(JSON.stringify(jsonObj));
+						//send the image as a base64 encoded image blob
+						var imageBlob = fs.readFileSync(imagePath); //TODO - change to async
+						var imageBase64 = new Buffer(imageBlob).toString('base64');
+						var jsonObj = {"imageData" : imageBase64};
+						res.setHeader('Content-Type', 'application/json');
+						res.send(JSON.stringify(jsonObj));
 
-					//dispose off the temp file
-					console.log("disposing off " + imagePath);
-					fs.unlink(imagePath);
-				});
+						//dispose off the temp file
+						console.log("disposing off " + imagePath);
+						fs.unlink(imagePath);
+					});
 	    		});
-				
 			});
 		} else if (req.body.imageSource == "url") {
 			// download the external web image into a local temp path, also set the "delete" flag to true

@@ -3,6 +3,13 @@ $(document).ready(function(){
 	$("#newentryimage").attr("src", "/challenges/images/" + challengeId);
 
 	document.getElementById("apply").onclick = postEntry;
+	$("#step1Next").click(showFilterStep);
+	$("#step2Previous").click(showLayoutStep);
+	$("#step2Next").click(showArtifactStep);
+	$("#step3Previous").click(showFilterStep);
+	$("#step3Next").click(showDecorationStep);
+	$("#step4Previous").click(showArtifactStep);
+
 	//$.getJSON('/api/filters/apply/' + challengeId, parseEntry);
 
 	$("#contrast").change(function() {
@@ -23,6 +30,8 @@ $(document).ready(function(){
 	});
 
 	$("input[type=checkbox][name=effects]").change(applyChanges);
+	$("input[type=checkbox][name=layout]").change(applyChanges);
+	$("input[type=radio][name=flip]").change(applyChanges);
 
 
 	$("input[type=range]").change(applyChanges);
@@ -49,7 +58,49 @@ $(document).ready(function(){
 			$("#customSection").show();
 		}
 	});
+
+	$("input[type=radio][name=size]").change(function() {
+		if (this.value == "autoSize") {
+			$("#textSizeWidth").hide();
+			$("#textSizeHeight").hide();
+		} else if (this.value == "customSize") {
+			$("#textSizeWidth").show();
+			$("#textSizeHeight").show();
+		}
+	});
 });
+
+function showFilterStep() {
+	$("#layoutSection").hide();
+	$("#filterSection").show();
+	$("#artifactSection").hide();
+	$("#decorationSection").hide();
+	$("#apply").hide();
+}
+
+function showLayoutStep() {
+	$("#layoutSection").show();
+	$("#filterSection").hide();
+	$("#artifactSection").hide();
+	$("#decorationSection").hide();
+	$("#apply").hide();
+}
+
+function showArtifactStep() {
+	$("#layoutSection").hide();
+	$("#filterSection").hide();
+	$("#artifactSection").show();
+	$("#decorationSection").hide();
+	$("#apply").hide();
+}
+
+function showDecorationStep() {
+	$("#layoutSection").hide();
+	$("#filterSection").hide();
+	$("#artifactSection").hide();
+	$("#decorationSection").show();
+	$("#apply").show();
+}
 
 function constructJSONObject(jsonObj) {
 	jsonObj.imageSource = "challengeId"; // Can be "url" | "challenge" | "blob"
@@ -59,7 +110,27 @@ function constructJSONObject(jsonObj) {
 	jsonObj.imageData = challengeId;
 	jsonObj.challengeId = challengeId;
 	jsonObj.created = (new Date()).getTime();
-	jsonObj.filters = [];
+
+	jsonObj.steps = {}; // the main object that encapsulates filters, layouts, etc.
+
+	/// LAYOUT
+	jsonObj.steps.layouts = [];
+
+	var layout = {};
+
+	if ($("#checkboxFlip").prop("checked")) {
+		layout.type = "custom";
+		if ($("#radioFlipHorizontally").prop("checked")) {
+			layout.mirror = "flop";
+		} else if ($("#radioFlipVertically").prop("checked")) {
+			layout.mirror = "flip";
+		}
+	}
+
+	jsonObj.steps.layouts.push(layout);
+
+	/// FILTERS
+	jsonObj.steps.filters = [];
 
 	var filter = {};
 
@@ -138,7 +209,7 @@ function constructJSONObject(jsonObj) {
 
 	
 
-	jsonObj.filters.push(filter);
+	jsonObj.steps.filters.push(filter);
 }
 
 function applyChanges() {
@@ -148,7 +219,6 @@ function applyChanges() {
 
 	constructJSONObject(jsonObj);
 
-	//alert("json is: " + JSON.stringify(jsonObj));
 
 	$.ajax({
 		type: "POST",
@@ -205,3 +275,4 @@ function parseEntry(entry) {
 	$("#entry").append($("<p>").text(entry.caption));
 	$("#entry").append($("<p>").text(entry.created));
 }
+

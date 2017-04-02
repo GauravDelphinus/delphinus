@@ -8,13 +8,29 @@
 <img id="newentryimage" />
 </div>
 
+	<div id="layoutSection" class="settingsBlock">
+		<span class="title">Step 1: Adjust Layout</span><br>
+		<input type="checkbox" id="checkboxResize" name="layout" value="resize"><b>Size</b>
+			<input type="radio" id="radioAutoSize" name="size" value="autoSize" checked="checked"><b>Auto</b>
+			<input type="radio" id="radioCustomSize" name="size" value="customSize"><b>Custom</b><br>
+				<input type="text" id="textSizeWidth" style="display: none;">
+				<input type="text" id="textSizeHeight" style="display: none;"><br>
+		<input type="checkbox" id="checkboxFlip" name="layout" value="flip"><b>Flip</b>
+			<input type="radio" id="radioFlipHorizontally" name="flip" value="flipHorizontally"><b>Horizontally</b>
+			<input type="radio" id="radioFlipVertically" name="flip" value="flipVertically"><b>Vertically</b><br>
+		<input type="checkbox" id="checkboxCrop" name="layout" value="crop"><b>Crop</b><br>
 
+		<br><br>
+		<div class="center">
+			<button class="submitButton" id="step1Next">Next >></button>
+		</div>
+	</div>
 	<br>
-	<div id="filterSection" class="settingsBlock">
-		<span class="title">Apply Filter</span><br>
-		<input type="radio" id="radioNone" name="filter" value="none"><b>None</b>
-		<input type="radio" id="radioPreset" name="filter" value="preset" checked="checked"><b>Preset</b>
-		<input type="radio" id="radioUserDefined" name="filter" value="user_defined"><b>User Defined</b>
+	<div id="filterSection" class="settingsBlock" style="display: none;">
+		<span class="title">Step 2: Apply Filter</span><br>
+		<input type="radio" id="radioNone" name="filter" value="none"><b>None</b><br>
+		<input type="radio" id="radioPreset" name="filter" value="preset" checked="checked"><b>Preset</b><br>
+		<input type="radio" id="radioUserDefined" name="filter" value="user_defined"><b>User Defined</b><br>
 		<input type="radio" id="radioCustom" name="filter" value="custom"><b>Custom</b>
 
 		<br><br>
@@ -58,11 +74,34 @@
 			<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
 			<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
 		</div>
+
+		<br><br>
+		<div class="center">
+			<button class="submitButton" id="step2Previous"><< Previous</button>
+			<button class="submitButton" id="step2Next">Next >></button>
+		</div>
 	</div>
 	<br>
+	<div id="artifactSection" class="settingsBlock" style="display: none;">
+		<span class="title">Step 3: Add Artifacts</span><br>
+		<input type="checkbox" id="checkboxBanner" name="artifact" value="banner"><b>Add Banner</b>
+				<input type="text" id="textBanner" style="display: none;">
+		<br><br>
+		<div class="center">
+			<button class="submitButton" id="step3Previous"><< Previous</button>
+			<button class="submitButton" id="step3Next">Next >></button>
+		</div>
+	</div>
+	<br>
+	<div id="decorationSection" class="settingsBlock" style="display: none;">
+		<span class="title">Step 4: Add Decorations</span><br>
+		<div class="center">
+			<button class="submitButton" id="step4Previous"><< Previous</button>
+		</div>
+	</div>
 <br><br>
 <div class="center">
-	<button class="submitButton" id="apply">Post Entry!</button>
+	<button class="submitButton" id="apply" style="display: none;">Post Entry!</button>
 </div>
 
 <script>

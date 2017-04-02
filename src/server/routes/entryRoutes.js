@@ -81,45 +81,56 @@ var routes = function(db) {
 					var createFilterNodesFunctions = []; // array of functions that will create the Filter Nodes
 
 					// FILTERS
-					if (req.body.filters && (req.body.filters.constructor === Array)) {
-						for (var i = 0; i < req.body.filters.length; i++) {
-							var filter = req.body.filters[i];
+					if (req.body.steps) {
+						if (req.body.steps.layouts && req.body.steps.layouts.constructor === Array) {
+							for (var i = 0; i < req.body.steps.layouts.length; i++) {
+								var layout = req.body.steps.layouts[i];
 
-							if (filter.effects.type == "user_defined") {
-								var userDefinedFilterNodeId = parseInt(filter.effects.user_defined);
-								createFilterNodesFunctions.push(function(callback) {
-									callback(null, userDefinedFilterNodeId);
-								});
-							} else {
-								createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter));
+								if (layout.type == "none") {
+									// No layout, do nothing
+								} else {
+									createFilterNodesFunctions.push(async.apply(dataUtils.createLayoutNode, db, layout));
+								}
 							}
-							/*
-							if (filter.type == "preset") {
-								// the value coming in the 'preset' value is the id of the Filter Node for the preset filter
-								nodeId = parseInt(filter.preset);
-								createFilterNodesFunctions.push(function(callback) {
-									console.log("preset function called, calling callback with nodeId = " + nodeId);
-									callback(null, nodeId);
-								});
+						}
 
-							} else if (filter.type == "user_defined") {
-								// the valu ecoming in the 'user_defined' value is the id of the Filter Node for the user defined filter
-								nodeId = parseInt(filter.user_defined);
-								createFilterNodesFunctions.push(function(callback) {
-									console.log("user_defined function called, calling callback with nodeId = " + nodeId);
-									callback(null, nodeId);
-								});
-							} else if (filter.type == "custom") {
-								
-								var createFilterQuery = "CREATE (f: Filter {" +
-														"type: 'custom', ";
-								createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter.custom));
-								
+						if (req.body.steps.filters && (req.body.steps.filters.constructor === Array)) {
+							for (var i = 0; i < req.body.steps.filters.length; i++) {
+								var filter = req.body.steps.filters[i];
 
+								if (filter.type == "none") {
+									// No filter added - do nothing
+								} else {
+									createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter));
+								}
 							}
-							*/
+						}
+
+						if (req.body.steps.artifacts && req.body.steps.artifacts.constructor === Array) {
+							for (var i = 0; i < req.body.steps.artifacts.length; i++) {
+								var artifact = req.body.steps.artifacts[i];
+
+								if (artifact.type == "none") {
+									// No Artifact, do nothing
+								} else {
+									createFilterNodesFunctions.push(async.apply(dataUtils.createArtifactNode, db, artifact));
+								}
+							}
+						}
+
+						if (req.body.steps.decorations && req.body.steps.decorations.constructor === Array) {
+							for (var i = 0; i < req.body.steps.decorations.length; i++) {
+								var decoration = req.body.steps.decorations[i];
+
+								if (decoration.type == "none") {
+									// No Decoration, do nothing
+								} else {
+									createFilterNodesFunctions.push(async.apply(dataUtils.createDecorationNode, db, decoration));
+								}
+							}
 						}
 					}
+					
 
 					// LAYOUTS
 
@@ -132,7 +143,7 @@ var routes = function(db) {
 								console.log("filterNodes, " + i + " = " + filterNodes[i]);
 
 								// Now associate filters to the new entry
-								cypherQuery += " MATCH (f" + i + ":Filter) WHERE id(f" + i + ") = " + filterNodes[i] + "";
+								cypherQuery += " MATCH (s" + i + ") WHERE id(s" + i + ") = " + filterNodes[i] + "";
 							}
 
 							cypherQuery += " CREATE ";
@@ -141,7 +152,7 @@ var routes = function(db) {
 								if (i > 0) {
 									cypherQuery += " , ";
 								}
-								cypherQuery += " (f" + i + ")<-[:USES {order : '" + i + "'}]-(e) ";
+								cypherQuery += " (s" + i + ")<-[:USES {order : '" + i + "'}]-(e) ";
 							}
 
 							cypherQuery += ";";

@@ -62,95 +62,154 @@ module.exports = {
 
 	    		console.log("Image is " + imagePath);
 
-	    		// Now, get the filters attached to this image
+	    		// Now, get the steps attached to this image
 
-				var cypherQuery = "MATCH (e:Entry)-[u:USES]->(f:Filter) WHERE id(e) = " + entryId + " RETURN f ORDER BY u.order;";
+				var cypherQuery = "MATCH (e:Entry)-[u:USES]->(s) WHERE id(e) = " + entryId + " RETURN LABELS(s),s ORDER BY u.order;";
 
 				db.cypherQuery(cypherQuery, function(err, result){
 	    			if(err) throw err;
 
 	    			console.log(result.data); // delivers an array of query results
 
-	    			var filtersFromDB = result.data;
-	    			var filters = [];
+	    			var stepsFromDB = result.data;
+	    			var steps = {};
+	    			var filters = [], layouts = [], artifacts = [], decorations = [];
 
 	    			// Now construct the filters array in the JSON format
-	    			for (var i = 0; i < filtersFromDB.length; i++) {
-	    				var filterFromDB = filtersFromDB[i];
-	    				var filter = {};
-	    				filter.effects = {};
+	    			for (var i = 0; i < stepsFromDB.length; i++) {
+	    				var stepFromDB = stepsFromDB[i];
 
-	    				if (filterFromDB.filterType == "none") {
-	    		
-	    					// shouldn't happen
-	    					throw err;
-	    				} else if (filterFromDB.filterType == "custom") {
-	    					filter.type = "custom";
+	    				if (stepFromDB[0][0] == "Filter") {
+	    					var filterFromDB = stepFromDB[1];
 
-	    					filter.effects = {};
+	    					var filter = {};
+		    				filter.effects = {};
 
-	    					if (filterFromDB.effects_paint == "on") {
-	    						filter.effects.paint = {};
-	    						filter.effects.paint.radius = filterFromDB.effects_paint_radius;
-	    					}
-	    					if (filterFromDB.effects_grayscale == "on") {
-	    						filter.effects.grayscale = "on";
-	    					}
-	    					if (filterFromDB.effects_charcoal == "on") {
-	    						filter.effects.charcoal = {};
-	    						filter.effects.charcoal.factor = filterFromDB.effects_charcoal_factor;
-	    					}
-	    					if (filterFromDB.effects_mosaic == "on") {
-	    						filter.effects.mosaic = "on";
-	    					}
-	    					if (filterFromDB.effects_negative == "on") {
-	    						filter.effects.negative = "on";
-	    					}
-	    					if (filterFromDB.effects_solarize == "on") {
-	    						filter.effects.solarize = {};
-	    						filter.effects.solarize.threshold = filterFromDB.effects_solarize_threshold;
-	    					}
-	    					if (filterFromDB.effects_monochrome == "on") {
-	    						filter.effects.monochrome = "on";
-	    					}
-	    					if (filterFromDB.effects_swirl == "on") {
-	    						filter.effects.swirl = {};
-	    						filter.effects.swirl.degrees = filterFromDB.effects_swirl_degrees;
-	    					}
-	    					if (filterFromDB.effects_wave == "on") {
-	    						filter.effects.wave = {};
-	    						filter.effects.wave.amplitude = filterFromDB.effects_wave_amplitude;
-	    						filter.effects.wave.wavelength = filterFromDB.effects_wave_wavelength;
-	    					}
-	    					if (filterFromDB.effects_spread == "on") {
-	    						filter.effects.spread = {};
-	    						filter.effects.spread.amount = filterFromDB.effects_spread_amount;
-	    					}
+		    				if (filterFromDB.filter_type == "none") {
+		    		
+		    					// shouldn't happen
+		    					throw err;
+		    				} else if (filterFromDB.filter_type == "preset") {
+		    					filter.type = "preset";
 
-	    					// ADD MORE
+		    					filter.preset = filterFromDB.preset;
 
-	    					filter.settings = {};
+		    				} else if (filterFromDB.filter_type == "user_defined" || filterFromDB.filter_type == "custom") {
+		    					
+		    					filter.type = filterFromDB.filter_type;
 
-	    					if (filterFromDB.settings_brightness == "on") {
-	    						filter.settings.brightness = { value: filterFromDB.settings_brightness_value};
-	    					}
-	    					if (filterFromDB.settings_hue == "on") {
-	    						filter.settings.hue = { value: filterFromDB.settings_hue_value};
-	    					}
-	    					if (filterFromDB.settings_saturation == "on") {
-	    						filter.settings.saturation = { value: filterFromDB.settings_saturation_value};
-	    					}
-	    					if (filterFromDB.settings_contrast == "on") {
-	    						filter.settings.contrast = { value: filterFromDB.settings_contrast_value};
-	    					}
-	    				} 
+		    					filter.effects = {};
 
-	   					// ADD MORE
+		    					if (filterFromDB.effects_paint == "on") {
+		    						filter.effects.paint = {};
+		    						filter.effects.paint.radius = filterFromDB.effects_paint_radius;
+		    					}
+		    					if (filterFromDB.effects_grayscale == "on") {
+		    						filter.effects.grayscale = "on";
+		    					}
+		    					if (filterFromDB.effects_charcoal == "on") {
+		    						filter.effects.charcoal = {};
+		    						filter.effects.charcoal.factor = filterFromDB.effects_charcoal_factor;
+		    					}
+		    					if (filterFromDB.effects_mosaic == "on") {
+		    						filter.effects.mosaic = "on";
+		    					}
+		    					if (filterFromDB.effects_negative == "on") {
+		    						filter.effects.negative = "on";
+		    					}
+		    					if (filterFromDB.effects_solarize == "on") {
+		    						filter.effects.solarize = {};
+		    						filter.effects.solarize.threshold = filterFromDB.effects_solarize_threshold;
+		    					}
+		    					if (filterFromDB.effects_monochrome == "on") {
+		    						filter.effects.monochrome = "on";
+		    					}
+		    					if (filterFromDB.effects_swirl == "on") {
+		    						filter.effects.swirl = {};
+		    						filter.effects.swirl.degrees = filterFromDB.effects_swirl_degrees;
+		    					}
+		    					if (filterFromDB.effects_wave == "on") {
+		    						filter.effects.wave = {};
+		    						filter.effects.wave.amplitude = filterFromDB.effects_wave_amplitude;
+		    						filter.effects.wave.wavelength = filterFromDB.effects_wave_wavelength;
+		    					}
+		    					if (filterFromDB.effects_spread == "on") {
+		    						filter.effects.spread = {};
+		    						filter.effects.spread.amount = filterFromDB.effects_spread_amount;
+		    					}
 
-	    				filters.push(filter);
+		    					// ADD MORE
+
+		    					filter.settings = {};
+
+		    					if (filterFromDB.settings_brightness == "on") {
+		    						filter.settings.brightness = { value: filterFromDB.settings_brightness_value};
+		    					}
+		    					if (filterFromDB.settings_hue == "on") {
+		    						filter.settings.hue = { value: filterFromDB.settings_hue_value};
+		    					}
+		    					if (filterFromDB.settings_saturation == "on") {
+		    						filter.settings.saturation = { value: filterFromDB.settings_saturation_value};
+		    					}
+		    					if (filterFromDB.settings_contrast == "on") {
+		    						filter.settings.contrast = { value: filterFromDB.settings_contrast_value};
+		    					}
+		    				} 
+
+		    				filters.push(filter);
+
+	    				} else if (stepFromDB[0][0] == "Layout") {
+	    					var layoutFromDB = stepFromDB[1];
+
+	    					var layout = {};
+
+		    				if (layoutFromDB.layout_type == "none") {
+		    		
+		    					// shouldn't happen
+		    					throw err;
+		    				} else if (layoutFromDB.layout_type == "preset") {
+		    					layout.type = "preset";
+
+		    					layout.preset = layoutFromDB.preset;
+
+		    				} else if (layoutFromDB.layout_type == "user_defined" || layoutFromDB.layout_type == "custom") {
+		    					
+		    					layout.type = layoutFromDB.layout_type;
+
+		    					if (layoutFromDB.mirror_flip == "on") {
+		    						layout.mirror = "flip";
+		    					} else if (layoutFromDB.mirror_flop == "on") {
+		    						layout.mirror = "flop";
+		    					}
+		    				}
+
+		    				layouts.push(layout);
+
+	    				} else if (stepFromDB[0][0] == "Artifact") {
+
+	    				} else if (stepFromDB[0][0] == "Decoration") {
+
+	    				}
+	    				
+	    				if (filters.length > 0) {
+	    					steps.filters = filters;
+	    				}
+
+	    				if (layouts.length > 0) {
+	    					steps.layouts = layouts;
+	    				}
+
+	    				if (artifacts.length > 0) {
+	    					steps.artifacts = artifacts;
+	    				}
+
+	    				if (decorations.length > 0) {
+	    					steps.decorations = decorations;
+	    				}
+	    				
 	    			}
 
-	    			next(0, { "image" : imagePath, "filters" : filters});
+	    			next(0, { "image" : imagePath, "steps" : steps});
 	    	});
 
 		});
@@ -158,12 +217,12 @@ module.exports = {
 	},
 
 	/**
-		Normalize / expand the filters array such that all indirect references
+		Normalize / expand the steps array such that all indirect references
 		(such as filter node ids, etc.) are resolved to actual settings that can 
 		be processed by the Image Processor.
 	**/
-	normalizeFilters: function (filters, next) {
-		next(0, filters);
+	normalizeSteps: function (steps, next) {
+		next(0, steps);
 	},
 
 	/**
@@ -215,11 +274,21 @@ module.exports = {
 		var cypherQuery = "CREATE (f:Filter {";
 
 		if (filter.type == "none") {
-			// shouldn't be here.  Client shouldn't send this up at all, and there's no need to create
-			// a filter node.
+			// There's no need to create a filter node in this case.
+			// This shouldn't be called, and should get handled by caller
 			throw err;
+		} else if (filter.type == "user_defined") {
+			callback(null, parseInt(filter.user_defined));
+			return;
+		}
+
+
+		if (filter.type == "preset") {
+			cypherQuery += " filter_type : 'preset' ";
+
+			cypherQuery += ", filter_preset : '" + filter.preset + "' ";
 		} else if (filter.type == "custom") {
-			cypherQuery += " filterType : 'custom'";
+			cypherQuery += " filter_type : 'custom'";
 
 			if (filter.effects) {
 				if (filter.effects.paint && filter.effects.paint == "on") {
@@ -306,8 +375,42 @@ module.exports = {
 
 	},
 
-	createLayoutNode : function(db, layoutJSON) {
+	createLayoutNode : function(db, layout, callback) {
+		var cypherQuery = "CREATE (l:Layout {";
 
+		if (layout.type == "none") {
+			// There's no need to create a layout node in this case.
+			// This shouldn't be called, and should get handled by caller
+			throw err;
+		} else if (layout.type == "user_defined") {
+			callback(null, parseInt(layout.user_defined));
+			return;
+		}
+
+		if (layout.type == "custom") {
+			cypherQuery += " layout_type : 'custom' ";
+
+			if (layout.mirror) {
+				if (layout.mirror == "flip") {
+					cypherQuery += ", mirror_flip : 'on'";
+				} else if (layout.mirror == "flop") {
+					cypherQuery += ", mirror_flop : 'on'";
+				}
+			}
+		}
+
+		cypherQuery += "}) RETURN l;";
+
+		console.log("Running cypherQuery: " + cypherQuery);
+				
+		db.cypherQuery(cypherQuery, function(err, result){
+    		if(err) throw err;
+
+    		console.log(result.data[0]); // delivers an array of query results
+
+    		var layoutID = result.data[0]._id;
+			callback(null, layoutID);
+		});
 	}
 
 }

@@ -10,5 +10,9 @@
 	"oauth_callback": "http://88fd8640.ngrok.io/request-token",
 	"path" : {
 		"challengeImages" : "/data/challenges/images/"
+	},
+	"image" : {
+		"maxHeight" : 800,
+		"maxWidth" : 800
 	}
 }
