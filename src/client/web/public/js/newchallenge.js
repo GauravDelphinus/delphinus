@@ -7,6 +7,33 @@ $(document).ready(function(){
   dropZone.addEventListener('drop', handleFileDropped, false);
 
   $("#postChallenge").click(postChallenge);
+
+  // canvas resizing of image
+  /*
+  var canvas = document.getElementById("canvas");
+  var ctx = canvas.getContext("2d");
+
+  img = new Image();
+  img.onload = function () {
+
+    canvas.height = canvas.width * (img.height / img.width);
+
+    /// step 1
+    var oc = document.createElement('canvas'),
+        octx = oc.getContext('2d');
+
+    oc.width = img.width * 0.5;
+    oc.height = img.height * 0.5;
+    octx.drawImage(img, 0, 0, oc.width, oc.height);
+
+    /// step 2
+    octx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5);
+
+    ctx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5,
+    0, 0, canvas.width, canvas.height);
+  }
+  //img.src = "http://i.imgur.com/SHo6Fub.jpg";
+  */
 });
 
 function handleFileDropped(evt) {
@@ -36,24 +63,17 @@ function handleFileSelect(evt) {
       // Closure to capture the file information.
       reader.onload = (function(theFile) {
         return function(e) {
-          console.log("in the callback for onload");
           // Render image.
-          var span = document.createElement('span');
-          span.innerHTML = ['<img id="challengeImage" class="centerImage" src="', e.target.result,
-                            '" title="', escape(theFile.name), '"/>'].join('');
-          console.log("span is " + span.innerHTML);
-          document.getElementById('list').insertBefore(span, null);
+
+          $("#challengeImage").prop("src", e.target.result);
+          $("#challengeImage").prop("title", escape(theFile.name));
+          $("#selectImage").hide();
         };
       })(f);
 
       // Read in the image file as a data URL.
       reader.readAsDataURL(f);
-      output.push('<li><strong>', escape(f.name), '</strong> (', f.type || 'n/a', ') - ',
-                  f.size, ' bytes, last modified: ',
-                  f.lastModifiedDate ? f.lastModifiedDate.toLocaleDateString() : 'n/a',
-                  '</li>');
     }
-    document.getElementById('list').innerHTML = '<ul>' + output.join('') + '</ul>';
   }
 
   function handleDragOver(evt) {
