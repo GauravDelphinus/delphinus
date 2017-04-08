@@ -36,11 +36,12 @@ function handleFileSelect(evt) {
       // Closure to capture the file information.
       reader.onload = (function(theFile) {
         return function(e) {
+          console.log("in the callback for onload");
           // Render image.
           var span = document.createElement('span');
           span.innerHTML = ['<img id="challengeImage" class="centerImage" src="', e.target.result,
                             '" title="', escape(theFile.name), '"/>'].join('');
-          //alert("span is " + span);
+          console.log("span is " + span.innerHTML);
           document.getElementById('list').insertBefore(span, null);
         };
       })(f);
@@ -75,9 +76,18 @@ function postChallenge() {
 		data: JSON.stringify(jsonObj)
 	})
 	.done(function(data, textStatus, jqXHR) {
-		alert("Challenge posted successfully, challenge id = " + data._id);
+		//alert("Challenge posted successfully, challenge id = " + data._id);
+    window.open("/challenge/" + data._id, "_self");
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
 		alert("some error was found, " + errorThrown);
+    $("#postChallenge").prop("value", "Post");
+    $("#postChallenge").prop("disabled", false);
 	});
+
+  //change button to 'posting ...'
+  console.log("changing button state... ");
+  $("#postChallenge").prop("value", "Posting...");
+  $("#postChallenge").prop("disabled", true);
+  console.log("after changing button state");
 }

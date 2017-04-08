@@ -12,7 +12,7 @@
 		"challengeImages" : "/data/challenges/images/"
 	},
 	"image" : {
-		"maxHeight" : 800,
-		"maxWidth" : 800
+		"maxHeight" : 1500,
+		"maxWidth" : 1500
 	}
 }

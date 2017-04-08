@@ -81,5 +81,5 @@
 .centerImage {
     display: block;
     margin: auto;
-    width: 40%;
+	max-width: 60%;
 }
