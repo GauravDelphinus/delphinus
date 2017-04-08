@@ -7,33 +7,6 @@ $(document).ready(function(){
   dropZone.addEventListener('drop', handleFileDropped, false);
 
   $("#postChallenge").click(postChallenge);
-
-  // canvas resizing of image
-  /*
-  var canvas = document.getElementById("canvas");
-  var ctx = canvas.getContext("2d");
-
-  img = new Image();
-  img.onload = function () {
-
-    canvas.height = canvas.width * (img.height / img.width);
-
-    /// step 1
-    var oc = document.createElement('canvas'),
-        octx = oc.getContext('2d');
-
-    oc.width = img.width * 0.5;
-    oc.height = img.height * 0.5;
-    octx.drawImage(img, 0, 0, oc.width, oc.height);
-
-    /// step 2
-    octx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5);
-
-    ctx.drawImage(oc, 0, 0, oc.width * 0.5, oc.height * 0.5,
-    0, 0, canvas.width, canvas.height);
-  }
-  //img.src = "http://i.imgur.com/SHo6Fub.jpg";
-  */
 });
 
 function handleFileDropped(evt) {
@@ -63,8 +36,29 @@ function handleFileSelect(evt) {
       // Closure to capture the file information.
       reader.onload = (function(theFile) {
         return function(e) {
+
+          //// resizing code
+          var img = new Image();
+
+          img.onload = function() {
+            console.log("image.onload called");
+            var canvas = document.createElement('canvas');
+            var ctx = canvas.getContext('2d');
+            canvas.width = Math.min(img.width, 1200); // TBD - max width of image, see if we can pass this value down from somewhere
+            canvas.height = canvas.width * (img.height / img.width);
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+            // SEND THIS DATA TO WHEREVER YOU NEED IT
+            var data = canvas.toDataURL('image/png');
+
+            //$('#challengeImage').prop('src', img.src);
+            $("#challengeImage").prop("src", data);
+          }
+          /// resizing code
+
           // Render image.
 
+          img.src = e.target.result;
           $("#challengeImage").prop("src", e.target.result);
           $("#challengeImage").prop("title", escape(theFile.name));
           $("#selectImage").hide();

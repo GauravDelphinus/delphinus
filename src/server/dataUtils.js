@@ -291,7 +291,7 @@ module.exports = {
 			cypherQuery += " filter_type : 'custom'";
 
 			if (filter.effects) {
-				if (filter.effects.paint && filter.effects.paint == "on") {
+				if (filter.effects.paint) {
 					cypherQuery += ", effects_paint : 'on' ";
 					cypherQuery += ", effects_paint_radius : " + filter.effects.paint.radius;
 				}
