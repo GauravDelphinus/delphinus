@@ -7,6 +7,9 @@ $(document).ready(function(){
   dropZone.addEventListener('drop', handleFileDropped, false);
 
   $("#postChallenge").click(postChallenge);
+  $("#goToHomePage").click(function() {
+      window.open("/", "_self");
+  });
 });
 
 function handleFileDropped(evt) {

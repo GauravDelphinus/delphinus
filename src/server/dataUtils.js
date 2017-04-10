@@ -5,10 +5,20 @@ module.exports = {
 	/**
 		Given an Entry ID, return the corresponding
 		Challenge ID that this entry belongs to.
-		Return -1 in case of error
+		calls the function next with an err and the challengeId
 	**/
-	getChallengeForEntry : function(db, entryId) {
+	getChallengeForEntry : function(db, entryId, next) {
+		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry) WHERE id(e) = " + entryId + " RETURN id(c);"
+		db.cypherQuery(fetchChallengeQuery, function(err, result){
+	    		if (err) {
+	    			next(err, -1);
+	    			return;
+	    		}
 
+	    		var challengeId = parseInt(result.data[0]);
+
+	    		next(0, challengeId);
+	    });
 	},
 
 		/**

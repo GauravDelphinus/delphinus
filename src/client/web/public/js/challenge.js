@@ -4,6 +4,9 @@ $(document).ready(function(){
 	$.getJSON('/api/entries/?challengeId=' + challengeId, extractEntries);
 
 	$("#postEntry").click(postEntry);
+	$("#goToHomePage").click(function() {
+		window.open("/", "_self");
+	});
 });
 
 function parseChallenge(challenge) {

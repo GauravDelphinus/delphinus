@@ -49,13 +49,20 @@ var routes = function(db) {
 			// Store the incoming base64 encoded image into a local image file first
 			var fs = require('fs');
 			var imageDataURI = req.body.imageDataURI;
-			var regex = /^data:.+\/(.+);base64,(.*)$/;
+			//var regex = /^data:.+\/(.+);base64,(.*)$/;
 
 			console.log("before match");
-			var matches = imageDataURI.match(regex);
+			//var matches = imageDataURI.match(regex);
 			console.log("after match");
-			var ext = matches[1].toLowerCase();
-			var data = matches[2];
+			//var ext = matches[1].toLowerCase();
+			//var data = matches[2];
+			var index = imageDataURI.indexOf("base64,");
+			var data;
+			if (index != -1) {
+				data = imageDataURI.slice(index + 7);
+			} else {
+				data = imageDataURI;
+			}
 
 			console.log("before creating buffer");
 			var buffer = new Buffer(data, 'base64');
@@ -76,7 +83,7 @@ var routes = function(db) {
     			
 				var cypherQuery = "CREATE (n:Challenge {" +
 							"image : '" + name + "'," +
-							"imageType : '" + ext + "'," + 
+							//"imageType : '" + ext + "'," + 
 							"created : '" + req.body.created + "'," + 
 							"title : '" + req.body.caption + "'" +
 							"}) RETURN n;";

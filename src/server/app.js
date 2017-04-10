@@ -93,7 +93,12 @@ module.exports = function() {
 
 	// 3 - Entry Page
 	app.get("/entry/:entryId", function(req, res) {
-		res.render("entry", {entryId: req.params.entryId});
+		dataUtils.getChallengeForEntry(db, req.params.entryId, function (err, challengeId) {
+			if (err) throw err;
+
+			res.render("entry", {entryId: req.params.entryId, challengeId: challengeId});
+		});
+		
 	});
 
 	// 4 - Entry Image

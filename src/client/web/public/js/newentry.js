@@ -2,7 +2,14 @@ $(document).ready(function(){
 	console.log("setting image source to " + challengeId);
 	$("#newentryimage").attr("src", "/challenges/images/" + challengeId);
 
-	document.getElementById("apply").onclick = postEntry;
+	$("#apply").click(postEntry);
+	$("#goToHomePage").click(function() {
+		window.open("/", "_self");
+	});
+	$("#goToChallenge").click(function() {
+		window.open("/challenge/" + challengeId, "_self");
+	});
+
 	$("#step1Next").click(showFilterStep);
 	$("#step2Previous").click(showLayoutStep);
 	$("#step2Next").click(showArtifactStep);
@@ -256,7 +263,10 @@ function postEntry() {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			alert("success, data is " + jsonData);
+
+			var jsonObj = JSON.parse(jsonData);
+
+			window.open("/entry/" + jsonObj.entryId, "_self");
 
 			//$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
 		},

@@ -1,5 +1,13 @@
 $(document).ready(function(){
 	$.getJSON('/api/entries/' + entryId, parseEntry);
+
+	$("#goToHomePage").click(function() {
+    	window.open("/", "_self");
+  	});
+
+  	$("#goToChallenge").click(function(){
+  		window.open("/challenge/" + challengeId, "_self");
+  	});
 });
 
 function parseEntry(entry) {
