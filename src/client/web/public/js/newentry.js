@@ -75,6 +75,27 @@ $(document).ready(function(){
 			$("#textSizeHeight").show();
 		}
 	});
+
+	// ARTIFACTS
+	$("input[type=checkbox][name=artifact]").change(function() {
+		if ($("#checkboxBanner").prop("checked")) {
+			$("#bannerSection").show();
+		} else {
+			$("#bannerSection").hide();
+		}
+	});
+
+	$("input[type=radio][name=artifact]").change(function() {
+		if (this.value == 'none') {
+			$("#customArtifacts").hide();
+		} else if (this.value == "preset") {
+			$("#customArtifacts").hide();
+		} else if (this.value == "user_defined") {
+			$("#customArtifacts").hide();
+		} else if (this.value == "custom") {
+			$("#customArtifacts").show();
+		}
+	});
 });
 
 function showFilterStep() {
@@ -217,6 +238,35 @@ function constructJSONObject(jsonObj) {
 	
 
 	jsonObj.steps.filters.push(filter);
+
+	// ARTIFACTS
+
+	jsonObj.steps.artifacts = [];
+
+	var artifact = {};
+
+	if ($("#radioArtifactNone").prop("checked")) {
+		artifact.type = "none";
+	} else if ($("#radioArtifactPreset").prop("checked")) {
+		artifact.type = "preset";
+	} else if ($("#radioArtifactUserDefined").prop("checked")) {
+		artifact.type = "user_defined";
+	} else if ($("#radioArtifactCustom").prop("checked")) {
+		artifact.type = "custom";
+	}
+
+	if ($("#checkboxBanner").prop("checked")) {
+		artifact.banner = {};
+		artifact.banner.text = $("#textBanner").prop("value");
+
+		if ($("#radioBannerLocationBottom").prop("checked")) {
+			artifact.banner.location = "bottom";
+		} else if ($("#radioBannerLocationTop").prop("checked")) {
+			artifact.banner.location = "top";
+		}
+	}
+
+	jsonObj.steps.artifacts.push(artifact);
 }
 
 function applyChanges() {

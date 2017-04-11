@@ -416,23 +416,27 @@ module.exports = {
     		// initialize the image
     		var image = gm(sourceImage);
 
-    		if (steps.layouts) {
-    			applyLayouts(image, steps.layouts);
-    		}
+    		image.size(function (err, size) {
+				if (err) throw err;
 
-    		if (steps.filters) {
-    			applyFilters(image, steps.filters);
-    		}
+	    		if (steps.layouts) {
+	    			applyLayouts(image, size, steps.layouts);
+	    		}
 
-    		if (steps.artifacts) {
-    			applyArtifacts(image, steps.artifacts);
-    		}
+	    		if (steps.filters) {
+	    			applyFilters(image, size, steps.filters);
+	    		}
 
-    		if (steps.decorations) {
-    			applyDecorations(image, steps.decorations);
-    		}
+	    		if (steps.artifacts) {
+	    			applyArtifacts(image, size, steps.artifacts);
+	    		}
 
-			writeImage(image, path, next);
+	    		if (steps.decorations) {
+	    			applyDecorations(image, size, steps.decorations);
+	    		}
+
+				writeImage(image, path, next);
+			});
 		});
 	},
 
@@ -606,7 +610,7 @@ function absoluteToMultiplierSigned(absoluteValue) {
 	}
 	]
 **/
-function applyLayouts (image, layouts) {
+function applyLayouts (image, size, layouts) {
 	//loop through layouts
 	var numLayouts = layouts.length;
 	for (var i = 0; i < numLayouts; i++) {
@@ -742,7 +746,7 @@ function applyLayouts (image, layouts) {
 	}
 	]
 **/
-function applyFilters (image, filters) {
+function applyFilters (image, size, filters) {
 
 	//loop through filters
 	var numFilters = filters.length;
@@ -833,7 +837,6 @@ function applyFilters (image, filters) {
 /**
 	artifacts: [
 	{
-		type: banner | callout | freetext,
 		banner: {
 			position: top | bottom,
 			font: {
@@ -864,8 +867,35 @@ function applyFilters (image, filters) {
 	}
 	]
 **/
-function applyArtifacts (image, artifacts) {
+function applyArtifacts (image, size, artifacts) {
+	//loop through artifacts
 
+	var numArtifacts = artifacts.length;
+	
+	for (var i = 0; i < numArtifacts; i++) {
+
+		var artifact = artifacts[i];
+
+		if (artifact.banner) {
+			console.log("drawing text, " + artifact.banner.text);
+
+			var x = 0, y = 0;
+
+			//testing, set x, y, font typeface, fontsize, background, etc.
+			image.fontSize(40);
+
+			if (artifact.banner.location == "bottom") {
+				x = 20;
+				y = size.height - 100;
+			} else if (artifact.banner.location == "top") {
+				x = 20;
+				y = 20;
+			}
+			console.log("x = " + x + ", y = " + y);
+			image.drawText(x, y, artifact.banner.text);
+		}
+	}
+	
 }
 
 /**
@@ -881,6 +911,6 @@ function applyArtifacts (image, artifacts) {
 		}
 		],
 **/
-function applyDecorations (image, decorations) {
+function applyDecorations (image, size, decorations) {
 
 }

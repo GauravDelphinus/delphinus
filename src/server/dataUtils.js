@@ -196,6 +196,28 @@ module.exports = {
 		    				layouts.push(layout);
 
 	    				} else if (stepFromDB[0][0] == "Artifact") {
+	    					var artifactFromDB = stepFromDB[1];
+
+	    					var artifact = {};
+
+	    					if (artifactFromDB.artifact_type == "none") {
+	    						// shouldn't happen
+	    						throw err;
+	    					} else if (artifactFromDB.artifact_type == "preset") {
+	    						artifact.type = "preset";
+
+	    						artifact.preset = artifactFromDB.preset;
+	    					} else if (artifactFromDB.artifact_type == "user_defined" || artifactFromDB.artifact_type == "custom") {
+	    						artifact.type = artifactFromDB.artifact_type;
+
+	    						if (artifactFromDB.banner == "on") {
+	    							artifact.banner = {};
+	    							artifact.banner.text = artifactFromDB.banner_text;
+	    							artifact.banner.location = artifactFromDB.banner_location;
+	    						}
+	    					}
+
+	    					artifacts.push(artifact);
 
 	    				} else if (stepFromDB[0][0] == "Decoration") {
 
@@ -381,8 +403,40 @@ module.exports = {
 
 	},
 
-	createArtifactNode : function(db, artifactJSON) {
+	createArtifactNode : function(db, artifact, callback) {
+		console.log("createArtifactNode: artifact = " + JSON.stringify(artifact));
+		var cypherQuery = "CREATE (a:Artifact {";
 
+		if (artifact.type == "none") {
+			throw err; // shouldn't happen
+		} else if (artifact.type == "user_defined") {
+			callback(null, parseInt(artifact.user_defined));
+			return;
+		}
+
+		if (artifact.type == "custom") {
+			cypherQuery += " artifact_type : 'custom' ";
+
+			if (artifact.banner) {
+				cypherQuery += ", banner : 'on'";
+				cypherQuery += ", banner_text : '" + artifact.banner.text + "'";
+
+				cypherQuery += ", banner_location : '" + artifact.banner.location + "'";
+			}
+		}
+
+		cypherQuery += "}) RETURN a;";
+
+		console.log("Running cypherQuery: " + cypherQuery);
+
+		db.cypherQuery(cypherQuery, function(err, result) {
+			if (err) throw err;
+
+			console.log(result.data[0]);
+
+			var artifactId = result.data[0]._id;
+			callback(null, artifactId);
+		});
 	},
 
 	createLayoutNode : function(db, layout, callback) {

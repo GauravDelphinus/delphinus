@@ -84,8 +84,18 @@
 	<br>
 	<div id="artifactSection" class="settingsBlock" style="display: none;">
 		<span class="title">Step 3: Add Artifacts</span><br>
-		<input type="checkbox" id="checkboxBanner" name="artifact" value="banner"><b>Add Banner</b>
-				<input type="text" id="textBanner" style="display: none;">
+		<input type="radio" id="radioArtifactNone" name="artifact" value="none" checked="checked"><b>None</b><br>
+		<input type="radio" id="radioArtifactPreset" name="artifact" value="preset"><b>Preset</b><br>
+		<input type="radio" id="radioArtifactUserDefined" name="artifact" value="user_defined"><b>User Defined</b><br>
+		<input type="radio" id="radioArtifactCustom" name="artifact" value="custom"><b>Custom</b>
+		<div id="customArtifacts" class="settingsSubBlock" style="display: none;">
+			<input type="checkbox" id="checkboxBanner" name="artifact" value="banner"><b>Add Banner</b>
+			<div id="bannerSection"  style="display: none;">
+				<input type="text" id="textBanner">
+				<input type="radio" id="radioBannerLocationBottom" name="banner" value="bannerLocationBottom" checked="checked"><b>Bottom</b><br>
+				<input type="radio" id="radioBannerLocationTop" name="banner" value="bannerLocationTop"><b>Top</b>
+			</div>
+		</div>
 		<br><br>
 		<div class="center">
 			<button class="submitButton" id="step3Previous"><< Previous</button>
