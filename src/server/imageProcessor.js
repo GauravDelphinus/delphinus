@@ -1,6 +1,6 @@
 var tmp = require("tmp");
 var fs = require("fs");
-var gm = require("gm").subClass({imageMagick: true});
+var gm = require("gm") //.subClass({imageMagick: true});
 var dataUtils = require("./dataUtils");
 
 /**
@@ -415,7 +415,7 @@ module.exports = {
 
     		// initialize the image
     		var image = gm(sourceImage);
-
+    		
     		image.size(function (err, size) {
 				if (err) throw err;
 
@@ -810,6 +810,7 @@ function applyFilters (image, size, filters) {
 				image.mosaic();
 			}
 			if (filter.effects.negative == "on") {
+				console.log("calling image.negative()");
 				image.negative();
 			}
 			if (filter.effects.solarize) {
@@ -846,6 +847,7 @@ function applyFilters (image, size, filters) {
 				strokeWidth: <number>
 			},
 			text: "text to draw",
+			background: <color> // could set opacity to zero for transparent
 		},
 		callout: {
 			position: {
@@ -877,22 +879,26 @@ function applyArtifacts (image, size, artifacts) {
 		var artifact = artifacts[i];
 
 		if (artifact.banner) {
-			console.log("drawing text, " + artifact.banner.text);
+			var labelHeight = 200; // testing
 
-			var x = 0, y = 0;
-
-			//testing, set x, y, font typeface, fontsize, background, etc.
-			image.fontSize(40);
+			image.fontSize(parseInt(artifact.banner.fontSize));
+			image.font(artifact.banner.fontName);
 
 			if (artifact.banner.location == "bottom") {
-				x = 20;
-				y = size.height - 100;
+				image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
+
 			} else if (artifact.banner.location == "top") {
-				x = 20;
-				y = 20;
+				image.region(size.width, labelHeight, 0, 0).gravity("Center");
 			}
-			console.log("x = " + x + ", y = " + y);
-			image.drawText(x, y, artifact.banner.text);
+
+			// Fill the background
+			image.fill(artifact.banner.backgroundColor);
+			image.drawRectangle(0, 0, size.width, size.height);
+
+			// Draw the text
+			image.strokeWidth(1);
+			image.stroke(artifact.banner.textColor);
+			image.drawText(0, 0, artifact.banner.text);
 		}
 	}
 	

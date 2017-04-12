@@ -214,6 +214,10 @@ module.exports = {
 	    							artifact.banner = {};
 	    							artifact.banner.text = artifactFromDB.banner_text;
 	    							artifact.banner.location = artifactFromDB.banner_location;
+	    							artifact.banner.fontSize = parseInt(artifactFromDB.banner_fontSize);
+	    							artifact.banner.fontName = artifactFromDB.banner_fontName;
+	    							artifact.banner.backgroundColor = artifactFromDB.banner_backgroundColor;
+	    							artifact.banner.textColor = artifactFromDB.banner_textColor;
 	    						}
 	    					}
 
@@ -419,9 +423,13 @@ module.exports = {
 
 			if (artifact.banner) {
 				cypherQuery += ", banner : 'on'";
-				cypherQuery += ", banner_text : '" + artifact.banner.text + "'";
+				cypherQuery += ", banner_text : '" + escapeSingleQuotes(artifact.banner.text) + "'";
 
 				cypherQuery += ", banner_location : '" + artifact.banner.location + "'";
+				cypherQuery += ", banner_fontSize : '" + artifact.banner.fontSize + "'";
+				cypherQuery += ", banner_fontName : '" + artifact.banner.fontName + "'";
+				cypherQuery += ", banner_backgroundColor : '" + artifact.banner.backgroundColor + "'";
+				cypherQuery += ", banner_textColor : '" + artifact.banner.textColor + "'";
 			}
 		}
 
@@ -477,4 +485,14 @@ module.exports = {
 		});
 	}
 
+
+
+};
+
+function escapeSingleQuotes (str) {
+	return str.replace(/'/g, "\\'");
+	//str.replace(/h/g, "v");
+	//console.log("str is now " + str);
+
+	return str;
 }

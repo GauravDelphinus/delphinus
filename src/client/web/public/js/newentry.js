@@ -96,6 +96,30 @@ $(document).ready(function(){
 			$("#customArtifacts").show();
 		}
 	});
+
+	$("#textBanner").change(function() {
+		applyChanges();
+	});
+
+	$("input[type=radio][name=banner]").change(function() {
+		applyChanges();
+	});
+
+	$("#bannerTextFontSize").change(function() {
+		applyChanges();
+	});
+
+	$("#bannerTextFontName").change(function () {
+		applyChanges();
+	});
+
+	$("#bannerBackgroundColor").change(function () {
+		applyChanges();
+	});
+
+	$("#bannerTextColor").change(function() {
+		applyChanges();
+	});
 });
 
 function showFilterStep() {
@@ -253,18 +277,25 @@ function constructJSONObject(jsonObj) {
 		artifact.type = "user_defined";
 	} else if ($("#radioArtifactCustom").prop("checked")) {
 		artifact.type = "custom";
-	}
 
-	if ($("#checkboxBanner").prop("checked")) {
-		artifact.banner = {};
-		artifact.banner.text = $("#textBanner").prop("value");
+		if ($("#checkboxBanner").prop("checked")) {
+			artifact.banner = {};
+			artifact.banner.text = $("#textBanner").prop("value");
 
-		if ($("#radioBannerLocationBottom").prop("checked")) {
-			artifact.banner.location = "bottom";
-		} else if ($("#radioBannerLocationTop").prop("checked")) {
-			artifact.banner.location = "top";
+			if ($("#radioBannerLocationBottom").prop("checked")) {
+				artifact.banner.location = "bottom";
+			} else if ($("#radioBannerLocationTop").prop("checked")) {
+				artifact.banner.location = "top";
+			}
+
+			artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
+			artifact.banner.fontName = $("#bannerTextFontName").val();
+			artifact.banner.backgroundColor = $("#bannerBackgroundColor").prop("value");
+			artifact.banner.textColor = $("#bannerTextColor").prop("value");
 		}
 	}
+
+
 
 	jsonObj.steps.artifacts.push(artifact);
 }

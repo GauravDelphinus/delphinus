@@ -69,7 +69,7 @@
 			<br>
 	
 			<span class="subTitle">Settings</span><br>
-			<b>Contrast</b><input id="contrast" type="range" min="-100" max="100" value="0" step="5"><span id="contrastValue"></span><br>
+			<b>Contrast</b>-100<input id="contrast" type="range" min="-100" max="100" value="0" step="5">100<span id="contrastValue"></span><br>
 			<b>Brightness</b><input id="brightness" type="range" min="-100" max="100" value="0" step="5"><span id="brightnessValue"></span><br>
 			<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
 			<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
@@ -91,9 +91,21 @@
 		<div id="customArtifacts" class="settingsSubBlock" style="display: none;">
 			<input type="checkbox" id="checkboxBanner" name="artifact" value="banner"><b>Add Banner</b>
 			<div id="bannerSection"  style="display: none;">
-				<input type="text" id="textBanner">
-				<input type="radio" id="radioBannerLocationBottom" name="banner" value="bannerLocationBottom" checked="checked"><b>Bottom</b><br>
-				<input type="radio" id="radioBannerLocationTop" name="banner" value="bannerLocationTop"><b>Top</b>
+				<b>Banner Text:</b><input type="text" id="textBanner">
+				<b>Font Size</b><input type="number" id="bannerTextFontSize" value="30">
+				<b>Font Name</b><select id="bannerTextFontName">
+									<option value="arial">Arial</option>
+									<option value="times">Times</option>
+									<option value="courier">Courier</option>
+									</select>
+				<b>Text Color</b><input type="color" id="bannerTextColor" value="#000000"><br>
+				<b>Banner Location:</b><input type="radio" id="radioBannerLocationBottom" name="banner" value="bannerLocationBottom" checked="checked"><b>Bottom</b>
+				<input type="radio" id="radioBannerLocationTop" name="banner" value="bannerLocationTop"><b>Top</b><br>
+
+
+				
+				
+				<b>Background Color</b><input type="color" id="bannerBackgroundColor" value="#FFFFFF">
 			</div>
 		</div>
 		<br><br>
