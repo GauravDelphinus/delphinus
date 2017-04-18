@@ -648,6 +648,7 @@ function applyLayouts (image, size, layouts) {
 		}
 
 		if (layout.shear) {
+			console.log("calling shear with xDegrees = " + layout.shear.xDegrees + ", yDegrees = " + layout.shear.yDegrees);
 			image.shear(layout.shear.xDegrees, layout.shear.yDegrees);
 		}
 	}

@@ -191,6 +191,26 @@ module.exports = {
 		    					} else if (layoutFromDB.mirror_flop == "on") {
 		    						layout.mirror = "flop";
 		    					}
+
+		    					if (layoutFromDB.crop == "on") {
+		    						layout.crop = {};
+		    						layout.crop.x = parseInt(layoutFromDB.crop_x);
+		    						layout.crop.y = parseInt(layoutFromDB.crop_y);
+		    						layout.crop.width = parseInt(layoutFromDB.crop_width);
+		    						layout.crop.height = parseInt(layoutFromDB.crop_height);
+		    					}
+
+		    					if (layoutFromDB.rotation == "on") {
+		    						layout.rotation = {};
+		    						layout.rotation.degrees = parseInt(layoutFromDB.rotation_degrees);
+		    						layout.rotation.color = layoutFromDB.rotation_color;
+		    					}
+
+		    					if (layoutFromDB.shear == "on") {
+		    						layout.shear = {};
+		    						layout.shear.xDegrees = parseInt(layoutFromDB.shear_xDegrees);
+		    						layout.shear.yDegrees = parseInt(layoutFromDB.shear_yDegrees);
+		    					}
 		    				}
 
 		    				layouts.push(layout);
@@ -468,6 +488,26 @@ module.exports = {
 				} else if (layout.mirror == "flop") {
 					cypherQuery += ", mirror_flop : 'on'";
 				}
+			}
+
+			if (layout.crop) {
+				cypherQuery += ", crop : 'on'";
+				cypherQuery += ", crop_x : '" + layout.crop.x + "'";
+				cypherQuery += ", crop_y : '" + layout.crop.y + "'";
+				cypherQuery += ", crop_width : '" + layout.crop.width + "'";
+				cypherQuery += ", crop_height : '" + layout.crop.height + "'";
+			}
+
+			if (layout.rotation) {
+				cypherQuery += ", rotation : 'on'";
+				cypherQuery += ", rotation_degrees : '" + layout.rotation.degrees + "'";
+				cypherQuery += ", rotation_color : '" + layout.rotation.color + "'";
+			}
+
+			if (layout.shear) {
+				cypherQuery += ", shear : 'on'";
+				cypherQuery += ", shear_xDegrees : '" + layout.shear.xDegrees + "'";
+				cypherQuery += ", shear_yDegrees : '" + layout.shear.yDegrees + "'";
 			}
 		}
 

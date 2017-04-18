@@ -21,6 +21,7 @@ var routes = function(db) {
 			purgeImageAfterUse = false;
 
 			dataUtils.getImageDataForChallenge(db, req.body.imageData, function(err, image){
+				console.log("/api/filters/apply - Received req.body = ~~" + JSON.stringify(req.body) + "~~");
 				if (err) throw err;
 
 				sourceImagePath = global.appRoot + config.path.challengeImages + image;

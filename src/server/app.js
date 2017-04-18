@@ -116,8 +116,15 @@ module.exports = function() {
 
 				console.log("calling res.sendFile with " + image);
 				res.sendFile(image, function(err) {
-					if (err) throw err;
-
+					if (err) {
+						if (err.code == "ECONNABORTED") {
+						console.log("err is " + err + ", continuing as usual ... ");
+						//console.log("err JSON is " + JSON.stringify(err));
+						//console.log("err.name is " + err.name);
+						} else {
+							throw err;
+						}
+					}
 					//dispose off the file
 					fs.unlink(image, function(err) {
 						if (err) throw err;
