@@ -48,107 +48,62 @@ $(document).ready(function(){
 	setChangeCallback(applyChanges, ["#checboxShear", "#shearX", "shearY"]);
 
 	// FILTERS SECTION ----------------------
-	$("#contrast").change(function() {
-		$("#contrastValue").text($("#contrast").val());
-		applyChanges();
-	});
-	$("#brightness").change(function() {
-		$("#brightnessValue").text($("#brightness").val());
-		applyChanges();
-	});
-	$("#hue").change(function() {
-		$("#hueValue").text($("#hue").val());
-		applyChanges();
-	});
-	$("#saturation").change(function() {
-		$("#saturationValue").text($("#saturation").val());
+	$("input[type=radio][name=filter]").change(function () {
+		showHideSection(this.value, 
+			[{value: "none", id: "#noneFilterSection"}, 
+			{value: "preset", id: "#presetFilterSection"}, 
+			{value: "user_defined", id: "#userDefinedFilterSection"}, 
+			{value: "custom", id: "#customFilterSection"}]);
 		applyChanges();
 	});
 
-	$("input[type=checkbox][name=effects]").change(applyChanges);
+	setChangeCallback(applyChanges, [
+		"input[type=checkbox][name=effects]", 
+		"input[type=range]",
+		"#contrast",
+		"#brightness",
+		"#hue",
+		"#saturation"
+		]);
 
-
-
-
-	$("input[type=range]").change(applyChanges);
-
-	// Set default selection to 'preset'
-	//$("input:radio[name=effect]").filter("[value=none]").prop("checked", true);
-
-	$("input[type=radio][name=filter]").change(function() {
-		if (this.value == 'none') {
-			$("#presetSection").hide();
-			$("#userDefinedSection").hide();
-			$("#customSection").hide();
-		} else if (this.value == "preset") {
-			$("#presetSection").show();
-			$("#userDefinedSection").hide();
-			$("#customSection").hide();
-		} else if (this.value == "user_defined") {
-			$("#presetSection").hide();
-			$("#userDefinedSection").show();
-			$("#customSection").hide();
-		} else if (this.value == "custom") {
-			$("#presetSection").hide();
-			$("#userDefinedSection").hide();
-			$("#customSection").show();
-		}
-	});
-
-	$("input[type=radio][name=size]").change(function() {
-		if (this.value == "autoSize") {
-			$("#textSizeWidth").hide();
-			$("#textSizeHeight").hide();
-		} else if (this.value == "customSize") {
-			$("#textSizeWidth").show();
-			$("#textSizeHeight").show();
-		}
-	});
-
-	// ARTIFACTS
-	$("input[type=checkbox][name=artifact]").change(function() {
-		if ($("#checkboxBanner").prop("checked")) {
-			$("#bannerSection").show();
-		} else {
-			$("#bannerSection").hide();
-		}
-	});
-
-	$("input[type=radio][name=artifact]").change(function() {
-		if (this.value == 'none') {
-			$("#customArtifacts").hide();
-		} else if (this.value == "preset") {
-			$("#customArtifacts").hide();
-		} else if (this.value == "user_defined") {
-			$("#customArtifacts").hide();
-		} else if (this.value == "custom") {
-			$("#customArtifacts").show();
-		}
-	});
-
-	$("#textBanner").change(function() {
+	// ARTIFACTS SECTION ------------------------
+	$("input[type=radio][name=artifact]").change(function () {
+		showHideSection(this.value, 
+			[{value: "none", id: "#noneArtifactSection"}, 
+			{value: "preset", id: "#presetArtifactSection"}, 
+			{value: "user_defined", id: "#userDefinedArtifactSection"}, 
+			{value: "custom", id: "#customArtifactSection"}]);
 		applyChanges();
 	});
 
-	$("input[type=radio][name=banner]").change(function() {
+	enableDisableOnCheck("#checkboxBanner", ["#bannerSection"]);
+	setChangeCallback(applyChanges, [
+		"#textBanner", 
+		"input[type=radio][name=banner]",
+		"#checkboxBanner",
+		"#bannerTextFontSize",
+		"#bannerTextFontName",
+		"#bannerBackgroundColor",
+		"#bannerTextColor"
+		]);
+
+	// DECORATIONS SECTION ------------------------
+	$("input[type=radio][name=decoration]").change(function () {
+		showHideSection(this.value, 
+			[{value: "none", id: "#noneDecorationSection"}, 
+			{value: "preset", id: "#presetDecorationSection"}, 
+			{value: "user_defined", id: "#userDefinedDecorationSection"}, 
+			{value: "custom", id: "#customDecorationSection"}]);
 		applyChanges();
 	});
 
-	$("#bannerTextFontSize").change(function() {
-		applyChanges();
-	});
+	enableDisableOnCheck("#checkboxBorder", ["#borderSection"]);
+	setChangeCallback(applyChanges, [
+		"#checkboxBorder", 
+		"#borderWidth",
+		"#borderColor"
+		]);
 
-	$("#bannerTextFontName").change(function () {
-		applyChanges();
-	});
-
-	$("#bannerBackgroundColor").change(function () {
-		applyChanges();
-	});
-
-	$("#bannerTextColor").change(function() {
-		applyChanges();
-	});
 });
 
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
@@ -385,6 +340,32 @@ function constructJSONObject(jsonObj) {
 
 
 	jsonObj.steps.artifacts.push(artifact);
+
+
+	// DECORATIONS
+
+	jsonObj.steps.decorations = [];
+
+	var decoration = {};
+
+	if ($("#radioDecorationNone").prop("checked")) {
+		decoration.type = "none";
+	} else if ($("#radioDecorationPreset").prop("checked")) {
+		decoration.type = "preset";
+	} else if ($("#radioDecorationUserDefined").prop("checked")) {
+		decoration.type = "user_defined";
+	} else if ($("#radioDecorationCustom").prop("checked")) {
+		decoration.type = "custom";
+
+		if ($("#checkboxBorder").prop("checked")) {
+			decoration.border = {};
+
+			decoration.border.width = $("#borderWidth").val();
+			decoration.border.color = $("#borderColor").val();
+		}
+	}
+
+	jsonObj.steps.decorations.push(decoration);
 }
 
 function applyChanges() {

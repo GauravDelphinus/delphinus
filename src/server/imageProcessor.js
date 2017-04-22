@@ -919,5 +919,16 @@ function applyArtifacts (image, size, artifacts) {
 		],
 **/
 function applyDecorations (image, size, decorations) {
+	var numDecorations = decorations.length;
+
+	for (var i = 0; i < numDecorations; i++) {
+		var decoration = decorations[i];
+
+		if (decoration.border) {
+			image.borderColor(decoration.border.color);
+			image.border(decoration.border.width, decoration.border.width);
+
+		}
+	}
 
 }

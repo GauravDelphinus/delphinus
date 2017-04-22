@@ -244,7 +244,29 @@ module.exports = {
 	    					artifacts.push(artifact);
 
 	    				} else if (stepFromDB[0][0] == "Decoration") {
+	    					var decorationFromDB = stepFromDB[1];
 
+	    					var decoration = {};
+
+	    					if (decorationFromDB.decoration_type == "none") {
+	    						//shouldn't happen
+	    						throw err;
+	    					} else if (decorationFromDB.decoration_type == "preset") {
+	    						decoration.type = "preset";
+
+	    						decoration.preset = decorationFromDB.preset;
+	    					} else if (decorationFromDB.decoration_type == "user_defined" || decorationFromDB.decoration_type == "custom") {
+	    						decoration.type = decorationFromDB.decoration_type;
+
+	    						if (decorationFromDB.border == "on") {
+	    							decoration.border = {};
+
+	    							decoration.border.width = parseInt(decorationFromDB.border_width);
+	    							decoration.border.color = decorationFromDB.border_color;
+	    						}
+	    					}
+
+	    					decorations.push(decoration);
 	    				}
 	    				
 	    				if (filters.length > 0) {
@@ -423,8 +445,40 @@ module.exports = {
 		});
 	},
 
-	createDecorationNode : function(db, decorationJSON) {
+	createDecorationNode : function(db, decoration, callback) {
+		console.log("createDecorationNode: decoration = " + JSON.stringify(decoration));
 
+		var cypherQuery = "CREATE (d:Decoration {";
+
+		if (decoration.type == "none") {
+			throw err; // shouldn't happen
+		} else if (decoration.type == "user_defined") {
+			callback(null, parseInt(decoration.user_defined));
+			return;
+		}
+
+		if (decoration.type == "custom") {
+			cypherQuery += " decoration_type : 'custom' ";
+
+			if (decoration.border) {
+				cypherQuery += ", border : 'on'";
+				cypherQuery += ", border_width : '" + decoration.border.width + "'";
+				cypherQuery += ", border_color : '" + decoration.border.color + "'";
+			}
+		}
+
+		cypherQuery += " }) RETURN d;";
+
+		console.log("Running cypherQuery: " + cypherQuery);
+
+		db.cypherQuery(cypherQuery, function(err, result) {
+			if (err) throw err;
+
+			console.log(result.data[0]);
+
+			var decorationId = result.data[0]._id;
+			callback(null, decorationId);
+		});
 	},
 
 	createArtifactNode : function(db, artifact, callback) {

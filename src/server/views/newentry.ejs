@@ -61,8 +61,13 @@
 		<input type="radio" id="radioUserDefined" name="filter" value="user_defined"><b>User Defined</b><br>
 		<input type="radio" id="radioCustom" name="filter" value="custom"><b>Custom</b>
 
+		<!-- NONE FILTER SUBSECTION -->
+		<div id="noneFilterSection" class="settingsSubBlock">
+		<p>No Filter Selected</p>
+		</div>
+
 		<!-- PRESET FILTER SUBSECTION -->
-		<div id="presetSection" class="settingsSubBlock">
+		<div id="presetFilterSection" class="settingsSubBlock">
 			<span class="subTitle">Preset Filters</span><br>
 
 			<input type="radio" id="radioRainyDay" name="preset" value="rainyDay"><b>Rainy Day</b>
@@ -73,12 +78,12 @@
 		</div>
 
 		<!-- USER DEFINED FILTER SUBSECTION -->
-		<div id="userDefinedSection" class="settingsSubBlock" style="display: none;">
+		<div id="userDefinedFilterSection" class="settingsSubBlock" style="display: none;">
 			<span class="subTitle">User Defined Filters</span><br>
 		</div>
 
 		<!-- CUSTOM FILTER SUBSECTION -->
-		<div id="customSection" class="settingsSubBlock" style="display: none;">
+		<div id="customFilterSection" class="settingsSubBlock" style="display: none;">
 			<span class="subTitle">Custom Filters</span><br>
 		
 			<span class="subTitle">Effects</span><br>
@@ -119,10 +124,25 @@
 		<input type="radio" id="radioArtifactUserDefined" name="artifact" value="user_defined"><b>User Defined</b><br>
 		<input type="radio" id="radioArtifactCustom" name="artifact" value="custom"><b>Custom</b>
 		
+		<!-- NONE ARTIFACT SUBSECTION -->
+		<div id="noneArtifactSection" class="settingsSubBlock">
+		<p>No Artifact Selected</p>
+		</div>
+
+		<!-- PRESET ARTIFACT SUBSECTION -->
+		<div id="presetArtifactSection" class="settingsSubBlock">
+		<p>Preset Artifacts</p>
+		</div>
+
+		<!-- USER DEFINED ARTIFACT SUBSECTION -->
+		<div id="userDefinedArtifactSection" class="settingsSubBlock" style="display: none;">
+			<span class="subTitle">User Defined Artifacts</span><br>
+		</div>
+
 		<!-- CUSTOM ARTIFACT SUBSECTION -->
-		<div id="customArtifacts" class="settingsSubBlock" style="display: none;">
+		<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
 			<input type="checkbox" id="checkboxBanner" name="artifact" value="banner"><b>Add Banner</b>
-			<div id="bannerSection"  style="display: none;">
+			<div id="bannerSection">
 				<b>Banner Text:</b><input type="text" id="textBanner">
 				<b>Font Size</b><input type="number" id="bannerTextFontSize" value="30">
 				<b>Font Name</b><select id="bannerTextFontName">
@@ -149,6 +169,38 @@
 	<!-- DECORATION SECTION -->
 	<div id="decorationSection" class="settingsBlock" style="display: none;">
 		<span class="title">Step 4: Add Decorations</span><br>
+
+		<input type="radio" id="radioDecorationNone" name="decoration" value="none" checked="checked"><b>None</b><br>
+		<input type="radio" id="radioDecorationPreset" name="decoration" value="preset"><b>Preset</b><br>
+		<input type="radio" id="radioDecorationUserDefined" name="decoration" value="user_defined"><b>User Defined</b><br>
+		<input type="radio" id="radioDecorationCustom" name="decoration" value="custom"><b>Custom</b>
+
+		<!-- NONE DECORATION SUBSECTION -->
+		<div id="noneDecorationSection" class="settingsSubBlock">
+		<p>No Decoration Selected</p>
+		</div>
+
+		<!-- PRESET DECORATION SUBSECTION -->
+		<div id="presetDecorationSection" class="settingsSubBlock">
+		<p>Preset Decorations</p>
+		</div>
+
+		<!-- USER DEFINED DECORATION SUBSECTION -->
+		<div id="userDefinedDecorationSection" class="settingsSubBlock" style="display: none;">
+			<span class="subTitle">User Defined Decorations</span><br>
+		</div>
+
+		<!-- CUSTOM DECORATION SUBSECTION -->
+		<div id="customDecorationSection" class="settingsSubBlock" style="display: none;">
+			<input type="checkbox" id="checkboxBorder" name="border" value="border"><b>Add Border</b>
+			<div id="borderSection">
+				<b>Border Width:</b><input type="number" id="borderWidth" value="0">
+				<b>Border Color</b><input type="color" id="borderColor" value="#000000">
+			</div>
+			
+		</div>
+		<br><br>
+
 		<div class="center">
 			<button class="submitButton" id="step4Previous"><< Previous</button>
 		</div>
