@@ -59,6 +59,7 @@ $(document).ready(function(){
 
 	setChangeCallback(applyChanges, [
 		"input[type=checkbox][name=effects]", 
+		"input[type=radio][name=preset]",
 		"input[type=range]",
 		"#contrast",
 		"#brightness",
@@ -233,17 +234,7 @@ function constructJSONObject(jsonObj) {
 	} else if ($("#radioPreset").prop("checked")) { // PRESET FILTER
 		filter.type = "preset";
 
-		if ($("#radioRainyDay").prop("checked")) {
-			filter.preset = "rainy_day";
-		} else if ($("#radioSolaris").prop("checked")) {
-			filter.preset = "solaris";
-		} else if ($("#radioNightingale").prop("checked")) {
-			filter.preset = "nightingale";
-		} else if ($("#radioRedGlory").prop("checked")) {
-			filter.preset = "red_glory";
-		} else if ($("#radioComical").prop("checked")) {
-			filter.preset = "comical";
-		} 
+		filter.preset = $("input[name=preset]:checked").val();
 	} else if ($("#radioUserDefined").prop("checked")) { // USER DEFINED FILTER
 		filter.type = "user_defined";
 		filter.user_defined = "some_unique_name";
@@ -308,6 +299,8 @@ function constructJSONObject(jsonObj) {
 	// ARTIFACTS
 
 	jsonObj.steps.artifacts = [];
+
+	console.log("jsonObj is " + JSON.stringify(jsonObj));
 
 	var artifact = {};
 

@@ -102,7 +102,7 @@ module.exports = {
 		    				} else if (filterFromDB.filter_type == "preset") {
 		    					filter.type = "preset";
 
-		    					filter.preset = filterFromDB.preset;
+		    					filter.preset = parseInt(filterFromDB.filter_preset);
 
 		    				} else if (filterFromDB.filter_type == "user_defined" || filterFromDB.filter_type == "custom") {
 		    					

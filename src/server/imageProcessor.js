@@ -2,6 +2,7 @@ var tmp = require("tmp");
 var fs = require("fs");
 var gm = require("gm") //.subClass({imageMagick: true});
 var dataUtils = require("./dataUtils");
+var config = require('./config');
 
 /**
 	FORMAT OF JSON SENT UP TO SERVER
@@ -463,81 +464,85 @@ module.exports = {
 
     			var filter = filters[i];
 
-    			// NOTE: the filter object sent to the image processor does *not* have the custom/preset/user_defined objects
+    			// NOTE: the filter object sent to the image processor does *not* have the custom/user_defined objects
     			// because all those are normalized/resolved by the time the information reaches the image process.
     			// The image processor expects actual settings, and does not need to worry about where they are coming from.
     			// So the format here skips the custom/preset/user_defined level in the object hierarchy.
     			console.log("filter is: " + JSON.stringify(filter));
-    			if (filter.settings) {
+    			if (filter.type == "preset") {
+    				applyPresetFilter(image, filter.preset);
+    			} else { // check for custom settings
+	    			if (filter.settings) {
 
-    				// Brigthness, Saturation and Hue
-    				if (filter.settings.brightness || filter.settings.saturation || filter.settings.hue) {
-    					var brightness, hue, saturation;
-    					if (filter.settings.brightness) {
-    						// Brightness values are from -100 to 100, 0 meaning no change
-    						// Image Processor expects the values from -200% to 200%, 100% meaning no change
-    						brightness = absoluteToPercentageChangeSigned(filter.settings.brightness.value);
-    					} else {
-    						brightness = 100; // no change, 100%
-    					}
+	    				// Brigthness, Saturation and Hue
+	    				if (filter.settings.brightness || filter.settings.saturation || filter.settings.hue) {
+	    					var brightness, hue, saturation;
+	    					if (filter.settings.brightness) {
+	    						// Brightness values are from -100 to 100, 0 meaning no change
+	    						// Image Processor expects the values from -200% to 200%, 100% meaning no change
+	    						brightness = absoluteToPercentageChangeSigned(filter.settings.brightness.value);
+	    					} else {
+	    						brightness = 100; // no change, 100%
+	    					}
 
-    					if (filter.settings.saturation) {
-    						saturation = absoluteToPercentageChangeSigned(filter.settings.saturation.value);
-    					} else {
-    						saturation = 100; // no change, 100%
-    					}
+	    					if (filter.settings.saturation) {
+	    						saturation = absoluteToPercentageChangeSigned(filter.settings.saturation.value);
+	    					} else {
+	    						saturation = 100; // no change, 100%
+	    					}
 
-    					if (filter.settings.hue) {
-    						hue = absoluteToPercentageChangeSigned(filter.settings.hue.value);
-    					} else {
-    						hue = 100; // no change, 100%
-    					}
+	    					if (filter.settings.hue) {
+	    						hue = absoluteToPercentageChangeSigned(filter.settings.hue.value);
+	    					} else {
+	    						hue = 100; // no change, 100%
+	    					}
 
-    					// now, do the thing
-    					console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
-    					image.modulate(brightness, saturation, hue);
-    				}
-    		
-    						
-    				// Contrast
-    				if (filter.settings.contrast) {
-    					image.contrast(absoluteToMultiplierSigned(filter.settings.contrast.value));
-    				}
-    						
-    				// ADD MORE
-    			}
+	    					// now, do the thing
+	    					console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
+	    					image.modulate(brightness, saturation, hue);
+	    				}
+	    		
+	    						
+	    				// Contrast
+	    				if (filter.settings.contrast) {
+	    					image.contrast(absoluteToMultiplierSigned(filter.settings.contrast.value));
+	    				}
+	    						
+	    				// ADD MORE
+	    			}
 
-    			if (filter.effects) {
-    				if (filter.effects.paint) {
-    					image.paint(filter.effects.paint.radius);
-    				}
-    				if (filter.effects.grayscale == "on") {
-    					image.colorspace("GRAY");
-    				}
-    				if (filter.effects.mosaic == "on") {
-    					image.mosaic();
-    				}
-    				if (filter.effects.negative == "on") {
-    					image.negative();
-    				}
-    				if (filter.effects.solarize) {
-    					image.solarize(filter.effects.solarize.threshold);
-    				}
-    				if (filter.effects.monochrome == "on") {
-    					image.monochrome();
-    				}
-    				if (filter.effects.swirl) {
-    					image.swirl(filter.effects.swirl.degrees);
-    				}
-    				if (filter.effects.wave) {
-    					image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
-    				}
-    				if (filter.effects.spread) {
-    					image.spread(filter.effects.spread.amount);
-    				}
-    				if (filter.effects.charcoal) {
-    					image.charcoal(filter.effects.charcoal.factor);
-    				}
+	    			if (filter.effects) {
+	    				if (filter.effects.paint) {
+	    					image.paint(filter.effects.paint.radius);
+	    				}
+	    				if (filter.effects.grayscale == "on") {
+	    					image.colorspace("GRAY");
+	    				}
+	    				if (filter.effects.mosaic == "on") {
+	    					image.mosaic();
+	    				}
+	    				if (filter.effects.negative == "on") {
+	    					image.negative();
+	    				}
+	    				if (filter.effects.solarize) {
+	    					image.solarize(filter.effects.solarize.threshold);
+	    				}
+	    				if (filter.effects.monochrome == "on") {
+	    					image.monochrome();
+	    				}
+	    				if (filter.effects.swirl) {
+	    					image.swirl(filter.effects.swirl.degrees);
+	    				}
+	    				if (filter.effects.wave) {
+	    					image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
+	    				}
+	    				if (filter.effects.spread) {
+	    					image.spread(filter.effects.spread.amount);
+	    				}
+	    				if (filter.effects.charcoal) {
+	    					image.charcoal(filter.effects.charcoal.factor);
+	    				}
+	    			}
     			}
 			}
 			writeImage(image, path, next);
@@ -761,78 +766,84 @@ function applyFilters (image, size, filters) {
 		// The image processor expects actual settings, and does not need to worry about where they are coming from.
 		// So the format here skips the custom/preset/user_defined level in the object hierarchy.
 		console.log("filter is: " + JSON.stringify(filter));
-		if (filter.settings) {
 
-			// Brigthness, Saturation and Hue
-			if (filter.settings.brightness || filter.settings.saturation || filter.settings.hue) {
-				var brightness, hue, saturation;
-				if (filter.settings.brightness) {
-					// Brightness values are from -100 to 100, 0 meaning no change
-					// Image Processor expects the values from -200% to 200%, 100% meaning no change
-					brightness = absoluteToPercentageChangeSigned(filter.settings.brightness.value);
-				} else {
-					brightness = 100; // no change, 100%
+		if (filter.type == "preset") {
+			applyPresetFilter(image, filter.preset);
+		} else if (filter.type == "custom") {
+			if (filter.settings) {
+
+				// Brigthness, Saturation and Hue
+				if (filter.settings.brightness || filter.settings.saturation || filter.settings.hue) {
+					var brightness, hue, saturation;
+					if (filter.settings.brightness) {
+						// Brightness values are from -100 to 100, 0 meaning no change
+						// Image Processor expects the values from -200% to 200%, 100% meaning no change
+						brightness = absoluteToPercentageChangeSigned(filter.settings.brightness.value);
+					} else {
+						brightness = 100; // no change, 100%
+					}
+
+					if (filter.settings.saturation) {
+						saturation = absoluteToPercentageChangeSigned(filter.settings.saturation.value);
+					} else {
+						saturation = 100; // no change, 100%
+					}
+
+					if (filter.settings.hue) {
+						hue = absoluteToPercentageChangeSigned(filter.settings.hue.value);
+					} else {
+						hue = 100; // no change, 100%
+					}
+
+					// now, do the thing
+					console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
+					image.modulate(brightness, saturation, hue);
 				}
-
-				if (filter.settings.saturation) {
-					saturation = absoluteToPercentageChangeSigned(filter.settings.saturation.value);
-				} else {
-					saturation = 100; // no change, 100%
+		
+						
+				// Contrast
+				if (filter.settings.contrast) {
+					image.contrast(absoluteToMultiplierSigned(filter.settings.contrast.value));
 				}
-
-				if (filter.settings.hue) {
-					hue = absoluteToPercentageChangeSigned(filter.settings.hue.value);
-				} else {
-					hue = 100; // no change, 100%
-				}
-
-				// now, do the thing
-				console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
-				image.modulate(brightness, saturation, hue);
-			}
-	
-					
-			// Contrast
-			if (filter.settings.contrast) {
-				image.contrast(absoluteToMultiplierSigned(filter.settings.contrast.value));
-			}
 					
 			// ADD MORE
-		}
+			}
 
-		if (filter.effects) {
-			if (filter.effects.paint) {
-				image.paint(filter.effects.paint.radius);
-			}
-			if (filter.effects.grayscale == "on") {
-				image.colorspace("GRAY");
-			}
-			if (filter.effects.mosaic == "on") {
-				image.mosaic();
-			}
-			if (filter.effects.negative == "on") {
-				console.log("calling image.negative()");
-				image.negative();
-			}
-			if (filter.effects.solarize) {
-				image.solarize(filter.effects.solarize.threshold);
-			}
-			if (filter.effects.monochrome == "on") {
-				image.monochrome();
-			}
-			if (filter.effects.swirl) {
-				image.swirl(filter.effects.swirl.degrees);
-			}
-			if (filter.effects.wave) {
-				image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
-			}
-			if (filter.effects.spread) {
-				image.spread(filter.effects.spread.amount);
-			}
-			if (filter.effects.charcoal) {
-				image.charcoal(filter.effects.charcoal.factor);
+			if (filter.effects) {
+				if (filter.effects.paint) {
+					image.paint(filter.effects.paint.radius);
+				}
+				if (filter.effects.grayscale == "on") {
+					image.colorspace("GRAY");
+				}
+				if (filter.effects.mosaic == "on") {
+					image.mosaic();
+				}
+				if (filter.effects.negative == "on") {
+					console.log("calling image.negative()");
+					image.negative();
+				}
+				if (filter.effects.solarize) {
+					image.solarize(filter.effects.solarize.threshold);
+				}
+				if (filter.effects.monochrome == "on") {
+					image.monochrome();
+				}
+				if (filter.effects.swirl) {
+					image.swirl(filter.effects.swirl.degrees);
+				}
+				if (filter.effects.wave) {
+					image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
+				}
+				if (filter.effects.spread) {
+					image.spread(filter.effects.spread.amount);
+				}
+				if (filter.effects.charcoal) {
+					image.charcoal(filter.effects.charcoal.factor);
+				}
 			}
 		}
+		
 	}
 }
 
@@ -931,4 +942,31 @@ function applyDecorations (image, size, decorations) {
 		}
 	}
 
+}
+
+function applyPresetFilter(image, presetFilter) {
+	console.log("applyPresetFilter, presetFilter is " + presetFilter + ", config rainyDay is " + config.presetFilter.rainyDay);
+	switch (parseInt(presetFilter)) {
+		case config.presetFilter.rainyDay:
+			console.log("calling image.negative");
+			image.wave(5, 100);
+			break;
+		case config.presetFilter.glassWall:
+			image.spread(15);
+			break;
+		case config.presetFilter.nightingale:
+			image.colorspace("GRAY");
+			image.negative();
+			image.monochrome();
+			break;
+		case config.presetFilter.whirlpool:
+			image.swirl(360);
+			break;
+		case config.presetFilter.comical:
+			image.paint(20);
+			image.colorspace("GRAY");
+			break;
+		default:
+			break;
+	}
 }
