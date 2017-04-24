@@ -105,6 +105,8 @@ $(document).ready(function(){
 		"#borderColor"
 		]);
 
+	createLoginHeader();
+	
 });
 
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {

@@ -11,6 +11,7 @@ module.exports = function() {
 
 	// Initialize the Neo4j Graph Database
 	var db = new neo4j("http://neo4j:Puzz1e$$@localhost:7474");
+	dataUtils.initializeDB(db);
 	
 	var config = require('./config');
 	var app = express();
@@ -19,6 +20,7 @@ module.exports = function() {
 	var path = require('path');
 	global.appRoot = path.resolve(__dirname);
 	
+	require('./auth/passport')(app);
 
 	// Set the view engine to ejs
 	app.set('view engine', 'ejs');
@@ -42,6 +44,12 @@ module.exports = function() {
 		implicitly or by the user directly.
 	**/
 
+	var authRouter = require("./routes/authRoutes")(db);
+	app.use('/auth', authRouter);
+
+	var userRouter = require("./routes/userRoutes")(db);
+	app.use("/user", userRouter);
+
 	// 1 - Challenge Router
 	var challengeRouter = require("./routes/challengeRoutes")(db);
 	app.use("/api/challenges", challengeRouter);
@@ -63,12 +71,12 @@ module.exports = function() {
 
 	// 0 - Home Page
 	app.get("/", function(req, res) {
-		res.render("index");
+		res.render("index", {user: normalizeUser(req.user)});
 	});
 
 	// 1 - Challenge Page
 	app.get("/challenge/:challengeId", function(req, res) {
-		res.render("challenge", {challengeId: req.params.challengeId});
+		res.render("challenge", {challengeId: req.params.challengeId, user: normalizeUser(req.user)});
 	});
 
 	// 2 - Challenge Image
@@ -96,7 +104,7 @@ module.exports = function() {
 		dataUtils.getChallengeForEntry(db, req.params.entryId, function (err, challengeId) {
 			if (err) throw err;
 
-			res.render("entry", {entryId: req.params.entryId, challengeId: challengeId});
+			res.render("entry", {entryId: req.params.entryId, challengeId: challengeId, user: normalizeUser(req.user)});
 		});
 		
 	});
@@ -136,13 +144,13 @@ module.exports = function() {
 
 	// 5 - Challenge - New Entry
 	app.get("/challenge/:challengeId/newEntry", function(req, res){
-		res.render("newentry", {challengeId: req.params.challengeId});
+		res.render("newentry", {challengeId: req.params.challengeId, user: normalizeUser(req.user)});
 	});
 
 
 	// 6 - New Challenge
 	app.get("/newChallenge", function(req, res){
-		res.render("newchallenge");
+		res.render("newchallenge", {user: normalizeUser(req.user)});
 	});
 
 	/////. TESTING TESTING
@@ -161,4 +169,12 @@ module.exports = function() {
 	app.listen(config.port, function() {
 		console.log("Listening on port " + config.port);
 	});
+}
+
+function normalizeUser(user) {
+	if (typeof user == 'undefined') {
+		return 0;
+	}
+
+	return user;
 }

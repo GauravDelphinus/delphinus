@@ -27,8 +27,11 @@
 	<input type="button" value="Post Challenge!" class="submitButton" id="postChallenge">
 	<input type="button" value="Cancel and Go Back to Home Page" class="submitButton" id="goToHomePage">
 </div>
-
+<script>
+	var user = <%- JSON.stringify(user) %>;
+</script>
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/newchallenge.js"></script>
+<script src="/js/header.js"></script>
 </body>
 </html>

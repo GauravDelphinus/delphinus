@@ -20,10 +20,14 @@
     "cookie-parser": "^1.4.0",
     "ejs": "^2.3.4",
     "express": "^4.13.3",
+    "express-session": "^1.15.2",
     "gm": "^1.23.0",
     "mongodb": "^2.1.2",
     "node-neo4j": "^2.0.3",
+    "node-uuid": "^1.4.8",
     "oauth": "^0.9.14",
+    "passport": "^0.3.2",
+    "passport-google-oauth": "^1.0.0",
     "tmp": "0.0.31"
   }
 }

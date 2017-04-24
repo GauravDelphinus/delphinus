@@ -1,6 +1,17 @@
 var config = require('./config');
+var uuid = require("node-uuid");
 
 module.exports = {
+
+	myDB: null,
+
+	initializeDB : function(db) {
+		myDB = db;
+	},
+
+	getDB : function() {
+		return myDB;
+	},
 
 	/**
 		Given an Entry ID, return the corresponding
@@ -577,11 +588,133 @@ module.exports = {
     		var layoutID = result.data[0]._id;
 			callback(null, layoutID);
 		});
+	},
+
+	findUser : function (query, callback) {
+		var findUserQuery = "MATCH(u:User) WHERE ";
+
+		if (query.userID) {
+			findUserQuery += " id = '" + query.userID + "'";
+		} else if (query.googleID) {
+			findUserQuery += " u.google_id = '" + query.googleID + "'";
+		}
+
+		findUserQuery += " RETURN u;";
+
+		console.log("running cypherquery: " + findUserQuery);
+		myDB.cypherQuery(findUserQuery, function(err, result) {
+			if (err) throw err;
+
+			console.log(result.data[0]);
+
+			if (result.data.length == 0) {
+				// no user found
+				callback(null, null);
+			} else {
+				var userFromDB = result.data[0];
+
+				var user = {};
+
+				if (userFromDB.id) {
+					user.id = userFromDB.id;
+				} else if (userFromDB.google_id) {
+					user.google = {};
+					user.google.id = userFromDB.google_id;
+				}
+
+				if (userFromDB.email) {
+					user.email = userFromDB.email;
+				}
+
+				if (userFromDB.image) {
+					user.image = userFromDB.image;
+				}
+
+				if (userFromDB.displayName) {
+					user.displayName = userFromDB.displayName;
+				}
+
+				callback(null, user);
+			}
+		});
+	},
+
+	saveUser : function (user, next) {
+		console.log("saveUser, user = " + JSON.stringify(user));
+		var query = {
+		};
+		if (user.id) {
+			query.id = user.id;
+		} else if (user.google) {
+			query.googleID = user.google.id;
+		}
+
+		this.findUser(query, function(err, existingUser) {
+			if (err) throw err;
+
+			var cypherQuery = "";
+			if (existingUser) { // user already exists in DB
+				cypherQuery = "MATCH(u:User) WHERE u.id = '" + existingUser.id + "'";
+
+				if (user.email) {
+					cypherQuery += " SET u.email = '" + user.email + "'";
+				}
+				if (user.displayName) {
+					cypherQuery += ", u.displayName = '" + user.displayName + "'";
+				}
+				if (user.image) {
+					cypherQuery += ", u.image = '" + user.image + "'";
+				}
+
+				if (user.google) {
+					if (user.google.id) {
+						cypherQuery += ", u.google_id = '" + user.google.id + "'";	
+					}
+
+					if (user.google.token) {
+						cypherQuery += ", u.google_token = '" + user.google.token + "'";
+					}
+				}
+			} else { // user doesn't exist in DB
+				cypherQuery = "CREATE(u:User {";
+
+				var uuid1 = uuid.v4();
+				cypherQuery += "id: '" + uuid1 + "'";
+
+				if (user.email) {
+					cypherQuery += ", email: '" + user.email + "'";
+				}
+
+				if (user.displayName) {
+					cypherQuery += ", displayName: '" + user.displayName + "'";
+				}
+
+				if (user.image) {
+					cypherQuery += ", image: '" + user.image + "'";
+				}
+
+				if (user.google) {
+					if (user.google.id) {
+						cypherQuery += ", google_id: '" + user.google.id + "'";
+					}
+
+					if (user.google.token) {
+						cypherQuery += ", google_token: '" + user.google.token + "'";
+					}
+				}
+
+				cypherQuery += "});";
+			}
+
+			console.log("running cypherquery: " + cypherQuery);
+			myDB.cypherQuery(cypherQuery, function(err, result) {
+				if (err) throw err;
+
+				next(null);
+			});
+		});
 	}
-
-
-
-};
+}
 
 function escapeSingleQuotes (str) {
 	return str.replace(/'/g, "\\'");

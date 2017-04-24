@@ -4,6 +4,8 @@ $(document).ready(function(){
 	$.getJSON('/api/entries/', extractEntries);
 
 	$("#postChallenge").click(postChallenge);
+
+	createLoginHeader();
 });
 
 function extractChallenges(challenges) {

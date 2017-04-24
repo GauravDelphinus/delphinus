@@ -8,6 +8,8 @@ $(document).ready(function(){
   	$("#goToChallenge").click(function(){
   		window.open("/challenge/" + challengeId, "_self");
   	});
+
+  	createLoginHeader();
 });
 
 function parseEntry(entry) {

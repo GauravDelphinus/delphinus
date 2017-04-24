@@ -7,6 +7,8 @@ $(document).ready(function(){
 	$("#goToHomePage").click(function() {
 		window.open("/", "_self");
 	});
+
+	createLoginHeader();
 });
 
 function parseChallenge(challenge) {
