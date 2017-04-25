@@ -147,45 +147,12 @@ module.exports = function() {
 		res.render("newentry", {challengeId: req.params.challengeId, user: normalizeUser(req.user)});
 	});
 
-
+	// 6 - New Challenge
 	app.get("/newChallenge", ensureLoggedIn, function(req, res) {
 		console.log("called the next function, renderin gthe page now");
 		res.render("newChallenge", {user: normalizeUser(req.user)});
 	});
 	
-	/*
-	// 6 - New Challenge
-	app.get("/newChallenge", function(req, res){
-		console.log("req.path is " + req.path);
-		console.log("req.session is " + JSON.stringify(req.session));
-		console.log("req.user is " + JSON.stringify(req.user));
-		//if (req.session.passport && req.session.passport.user) {
-
-		if (req.user) {
-			res.render("newChallenge", {user: normalizeUser(req.user)});
-		} else {
-			req.session.redirectTo = "/newChallenge";
-			res.redirect("/auth/google");
-		}
-
-		*/
-		/*
-		if (!req.session.passport) {
-            req.session.redirectTo = '/newChallenge';
-            res.redirect('/auth/google');
-        } else {
-            res.render("newchallenge", {user: normalizeUser(req.user)});
-        }
-        */
-	/*}); */
-
-
-	/////. TESTING TESTING
-	
-
-	/////. TESTING TESTING
-
-
 	/**
 		STATIC ROUTERS
 		Serve static files in public directory

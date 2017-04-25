@@ -17,10 +17,8 @@ module.exports = function () {
 
             dataUtils.findUser(query, function (error, user) {
                 if (user) {
-                    console.log('found');
                     done(null, user);
                 } else {
-                    console.log('not found');
                     var user = {};
 
                     user.email = profile.emails[0].value;
