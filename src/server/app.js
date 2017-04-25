@@ -91,7 +91,7 @@ module.exports = function() {
 			if (err) throw err;
 
 			var challengeImagesDir = __dirname + "/data/challenges/images/";
-			console.log("calling res.sendFile with " + image);
+			//console.log("calling res.sendFile with " + image);
 			res.set('Content-Type', 'image/' + imageType);
 			res.sendFile(challengeImagesDir + image, function(err) {
 				if (err) throw err;
@@ -126,7 +126,7 @@ module.exports = function() {
 				res.sendFile(image, function(err) {
 					if (err) {
 						if (err.code == "ECONNABORTED") {
-						console.log("err is " + err + ", continuing as usual ... ");
+						//console.log("err is " + err + ", continuing as usual ... ");
 						//console.log("err JSON is " + JSON.stringify(err));
 						//console.log("err.name is " + err.name);
 						} else {
@@ -143,15 +143,42 @@ module.exports = function() {
 	});
 
 	// 5 - Challenge - New Entry
-	app.get("/challenge/:challengeId/newEntry", function(req, res){
+	app.get("/challenge/:challengeId/newEntry", ensureLoggedIn, function(req, res){
 		res.render("newentry", {challengeId: req.params.challengeId, user: normalizeUser(req.user)});
 	});
 
 
+	app.get("/newChallenge", ensureLoggedIn, function(req, res) {
+		console.log("called the next function, renderin gthe page now");
+		res.render("newChallenge", {user: normalizeUser(req.user)});
+	});
+	
+	/*
 	// 6 - New Challenge
 	app.get("/newChallenge", function(req, res){
-		res.render("newchallenge", {user: normalizeUser(req.user)});
-	});
+		console.log("req.path is " + req.path);
+		console.log("req.session is " + JSON.stringify(req.session));
+		console.log("req.user is " + JSON.stringify(req.user));
+		//if (req.session.passport && req.session.passport.user) {
+
+		if (req.user) {
+			res.render("newChallenge", {user: normalizeUser(req.user)});
+		} else {
+			req.session.redirectTo = "/newChallenge";
+			res.redirect("/auth/google");
+		}
+
+		*/
+		/*
+		if (!req.session.passport) {
+            req.session.redirectTo = '/newChallenge';
+            res.redirect('/auth/google');
+        } else {
+            res.render("newchallenge", {user: normalizeUser(req.user)});
+        }
+        */
+	/*}); */
+
 
 	/////. TESTING TESTING
 	
@@ -169,6 +196,15 @@ module.exports = function() {
 	app.listen(config.port, function() {
 		console.log("Listening on port " + config.port);
 	});
+}
+
+function ensureLoggedIn(req, res, next) {
+	if (!req.user) {
+		req.session.redirectTo = req.path;
+		res.redirect("/auth/google");
+	} else {
+		next();
+	}
 }
 
 function normalizeUser(user) {
