@@ -166,7 +166,7 @@ module.exports = function() {
 function ensureLoggedIn(req, res, next) {
 	if (!req.user) {
 		req.session.redirectTo = req.path;
-		res.redirect("/auth/google");
+		res.redirect("/auth");
 	} else {
 		next();
 	}

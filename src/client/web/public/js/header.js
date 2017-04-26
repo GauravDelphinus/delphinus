@@ -20,6 +20,6 @@ function createLoginHeader() {
 		$("<a>", {text: "Sign Out", href : "/auth/logout"}).attr("class", "signOutTextHeader").appendTo("#dropDownList");
 
 	} else {
-		$("<a>", {text: "Sign in", href : "/auth/google"}).attr("class", "signInTextHeader").appendTo("#userLoginHeader");
+		$("<a>", {text: "Sign in", href : "/auth"}).attr("class", "signInTextHeader").appendTo("#userLoginHeader");
 	}
 }

@@ -4,6 +4,22 @@ var passport = require("passport");
 var routes = function(db) {
 	var authRouter = express.Router();
 
+    authRouter.route("/")
+        .get(function(req, res, next) {
+            if (!req.session.redirectTo) {
+                /**
+                    If the redirectTo is not set, this means that this wasn't set explicitly
+                    by a "sign-in required" resource access, but the user explicitly clicked
+                    on the "Sign In" link from some web page.  Check the referring site's URL
+                    and set that to the redirectTo value in the session.
+                **/
+                console.log("referrer: " + req.get('Referrer'));
+                req.session.redirectTo = req.get('Referrer');
+            }
+
+            res.render("login");
+        });
+
 	authRouter.route("/google")
         .get(function (req, res, next) {
             if (!req.session.redirectTo) {
