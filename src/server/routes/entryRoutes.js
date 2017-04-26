@@ -37,12 +37,12 @@ var routes = function(db) {
 			}
 			
 
-			console.log("Running cypherQuery: " + cypherQuery);
+			//console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data);
 			});
@@ -63,12 +63,12 @@ var routes = function(db) {
 							"created : '" + req.body.created + "'" + 
 							"})-[:PART_OF]->(c) RETURN e;";
 
-				console.log("Running cypherQuery: " + cypherQuery);
+				//console.log("Running cypherQuery: " + cypherQuery);
 				
 				db.cypherQuery(cypherQuery, function(err, result){
     				if(err) throw err;
 
-    				console.log(result.data); // delivers an array of query results
+    				//console.log(result.data); // delivers an array of query results
     				var newEntryId = result.data[0]._id;
 
     				//res.json(result.data[0]);
@@ -138,9 +138,9 @@ var routes = function(db) {
 						function(err, filterNodes) {
 
 							var cypherQuery = "MATCH (e:Entry) WHERE id(e) = " + newEntryId + "";
-							console.log("filterNodes, num values = " + filterNodes.length);
+							//console.log("filterNodes, num values = " + filterNodes.length);
 							for (var i = 0; i < filterNodes.length; i++) {
-								console.log("filterNodes, " + i + " = " + filterNodes[i]);
+								//console.log("filterNodes, " + i + " = " + filterNodes[i]);
 
 								// Now associate filters to the new entry
 								cypherQuery += " MATCH (s" + i + ") WHERE id(s" + i + ") = " + filterNodes[i] + "";
@@ -157,7 +157,7 @@ var routes = function(db) {
 
 							cypherQuery += ";";
 
-							console.log("cypherQuery is: " + cypherQuery);
+							//console.log("cypherQuery is: " + cypherQuery);
 
 							db.cypherQuery(cypherQuery, function(err, result){
     							if(err) throw err;
@@ -184,12 +184,12 @@ var routes = function(db) {
 
 			var cypherQuery = "MATCH (e:Entry) WHERE id(e) = " + req.params.entryId + " RETURN e;";
 
-			console.log("GET Received, Running cypherQuery: " + cypherQuery);
+			//console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			var entryObject = result.data[0];
     			entryObject.image = "/entries/images/" + req.params.entryId;
@@ -215,12 +215,12 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN e;";
 
-			console.log("PUT received, Running cypherQuery: " + cypherQuery);
+			//console.log("PUT received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data[0]);
 			});
@@ -263,12 +263,12 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN e;";
 
-			console.log("PATCH received, Running cypherQuery: " + cypherQuery);
+			//console.log("PATCH received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data[0]);
 			});
@@ -282,12 +282,12 @@ var routes = function(db) {
 			**/
 
 			var cypherQuery = "MATCH (e: Challenge) WHERE id(e) = '" + req.params.challengeId + "' DELETE e;";
-			console.log("DELETE received, Running cypherQuery: " + cypherQuery);
+			//console.log("DELETE received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data);
 			});

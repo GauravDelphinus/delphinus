@@ -410,7 +410,7 @@ module.exports = {
 	applyStepsToImage : function(sourceImage, steps, next) {
 		var tmp = require('tmp');
 
-		console.log("applyStepsToImage: steps = " + JSON.stringify(steps));
+		//console.log("applyStepsToImage: steps = " + JSON.stringify(steps));
 		tmp.tmpName(function _tempNameGenerated(err, path) {
     		if (err) throw err;
 
@@ -445,8 +445,8 @@ module.exports = {
 		
 	applyFiltersToImage : function(sourceImage, filters, next) {
 
-		console.log("applyFiltersToImage: imagePath is " + sourceImage);
-		console.log("filters: " + filters);
+		//console.log("applyFiltersToImage: imagePath is " + sourceImage);
+		//console.log("filters: " + filters);
 
 		var tmp = require('tmp');
 
@@ -468,7 +468,7 @@ module.exports = {
     			// because all those are normalized/resolved by the time the information reaches the image process.
     			// The image processor expects actual settings, and does not need to worry about where they are coming from.
     			// So the format here skips the custom/preset/user_defined level in the object hierarchy.
-    			console.log("filter is: " + JSON.stringify(filter));
+    			//console.log("filter is: " + JSON.stringify(filter));
     			if (filter.type == "preset") {
     				applyPresetFilter(image, filter.preset);
     			} else { // check for custom settings
@@ -498,7 +498,7 @@ module.exports = {
 	    					}
 
 	    					// now, do the thing
-	    					console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
+	    					//console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
 	    					image.modulate(brightness, saturation, hue);
 	    				}
 	    		
@@ -653,7 +653,6 @@ function applyLayouts (image, size, layouts) {
 		}
 
 		if (layout.shear) {
-			console.log("calling shear with xDegrees = " + layout.shear.xDegrees + ", yDegrees = " + layout.shear.yDegrees);
 			image.shear(layout.shear.xDegrees, layout.shear.yDegrees);
 		}
 	}
@@ -765,7 +764,7 @@ function applyFilters (image, size, filters) {
 		// because all those are normalized/resolved by the time the information reaches the image process.
 		// The image processor expects actual settings, and does not need to worry about where they are coming from.
 		// So the format here skips the custom/preset/user_defined level in the object hierarchy.
-		console.log("filter is: " + JSON.stringify(filter));
+		//console.log("filter is: " + JSON.stringify(filter));
 
 		if (filter.type == "preset") {
 			applyPresetFilter(image, filter.preset);
@@ -796,7 +795,6 @@ function applyFilters (image, size, filters) {
 					}
 
 					// now, do the thing
-					console.log("calling modulate with brightness = " + brightness + ", saturation = " + saturation + ", hue = " + hue);
 					image.modulate(brightness, saturation, hue);
 				}
 		
@@ -820,7 +818,6 @@ function applyFilters (image, size, filters) {
 					image.mosaic();
 				}
 				if (filter.effects.negative == "on") {
-					console.log("calling image.negative()");
 					image.negative();
 				}
 				if (filter.effects.solarize) {
@@ -945,10 +942,9 @@ function applyDecorations (image, size, decorations) {
 }
 
 function applyPresetFilter(image, presetFilter) {
-	console.log("applyPresetFilter, presetFilter is " + presetFilter + ", config rainyDay is " + config.presetFilter.rainyDay);
+	//console.log("applyPresetFilter, presetFilter is " + presetFilter + ", config rainyDay is " + config.presetFilter.rainyDay);
 	switch (parseInt(presetFilter)) {
 		case config.presetFilter.rainyDay:
-			console.log("calling image.negative");
 			image.wave(5, 100);
 			break;
 		case config.presetFilter.glassWall:

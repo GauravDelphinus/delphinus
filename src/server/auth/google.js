@@ -10,7 +10,7 @@ module.exports = function () {
         callbackURL: 'http://localhost:8080/auth/google/callback'},
         function(req, accessToken, refreshToken, profile, done){
 
-            console.log("Info from Google Profile: " + JSON.stringify(profile));
+            //console.log("Info from Google Profile: " + JSON.stringify(profile));
             var query = {
                 googleID : profile.id
             };

@@ -28,12 +28,12 @@ var routes = function(db) {
 
 			var cypherQuery = "MATCH (n:Challenge) RETURN n;";
 
-			console.log("Running cypherQuery: " + cypherQuery);
+			//console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data);
 			});
@@ -45,15 +45,13 @@ var routes = function(db) {
 				POST a new challenge node.
 			**/
 
-			console.log("received POST on /api/challenges");
+			//console.log("received POST on /api/challenges");
 			// Store the incoming base64 encoded image into a local image file first
 			var fs = require('fs');
 			var imageDataURI = req.body.imageDataURI;
 			//var regex = /^data:.+\/(.+);base64,(.*)$/;
 
-			console.log("before match");
 			//var matches = imageDataURI.match(regex);
-			console.log("after match");
 			//var ext = matches[1].toLowerCase();
 			//var data = matches[2];
 			var index = imageDataURI.indexOf("base64,");
@@ -64,18 +62,14 @@ var routes = function(db) {
 				data = imageDataURI;
 			}
 
-			console.log("before creating buffer");
 			var buffer = new Buffer(data, 'base64');
-			console.log("after creating buffer");
 			var baseDir = global.appRoot + config.path.challengeImages;
 
-			console.log("calling tmpName with baseDir = " + baseDir);
 			//Create random name for new image file
 			tmp.tmpName({ dir: baseDir }, function _tempNameGenerated(err, fullpath) {
     			if (err) throw err;
  
  				var name = path.parse(fullpath).base;
-    			console.log("Created temporary filename: ", fullpath);
 
     			fs.writeFileSync(fullpath, buffer);
 
@@ -88,12 +82,12 @@ var routes = function(db) {
 							"title : '" + req.body.caption + "'" +
 							"}) RETURN n;";
 
-				console.log("Running cypherQuery: " + cypherQuery);
+				//console.log("Running cypherQuery: " + cypherQuery);
 				
 				db.cypherQuery(cypherQuery, function(err, result){
     				if(err) throw err;
 
-    				console.log(result.data); // delivers an array of query results
+    				//console.log(result.data); // delivers an array of query results
 
     				res.json(result.data[0]);
 				});
@@ -112,12 +106,12 @@ var routes = function(db) {
 
 			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId + " RETURN c;";
 
-			console.log("GET Received, Running cypherQuery: " + cypherQuery);
+			//console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			//image is /challenges/images/challengeId which in turn will be mapped to the actual image by the separate route
     			result.data[0].image = "/challenges/images/" + req.params.challengeId;
@@ -143,12 +137,12 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN c;";
 
-			console.log("PUT received, Running cypherQuery: " + cypherQuery);
+			//console.log("PUT received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data[0]);
 			});
@@ -191,12 +185,12 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN c;";
 
-			console.log("PATCH received, Running cypherQuery: " + cypherQuery);
+			//console.log("PATCH received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data[0]);
 			});
@@ -210,12 +204,12 @@ var routes = function(db) {
 			**/
 
 			var cypherQuery = "MATCH (c: Challenge) WHERE id(c) = '" + req.params.challengeId + "' DELETE c;";
-			console.log("DELETE received, Running cypherQuery: " + cypherQuery);
+			//console.log("DELETE received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data);
 			});

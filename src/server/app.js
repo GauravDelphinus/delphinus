@@ -119,10 +119,9 @@ module.exports = function() {
 			if (err) throw err;
 
 			imageProcessor.applyStepsToImage(imageData.image, imageData.steps, function(err, image){
-				console.log("err is " + err);
 				if (err) throw err;
 
-				console.log("calling res.sendFile with " + image);
+				//console.log("calling res.sendFile with " + image);
 				res.sendFile(image, function(err) {
 					if (err) {
 						if (err.code == "ECONNABORTED") {
@@ -149,7 +148,6 @@ module.exports = function() {
 
 	// 6 - New Challenge
 	app.get("/newChallenge", ensureLoggedIn, function(req, res) {
-		console.log("called the next function, renderin gthe page now");
 		res.render("newChallenge", {user: normalizeUser(req.user)});
 	});
 	

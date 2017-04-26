@@ -43,12 +43,11 @@ module.exports = {
 	getImageDataForChallenge : function(db, challengeId, next) {
 		var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + challengeId + " RETURN c.imageType, c.image;";
 
-		console.log("cypherQuery is " + cypherQuery);
+		//console.log("cypherQuery is " + cypherQuery);
 		db.cypherQuery(cypherQuery, function(err, result){
 	    	if(err) throw err;
 
 	    	var row = result.data[0].toString();
-	    	console.log("row is " + row);
 	    	var dataArray = row.split(",");
 	    	var imageType = dataArray[0];
 	    	var image = dataArray[1];
@@ -77,11 +76,11 @@ module.exports = {
 		db.cypherQuery(fetchChallengeQuery, function(err, output){
 	    		if (err) throw err;
 
-	    		console.log(output.data);
+	    		//console.log(output.data);
 	    		var image = output.data[0];
 	    		var imagePath = global.appRoot + config.path.challengeImages + image;
 
-	    		console.log("Image is " + imagePath);
+	    		//console.log("Image is " + imagePath);
 
 	    		// Now, get the steps attached to this image
 
@@ -90,7 +89,7 @@ module.exports = {
 				db.cypherQuery(cypherQuery, function(err, result){
 	    			if(err) throw err;
 
-	    			console.log(result.data); // delivers an array of query results
+	    			//console.log(result.data); // delivers an array of query results
 
 	    			var stepsFromDB = result.data;
 	    			var steps = {};
@@ -444,12 +443,12 @@ module.exports = {
 
 		cypherQuery += "}) RETURN f;";
 
-		console.log("Running cypherQuery: " + cypherQuery);
+		//console.log("Running cypherQuery: " + cypherQuery);
 				
 		db.cypherQuery(cypherQuery, function(err, result){
     		if(err) throw err;
 
-    		console.log(result.data[0]); // delivers an array of query results
+    		//console.log(result.data[0]); // delivers an array of query results
 
     		var filterID = result.data[0]._id;
 			callback(null, filterID);
@@ -457,7 +456,7 @@ module.exports = {
 	},
 
 	createDecorationNode : function(db, decoration, callback) {
-		console.log("createDecorationNode: decoration = " + JSON.stringify(decoration));
+		//console.log("createDecorationNode: decoration = " + JSON.stringify(decoration));
 
 		var cypherQuery = "CREATE (d:Decoration {";
 
@@ -480,12 +479,12 @@ module.exports = {
 
 		cypherQuery += " }) RETURN d;";
 
-		console.log("Running cypherQuery: " + cypherQuery);
+		//console.log("Running cypherQuery: " + cypherQuery);
 
 		db.cypherQuery(cypherQuery, function(err, result) {
 			if (err) throw err;
 
-			console.log(result.data[0]);
+			//console.log(result.data[0]);
 
 			var decorationId = result.data[0]._id;
 			callback(null, decorationId);
@@ -493,7 +492,7 @@ module.exports = {
 	},
 
 	createArtifactNode : function(db, artifact, callback) {
-		console.log("createArtifactNode: artifact = " + JSON.stringify(artifact));
+		//console.log("createArtifactNode: artifact = " + JSON.stringify(artifact));
 		var cypherQuery = "CREATE (a:Artifact {";
 
 		if (artifact.type == "none") {
@@ -520,12 +519,12 @@ module.exports = {
 
 		cypherQuery += "}) RETURN a;";
 
-		console.log("Running cypherQuery: " + cypherQuery);
+		//console.log("Running cypherQuery: " + cypherQuery);
 
 		db.cypherQuery(cypherQuery, function(err, result) {
 			if (err) throw err;
 
-			console.log(result.data[0]);
+			//console.log(result.data[0]);
 
 			var artifactId = result.data[0]._id;
 			callback(null, artifactId);
@@ -578,12 +577,12 @@ module.exports = {
 
 		cypherQuery += "}) RETURN l;";
 
-		console.log("Running cypherQuery: " + cypherQuery);
+		//console.log("Running cypherQuery: " + cypherQuery);
 				
 		db.cypherQuery(cypherQuery, function(err, result){
     		if(err) throw err;
 
-    		console.log(result.data[0]); // delivers an array of query results
+    		//console.log(result.data[0]); // delivers an array of query results
 
     		var layoutID = result.data[0]._id;
 			callback(null, layoutID);
@@ -601,11 +600,11 @@ module.exports = {
 
 		findUserQuery += " RETURN u;";
 
-		console.log("running cypherquery: " + findUserQuery);
+		//console.log("running cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) throw err;
 
-			console.log(result.data[0]);
+			//console.log(result.data[0]);
 
 			if (result.data.length == 0) {
 				// no user found
@@ -640,7 +639,7 @@ module.exports = {
 	},
 
 	saveUser : function (user, next) {
-		console.log("saveUser, user = " + JSON.stringify(user));
+		//console.log("saveUser, user = " + JSON.stringify(user));
 		var query = {
 		};
 		if (user.id) {
@@ -706,7 +705,7 @@ module.exports = {
 				cypherQuery += "});";
 			}
 
-			console.log("running cypherquery: " + cypherQuery);
+			//console.log("running cypherquery: " + cypherQuery);
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 

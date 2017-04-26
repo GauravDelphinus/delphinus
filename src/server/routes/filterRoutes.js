@@ -10,7 +10,7 @@ var routes = function(db) {
 
 	filterRouter.route("/apply") // /api/filters/apply ROUTE
 	.post(function(req, res){
-		console.log("received post, body is = " + req.body.filters);
+		//console.log("received post, body is = " + req.body.filters);
 
 		var sourceImagePath;
 		var purgeImageAfterUse = false;
@@ -21,7 +21,7 @@ var routes = function(db) {
 			purgeImageAfterUse = false;
 
 			dataUtils.getImageDataForChallenge(db, req.body.imageData, function(err, image){
-				console.log("/api/filters/apply - Received req.body = ~~" + JSON.stringify(req.body) + "~~");
+				//console.log("/api/filters/apply - Received req.body = ~~" + JSON.stringify(req.body) + "~~");
 				if (err) throw err;
 
 				sourceImagePath = global.appRoot + config.path.challengeImages + image;
@@ -62,7 +62,6 @@ var routes = function(db) {
 						res.send(JSON.stringify(jsonObj));
 
 						//dispose off the temp file
-						console.log("disposing off " + imagePath);
 						fs.unlink(imagePath);
 					});
 	    		});
@@ -81,10 +80,9 @@ var routes = function(db) {
 }
 
 function sendImage(err, imagePath, purge) {
-	console.log("err is " + err);
 	if (err) throw err;
 
-	console.log("calling res.send with " + imagePath);
+	//console.log("calling res.send with " + imagePath);
 	var json = "{ image : '" + imagePath + "' }";
 	res.send(json); //, function(err) {
 			

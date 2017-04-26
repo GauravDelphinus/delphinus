@@ -6,7 +6,7 @@ var routes = function(db) {
 	userRouter.route("/")
 
         .get(function(req, res) {
-            console.log("/user/ req.user is " + JSON.stringify(req.user));
+            //console.log("/user/ req.user is " + JSON.stringify(req.user));
             res.render("user", {user: {name: req.user.displayName,
                                     image: req.user.image}});
         });
