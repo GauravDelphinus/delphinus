@@ -1,35 +1,32 @@
 var passport = require('passport');
-var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+var TwitterStrategy = require('passport-twitter').Strategy;
 var dataUtils = require("../dataUtils");
 
 module.exports = function () {
 
-    passport.use(new GoogleStrategy({
-            clientID: '834949392857-spbcn54g31c0cdd764s092m1hd6va9hf.apps.googleusercontent.com',
-            clientSecret: '-FDBs0AqFgNR_zmdMbdlhVu2',
-            callbackURL: 'http://localhost:8080/auth/google/callback',
+    passport.use(new TwitterStrategy({
+            consumerKey: '7Y9T7UneSfQnZ3EvuhErbEpdP',
+            consumerSecret: 'n7lQJiOJFrTCpNzrsq1Vt6JI18hkEwfTB0r1iTRgozYi8w793f',
+            callbackURL: 'http://localhost:8080/auth/twitter/callback',
             passReqToCallback: true
         },
-        function(req, accessToken, refreshToken, profile, done){
-
-            //console.log("Info from Google Profile: " + JSON.stringify(profile));
-
+        function(req, token, tokenSecret, profile, done){
             var query = {};
-
+            
             if (req.user) {
                 if (req.user.id) {
                     query.userID = req.user.id;
                 }
 
-                if (req.user.twitter) {
-                    query.twitterID = req.user.twitter.id;
+                if (req.user.google) {
+                    query.googleID = req.user.google.id;
                 }
 
                 if (req.user.facebook) {
                     query.facebookID = req.user.facebook.id;
                 }
             } else {
-                query.googleID = profile.id;
+                query.twitterID = profile.id;
             }
 
             dataUtils.findUser(query, function (error, user) {
@@ -41,7 +38,7 @@ module.exports = function () {
                     }
                 }
 
-                user.email = profile.emails[0].value;
+                //user.email = profile.emails[0].value; Twitter doesn't provide email information
 
                 user.image = profile.photos[0].value;
                 var trailerLoc = user.image.indexOf("?");
@@ -52,9 +49,10 @@ module.exports = function () {
                 
                 user.displayName = profile.displayName;
 
-                user.google = {};
-                user.google.id = profile.id;
-                user.google.token = accessToken;
+                user.twitter = {};
+                user.twitter.id = profile.id;
+                user.twitter.token = token;
+                user.twitter.tokenSecret = tokenSecret;
                 
                 dataUtils.saveUser(user, function(err) {
                     if (err) throw err;
@@ -62,6 +60,6 @@ module.exports = function () {
                     done(null, user);
                 });
             });
-        })
-    );
+        }
+    ));
 };

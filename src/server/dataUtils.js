@@ -591,16 +591,40 @@ module.exports = {
 
 	findUser : function (query, callback) {
 		var findUserQuery = "MATCH(u:User) WHERE ";
+		var addOr = false;
 
 		if (query.userID) {
-			findUserQuery += " id = '" + query.userID + "'";
-		} else if (query.googleID) {
+			findUserQuery += " u.id = '" + query.userID + "'";
+			addOr = true;
+		}
+
+		if (query.googleID) {
+			if (addOr) {
+				findUserQuery += " OR ";
+			}
 			findUserQuery += " u.google_id = '" + query.googleID + "'";
+			addOr = true;
+		}
+
+		if (query.twitterID) {
+			if (addOr) {
+				findUserQuery += " OR ";
+			}
+			findUserQuery += " u.twitter_id = '" + query.twitterID + "'";
+			addOr = true;
+		}
+
+		if (query.facebookID) {
+			if (addOr) {
+				findUserQuery += " OR ";
+			}
+			findUserQuery += " u.facebook_id = '" + query.facebookID + "'";
+			addOr = true;
 		}
 
 		findUserQuery += " RETURN u;";
 
-		//console.log("running cypherquery: " + findUserQuery);
+		console.log("running cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) throw err;
 
@@ -616,9 +640,21 @@ module.exports = {
 
 				if (userFromDB.id) {
 					user.id = userFromDB.id;
-				} else if (userFromDB.google_id) {
+				}
+
+				if (userFromDB.google_id) {
 					user.google = {};
 					user.google.id = userFromDB.google_id;
+				}
+
+				if (userFromDB.twitter_id) {
+					user.twitter = {};
+					user.twitter.id = userFromDB.twitter_id;
+				}
+
+				if (userFromDB.facebook_id) {
+					user.facebook = {};
+					user.facebook.id = userFromDB.facebook_id;
 				}
 
 				if (userFromDB.email) {
@@ -639,13 +675,24 @@ module.exports = {
 	},
 
 	saveUser : function (user, next) {
-		//console.log("saveUser, user = " + JSON.stringify(user));
+		console.log("saveUser, user = " + JSON.stringify(user));
 		var query = {
 		};
+
 		if (user.id) {
-			query.id = user.id;
-		} else if (user.google) {
+			query.userID = user.id;
+		}
+
+		if (user.google) {
 			query.googleID = user.google.id;
+		}
+
+		if (user.twitter) {
+			query.twitterID = user.twitter.id;
+		}
+
+		if (user.facebook) {
+			query.facebookID = user.facebook.id;
 		}
 
 		this.findUser(query, function(err, existingUser) {
@@ -655,24 +702,63 @@ module.exports = {
 			if (existingUser) { // user already exists in DB
 				cypherQuery = "MATCH(u:User) WHERE u.id = '" + existingUser.id + "'";
 
+				var setValues = [];
 				if (user.email) {
-					cypherQuery += " SET u.email = '" + user.email + "'";
+					setValues.push(" u.email = '" + user.email + "'");
 				}
 				if (user.displayName) {
-					cypherQuery += ", u.displayName = '" + user.displayName + "'";
+					setValues.push(" u.displayName = '" + user.displayName + "'");
 				}
 				if (user.image) {
-					cypherQuery += ", u.image = '" + user.image + "'";
+					setValues.push(" u.image = '" + user.image + "'");
 				}
 
 				if (user.google) {
 					if (user.google.id) {
-						cypherQuery += ", u.google_id = '" + user.google.id + "'";	
+						setValues.push(" u.google_id = '" + user.google.id + "'");
 					}
 
 					if (user.google.token) {
-						cypherQuery += ", u.google_token = '" + user.google.token + "'";
+						setValues.push(" u.google_token = '" + user.google.token + "'");
 					}
+				}
+
+				if (user.twitter) {
+					if (user.twitter.id) {
+						setValues.push(" u.twitter_id = '" + user.twitter.id + "'");
+					}
+
+					if (user.twitter.token) {
+						setValues.push(" u.twitter_token = '" + user.twitter.token + "'");
+					}
+
+					if (user.twitter.tokenSecret) {
+						setValues.push(" u.twitter_tokenSecret = '" + user.twitter.tokenSecret + "'");
+					}
+				}
+
+				if (user.facebook) {
+					if (user.facebook.id) {
+						setValues.push(" u.facebook_id = '" + user.facebook.id + "'");
+					}
+
+					if (user.facebook.token) {
+						setValues.push(" u.facebook_token = '" + user.facebook.token + "'");
+					}
+				}
+
+				// add set values to cypherquery
+				if (setValues.length > 0) {
+					cypherQuery += " SET ";
+					for (var i = 0; i < setValues.length; i++) {
+						if (i > 0) {
+							cypherQuery += " , ";
+						}
+						cypherQuery += setValues[i];
+					}
+				} else {
+					//shouldn't happen
+					throw "No values to edit";
 				}
 			} else { // user doesn't exist in DB
 				cypherQuery = "CREATE(u:User {";
@@ -702,10 +788,34 @@ module.exports = {
 					}
 				}
 
+				if (user.twitter) {
+					if (user.twitter.id) {
+						cypherQuery += ", twitter_id: '" + user.twitter.id + "'";
+					}
+
+					if (user.twitter.token) {
+						cypherQuery += ", twitter_token: '" + user.twitter.token + "'";
+					}
+
+					if (user.twitter.tokenSecret) {
+						cypherQuery += ", twitter_tokenSecret: '" + user.twitter.tokenSecret + "'";
+					}
+				}
+
+				if (user.facebook) {
+					if (user.facebook.id) {
+						cypherQuery += ", facebook_id: '" + user.facebook.id + "'";
+					}
+
+					if (user.facebook.token) {
+						cypherQuery += ", facebook_token: '" + user.facebook.token + "'";
+					}
+				}
+
 				cypherQuery += "});";
 			}
 
-			//console.log("running cypherquery: " + cypherQuery);
+			console.log("running cypherquery: " + cypherQuery);
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 

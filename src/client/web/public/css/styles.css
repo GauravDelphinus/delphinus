@@ -91,6 +91,15 @@
 	font-weight: bold;
 }
 
+.userInfoText {
+	font: 30px arial;
+	font-weight: bold;
+}
+
+.userInfoImage {
+	float: right;
+}
+
 .userNameHeader {
 	float: right;
 	font-family: arial;	

@@ -3,7 +3,14 @@ var session = require("express-session");
 
 module.exports = function (app) {
 
-	app.use(session({secret: 'anything'}));
+	app.use(session({secret: 'crackalackin',
+        resave: true,
+        saveUninitialized: true,
+        cookie : { 
+            secure : false, 
+            maxAge : (4 * 60 * 60 * 1000) 
+        }
+    }));
 
     app.use(passport.initialize());
     app.use(passport.session());
@@ -16,5 +23,7 @@ module.exports = function (app) {
         done(null, user);
     });
     
-    require('./google')();
+    require("./google")();
+    require("./twitter")();
+    require("./facebook")();
 };
