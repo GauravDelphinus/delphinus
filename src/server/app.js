@@ -48,7 +48,7 @@ module.exports = function() {
 	app.use('/auth', authRouter);
 
 	var userRouter = require("./routes/userRoutes")(db);
-	app.use("/user", userRouter);
+	app.use("/api/users", userRouter);
 
 	// 1 - Challenge Router
 	var challengeRouter = require("./routes/challengeRoutes")(db);
@@ -94,7 +94,7 @@ module.exports = function() {
 			//console.log("calling res.sendFile with " + image);
 			res.set('Content-Type', 'image/' + imageType);
 			res.sendFile(challengeImagesDir + image, function(err) {
-				if (err) throw err;
+				if (err && err.code !== "ECONNABORTED") throw err;
 			});
 		});
 	});
@@ -150,6 +150,51 @@ module.exports = function() {
 	app.get("/newChallenge", ensureLoggedIn, function(req, res) {
 		res.render("newChallenge", {user: normalizeUser(req.user)});
 	});
+
+	app.get("/user", ensureLoggedIn, function(req, res) {
+            //console.log("/user/ req.user is " + JSON.stringify(req.user));
+            if (req.user) {
+            	var query = {
+            	};
+
+            	if (req.user.id) {
+            		query.userID = req.user.id;
+            	}
+
+            	if (req.user.google) {
+            		query.googleID = req.user.google.id;
+            	}
+
+            	if (req.user.twitter) {
+            		query.twitterID = req.user.twitter.id;
+            	}
+
+            	if (req.user.facebook) {
+            		query.facebookID = req.user.facebook.id;
+            	}
+            	
+            	dataUtils.findUser(query, function(err, user) {
+            		if (err) throw err;
+
+            		//console.log("passing user to render, user = " + JSON.stringify(user));
+            		res.render("user", {user : user});
+            	});
+            } else {
+            	res.render("user", null);
+            }
+    });
+
+	app.get("/user/:userID", function(req, res) {
+            var query = {
+                  userID : req.params.userID
+            };
+
+            dataUtils.findUser(query, function(err, user) {
+                  if (err) throw err;
+
+                  res.render("user", {user: user});
+            });
+    });
 	
 	/**
 		STATIC ROUTERS

@@ -624,7 +624,7 @@ module.exports = {
 
 		findUserQuery += " RETURN u;";
 
-		console.log("running cypherquery: " + findUserQuery);
+		//console.log("running cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) throw err;
 
@@ -675,7 +675,7 @@ module.exports = {
 	},
 
 	saveUser : function (user, next) {
-		console.log("saveUser, user = " + JSON.stringify(user));
+		//console.log("saveUser, user = " + JSON.stringify(user));
 		var query = {
 		};
 
@@ -815,7 +815,7 @@ module.exports = {
 				cypherQuery += "});";
 			}
 
-			console.log("running cypherquery: " + cypherQuery);
+			//console.log("running cypherquery: " + cypherQuery);
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 

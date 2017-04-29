@@ -26,7 +26,14 @@ var routes = function(db) {
 				effect will be an intersection.
 			**/
 
-			var cypherQuery = "MATCH (n:Challenge) RETURN n;";
+			var cypherQuery = "MATCH (n:Challenge)";
+
+			// Filter by user who posted the challenge
+			if (req.query.user) {
+				cypherQuery += "-[r:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) ";
+			}
+
+			cypherQuery += " RETURN n;";
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -45,7 +52,7 @@ var routes = function(db) {
 				POST a new challenge node.
 			**/
 
-			//console.log("received POST on /api/challenges");
+			console.log("received POST on /api/challenges");
 			// Store the incoming base64 encoded image into a local image file first
 			var fs = require('fs');
 			var imageDataURI = req.body.imageDataURI;
@@ -73,16 +80,16 @@ var routes = function(db) {
 
     			fs.writeFileSync(fullpath, buffer);
 
-    			//console.log(JSON.stringify(req.body));
+    			console.log(JSON.stringify(req.user));
     			
-				var cypherQuery = "CREATE (n:Challenge {" +
+				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) CREATE (n:Challenge {" +
 							"image : '" + name + "'," +
 							//"imageType : '" + ext + "'," + 
 							"created : '" + req.body.created + "'," + 
 							"title : '" + req.body.caption + "'" +
-							"}) RETURN n;";
+							"})-[r:POSTED_BY]->(u) RETURN n;";
 
-				//console.log("Running cypherQuery: " + cypherQuery);
+				console.log("Running cypherQuery: " + cypherQuery);
 				
 				db.cypherQuery(cypherQuery, function(err, result){
     				if(err) throw err;

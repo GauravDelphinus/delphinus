@@ -32,6 +32,8 @@ var routes = function(db) {
 			// In case a challenge is mentioned, extract all entries linked to that challenge
 			if (req.query.challengeId) {
 				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge) WHERE id(c) = " + req.query.challengeId + " RETURN e;"
+			} else if (req.query.user) {
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) RETURN e;";
 			} else {
 				cypherQuery = "MATCH (n:Entry) RETURN n;";
 			}
@@ -58,12 +60,12 @@ var routes = function(db) {
 			/**
 				First create the entry node.  Then later, link them to Filter nodes.
 			**/
-			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.body.challengeId +
-							" CREATE (e:Entry {" +
+			var cypherQuery = "MATCH (c:Challenge) WHERE (id(c) = " + req.body.challengeId +
+							") MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
 							"created : '" + req.body.created + "'" + 
-							"})-[:PART_OF]->(c) RETURN e;";
+							"})-[:PART_OF]->(c), (u)<-[r:POSTED_BY]-(e) RETURN e;";
 
-				//console.log("Running cypherQuery: " + cypherQuery);
+				console.log("Running cypherQuery: " + cypherQuery);
 				
 				db.cypherQuery(cypherQuery, function(err, result){
     				if(err) throw err;

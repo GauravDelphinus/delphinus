@@ -1,5 +1,6 @@
 $(document).ready(function(){
 	$.getJSON('/api/entries/' + entryId, parseEntry);
+	$.getJSON("/api/users?entryId=" + entryId, parseUser);
 
 	$("#goToHomePage").click(function() {
     	window.open("/", "_self");
@@ -11,6 +12,12 @@ $(document).ready(function(){
 
   	createLoginHeader();
 });
+
+function parseUser(users) {
+	var user = users[0];
+	$("#entryPostedBy").append($("<a>", {href: "/user/" + user.id, text: user.displayName}));
+	$("#entryPostedBy").append($("<img>", {src: user.image}));
+}
 
 function parseEntry(entry) {
 

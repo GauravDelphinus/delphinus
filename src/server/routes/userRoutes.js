@@ -4,40 +4,29 @@ var dataUtils = require("../dataUtils");
 var routes = function(db) {
 	var userRouter = express.Router();
 
-	userRouter.route("/")
+      userRouter.route("/") // Route for /api/users
 
-        .get(function(req, res) {
-            console.log("/user/ req.user is " + JSON.stringify(req.user));
-            if (req.user) {
-            	var query = {
-            	};
+      .get(function(req, res) {
+                  // Filter by user who posted the challenge
+                  if (req.query.challengeId) {
+                        cypherQuery = "MATCH (c:Challenge) WHERE (id(c) = " + req.query.challengeId + ") MATCH (c)-[POSTED_BY]->(u:User) RETURN u;";
+                  } else if (req.query.entryId) { // filter by user who posted the entry
+                        cypherQuery = "MATCH (e:Entry) WHERE (id(e) = " + req.query.entryId + ") MATCH (e)-[POSTED_BY]->(u:User) RETURN u;";
+                  } else { // return all users
+                        cypherQuery = "MATCH (u:User) RETURN u;";
+                  }
 
-            	if (req.user.id) {
-            		query.userID = req.user.id;
-            	}
+                  console.log("Running cypherQuery: " + cypherQuery);
+                  db.cypherQuery(cypherQuery, function(err, result){
+                        if(err) throw err;
 
-            	if (req.user.google) {
-            		query.googleID = req.user.google.id;
-            	}
+                        //console.log(result.data); // delivers an array of query results
+                        //console.log(result.columns); // delivers an array of names of objects getting returned
 
-            	if (req.user.twitter) {
-            		query.twitterID = req.user.twitter.id;
-            	}
-
-            	if (req.user.facebook) {
-            		query.facebookID = req.user.facebook.id;
-            	}
-            	
-            	dataUtils.findUser(query, function(err, user) {
-            		if (err) throw err;
-
-            		console.log("passing user to render, user = " + JSON.stringify(user));
-            		res.render("user", {user : user});
-            	});
-            } else {
-            	res.render("user", null);
-            }
-        });
+                        console.log(result.data);
+                        res.json(result.data);
+                  });
+      });
 
 	return userRouter;
 };

@@ -5,19 +5,16 @@ function createLoginHeader() {
 	}
 	
 	if (user) {
-		$("<div>", {class : "dropdown"}).appendTo("#userLoginHeader").append($("<span>", {id : "dropbtn", class : "dropbtn"}));
+		$("<div>", {class : "userLoginHeader"}).appendTo("#userLoginHeader").append($("<span>", {id : "dropbtn", class : "dropbtn"}));
 
-		
+		$("<a>", {text: user.displayName, href : "/user/" + user.id}).attr("class", "userNameHeader").appendTo("#userLoginHeader");
+
 		var img = $("<img>");
 		img.attr("src", user.image);
 		img.attr("class", "userImageHeader");
-		img.appendTo("#dropbtn");
+		img.appendTo("#userLoginHeader");
 
-
-		$("<p>", {text: user.displayName}).attr("class", "userNameHeader").appendTo("#dropbtn");
-
-		$("<div>", {id: "dropDownList", class : "dropdown-content"}).appendTo(".dropdown");
-		$("<a>", {text: "Sign Out", href : "/auth/logout"}).attr("class", "signOutTextHeader").appendTo("#dropDownList");
+		$("<a>", {text: "Sign Out", href : "/auth/logout"}).attr("class", "signOutTextHeader").appendTo("#userLoginHeader");
 
 	} else {
 		$("<a>", {text: "Sign in", href : "/auth"}).attr("class", "signInTextHeader").appendTo("#userLoginHeader");
