@@ -22,8 +22,10 @@ function parseChallenge(challenge) {
 
 function parseUser(users) {
 	var user = users[0];
-	$("#challengePostedBy").append($("<a>", {href: "/user/" + user.id, text: user.displayName}));
-	$("#challengePostedBy").append($("<img>", {src: user.image}));
+	if (user) {
+		$("#challengePostedBy").append($("<a>", {href: "/user/" + user.id, text: user.displayName}));
+		$("#challengePostedBy").append($("<img>", {src: user.image}));
+	}
 }
 
 function postEntry() {
