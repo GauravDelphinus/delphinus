@@ -5,13 +5,30 @@
     <link rel="stylesheet" href="/lib/bootstrap/dist/css/bootstrap.min.css">
     <link rel="stylesheet" href="/lib/fontawesome/css/font-awesome.min.css">
     -->
+    <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css">
+    <link ref="stylesheet" href="/css/font-awesome/css/font-awesome.css">
     <link rel="stylesheet" href="/css/styles.css">
 
     <title>User</title>
 </head>
 
 <body>
-<div id="profileInfo">
+<div id="profileInfo" class="container">
+  <div class="row">
+    <div id="imageSection" class="span5">
+      <img id="image" class="img-rounded"><br>
+      <p id="displayName" class="lead"></p>
+    </div>
+    <div id="socialSection" class="span7">
+      <ul class="social list-inline">
+        <li>
+          <a id="linkGoogle" href="/auth/google"><img id="imageGoogle" width="50px"></a>
+          <a id="linkTwitter" href="/auth/twitter"><img id="imageTwitter" width="50px"></a>
+          <a id="linkFacebook" href="/auth/facebook"><img id="imageFacebook" width="50px"></a>
+        </li>
+      </ul>
+    </div>
+  </div>
 </div> <br><br>
 <div id="challenges">
   <span class="sectionHeader">Challenges Posted by this user</span><br>
@@ -28,9 +45,11 @@
 </body>
 
 <script>
+var userInfo = <%- JSON.stringify(userInfo) %>;
 var user = <%- JSON.stringify(user) %>;
 </script>
 <script src="/js/jquery-3.1.1.min.js"></script>
+<script src="/js/bootstrap.js"></script>
 <script src="/js/user.js"></script>
 <script src="/js/header.js"></script>
 </html>

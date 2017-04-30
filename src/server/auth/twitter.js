@@ -54,6 +54,7 @@ module.exports = function () {
                 user.twitter.token = token;
                 user.twitter.tokenSecret = tokenSecret;
                 
+                console.log("calling saveUser, user = " + JSON.stringify(user));
                 dataUtils.saveUser(user, function(err) {
                     if (err) throw err;
 

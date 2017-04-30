@@ -1,22 +1,22 @@
 function createLoginHeader() {
 
-	if (!$("#userLoginHeader").length) {
-		$("<div>", {id: "userLoginHeader"}).attr("class", "userLoginHeader").prependTo("body");
+	if (!$("#header").length) {
+		console.log("header not found");
+		$("<div>", {id: "header"}).attr("class", "header").prependTo("body");
 	}
 	
 	if (user) {
-		$("<div>", {class : "userLoginHeader"}).appendTo("#userLoginHeader").append($("<span>", {id : "dropbtn", class : "dropbtn"}));
+		console.log("user found");
+		$("<div>", {id: "dropdown", class : "dropdown userLoginHeader"}).appendTo("#header");
+		$("<a>", {href: "#", id: "dropdownmenu", class: "dropdown-toggle", "data-toggle" : "dropdown", text: user.displayName}).appendTo("#dropdown");
+		$("<b>", {class: "caret"}).appendTo("#dropdownmenu");
 
-		$("<a>", {text: user.displayName, href : "/user/" + user.id}).attr("class", "userNameHeader").appendTo("#userLoginHeader");
+		$("<ul>", {id: "dropdownlist", class: "dropdown-menu", role: "menu", "aria-labelledby" : "dropdownmenu"}).appendTo("#dropdown");
 
-		var img = $("<img>");
-		img.attr("src", user.image);
-		img.attr("class", "userImageHeader");
-		img.appendTo("#userLoginHeader");
-
-		$("<a>", {text: "Sign Out", href : "/auth/logout"}).attr("class", "signOutTextHeader").appendTo("#userLoginHeader");
+		$("<li>").append($("<a>", {text: "Profile", href: "/user/" + user.id})).appendTo("#dropdownlist");
+		$("<li>").append($("<a>", {text: "Sign Out", href: "/auth/logout"})).appendTo("#dropdownlist");
 
 	} else {
-		$("<a>", {text: "Sign in", href : "/auth"}).attr("class", "signInTextHeader").appendTo("#userLoginHeader");
+		$("<a>", {text: "Sign in", href : "/auth"}).attr("class", "userLoginHeader").appendTo("#header");
 	}
 }

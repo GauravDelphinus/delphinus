@@ -192,7 +192,7 @@ module.exports = function() {
             dataUtils.findUser(query, function(err, user) {
                   if (err) throw err;
 
-                  res.render("user", {user: user});
+                  res.render("user", {userInfo: user, user: normalizeUser(req.user)});
             });
     });
 	
