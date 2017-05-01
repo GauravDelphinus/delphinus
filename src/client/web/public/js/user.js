@@ -72,7 +72,7 @@ $(document).ready(function(){
           $("#linkFacebook").attr("href", "https://www.facebook.com/" + userInfo.facebook.id);
           $("#imageFacebook").attr("src", "/images/social/facebook_regular_300x300.png");
         } else {
-          $("#linkFacebook").attr("href", "https://www.facebook.com/" + userInfo.facebook.id);
+          $("#linkFacebook").attr("href", "/auth/facebook");
           $("#imageFacebook").attr("src", "/images/social/facebook_disabled_300x300.png");
         }
         $("#linkFacebook").show();

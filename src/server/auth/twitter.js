@@ -45,12 +45,6 @@ module.exports = function () {
 
                 //user.email = profile.emails[0].value; Twitter doesn't provide email information
 
-                var trailerLoc = user.image.indexOf("?");
-                if (trailerLoc != -1)
-                {
-                    user.image = user.image.slice(0, trailerLoc);
-                }
-
                 user.twitter = {};
                 user.twitter.id = profile.id;
                 user.twitter.username = profile.username; //twitter handle

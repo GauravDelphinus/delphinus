@@ -894,7 +894,7 @@ module.exports = {
 					}
 
 					if (user.twitter.images) {
-						cypherQuery += ", twitter_images: " + user.twitter.images + "";
+						cypherQuery += ", twitter_images: " + JSON.stringify(user.twitter.images) + "";
 					}
 				}
 

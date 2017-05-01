@@ -7,7 +7,7 @@ function createLoginHeader() {
 
 		$("<ul>", {id: "dropdownlist", class: "dropdown-menu", role: "menu", "aria-labelledby" : "dropdownmenu"}).appendTo("#dropdown");
 
-		$("<li>").append($("<a>", {text: "Profile", href: "/user/" + user.id})).appendTo("#dropdownlist");
+		$("<li>").append($("<a>", {text: "Profile", href: "/user"})).appendTo("#dropdownlist");
 		$("<li>").append($("<a>", {text: "Sign Out", href: "/auth/logout"})).appendTo("#dropdownlist");
 
 	} else {

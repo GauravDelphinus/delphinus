@@ -179,7 +179,7 @@ module.exports = function() {
             		if (err) throw err;
 
             		//console.log("passing user to render, user = " + JSON.stringify(user));
-            		res.render("user", {user : user});
+            		res.render("user", {user : user, userInfo: user});
             	});
             } else {
             	res.render("user", null);
