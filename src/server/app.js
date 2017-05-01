@@ -22,6 +22,8 @@ module.exports = function() {
 	
 	require('./auth/passport')(app);
 
+	var flash = require("connect-flash");
+
 	// Set the view engine to ejs
 	app.set('view engine', 'ejs');
 

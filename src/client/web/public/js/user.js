@@ -31,7 +31,7 @@ $(document).ready(function(){
         }
 
         if (userInfo.twitter && userInfo.twitter.id) {
-          $("#linkTwitter").attr("href", "https://twitter.com/" + userInfo.twitter.id);
+          $("#linkTwitter").attr("href", "https://twitter.com/" + userInfo.twitter.username);
           $("#imageTwitter").attr("src", "/images/social/twitter_regular_300x300.png");
         } else {
           $("#linkTwitter").hide();
@@ -59,7 +59,7 @@ $(document).ready(function(){
         $("#imageGoogle").show();
 
         if (userInfo.twitter && userInfo.twitter.id) {
-          $("#linkTwitter").attr("href", "https://twitter.com/" + userInfo.twitter.id);
+          $("#linkTwitter").attr("href", "https://twitter.com/" + userInfo.twitter.username);
           $("#imageTwitter").attr("src", "/images/social/twitter_regular_300x300.png");
         } else {
           $("#linkTwitter").attr("href", "/auth/twitter");

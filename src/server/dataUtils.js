@@ -622,13 +622,26 @@ module.exports = {
 			addOr = true;
 		}
 
+		if (query.localEmail) {
+			if (addOr) {
+				findUserQuery += " OR ";
+			}
+			findUserQuery += " u.local_email = '" + query.localEmail + "'";
+
+			if (query.type == "extended") { // search in other accounts as well
+				findUserQuery += " OR '" + query.localEmail + "' IN u.google_emails ";
+				findUserQuery += " OR '" + query.localEmail + "' IN u.facebook_emails ";
+			}
+			addOr = true;
+		}
+
 		findUserQuery += " RETURN u;";
 
-		//console.log("running cypherquery: " + findUserQuery);
+		console.log("running cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) throw err;
 
-			//console.log(result.data[0]);
+			console.log(result.data[0]);
 
 			if (result.data.length == 0) {
 				// no user found
@@ -642,31 +655,46 @@ module.exports = {
 					user.id = userFromDB.id;
 				}
 
-				if (userFromDB.google_id) {
-					user.google = {};
-					user.google.id = userFromDB.google_id;
-				}
-
-				if (userFromDB.twitter_id) {
-					user.twitter = {};
-					user.twitter.id = userFromDB.twitter_id;
-				}
-
-				if (userFromDB.facebook_id) {
-					user.facebook = {};
-					user.facebook.id = userFromDB.facebook_id;
-				}
-
-				if (userFromDB.email) {
-					user.email = userFromDB.email;
+				if (userFromDB.displayName) {
+					user.displayName = userFromDB.displayName;
 				}
 
 				if (userFromDB.image) {
 					user.image = userFromDB.image;
 				}
 
-				if (userFromDB.displayName) {
-					user.displayName = userFromDB.displayName;
+				if (userFromDB.google_id) {
+					user.google = {};
+					user.google.id = userFromDB.google_id;
+					user.google.displayName = userFromDB.google_displayName;
+					user.google.token = userFromDB.google_token;
+					user.google.emails = userFromDB.google_emails;
+					user.google.images = userFromDB.google_images;
+				}
+
+				if (userFromDB.twitter_id) {
+					user.twitter = {};
+					user.twitter.id = userFromDB.twitter_id;
+					user.twitter.username = userFromDB.twitter_username;
+					user.twitter.token = userFromDB.twitter_token;
+					user.twitter.tokenSecret = userFromDB.twitter_tokenSecret;
+					user.twitter.displayName = userFromDB.twitter_displayName;
+					user.twitter.images = userFromDB.twitter_images;
+				}
+
+				if (userFromDB.facebook_id) {
+					user.facebook = {};
+					user.facebook.id = userFromDB.facebook_id;
+					user.facebook.token = userFromDB.facebook_token;
+					user.facebook.displayName = userFromDB.facebook_displayName;
+					user.facebook.image = userFromDB.facebook_image;
+					user.facebook.emails = userFromDB.facebook_emails;
+				}
+
+				if (userFromDB.local_email) {
+					user.local = {};
+					user.local.email = userFromDB.local_email;
+					user.local.password = userFromDB.local_password;
 				}
 
 				callback(null, user);
@@ -695,6 +723,10 @@ module.exports = {
 			query.facebookID = user.facebook.id;
 		}
 
+		if (user.local) {
+			query.localEmail = user.local.email;
+		}
+
 		this.findUser(query, function(err, existingUser) {
 			if (err) throw err;
 
@@ -703,9 +735,7 @@ module.exports = {
 				cypherQuery = "MATCH(u:User) WHERE u.id = '" + existingUser.id + "'";
 
 				var setValues = [];
-				if (user.email) {
-					setValues.push(" u.email = '" + user.email + "'");
-				}
+
 				if (user.displayName) {
 					setValues.push(" u.displayName = '" + user.displayName + "'");
 				}
@@ -721,6 +751,18 @@ module.exports = {
 					if (user.google.token) {
 						setValues.push(" u.google_token = '" + user.google.token + "'");
 					}
+
+					if (user.google.emails) {
+						setValues.push(" u.google_emails = " + JSON.stringify(user.google.emails) + "");
+					}
+
+					if (user.google.images) {
+						setValues.push(" u.google_images = " + JSON.stringify(user.google.images) + "");
+					}
+
+					if (user.google.displayName) {
+						setValues.push(" u.google_displayName = '" + user.google.displayName + "'");
+					}
 				}
 
 				if (user.twitter) {
@@ -735,6 +777,18 @@ module.exports = {
 					if (user.twitter.tokenSecret) {
 						setValues.push(" u.twitter_tokenSecret = '" + user.twitter.tokenSecret + "'");
 					}
+
+					if (user.twitter.username) {
+						setValues.push(" u.twitter_username = '" + user.twitter.username + "'");
+					}
+
+					if (user.twitter.displayName) {
+						setValues.push(" u.twitter_displayName = '" + user.twitter.displayName + "'");
+					}
+
+					if (user.twitter.images) {
+						setValues.push(" u.twitter_images = " + JSON.stringify(user.twitter.images) + "");
+					}
 				}
 
 				if (user.facebook) {
@@ -744,6 +798,28 @@ module.exports = {
 
 					if (user.facebook.token) {
 						setValues.push(" u.facebook_token = '" + user.facebook.token + "'");
+					}
+
+					if (user.facebook.displayName) {
+						setValues.push(" u.facebook_displayName = '" + user.facebook.displayName + "'");
+					}
+
+					if (user.facebook.emails) {
+						setValues.push(" u.facebook_emails = " + JSON.stringify(user.facebook.emails) + "");
+					}
+
+					if (user.facebook.image) {
+						setValues.push(" u.facebook_image = '" + user.facebook.image + "'");
+					}
+				}
+
+				if (user.local) {
+					if (user.local.email) {
+						setValues.push(" u.local_email = '" + user.local.email + "'");
+					}
+
+					if (user.local.password) {
+						setValues.push(" u.local_password = '" + user.local.password + "'");
 					}
 				}
 
@@ -766,10 +842,6 @@ module.exports = {
 				var uuid1 = uuid.v4();
 				cypherQuery += "id: '" + uuid1 + "'";
 
-				if (user.email) {
-					cypherQuery += ", email: '" + user.email + "'";
-				}
-
 				if (user.displayName) {
 					cypherQuery += ", displayName: '" + user.displayName + "'";
 				}
@@ -786,6 +858,18 @@ module.exports = {
 					if (user.google.token) {
 						cypherQuery += ", google_token: '" + user.google.token + "'";
 					}
+
+					if (user.google.emails) {
+						cypherQuery += ", google_emails: " + JSON.stringify(user.google.emails) + "";
+					}
+
+					if (user.google.images) {
+						cypherQuery += ", google_images: " + JSON.stringify(user.google.images) + "";
+					}
+
+					if (user.google.displayName) {
+						cypherQuery += ", google_displayName: '" + user.google.displayName + "'";
+					}
 				}
 
 				if (user.twitter) {
@@ -800,6 +884,18 @@ module.exports = {
 					if (user.twitter.tokenSecret) {
 						cypherQuery += ", twitter_tokenSecret: '" + user.twitter.tokenSecret + "'";
 					}
+
+					if (user.twitter.username) {
+						cypherQuery += ", twitter_username: '" + user.twitter.username + "'";
+					}
+
+					if (user.twitter.displayName) {
+						cypherQuery += ", twitter_displayName: '" + user.twitter.displayName + "'";
+					}
+
+					if (user.twitter.images) {
+						cypherQuery += ", twitter_images: " + user.twitter.images + "";
+					}
 				}
 
 				if (user.facebook) {
@@ -810,12 +906,34 @@ module.exports = {
 					if (user.facebook.token) {
 						cypherQuery += ", facebook_token: '" + user.facebook.token + "'";
 					}
+
+					if (user.facebook.displayName) {
+						cypherQuery += ", facebook_displayName: '" + user.facebook.displayName + "'";
+					}
+
+					if (user.facebook.emails) {
+						cypherQuery += ", facebook_emails: " + JSON.stringify(user.facebook.emails) + "";
+					}
+
+					if (user.facebook.image) {
+						cypherQuery += ", facebook_image: '" + user.facebook.image + "'";
+					}
+				}
+
+				if (user.local) {
+					if (user.local.email) {
+						cypherQuery += ", local_email: '" + user.local.email + "'";
+					}
+
+					if (user.local.password) {
+						cypherQuery += ", local_password: '" + user.local.password + "'";
+					}
 				}
 
 				cypherQuery += "});";
 			}
 
-			//console.log("running cypherquery: " + cypherQuery);
+			console.log("running cypherquery: " + cypherQuery);
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 

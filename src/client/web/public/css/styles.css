@@ -84,6 +84,13 @@
 	max-width: 60%;
 }
 
+.centerDiv {
+	width: 500px;
+	position: absolute;
+	margin: 0 auto;
+	top: 0; left: 0; bottom: 0; right: 0;
+}
+
 .signInTextHeader {
 	float: right;
 	font-family: arial;	

@@ -1,5 +1,6 @@
 var passport = require('passport');
 var session = require("express-session");
+var flash = require("connect-flash");
 
 module.exports = function (app) {
 
@@ -15,6 +16,8 @@ module.exports = function (app) {
     app.use(passport.initialize());
     app.use(passport.session());
 
+    app.use(flash());
+
     passport.serializeUser(function (user, done) {
         done(null, user)
     });
@@ -26,4 +29,5 @@ module.exports = function (app) {
     require("./google")();
     require("./twitter")();
     require("./facebook")();
+    require("./local")();
 };

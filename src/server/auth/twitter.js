@@ -11,6 +11,7 @@ module.exports = function () {
             passReqToCallback: true
         },
         function(req, token, tokenSecret, profile, done){
+            console.log("Twitter Profile is " + JSON.stringify(profile));
             var query = {};
             
             if (req.user) {
@@ -24,6 +25,10 @@ module.exports = function () {
 
                 if (req.user.facebook) {
                     query.facebookID = req.user.facebook.id;
+                }
+
+                if (req.user.local) {
+                    query.localEmail = req.user.local.email;
                 }
             } else {
                 query.twitterID = profile.id;
@@ -40,20 +45,38 @@ module.exports = function () {
 
                 //user.email = profile.emails[0].value; Twitter doesn't provide email information
 
-                user.image = profile.photos[0].value;
                 var trailerLoc = user.image.indexOf("?");
                 if (trailerLoc != -1)
                 {
                     user.image = user.image.slice(0, trailerLoc);
                 }
-                
-                user.displayName = profile.displayName;
 
                 user.twitter = {};
                 user.twitter.id = profile.id;
+                user.twitter.username = profile.username; //twitter handle
                 user.twitter.token = token;
                 user.twitter.tokenSecret = tokenSecret;
+                user.twitter.displayName = profile.displayName;
+                user.twitter.images = [];
+                for (var i = 0; i < profile.photos.length; i++) {
+                    var imageStr = profile.photos[i].value;
+                    var trailerLoc = imageStr.indexOf("?");
+                    if (trailerLoc != -1)
+                    {
+                        imageStr = imageStr.slice(0, trailerLoc);
+                    }
+                    user.twitter.images.push(imageStr);
+                }
                 
+                // set the user name and image, if not already set
+                if (!user.displayName) {
+                    user.displayName = user.twitter.displayName;
+                }
+
+                if (!user.image && user.twitter.images.length > 0) {
+                    user.image = user.twitter.images[0];
+                }
+
                 console.log("calling saveUser, user = " + JSON.stringify(user));
                 dataUtils.saveUser(user, function(err) {
                     if (err) throw err;

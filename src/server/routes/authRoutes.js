@@ -17,7 +17,31 @@ var routes = function(db) {
                 req.session.redirectTo = req.get('Referrer');
             }
 
-            res.render("login");
+            res.render("auth");
+        });
+
+    authRouter.route("/login")
+        .get(function(req, res, next) {
+            res.render("login", {message: []});
+        })
+        .post(passport.authenticate("local-login", {
+            failureRedirect : "/auth/login",
+            failureFlash: true
+        }), function(req, res) {
+            console.log("**** Local login callback **** ");
+            res.redirect("/");
+        });
+
+    authRouter.route("/signup")
+        .get(function(req, res, next) {
+            res.render("signup", {message: req.flash("signupMessage")});
+        })
+        .post(passport.authenticate("local-signup", {
+            failureRedirect: "/auth/signup",
+            failureFlash: true
+        }), function(req, res) {
+            console.log(" ****** Local Signup callback ************* ");
+            res.redirect("/");
         });
 
 	authRouter.route("/google")

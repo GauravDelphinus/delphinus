@@ -8,11 +8,12 @@ module.exports = function () {
             clientID: '1286014801445639',
             clientSecret: '81732e3d807f86c9099589f632897dce',
             callbackURL: 'http://localhost:8080/auth/facebook/callback',
+            profileFields: ['id', 'email', 'name'],
             passReqToCallback: true
         },
         function(req, accessToken, refreshToken, profile, done){
 
-            //console.log("Info from Facebook Profile: " + JSON.stringify(profile));
+            console.log("Info from Facebook Profile: " + JSON.stringify(profile));
 
             var query = {};
             
@@ -28,6 +29,10 @@ module.exports = function () {
                 if (req.user.google) {
                     query.googleID = req.user.google.id;
                 }
+
+                if (req.user.local) {
+                    query.localEmail = req.user.local.email;
+                }
             } else {
                 query.facebookID = profile.id;
             }
@@ -42,27 +47,35 @@ module.exports = function () {
                     }
                 }
 
-                //user.email = profile.emails[0].value; // Seems facebook doesn't provide email either
-                //user.image = profile.photos[0].value; // Facebook doesn't provide profile image
-                
-                user.displayName = profile.displayName;
-
                 user.facebook = {};
                 user.facebook.id = profile.id;
                 user.facebook.token = accessToken;
+                user.facebook.displayName = profile.displayName;
+                user.facebook.emails = [];
+                for (var i = 0; i < profile.emails.length; i++) {
+                    user.facebook.emails.push(profile.emails[i].value);
+                }
                 
                 var facebook = require('../services/facebook')('1286014801445639', '81732e3d807f86c9099589f632897dce');
                 facebook.getImage(user.facebook.token, function (imageUrl) {
                     console.log("getImage returned, imageUrl = " + imageUrl);
-                    user.image = imageUrl;
+                    user.facebook.image = imageUrl;
+
+                    // set the user name and image, if not already set
+                    if (!user.displayName) {
+                        user.displayName = user.facebook.displayName;
+                    }
+
+                    if (!user.image && user.facebook.image) {
+                        user.image = user.facebook.image;
+                    }
+
                     dataUtils.saveUser(user, function(err) {
                         if (err) throw err;
 
                         done(null, user);
                     });   
-                });
-
-                 
+                });  
             });
         }
     ));
