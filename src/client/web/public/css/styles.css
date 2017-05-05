@@ -134,6 +134,77 @@
 	float: right;
 }
 
+.profileImage {
+	display: block;
+	margin: 0 auto;
+}
+
+.profileName {
+	font-style: sans-serif;
+	font-size: 2em;
+	font-weight: bold;
+	text-align: center;
+}
+
+.socialSection {
+	text-align: center;
+}
+.socialSection ul li {
+	display: inline;
+}
+
+.socialSection ul {
+	list-style: none;
+	padding: 0;
+}
+
+.socialImageSection {
+	display: inline-block;
+	position: relative;
+	width: 80px;
+	height: 80px;
+}
+
+.socialImage {
+	width: 80px;
+	height: 80px;
+}
+
+.socialTick {
+	position: absolute;
+	right: 0px;
+	bottom: 0px;
+	width: 40px;
+	height: 40px;
+}
+
+.subHeading {
+	font-size: 1.5em;
+	text-align: center;
+}
+
+.numFollowers {
+	font-style: sans-serif;
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+.followers {
+	font-style: serif;
+	font-size: 0.5em;
+}
+
+.followButton {
+	text-decoration: none;
+	background-color: #42c8f4;
+	padding: 5px;
+	color: white;
+	font-size: 1.2em;
+}
+
+.followSection {
+	text-align: center;
+}
 .social a {
     text-align: center;
     font-size: 28px;

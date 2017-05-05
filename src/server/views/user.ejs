@@ -15,21 +15,43 @@
 <body>
 <% include ./header %>
 <div id="profileInfo" class="container">
-  <div class="row">
-    <div id="imageSection" class="span5">
-      <img id="image" class="img-rounded"><br>
-      <p id="displayName" class="lead"></p>
+    <div class="imageSection">
+      <!--<img id="image" class="img-rounded profileImage"> -->
+
+      <div class="carousel slide" id="imageCarousel" data-interval="false">
+        <ol class="carousel-indicators">
+        </ol>
+        <div class="carousel-inner">
+        </div>
+        <a href="#imageCarousel" class="carousel-control left" data-slide="prev"><span class="icon-prev"></span></a>
+        <a href="#imageCarousel" class="carousel-control right" data-slide="next"><span class="icon-next"></span></a>
+      </div>
+      <p id="displayName" class="profileName"></p>
     </div>
-    <div id="socialSection" class="span7">
-      <ul class="social list-inline">
-        <li>
-          <a id="linkGoogle" href="/auth/google"><img id="imageGoogle" width="50px"></a>
-          <a id="linkTwitter" href="/auth/twitter"><img id="imageTwitter" width="50px"></a>
-          <a id="linkFacebook" href="/auth/facebook"><img id="imageFacebook" width="50px"></a>
-        </li>
+    <div class="followSection">
+      <span id="numFollowers" class="numFollowers"></span><span class="followers"> Followers</span>
+      <a id="followLink" class="followButton"></a>
+    </div>
+    <div class="socialSection">
+      <p id="socialHeader" class="subHeading"></p>
+      <ul>
+        <li><a id="linkGoogle" href="/auth/google">
+          <div class="socialImageSection">
+            <img id="imageGoogle" class="socialImage"><img id="imageGoogleTick" class="socialTick" src="/images/social/tick_small_50x50.png">
+          </div>
+        </a></li>
+        <li><a id="linkTwitter" href="/auth/twitter">
+        <div class="socialImageSection">
+          <img id="imageTwitter" class="socialImage"><img id="imageTwitterTick" class="socialTick" src="/images/social/tick_small_50x50.png">
+        </span>
+        </a></li>
+        <li><a id="linkFacebook" href="/auth/facebook">
+        <div class="socialImageSection">
+          <img id="imageFacebook" class="socialImage"><img id="imageFacebookTick" class="socialTick" src="/images/social/tick_small_50x50.png">
+        </span>
+        </a></li>
       </ul>
     </div>
-  </div>
 </div> <br><br>
 <div id="challenges">
   <span class="sectionHeader">Challenges Posted by this user</span><br>

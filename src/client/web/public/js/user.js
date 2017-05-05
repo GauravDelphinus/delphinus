@@ -8,76 +8,60 @@ $(document).ready(function(){
     console.log("user is " + JSON.stringify(user));
     console.log("userInfo is " + JSON.stringify(userInfo));
 
+    var profileType = "public";
+    if (!user) {
+      profileType = "public"; // public profile, not logged in
+    } else if (user) {
+      if (user.id == userInfo.id) {
+        profileType = "mine";  // I'm logged in, and it's my own profile
+      } else {
+        profileType = "member"; // I'm logged in, and it's another member's profile
+      }
+    }
   	if (userInfo) {
 
-  		if (userInfo.displayName) {
-  			//$("#profileInfo").append($("<p>", {text: "Display Name: " + userInfo.displayName, class: "userInfoText"}));
+      // Profile Image and Name
+      setupCarousel(userInfo);
+
+
+      if (userInfo.displayName) {
         $("#displayName").text(userInfo.displayName);
-  		}
+      }
 
-  		if (userInfo.image) {
-  			//$("#profileInfo").append($("<img>", {src : userInfo.image, class: "userInfoImage"}));
-        $("#image").attr("src", userInfo.image);
-  		}
+      // Followers Section
+      //testing
+      userInfo.numFollowers = 122;
+      if (userInfo.numFollowers) {
+        $("#numFollowers").text(userInfo.numFollowers);
+      }
 
-      if (!user || (user && (user.id != userInfo.id))) {
-        // show public information
-        if (userInfo.google && userInfo.google.id) {
-          $("#linkGoogle").attr("href", "https://plus.google.com/" + userInfo.google.id);
-          $("#imageGoogle").attr("src", "/images/social/google_regular_300x300.png");
-        } else {
-          $("#linkGoogle").hide();
-          $("#imageGoogle").hide();
-        }
+      $("#followLink").text("FOLLOW " + userInfo.displayName).attr("href", "/user/" + userInfo.id + "/follow");
 
-        if (userInfo.twitter && userInfo.twitter.id) {
-          $("#linkTwitter").attr("href", "https://twitter.com/" + userInfo.twitter.username);
-          $("#imageTwitter").attr("src", "/images/social/twitter_regular_300x300.png");
-        } else {
-          $("#linkTwitter").hide();
-          $("#imageTwitter").hide();
-        }
+      // Social Section
+      if (profileType == "public" || profileType == "member") {
+        $("#socialHeader").text("Connect with " + userInfo.displayName);
+      } else if (profileType == "mine") {
+        $("#socialHeader").text("Manage your Social Networks");
+      }
 
-        if (userInfo.facebook && userInfo.facebook.id) {
-          $("#linkFacebook").attr("href", "https://www.facebook.com/" + userInfo.facebook.id);
-          $("#imageFacebook").attr("src", "/images/social/facebook_regular_300x300.png");
-        } else {
-          $("#linkFacebook").hide();
-          $("#imageFacebook").hide();
-        }
-      } else if (user && user.id == userInfo.id) {
-        // if currently logged in user is the same user
+      console.log("userInfo is " + JSON.stringify(userInfo));
 
-        if (userInfo.google && userInfo.google.id) {
-          $("#linkGoogle").attr("href", "https://plus.google.com/" + userInfo.google.id);
-          $("#imageGoogle").attr("src", "/images/social/google_regular_300x300.png");
-        } else {
-          $("#linkGoogle").attr("href", "/auth/google");
-          $("#imageGoogle").attr("src", "/images/social/google_disabled_300x300.png");
-        }
-        $("#linkGoogle").show();
-        $("#imageGoogle").show();
+      console.log("userInfo.google is " + userInfo.google);
+      console.log("userInfo.twitter is " + userInfo.twitter);
+      console.log("userInfo.facebook is " + userInfo.facebook);
 
-        if (userInfo.twitter && userInfo.twitter.id) {
-          $("#linkTwitter").attr("href", "https://twitter.com/" + userInfo.twitter.username);
-          $("#imageTwitter").attr("src", "/images/social/twitter_regular_300x300.png");
-        } else {
-          $("#linkTwitter").attr("href", "/auth/twitter");
-          $("#imageTwitter").attr("src", "/images/social/twitter_disabled_300x300.png");
-        }
-        $("#linkTwitter").show();
-        $("#imageTwitter").show();
+      var googleIsConnected = userInfo.hasOwnProperty("google") ? userInfo.google.hasOwnProperty("id") : false;
+      var googleProfileLink = (googleIsConnected) ? "https://plus.google.com/" + userInfo.google.id : "/auth/google";
+      var twitterIsConnected = userInfo.hasOwnProperty("twitter") ? userInfo.twitter.hasOwnProperty("username") : false;
+      var twitterProfileLink = (twitterIsConnected) ? "https://twitter.com/" + userInfo.twitter.username : "/auth/twitter";
+      var facebookIsConnected = userInfo.hasOwnProperty("facebook") ? userInfo.facebook.hasOwnProperty("id") : false;
+      var facebookProfileLink = (facebookIsConnected) ? "https://www.facebook.com/" + userInfo.facebook.id : "/auth/facebook";
 
-        if (userInfo.facebook && userInfo.facebook.id) {
-          $("#linkFacebook").attr("href", "https://www.facebook.com/" + userInfo.facebook.id);
-          $("#imageFacebook").attr("src", "/images/social/facebook_regular_300x300.png");
-        } else {
-          $("#linkFacebook").attr("href", "/auth/facebook");
-          $("#imageFacebook").attr("src", "/images/social/facebook_disabled_300x300.png");
-        }
-        $("#linkFacebook").show();
-        $("#imageFacebook").show();
+      updateSocialStatus(profileType, googleIsConnected, "#linkGoogle", "#imageGoogle", "#imageGoogleTick", googleProfileLink, "/auth/google", "/images/social/google_regular_300x300.png", "/images/social/google_disabled_300x300.png");
+      updateSocialStatus(profileType, twitterIsConnected, "#linkTwitter", "#imageTwitter", "#imageTwitterTick", twitterProfileLink, "/auth/twitter", "/images/social/twitter_regular_300x300.png", "/images/social/twitter_disabled_300x300.png");
+      updateSocialStatus(profileType, facebookIsConnected, "#linkFacebook", "#imageFacebook", "#imageFacebookTick", facebookProfileLink, "/auth/facebook", "/images/social/facebook_regular_300x300.png", "/images/social/facebook_disabled_300x300.png");
 
+      
      		if (userInfo.id) {
           $("#profileInfo").append($("<p>", {text: "ID: " + userInfo.id, class: "userInfoText"}));
         }
@@ -86,45 +70,94 @@ $(document).ready(function(){
           $("#profileInfo").append($("<p>", {text: "Email: " + userInfo.email, class: "userInfoText"}));
         }
 
-        /*
-        if (userInfo.google) {
-    			if (userInfo.google.id) {
-    				$("#profileInfo").append($("<p>", {text: "Google ID: " + userInfo.google.id, class: "userInfoText"}));
-    			} 
-    		} else {
-    			$("#profileInfo").append($("<a>", {href: "/auth/google", text: "Connect to Google"})).append("<br>");
-    		}
-
-    		if (userInfo.twitter) {
-    			if (userInfo.twitter.id) {
-    				$("#profileInfo").append($("<p>", {text: "Twitter ID: " + userInfo.twitter.id, class: "userInfoText"}));
-    			} 
-    		} else {
-    			$("#profileInfo").append($("<a>", {href: "/auth/twitter", text: "Connect to Twitter"})).append("<br>");
-    		}
-
-    		if (userInfo.facebook) {
-    			if (userInfo.facebook.id) {
-    				$("#profileInfo").append($("<p>", {text: "Facebook ID: " + userInfo.facebook.id, class: "userInfoText"}));
-    			} 
-    		} else {
-    			$("#profileInfo").append($("<a>", {href: "/auth/facebook", text: "Connect to Facebook"})).append("<br>");
-    		}
-        */
-
-
-      }
-      
-
       //get challenges posted by this user
       $.getJSON('/api/challenges/?user=' + userInfo.id, extractChallenges);
 
       //get entries posted by this user
       $.getJSON('/api/entries/?user=' + userInfo.id, extractEntries);
+
+      //trigger the carousel
+      $("#imageCarousel").carousel();
   	}
 
 
 });
+
+function setupCarousel(userInfo) {
+        if (userInfo.image) {
+        appendProfileImageToCarousel(userInfo.image, true);
+      }
+
+      if (userInfo.hasOwnProperty("facebook")) {
+        if (userInfo.facebook.image) {
+          appendProfileImageToCarousel(userInfo.facebook.image);
+        }
+      }
+      if (userInfo.hasOwnProperty("google")) {
+        console.log("num Google Images = " + userInfo.google.images.length);
+        if (userInfo.google.images && userInfo.google.images.length > 0) {
+          for (var i = 0; i < userInfo.google.images.length; i++) {
+            appendProfileImageToCarousel(userInfo.google.images[i]);
+          }
+        }
+      }
+
+      if (userInfo.hasOwnProperty("twitter")) {
+        console.log("num Twitter Images = " + userInfo.twitter.images.length);
+        if (userInfo.twitter.images && userInfo.twitter.images.length > 0) {
+          for (var i = 0; i < userInfo.twitter.images.length; i++) {
+            appendProfileImageToCarousel(userInfo.twitter.images[i]);
+          }
+        }
+      }
+}
+function appendProfileImageToCarousel(imageUrl, active) {
+  this.carouselSlideIndex = 0;
+
+  $div = $("<div>", {class: "item" + (active ? " active" : "")}).appendTo($(".carousel-inner"));
+  $div.append($("<img>", {class: "img-responsive profileImage", src: imageUrl, height: "200px"}));
+
+  $ci = $(".carousel-indicators");
+  $("<li>", {"data-target" : "#imageCarousel", "data-slide-to" : this.carouselSlideIndex, class : (active ? " active" : "")}).appendTo($ci);
+
+  this.carouselSlideIndex++;
+}
+
+function updateSocialStatus(profileType, isConnected, linkID, imageID, imageTickID, profilePath, authPath, regularIconPath, disabledIconPath) {
+  // Google
+      if (isConnected) {
+        if (profileType == "public") {
+          $(linkID).attr("href", profilePath);
+          $(imageID).attr("src", regularIconPath);
+          $(imageID).show();
+          $(imageTickID).hide();
+        } else if (profileType == "member") {
+          $(linkID).attr("href", profilePath);
+          $(imageID).attr("src", regularIconPath);
+          $(imageID).show();
+          if (false) { // if user and userInfo are connected on Google
+            $(imageTickID).show();
+          } else {
+            $(imageTickID).hide();
+          }
+        } else if (profileType == "mine") {
+          $(linkID).attr("href", profilePath);
+          $(imageID).attr("src", regularIconPath);
+          $(imageID).show();
+          $(imageTickID).show();
+        }
+      } else {
+        if (profileType == "mine") {
+          //show a grayed icon, with a link to connect
+          $(linkID).attr("href", authPath);
+          $(imageID).attr("src", disabledIconPath);
+          $(imageTickID).hide();
+        } else {
+          $(imageID).hide();
+          $(imageTickID).hide();
+        }
+      }
+}
 
 function extractChallenges(challenges) {
   var numCols = 5; // max columns

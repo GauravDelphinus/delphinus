@@ -59,6 +59,9 @@ module.exports = function () {
                     {
                         imageStr = imageStr.slice(0, trailerLoc);
                     }
+
+                    //slice off "_normal" from the name of the image to get the original image
+                    imageStr = imageStr.replace("_normal", "");
                     user.twitter.images.push(imageStr);
                 }
                 
