@@ -124,7 +124,8 @@ function appendProfileImageToCarousel(imageUrl, active) {
 }
 
 function updateSocialStatus(profileType, isConnected, linkID, imageID, imageTickID, profilePath, authPath, regularIconPath, disabledIconPath) {
-  // Google
+  
+    //console.log("updateSocialStatus: profileType : " + profileType + ", isConnected = " + isConnected + ", profilePath = " + profilePath + ", authPath = " + authPath);
       if (isConnected) {
         if (profileType == "public") {
           $(linkID).attr("href", profilePath);
