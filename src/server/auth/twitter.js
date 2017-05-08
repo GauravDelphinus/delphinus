@@ -72,7 +72,9 @@ module.exports = function () {
 
                 if (!user.image && user.twitter.images.length > 0) {
                     user.image = user.twitter.images[0];
-                }
+                } else {
+					user.image = config.path.defaultUserImageName;
+				}
 
                 console.log("calling saveUser, user = " + JSON.stringify(user));
                 dataUtils.saveUser(user, function(err) {

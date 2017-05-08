@@ -1,6 +1,7 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var dataUtils = require("../dataUtils");
+var config = require('../config');
 
 module.exports = function () {
 
@@ -18,6 +19,7 @@ module.exports = function () {
             query.type = "extended"; // search emails not just in local, but other social accounts
 
             dataUtils.findUser(query, function(err, user) {
+            	console.log("user is " + user + ", err = " + err);
                 if (user) {
                     console.log("user already found, returning.  user is " + JSON.stringify(user));
                     //user already exists
@@ -82,9 +84,10 @@ module.exports = function () {
                     //user already exists
                     return done(null, false, req.flash("loginMessage", "An account with that email address does not exist.  Consider Signing-up."));
                 } else {
-                    console.log("user not found, req.user is " + req.user);
+                    console.log("user found, user is " + user);
+                 	console.log("password = " + password + ", user.password = " + user.password);
 
-                    if (password != user.password) {
+                    if (password != user.local.password) {
                         return done(null, false, req.flash("loginMessage", "Oops!  Wrong password.  Try again."));
                     }
                     
@@ -102,6 +105,7 @@ module.exports = function () {
                         }
                     }
 
+                    console.log("calling findUser with query = " + JSON.stringify(query));
                     dataUtils.findUser(query, function (error, user) {
                         console.log("findUser returned user = " + user);
                         if (!user) {
@@ -115,6 +119,9 @@ module.exports = function () {
                         user.local = {};
                         user.local.email = email;
                         user.local.password = password;
+
+                    	user.image = config.path.defaultUserImageName;
+
                         
                         console.log("calling saveUser with user = " + JSON.stringify(user));
                         dataUtils.saveUser(user, function(err) {

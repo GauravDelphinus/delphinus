@@ -71,7 +71,9 @@ module.exports = function () {
 
                 if (!user.image && user.google.images.length > 0) {
                     user.image = user.google.images[0];
-                }
+                } else {
+					user.image = config.path.defaultUserImageName;
+				}
                 
                 dataUtils.saveUser(user, function(err) {
                     if (err) throw err;

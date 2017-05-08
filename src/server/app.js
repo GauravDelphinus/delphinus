@@ -174,6 +174,10 @@ module.exports = function() {
             	if (req.user.facebook) {
             		query.facebookID = req.user.facebook.id;
             	}
+
+            	if (req.user.local) {
+            		query.localEmail = req.user.local.email;
+            	}
             	
             	dataUtils.findUser(query, function(err, user) {
             		if (err) throw err;

@@ -10,7 +10,8 @@
 	"oauth_callback": "http://88fd8640.ngrok.io/request-token",
 	"path" : {
 		"challengeImages" : "/data/challenges/images/",
-		"userImages" : "/data/users/images/"
+		"userImages" : "/data/users/images/",
+		"defaultUserImageName" : "defaultUserImage.jpg"
 	},
 	"image" : {
 		"maxHeight" : 1500,

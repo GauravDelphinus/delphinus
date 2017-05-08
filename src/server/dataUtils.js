@@ -637,11 +637,11 @@ module.exports = {
 
 		findUserQuery += " RETURN u;";
 
-		//console.log("running cypherquery: " + findUserQuery);
+		console.log("running 2 cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) throw err;
 
-			console.log(result.data[0]);
+			console.log("result is " + JSON.stringify(result.data[0]));
 
 			if (result.data.length == 0) {
 				// no user found
@@ -697,6 +697,7 @@ module.exports = {
 					user.local.password = userFromDB.local_password;
 				}
 
+				console.log("calling callback with user = " + JSON.stringify(user));
 				callback(null, user);
 			}
 		});

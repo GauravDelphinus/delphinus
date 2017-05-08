@@ -21,6 +21,9 @@ $(document).ready(function(){
 
 	console.log("profileType is " + profileType);
 
+	if (userInfo.image.indexOf("http") == -1) {
+		userInfo.image = "/users/images/" + userInfo.image;
+	}
 	// Profile Image and Name
 	$("#profileImage").attr("src", userInfo.image);
 	$("#displayName").val(userInfo.displayName);
@@ -90,7 +93,7 @@ function setupImageHandlers(profileType) {
 			//alert("successful, image is " + data.image);
 			userInfo.image = data.image;
 
-			$("#profileImage").prop("src", data.image);
+			$("#profileImage").prop("src", "/users/images/" + data.image);
 			$("#profileImage").show();
 			$("#newImage").hide();
 			$("#saveImage").hide();
