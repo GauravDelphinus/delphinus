@@ -93,7 +93,7 @@
         $("#changePicture").hide();
         
         $("#profileImage").hide();
-        $("#saveImage").show();
+        $("#setImage").show();
         $("#newImage").show();
 
 
@@ -152,10 +152,12 @@
           });
       
     $("#saveImage").click(function() {
-      var selectedIndex = $('div.active').index() + 1;
-      console.log("selectedIndex is " + selectedIndex);
-      var selectedImageSrc = $("#imageCarousel .item.active img").prop("src");
-      console.log("selected src = " + selectedImageSrc);
+      //var selectedIndex = $('div.active').index() + 1;
+      //console.log("selectedIndex is " + selectedIndex);
+      //var selectedImageSrc = $("#imageCarousel .item.active img").prop("src");
+      //console.log("selected src = " + selectedImageSrc);
+
+      var selectedImageSrc = $("#profileImage").prop("src");
 
       if (selectedImageSrc.substring(0, 4) == "data") {
         //data url
@@ -175,7 +177,7 @@
           data: JSON.stringify(jsonObj)
         })
         .done(function(data, textStatus, jqXHR) {
-          alert("successful, image is " + data.image);
+          //alert("successful, image is " + data.image);
           userInfo.image = data.image;
 
           $("#imageCarousel .item.active img").prop("src", data.image);
@@ -202,12 +204,51 @@
 
     });
 
+    $("#setImage").click(function() {
+      var selectedImage = $("#imageCarousel .item.active img").prop("src");
+
+
+      var jsonObj = {};
+        jsonObj.user = {};
+        jsonObj.user.id = userInfo.id;
+        jsonObj.user.image = selectedImage;
+
+        $.ajax({
+          type: "PUT",
+          url: "/api/users/",
+          dataType: "json", // return data type
+          contentType: "application/json; charset=UTF-8",
+          data: JSON.stringify(jsonObj)
+        })
+        .done(function(data, textStatus, jqXHR) {
+          //alert("successful, image is " + data.image);
+          userInfo.image = data.image;
+
+          $("#profileImage").prop("src", data.image);
+
+          //clean up the carousel of children
+          $(".carousel .item").remove();
+          $(".carousel-indicators li").remove();
+          $("#imageCarousel").removeData();
+          $("#imageCarousel").hide();
+          $("#profileImage").show();
+          $("#newImage").hide();
+          $("#setImage").hide();
+          $("#changePicture").show();
+        })
+        .fail(function(jqXHR, textStatus, errorThrown) {
+          alert("some error was found, " + errorThrown);
+          
+        });
+    });
+
     $("#newImage").click(function() {
       $("#imageCarousel").hide();
       $("#dropzone").show();
       $("#browseImage").show();
       $("#newImage").hide();
       $("#saveImage").hide();
+      $("#setImage").hide();
     });
           
 
@@ -325,20 +366,23 @@ function handleFileDropped(evt) {
 
 function handleFileSelected(data, path, title) {
   console.log("file selected, path = " + path + ", title = " + title);
-  $("#imageCarousel").show();
-  appendProfileImageToCarousel(data, false);
-  var totalItems = $('.carousel .item').length;
-  console.log("totalItems is " + totalItems);
+  //$("#imageCarousel").show();
+  //appendProfileImageToCarousel(data, false);
+  //var totalItems = $('.carousel .item').length;
+  //console.log("totalItems is " + totalItems);
 
   // the item appended above must be the last item, make that active
-  $("#imageCarousel").carousel(totalItems - 1);
+  //$("#imageCarousel").carousel(totalItems - 1);
 
-  console.log("switched carousel to item index: " + (totalItems - 1));
+  //console.log("switched carousel to item index: " + (totalItems - 1));
   
+  $("#profileImage").prop("src", data);
+  $("#profileImage").show();
       $("#dropzone").hide();
       $("#browseImage").hide();
       $("#newImage").show();
       $("#saveImage").show();
+      $("#setImage").hide();
 }
 
 function handleFileSelect(evt) {

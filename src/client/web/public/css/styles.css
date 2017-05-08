@@ -149,7 +149,6 @@
   position: relative;
   display: inline-block;
   margin:0 auto;
-  background: red;
   padding: 0px;
 }
 
@@ -179,6 +178,11 @@
 #saveImage {
 	right: 5px;
     bottom: 2px;
+}
+
+#setImage {
+	right: 5px;
+	bottom: 2px;
 }
 
 #browseImage {
