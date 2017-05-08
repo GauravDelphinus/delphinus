@@ -14,19 +14,34 @@
 
 <body>
 <% include ./header %>
-<div id="profileInfo" class="container">
+<div id="profileInfo" class="profileInfo">
     <div class="imageSection">
-      <!--<img id="image" class="img-rounded profileImage"> -->
+    
+      <img id="profileImage" class="profileImage img-rounded">
 
+      
+    
       <div class="carousel slide" id="imageCarousel" data-interval="false">
+      
         <ol class="carousel-indicators">
         </ol>
+      
         <div class="carousel-inner">
         </div>
+        
         <a href="#imageCarousel" class="carousel-control left" data-slide="prev"><span class="icon-prev"></span></a>
         <a href="#imageCarousel" class="carousel-control right" data-slide="next"><span class="icon-next"></span></a>
+        
       </div>
-      <p id="displayName" class="profileName"></p>
+      <div id="dropzone" class="dropZone" style="display:none;">Drop Image here</div>
+
+      <input id="changePicture" class="buttonOverImage" type="button" value="Change Picture" />
+      <input id="newImage" class="buttonOverImage" type="button" value="New Image" style="display:none;"/>
+      <input id="saveImage" class="buttonOverImage" type="button" value="Save" style="display:none;"/>
+      <input id="browseImage" class="buttonOverImage" type="file" name="file" value="Browse New Image" style="display:none;"/>
+    </div>
+    <div class="profileName">
+      <p id="displayName"></p>
     </div>
     <div class="followSection">
       <span id="numFollowers" class="numFollowers"></span><span class="followers"> Followers</span>
@@ -73,6 +88,7 @@ var user = <%- JSON.stringify(user) %>;
 </script>
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/bootstrap.js"></script>
+<script src="/js/utils.js"></script>
 <script src="/js/user.js"></script>
 <script src="/js/header.js"></script>
 </html>

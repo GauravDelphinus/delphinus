@@ -13,7 +13,7 @@ module.exports = function () {
         },
         function(req, accessToken, refreshToken, profile, done){
 
-            console.log("Info from Facebook Profile: " + JSON.stringify(profile));
+            //console.log("Info from Facebook Profile: " + JSON.stringify(profile));
 
             var query = {};
             

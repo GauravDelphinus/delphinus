@@ -137,6 +137,58 @@
 .profileImage {
 	display: block;
 	margin: 0 auto;
+	height: 200px;
+}
+
+.profileInfo {
+	width: 100%;
+	text-align: center;
+}
+
+.imageSection {
+  position: relative;
+  display: inline-block;
+  margin:0 auto;
+  background: red;
+  padding: 0px;
+}
+
+.imageSection:hover input
+{
+  display: block;
+}
+
+.buttonOverImage {
+    position:absolute;
+    background: rgba(0, 0, 0, 0);
+    border: 0px;
+   	color: white;
+    display:none;
+}
+
+#changePicture {
+	right: 5px;
+    bottom: 2px;
+}
+
+#newImage {
+	left: 5px;
+    bottom: 2px;
+}
+
+#saveImage {
+	right: 5px;
+    bottom: 2px;
+}
+
+#browseImage {
+	right: 5px;
+	bottom: 2px;
+}
+
+.imageCarousel {
+	 display: none; 
+	 margin: 0 auto; 
 }
 
 .profileName {

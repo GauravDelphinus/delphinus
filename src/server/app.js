@@ -197,6 +197,23 @@ module.exports = function() {
                   res.render("user", {userInfo: user, user: normalizeUser(req.user)});
             });
     });
+
+    app.get("/users/images/:imageName", function(req, res) {
+    	var baseDir = global.appRoot + config.path.userImages;
+    	var localImagePath = baseDir + "/" + req.params.imageName;
+    	res.sendFile(localImagePath, function(err) {
+					if (err) {
+						if (err.code == "ECONNABORTED") {
+						//console.log("err is " + err + ", continuing as usual ... ");
+						//console.log("err JSON is " + JSON.stringify(err));
+						//console.log("err.name is " + err.name);
+						} else {
+							throw err;
+						}
+					}
+				});
+
+    });
 	
 	/**
 		STATIC ROUTERS

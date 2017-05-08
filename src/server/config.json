@@ -9,7 +9,8 @@
 	"oauth_signature": "HMAC-SHA1",
 	"oauth_callback": "http://88fd8640.ngrok.io/request-token",
 	"path" : {
-		"challengeImages" : "/data/challenges/images/"
+		"challengeImages" : "/data/challenges/images/",
+		"userImages" : "/data/users/images/"
 	},
 	"image" : {
 		"maxHeight" : 1500,
