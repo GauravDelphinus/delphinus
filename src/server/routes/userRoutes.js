@@ -37,9 +37,14 @@ var routes = function(db) {
             console.log("PUT on /api/users, body is " + JSON.stringify(req.body));
             var user = req.body.user;
 
-            var imageDataURI = user.image;
-           
-            var index = imageDataURI.indexOf("base64,");
+            var index = -1;
+            var imageDataURI;
+
+            if (user.image) {
+            	imageDataURI = user.image;
+           		index = imageDataURI.indexOf("base64,");
+            }
+            
             var data;
             if (index != -1) { // data URI
                   
@@ -75,6 +80,7 @@ function updateUserInDB(res, user) {
       dataUtils.saveUser(user, function(err) {
             if (err) throw err;
 
+            console.log("sending JSON back: " + JSON.stringify(user));
             res.json(user);
       });
 }

@@ -19,12 +19,16 @@ $(document).ready(function(){
 		}
 	}
 
+	console.log("profileType is " + profileType);
+
 	// Profile Image and Name
 	$("#profileImage").attr("src", userInfo.image);
-	$("#displayName").text(userInfo.displayName);
+	$("#displayName").val(userInfo.displayName);
 
 	// set up all the image related handlers (including carousel, drag drop, etc.)
-	setupImageHandlers(userInfo, profileType);
+	setupImageHandlers(profileType);
+
+	setupNameSection(profileType);
 
 	// set up the social information
 	setupSocialSection(profileType);
@@ -36,8 +40,13 @@ $(document).ready(function(){
 	$.getJSON('/api/entries/?user=' + userInfo.id, extractEntries);
 });
 
-function setupImageHandlers(userInfo, profileType) {
+function setupImageHandlers(profileType) {
 	
+	if (profileType == "mine") {
+		// If I'm viewing my own profile, allow me to change stuff, otherwise don't!
+		$(".imageSection").addClass("imageSectionHover");
+	}
+
 	/**
 		Change Picture shows the Carousel view, where user can select a different
 		Image from those pulled from the social networks and make that the profile
@@ -81,15 +90,6 @@ function setupImageHandlers(userInfo, profileType) {
 			//alert("successful, image is " + data.image);
 			userInfo.image = data.image;
 
-			//$("#imageCarousel .item.active img").prop("src", data.image);
-			
-
-			//clean up the carousel of children
-			//$(".carousel .item").remove();
-			//$(".carousel-indicators li").remove();
-			//$("#imageCarousel").removeData();
-			//$("#imageCarousel").hide();
-
 			$("#profileImage").prop("src", data.image);
 			$("#profileImage").show();
 			$("#newImage").hide();
@@ -127,12 +127,6 @@ function setupImageHandlers(userInfo, profileType) {
           //alert("successful, image is " + data.image);
           userInfo.image = data.image;
 
-          //clean up the carousel of children
-          //$(".carousel .item").remove();
-          //$(".carousel-indicators li").remove();
-          //$("#imageCarousel").removeData();
-          //$("#imageCarousel").hide();
-
           cleanupAndHideCarousel();
 
           $("#profileImage").prop("src", data.image);
@@ -155,8 +149,6 @@ function setupImageHandlers(userInfo, profileType) {
 	$("#newImage").click(function() {
 		cleanupAndHideCarousel();
 
-		//$("#imageCarousel").hide();
-
 		$("#dropzone").show();
 		$("#browseImage").show();
 		$("#newImage").hide();
@@ -169,6 +161,49 @@ function setupImageHandlers(userInfo, profileType) {
 	dropZone.addEventListener('dragover', handleDragOver, false);
 	dropZone.addEventListener('drop', handleFileDropped, false);
 	$("#browseImage").on("change", handleFileSelect);
+}
+
+function setupNameSection(profileType) {
+	if (profileType == "mine") {
+		// If I'm viewing my own profile, allow me to change stuff, otherwise don't!
+		$("#displayName").prop("readonly", true);
+		$(".displayName").addClass("displayNameHover");
+		$(".profileName").addClass("profileNameHover");
+	}
+
+	$("#editName").click(function () {
+		$("#displayName").prop("readonly", false);
+		$("#displayName").focus();
+
+		$("#editName").hide();
+		$("#saveName").show();
+	});
+
+	$("#saveName").click(function() {
+		var jsonObj = {};
+		jsonObj.user = {};
+		jsonObj.user.id = userInfo.id;
+		jsonObj.user.displayName = $("#displayName").val();
+
+		$.ajax({
+			type: "PUT",
+			url: "/api/users/",
+          dataType: "json", // return data type
+          contentType: "application/json; charset=UTF-8",
+          data: JSON.stringify(jsonObj)
+      	})
+		.done(function(data, textStatus, jqXHR) {
+          userInfo.displayName = data.displayName;
+
+          $("#displayName").prop("readonly", true);
+          $("#saveName").hide();
+          $("#editName").show();
+      	})
+		.fail(function(jqXHR, textStatus, errorThrown) {
+			alert("some error was found, " + errorThrown);
+
+		});
+	});
 }
 
 function setupSocialSection(profileType) {

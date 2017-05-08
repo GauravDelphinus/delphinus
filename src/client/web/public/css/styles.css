@@ -152,9 +152,15 @@
   padding: 0px;
 }
 
+/*
 .imageSection:hover input
 {
   display: block;
+}
+*/
+
+.imageSectionHover:hover input {
+	display: block;
 }
 
 .buttonOverImage {
@@ -162,6 +168,14 @@
     background: rgba(0, 0, 0, 0);
     border: 0px;
    	color: white;
+    display:none;
+}
+
+.buttonOverText {
+    position:absolute;
+    background: rgba(0, 0, 0, 0);
+    border: 0px;
+   	color: gray;
     display:none;
 }
 
@@ -190,16 +204,44 @@
 	bottom: 2px;
 }
 
+#editName {
+	right: 5px;
+	bottom: 2px;
+}
+
+#saveName {
+	right: 5px;
+	bottom: 2px;
+}
+
 .imageCarousel {
 	 display: none; 
 	 margin: 0 auto; 
 }
 
 .profileName {
+	position: relative;
+	display: inline-block;
+  margin:0 auto;
+  padding: 0px;
+	background-color: red;
+}
+
+.displayName {
 	font-style: sans-serif;
 	font-size: 2em;
 	font-weight: bold;
 	text-align: center;
+	border-style: dotted;
+	border-color: rgba(0, 0, 0, 0);
+}
+
+.displayNameHover:hover {
+	border-color: black;
+}
+
+.profileNameHover:hover input {
+	display:block;
 }
 
 .socialSection {
