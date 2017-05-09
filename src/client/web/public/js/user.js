@@ -33,6 +33,8 @@ $(document).ready(function(){
 
 	setupNameSection(profileType);
 
+	setupFollowSection(profileType);
+
 	// set up the social information
 	setupSocialSection(profileType);
 
@@ -206,6 +208,70 @@ function setupNameSection(profileType) {
 			alert("some error was found, " + errorThrown);
 
 		});
+	});
+}
+
+function setupFollowSection(profileType) {
+	if (profileType == "mine") {
+		//don't show the follow button
+		$("#followButton").hide();
+	} else if (profileType == "member") {
+		//find out if you're already following this user or not
+
+		$.getJSON("/api/users/follow/" + userInfo.id, function(result) {
+			if (result.followStatus == "following") {
+				$("#followButton").prop("value", "FOLLOWING");
+          		$("#followButton").data("followStatus", "following");
+          		$("#followButton").show();
+          	} else if (result.followStatus == "not_following") {
+          		$("#followButton").prop("value", "FOLLOW " + userInfo.displayName);
+          		$("#followButton").data("followStatus", "not_following");
+          		$("#followButton").show();
+          }
+		});
+	} else if (profileType == "public") {
+		//redirect to sign-in
+		$("#followButton").prop("value", "FOLLOW " + userInfo.displayName);
+		$("#followButton").show();
+	}
+
+
+	$("#followButton").click(function() {
+		if (profileType == "public") {
+			window.open("/auth", "_self");
+		} else if (profileType == "member") {
+
+			var jsonObj = {};
+			if ($("#followButton").data("followStatus") == "not_following") {
+				jsonObj.followAction = "follow";
+			} else {
+				jsonObj.followAction = "unfollow";
+			}
+
+			$.ajax({
+				type: "PUT",
+				url: "/api/users/follow/" + userInfo.id,
+	          dataType: "json", // return data type
+	          contentType: "application/json; charset=UTF-8",
+	          data: JSON.stringify(jsonObj)
+	      	})
+			.done(function(data, textStatus, jqXHR) {
+	          	if (data.followStatus == "following") {
+	          		//already following
+	          		$("#followButton").prop("value", "FOLLOWING");
+	          		$("#followButton").data("followStatus", "following");
+	          		$("#followButton").show();
+	          	} else {
+	          		$("#followButton").prop("value", "FOLLOW" + userInfo.displayName);
+	          		$("#followButton").data("followStatus", "not_following");
+	          		$("#followButton").show();
+	          	}
+	      	})
+			.fail(function(jqXHR, textStatus, errorThrown) {
+				alert("some error was found, " + errorThrown);
+
+			});
+		}
 	});
 }
 

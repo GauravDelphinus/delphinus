@@ -1,6 +1,7 @@
 var passport = require('passport');
 var TwitterStrategy = require('passport-twitter').Strategy;
 var dataUtils = require("../dataUtils");
+var config = require('../config');
 
 module.exports = function () {
 

@@ -1,6 +1,7 @@
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var dataUtils = require("../dataUtils");
+var config = require('../config');
 
 module.exports = function () {
 

@@ -73,6 +73,77 @@ var routes = function(db) {
             }
       });
 
+      userRouter.route("/follow/:followedId") //api/users/follow
+      .get(function(req, res) {
+      	console.log("GET on /api/users/follow, req.user is " + JSON.stringify(req.user));
+      	if (req.user && req.user.id && req.params.followedId) {
+      		var cypherQuery = "MATCH (u1:User {id: '" + req.user.id + 
+      			"'})-[:FOLLOWING]->(u2:User {id: '" + req.params.followedId + "'}) RETURN u1;";
+      		console.log("running cypherQuery: " + cypherQuery);
+      		db.cypherQuery(cypherQuery, function(err, result){
+                if(err) throw err;
+
+                console.log(JSON.stringify(result.data)); // delivers an array of query results
+                //console.log(result.columns); // delivers an array of names of objects getting returned
+
+                console.log(result.data);
+                var output = {};
+                if (result.data.length == 1) {
+                	output = {followStatus : "following"};
+                } else {
+                	output = {followStatus : "not_following"};
+                }
+                res.json(output);
+			});
+      	}
+      })
+      .put(function(req, res) {
+      	console.log("PUT on /api/users/follow, req.user is " + JSON.stringify(req.user));
+      	if (req.user && req.user.id && req.params.followedId) {
+
+      		if (req.body.followAction == "follow") {
+      			var cypherQuery = "MATCH (u1:User {id: '" + req.user.id + 
+      				"'}), (u2:User {id: '" + req.params.followedId + "'}) CREATE (u1)-[r:FOLLOWING]->(u2) RETURN r;";
+      			db.cypherQuery(cypherQuery, function(err, result){
+	                if(err) throw err;
+
+	                //console.log(result.data); // delivers an array of query results
+	                //console.log(result.columns); // delivers an array of names of objects getting returned
+
+	                var output = {};
+
+	                console.log(result.data);
+	                if (result.data.length == 1) {
+
+	                	output.followStatus = "following";
+	                } else {
+
+	                	output.followStatus = "not_following";
+	                }
+	                res.json(output);
+				});
+      		} else if (req.body.followAction == "unfollow") {
+      			var cypherQuery = "MATCH (u1:User {id: '" + req.user.id + 
+      				"'})-[r:FOLLOWING]->(u2:User {id: '" + req.params.followedId + "'}) DELETE r RETURN COUNT(r);";
+      			db.cypherQuery(cypherQuery, function(err, result){
+	                if(err) throw err;
+
+					console.log("result of deletion: " + JSON.stringify(result));
+					var output = {};
+
+					if (result.data.length == 1) {
+						output.followStatus = "not_following";
+					} else {
+						output.followStatus = "following";
+					}
+					
+					res.json(output);
+				});
+      		}
+      		
+      	}
+      });
+
 	return userRouter;
 };
 
