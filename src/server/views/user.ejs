@@ -45,8 +45,8 @@
 	    	<input id="saveName" class="buttonOverText" type="button" value="Save" style="display:none;"/>
 	    </div>
 	    <div class="followSection">
-	      <span id="numFollowers" class="numFollowers"></span><span class="followers"> Followers</span>
-	      <input id="followButton" class="followButton" type="button" value="" style="display:none;"/>
+	      <span id="numFollowers" class="numFollowers"></span><span class="followers"> Followers </span><span class="glyphicon glyphicon-globe"></span>
+	      <input id="followButton" class="btn btn-info" type="button" value="" style="display:none;"/>
 	    </div>
     </div>
     <div class="socialSection">
@@ -70,18 +70,32 @@
       </ul>
     </div>
 </div> <br><br>
-<div id="challenges">
-  <span class="sectionHeader">Challenges Posted by this user</span><br>
+<div id="tabs" class="container">
+	<ul class="nav nav-tabs">
+	<!--
+	  <li class="active"><a data-toggle="tab" href="#challenges" style="display:none;">Challenges</a></li>
+	  
+	  <li><a data-toggle="tab" href="#entries" style="display:none;">Entries</a></li>
+	  -->
+	</ul>
 
-  <table id="challengesTable" class="gridTable">
-  </table>
+	<div class="tab-content">
+	<!--
+	  <div id="challenges" class="tab-pane fade in active" style="display:none;">
+	    <h3>Challenges</h3>
+  			<table id="challengesTable" class="gridTable">
+  			</table>
+	  </div>
+	  
+	  <div id="entries" class="tab-pane fade" style="display:none;">
+	    <h3>Entries</h3>
+    		<table id="entriesTable" class="gridTable">
+  			</table>
+	  </div>
+	  -->
+	</div>
 </div>
 
-<div id="entries">
-  <span class="sectionHeader">Entries Posted by this user</span><br>
-    <table id="entriesTable" class="gridTable">
-  </table>
-</div>
 </body>
 
 <script>

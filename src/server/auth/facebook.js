@@ -70,7 +70,7 @@ module.exports = function () {
                     if (!user.image && user.facebook.image) {
                         user.image = user.facebook.image;
                     } else {
-                    	user.image = config.path.defaultUserImageName;
+                    	user.image = config.url.staticImages + config.name.defaultProfileImageName;
                     }
 
                     dataUtils.saveUser(user, function(err) {

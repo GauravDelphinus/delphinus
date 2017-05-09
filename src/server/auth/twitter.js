@@ -74,7 +74,7 @@ module.exports = function () {
                 if (!user.image && user.twitter.images.length > 0) {
                     user.image = user.twitter.images[0];
                 } else {
-					user.image = config.path.defaultUserImageName;
+					user.image = config.url.staticImages + config.name.defaultProfileImageName;
 				}
 
                 console.log("calling saveUser, user = " + JSON.stringify(user));

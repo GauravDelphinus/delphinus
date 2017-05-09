@@ -11,7 +11,13 @@
 	"path" : {
 		"challengeImages" : "/data/challenges/images/",
 		"userImages" : "/data/users/images/",
-		"defaultUserImageName" : "defaultUserImage.jpg"
+		"staticImages" : "../client/web/public/images/static/"
+	},
+	"url" : {
+		"staticImages" : "/images/static/"
+	},
+	"name" : {
+		"defaultProfileImageName" : "default.png"
 	},
 	"image" : {
 		"maxHeight" : 1500,

@@ -21,9 +21,6 @@ $(document).ready(function(){
 
 	console.log("profileType is " + profileType);
 
-	if (userInfo.image.indexOf("http") == -1) {
-		userInfo.image = "/users/images/" + userInfo.image;
-	}
 	// Profile Image and Name
 	$("#profileImage").attr("src", userInfo.image);
 	$("#displayName").val(userInfo.displayName);
@@ -38,11 +35,7 @@ $(document).ready(function(){
 	// set up the social information
 	setupSocialSection(profileType);
 
-	//get challenges posted by this user
-	$.getJSON('/api/challenges/?user=' + userInfo.id, extractChallenges);
-
-	//get entries posted by this user
-	$.getJSON('/api/entries/?user=' + userInfo.id, extractEntries);
+	setupTabs(profileType);
 });
 
 function setupImageHandlers(profileType) {
@@ -262,7 +255,7 @@ function setupFollowSection(profileType) {
 	          		$("#followButton").data("followStatus", "following");
 	          		$("#followButton").show();
 	          	} else {
-	          		$("#followButton").prop("value", "FOLLOW" + userInfo.displayName);
+	          		$("#followButton").prop("value", "FOLLOW " + userInfo.displayName);
 	          		$("#followButton").data("followStatus", "not_following");
 	          		$("#followButton").show();
 	          	}
@@ -314,6 +307,108 @@ function setupSocialSection(profileType) {
 	if (userInfo.id) {
 		$("#profileInfo").append($("<p>", {text: "ID: " + userInfo.id, class: "userInfoText"}));
 	}
+}
+
+function setupTabs(profileType) {
+	if (profileType == "mine") {
+		//if it's my profile, show the "Profile" tab
+		setupProfileTab();
+	}
+
+	//challenges are shown irrespective of who is viewing, as long as there are challenges
+	setupChallengesTab();
+
+	//entries are shown irrespective of who is viewing, as long as there are entries
+	setupEntriesTab();
+}
+
+function setupProfileTab() {
+
+}
+
+function appendNewTab(id, title) {
+	var active = false;
+	if ($("#tabs ul li").length == 0) {
+		active = true;
+	}
+
+	var li = $("<li>", {class: active ? "active" : ""}).append($("<a>", {"data-toggle" : "tab", href: "#" + id}).text(title));
+	$("#tabs ul").append(li);
+
+	var div = $("<div>", {id: id, class: "tab-pane fade" + (active ? " in active" : "")});
+	$("#tabs .tab-content").append(div);
+
+	return div;
+}
+
+function setupChallengesTab(active) {
+	//get challenges posted by this user
+	$.getJSON('/api/challenges/?user=' + userInfo.id, function(challenges) {
+		if (challenges.length > 0) {
+			//show the tab
+			var tabDiv = appendNewTab("challenges", "Challenges", false);
+			var h3 = $("<h3>").text("Challenges posted by " + userInfo.displayName);
+			var table = $("<table>", {id: "challengesTable", class: "gridTable"});
+			
+			tabDiv.append(h3);
+			tabDiv.append(table);
+
+			var numCols = 5; // max columns
+			$("#challengesTable").empty();
+
+			for (var i = 0; i < challenges.length; i++) {
+				var col = i % numCols;
+				var challenge = challenges[i];
+				var tr;
+
+				var td = $("<td>").append($("<img>").attr("src", "/challenges/images/" + challenge._id).attr("width", "100"));
+				td.append($("<br>"));
+				td.append($("<a>").attr("href", "/challenge/" + challenge._id).text(challenge.title));
+		        
+				if (col == 0) {
+					tr = $("<tr>").append(td);
+					$("#challengesTable").append(tr);
+				} else {
+					tr.append(td);
+				}
+			}
+		}
+	});
+}
+
+function setupEntriesTab() {
+	//get entries posted by this user
+	$.getJSON('/api/entries/?user=' + userInfo.id, function(entries) {
+		if (entries.length > 0) {
+			//show the tab
+			var tabDiv = appendNewTab("entries", "Entries", false);
+			var h3 = $("<h3>").text("Entries posted by " + userInfo.displayName);
+			var table = $("<table>", {id: "entriesTable", class: "gridTable"});
+			
+			tabDiv.append(h3);
+			tabDiv.append(table);
+
+			var numCols = 5; // max columns
+
+			$("#entriesTable").empty();
+
+			for (var i = 0; i < entries.length; i++) {
+				var col = i % numCols;
+		        var entry = entries[i];
+
+				var td = $("<td>").append($("<img>").attr("src", "/entries/images/" + entry._id).attr("width", "100"));
+				td.append($("<br>"));
+				td.append($("<a>").attr("href", "/entry/" + entry._id).text("Entry " + entry._id));
+		        
+				if (col == 0) {
+					tr = $("<tr>").append(td);
+					$("#entriesTable").append(tr);
+				} else {
+					tr.append(td);
+				}
+			}
+		}
+	});
 }
 
 function setupAndShowCarousel() {
@@ -415,48 +510,6 @@ function updateSocialStatus(profileType, isConnected, linkID, imageID, imageTick
 		} else {
 			$(imageID).hide();
 			$(imageTickID).hide();
-		}
-	}
-}
-
-function extractChallenges(challenges) {
-	var numCols = 5; // max columns
-
-	$("#challengesTable").empty();
-
-	for (var i = 0; i < challenges.length; i++) {
-		var col = i % numCols;
-		var challenge = challenges[i];
-
-		var td = $("<td>").append($("<img>").attr("src", "/challenges/images/" + challenge._id).attr("width", "100"));
-		td.append($("<br>"));
-		td.append($("<a>").attr("href", "/challenge/" + challenge._id).text(challenge.title));
-        
-		if (col == 0) {
-			$("#challengesTable").append("<tr>").append(td);
-		} else {
-			$("#challengesTable").append(td);
-		}
-	}
-}
-
-function extractEntries(entries) {
-	var numCols = 5; // max columns
-
-	$("#entriesTable").empty();
-
-	for (var i = 0; i < entries.length; i++) {
-		var col = i % numCols;
-        var entry = entries[i];
-
-		var td = $("<td>").append($("<img>").attr("src", "/entries/images/" + entry._id).attr("width", "100"));
-		td.append($("<br>"));
-		td.append($("<a>").attr("href", "/entry/" + entry._id).text("Entry " + entry._id));
-        
-		if (col == 0) {
-			$("#entriesTable").append("<tr>").append(td);
-		} else {
-			$("#entriesTable").append(td);
 		}
 	}
 }

@@ -53,6 +53,7 @@ module.exports = function () {
                         user.local = {};
                         user.local.email = email;
                         user.local.password = password;
+                        user.image = config.url.staticImages + config.name.defaultProfileImageName;
                         
                         console.log("calling saveUser with user = " + JSON.stringify(user));
                         dataUtils.saveUser(user, function(err) {
@@ -120,9 +121,10 @@ module.exports = function () {
                         user.local.email = email;
                         user.local.password = password;
 
-                    	user.image = config.path.defaultUserImageName;
+                        if (!user.image) {
+                        	user.image = config.url.staticImages + config.name.defaultProfileImageName;
+                        }
 
-                        
                         console.log("calling saveUser with user = " + JSON.stringify(user));
                         dataUtils.saveUser(user, function(err) {
                             if (err) throw err;

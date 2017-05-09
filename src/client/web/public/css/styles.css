@@ -146,14 +146,16 @@
 }
 
 .mainProfileSection {
-	border-radius: 5px;
+	border-radius: 50px;
 	border-style: dotted;
 	border-color: black;
 	border-width: 0.5px;
 	padding: 20px;
 	margin: 0 auto;
 	width: 40%;
+	background-color: #E9F7EF;
 }
+
 .imageSection {
   position: relative;
   display: inline-block;
@@ -233,7 +235,6 @@
 	display: inline-block;
   margin:0 auto;
   padding: 0px;
-	background-color: red;
 }
 
 .displayName {
@@ -243,6 +244,7 @@
 	text-align: center;
 	border-style: dotted;
 	border-color: rgba(0, 0, 0, 0);
+	background-color: rgba(0, 0, 0, 0);
 }
 
 .displayNameHover:hover {
@@ -255,6 +257,13 @@
 
 .socialSection {
 	text-align: center;
+	border-radius: 5px;
+	border-style: dotted;
+	border-color: black;
+	border-width: 0.5px;
+	padding: 20px;
+	margin: 0 auto;
+	width: 30%;
 }
 .socialSection ul li {
 	display: inline;
@@ -311,6 +320,12 @@
 .followSection {
 	text-align: center;
 }
+
+/* Tab Titles */
+.nav li {
+	font-size: 2em;
+}
+
 .social a {
     text-align: center;
     font-size: 28px;
