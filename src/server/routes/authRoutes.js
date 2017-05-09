@@ -29,7 +29,14 @@ var routes = function(db) {
             failureFlash: true
         }), function(req, res) {
             console.log("**** Local login callback **** ");
-            res.redirect("/");
+            console.log("req.session.redirectTo is " + req.session.redirectTo);
+            if (req.session.redirectTo) {
+                var redirectTo = req.session.redirectTo;
+                req.session.redirectTo = null;
+                res.redirect(redirectTo);
+            } else {
+                res.redirect("/"); // redirect to home page by default
+            }
         });
 
     authRouter.route("/signup")
@@ -41,7 +48,14 @@ var routes = function(db) {
             failureFlash: true
         }), function(req, res) {
             console.log(" ****** Local Signup callback ************* ");
-            res.redirect("/");
+            console.log("req.session.redirectTo is " + req.session.redirectTo);
+            if (req.session.redirectTo) {
+                var redirectTo = req.session.redirectTo;
+                req.session.redirectTo = null;
+                res.redirect(redirectTo);
+            } else {
+                res.redirect("/"); // redirect to home page by default
+            }
         });
 
 	authRouter.route("/google")
