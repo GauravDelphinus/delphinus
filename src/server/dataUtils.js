@@ -637,11 +637,11 @@ module.exports = {
 
 		findUserQuery += " RETURN u;";
 
-		console.log("running 2 cypherquery: " + findUserQuery);
+		//console.log("running 2 cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) throw err;
 
-			console.log("result is " + JSON.stringify(result.data[0]));
+			//console.log("result is " + JSON.stringify(result.data[0]));
 
 			if (result.data.length == 0) {
 				// no user found

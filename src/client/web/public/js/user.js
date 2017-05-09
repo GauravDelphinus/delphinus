@@ -273,18 +273,25 @@ function setupFollowSection(profileType) {
 			});
 		}
 	});
+
+	//calculate the number of followers
+	$.getJSON("/api/users/" + userInfo.id + "?numFollowers=true", function(result) {
+		console.log("result is " + JSON.stringify(result));
+		userInfo.numFollowers = result.numFollowers;
+
+		$("#numFollowers").text(userInfo.numFollowers);
+	});
+
+	
+
+	//$("#followLink").text("FOLLOW " + userInfo.displayName).attr("href", "/user/" + userInfo.id + "/follow");
+
 }
 
 function setupSocialSection(profileType) {
 	// Followers Section
 	//testing
-	userInfo.numFollowers = 122;
-	if (userInfo.numFollowers) {
-		$("#numFollowers").text(userInfo.numFollowers);
-	}
-
-	$("#followLink").text("FOLLOW " + userInfo.displayName).attr("href", "/user/" + userInfo.id + "/follow");
-
+	
 	// Social Section
 	if (profileType == "public" || profileType == "member") {
 		$("#socialHeader").text("Connect with " + userInfo.displayName);

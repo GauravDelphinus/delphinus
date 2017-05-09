@@ -145,6 +145,15 @@
 	text-align: center;
 }
 
+.mainProfileSection {
+	border-radius: 5px;
+	border-style: dotted;
+	border-color: black;
+	border-width: 0.5px;
+	padding: 20px;
+	margin: 0 auto;
+	width: 40%;
+}
 .imageSection {
   position: relative;
   display: inline-block;
@@ -284,12 +293,11 @@
 .numFollowers {
 	font-style: sans-serif;
 	font-size: 1.5em;
-	font-weight: bold;
 }
 
 .followers {
 	font-style: serif;
-	font-size: 0.5em;
+	font-size: 1.4em;
 }
 
 .followButton {

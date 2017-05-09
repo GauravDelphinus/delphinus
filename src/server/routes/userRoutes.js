@@ -142,7 +142,24 @@ var routes = function(db) {
       		}
       		
       	}
-      });
+	});
+
+	userRouter.route("/:userId") // /api/users/<id>
+	.get(function(req, res) {
+		if (req.query.numFollowers) {
+			var cypherQuery = "MATCH (u:User {id: '" + req.params.userId + "'})<-[:FOLLOWING]-(f:User) RETURN COUNT(f);";
+			db.cypherQuery(cypherQuery, function(err, result) {
+				if (err) throw err;
+
+				console.log("result of query = " + JSON.stringify(result));
+
+				var output = {};
+
+				output.numFollowers = parseInt(result.data[0]);
+				res.json(output);
+			});
+		}
+	});
 
 	return userRouter;
 };
