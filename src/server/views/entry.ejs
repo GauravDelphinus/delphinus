@@ -7,16 +7,19 @@
 </head>
 <body>
 <% include ./header %>
-<div id="entry" style="text-align: center;">
-<span id="entryTitle" class="title"></span><br>
-<span id="entryCreationDate" class="creationDate"></span><br>
-<span id="entryPostedBy" class="postedBy"></span><br>
-<img id="entryImage">
+
+<div id="main">
+	<h1 id="mainTitle" class="title"></h1>
+</div>
+
 </div>
 <br><br>
-<div class="center">
-	<input type="button" value="Go Back to the Challenge" class="submitButton" id="goToChallenge">
-	<input type="button" value="Go Back to Home Page" class="submitButton" id="goToHomePage">
+<div id="tabs" class="container">
+	<ul class="nav nav-tabs">
+	</ul>
+
+	<div class="tab-content">
+	</div>
 </div>
 <script>
 	var entryId = <%= entryId %>;
@@ -27,5 +30,6 @@
 <script src="/js/bootstrap.js"></script>
 <script src="/js/entry.js"></script>
 <script src="/js/header.js"></script>
+<script src="/js/utils.js"></script>
 </body>
 </html>

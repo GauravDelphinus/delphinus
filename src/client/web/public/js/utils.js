@@ -54,4 +54,145 @@ function extractImage(files, callback) {
       // Read in the image file as a data URL.
       reader.readAsDataURL(f);
     }
-  }
+}
+
+function formatDate(date) {
+	var dayList = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+	var monthList = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+
+	var today = new Date();
+	var numHours = numHoursBetween(today, date);
+	var numDays = numDaysBetween(today, date);
+	var output;
+	if (numHours < 30) {
+		// show in hours ago format
+		output = Math.floor(numHours) + " hours ago";
+	} else if (numDays < 5) {
+		//if posted less than 5 days ago, say something like "4 days ago"
+		output = Math.floor(numDays) + " days ago";
+	} else {
+		//post something like "Sunday, May 12, 2017"
+		var day = dayList[date.getDay()];
+		var month = monthList[date.getMonth()];
+		var dateValue = date.getDate();
+		var year = date.getFullYear();
+
+		output = day + ", " + month + " " + dateValue + ", " + year;
+	}
+	
+	return output;
+}
+
+function numHoursBetween(d1, d2) {
+	var diff = Math.abs(d1.getTime() - d2.getTime());
+	return diff / (1000 * 60 * 60);
+}
+
+function numDaysBetween (d1, d2) {
+	var diff = Math.abs(d1.getTime() - d2.getTime());
+	return diff / (1000 * 60 * 60 * 24);
+};
+
+
+function appendNewTab(id, title) {
+	var active = false;
+	if ($("#tabs ul li").length == 0) {
+		active = true;
+	}
+
+	var li = $("<li>", {class: active ? "active" : ""}).append($("<a>", {"data-toggle" : "tab", href: "#" + id}).text(title));
+	$("#tabs ul").append(li);
+
+	var div = $("<div>", {id: id, class: "tab-pane fade" + (active ? " in active" : "")});
+	$("#tabs .tab-content").append(div);
+
+	return div;
+}
+
+function createPostedBySectionElement(data) {
+	// Posted By Section
+	var postedBySection = $("<div>", {class: "postedBySection"});
+	var postedByDate = $("<span>", {id: "postedByDate", class: "postedByDate", text: "Posted " + formatDate(data.postedDate)});
+	var postedBy = $("<div>", {class: "postedBy"});
+	var postedByName = $("<span>", {id: "postedByName", class: "postedByName"});
+	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: "by " + data.postedByUser.displayName}));
+	var postedByImage = $("<img>", {id: "postedByImage", class: "postedByImage"});
+	postedByImage.prop("src", data.postedByUser.image);
+	postedBy.append(postedByName);
+	postedBy.append(postedByImage);
+
+	postedBySection.append(postedByDate);
+	postedBySection.append(postedBy);
+
+	return postedBySection;
+}
+
+function createCaptionSectionElement(data) {
+	// Caption (if available)
+	var captionSection = $("<div>", {class: "captionSection"});
+	var caption = $("<span>", {class: "caption", text: data.caption});
+	captionSection.append(caption);
+
+	return captionSection;
+}
+
+function createSocialStatusSectionElement(data) {
+	// Social Status Section
+	var socialStatusSection = $("<div>", {class: "socialStatusSection"});
+	var socialStatus = $("<div>", {class: "socialStatus"});
+	var numLikes = $("<span>", {class: "glyphicon glyphicon-thumbs-up"});
+	var numShares = $("<span>", {class: "glyphicon glyphicon-share-alt"});
+	var numComments = $("<span>", {class: "glyphicon glyphicon-comment"});
+	var likeButton = $("<button>", {id: "likeButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	var shareButton = $("<button>", {id: "shareButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	var commentButton = $("<button>", {id: "commentButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	likeButton.append(numLikes).append("  " + data.socialStatus.numLikes);
+	shareButton.append(numShares).append("  " + data.socialStatus.numShares);
+	commentButton.append(numComments).append("  " + data.socialStatus.numComments);
+	socialStatus.append(likeButton);
+	socialStatus.append(shareButton);
+	socialStatus.append(commentButton);
+	socialStatusSection.append(socialStatus);
+
+	return socialStatusSection;
+}
+
+function createImageElement(data) {
+	var mainImage = $("<img>", {class: "mainImage"});
+	mainImage.prop("src", data.image);
+	return mainImage;
+}
+
+function createMainElement(data) {
+	var element = $("<div>", {class: "mainElement"});
+
+	element.append(createPostedBySectionElement(data));
+	element.append(createImageElement(data));
+
+	if (data.caption) {
+		element.append(createCaptionSectionElement(data));
+	}
+
+	element.append(createSocialStatusSectionElement(data));
+
+	return element;
+}
+
+function createScrollableElement(data) {
+	var element = $("<div>", {class: "scrollableElement"});
+
+	element.append(createPostedBySectionElement(data));
+
+	var imageLink = $("<a>", {href: data.link}).append(createImageElement(data));
+	element.append(imageLink);
+
+	if (data.caption) {
+		element.append(createCaptionSectionElement(data));
+	}
+
+	element.append(createSocialStatusSectionElement(data));
+
+	return element;
+}
+
+

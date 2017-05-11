@@ -26,21 +26,23 @@ var routes = function(db) {
 				effect will be an intersection.
 			**/
 
-			var cypherQuery = "MATCH (n:Challenge)";
+			var cypherQuery = "MATCH (c:Challenge)";
 
 			// Filter by user who posted the challenge
 			if (req.query.user) {
 				cypherQuery += "-[r:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) ";
+			} else {
+				cypherQuery += "-[r:POSTED_BY]->(u:User) ";
 			}
 
-			cypherQuery += " RETURN n;";
+			cypherQuery += " RETURN c, u;";
 
-			//console.log("Running cypherQuery: " + cypherQuery);
+			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
+    			console.log(result.data); // delivers an array of query results
+    			console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data);
 			});
@@ -111,18 +113,20 @@ var routes = function(db) {
 				Returns a single JSON object of type challenge
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId + " RETURN c;";
+			var cypherQuery = "MATCH (c:Challenge)-[:POSTED_BY]->(u:User) WHERE id(c) = " + req.params.challengeId + " RETURN c, u;";
 
-			//console.log("GET Received, Running cypherQuery: " + cypherQuery);
+			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
+    			console.log(result.data); // delivers an array of query results
+    			console.log(result.columns); // delivers an array of names of objects getting returned
 
+    			var challenge = result.data[0][0];
+    			var user = result.data[0][1];
     			//image is /challenges/images/challengeId which in turn will be mapped to the actual image by the separate route
-    			result.data[0].image = "/challenges/images/" + req.params.challengeId;
-    			res.json(result.data[0]);
+    			challenge.image = "/challenges/images/" + challenge.image;
+    			res.json([challenge, user]);
 			});
 		})
 

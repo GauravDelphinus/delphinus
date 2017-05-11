@@ -43,10 +43,11 @@ module.exports = {
 	getImageDataForChallenge : function(db, challengeId, next) {
 		var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + challengeId + " RETURN c.imageType, c.image;";
 
-		//console.log("cypherQuery is " + cypherQuery);
+		console.log("cypherQuery is " + cypherQuery);
 		db.cypherQuery(cypherQuery, function(err, result){
 	    	if(err) throw err;
 
+	    	console.log("result is " + JSON.stringify(result));
 	    	var row = result.data[0].toString();
 	    	var dataArray = row.split(",");
 	    	var imageType = dataArray[0];
@@ -663,6 +664,18 @@ module.exports = {
 					user.image = userFromDB.image;
 				}
 
+				if (userFromDB.username) {
+					user.username = userFromDB.username;
+				}
+
+				if (userFromDB.email) {
+					user.email = userFromDB.email;
+				}
+
+				if(userFromDB.location) {
+					user.location = userFromDB.location;
+				}
+
 				if (userFromDB.google_id) {
 					user.google = {};
 					user.google.id = userFromDB.google_id;
@@ -742,6 +755,18 @@ module.exports = {
 				}
 				if (user.image) {
 					setValues.push(" u.image = '" + user.image + "'");
+				}
+
+				if (user.username) {
+					setValues.push(" u.username = '" + user.username + "'");
+				}
+
+				if (user.email) {
+					setValues.push(" u.email = '" + user.email + "'");
+				}
+
+				if (user.location) {
+					setValues.push(" u.location = '" + user.location + "'");
 				}
 
 				if (user.google) {
@@ -849,6 +874,18 @@ module.exports = {
 
 				if (user.image) {
 					cypherQuery += ", image: '" + user.image + "'";
+				}
+
+				if (user.username) {
+					cypherQuery += ", username: '" + user.username + "'";
+				}
+
+				if (user.email) {
+					cypherQuery += ", email: '" + user.email + "'";
+				}
+
+				if (user.location) {
+					cypherQuery += ", location: '" + user.location + "'";
 				}
 
 				if (user.google) {

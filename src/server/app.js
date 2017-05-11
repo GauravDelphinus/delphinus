@@ -82,13 +82,14 @@ module.exports = function() {
 	});
 
 	// 2 - Challenge Image
-	app.get("/challenges/images/:challengeId", function(req, res) {
+	app.get("/challenges/images/:imageName", function(req, res) {
 		/**
 			The /challenges/images/challengeId route returns the actual original image
 			for that challenge Id.  That is the only legal way for the client to retrieve
 			the challenge Image.  The actual image is stored under /data/challenges/images/<random name>
 			path, and the random name is stored in the neo4j db entry for that challenge node.
 		**/
+		/*
 		dataUtils.getImageDataForChallenge(db, req.params.challengeId, function(err, image, imageType){
 			if (err) throw err;
 
@@ -98,6 +99,10 @@ module.exports = function() {
 			res.sendFile(challengeImagesDir + image, function(err) {
 				if (err && err.code !== "ECONNABORTED") throw err;
 			});
+		});
+		*/
+		res.sendFile(global.appRoot + config.path.challengeImages + req.params.imageName, function(err) {
+			if (err && err.code !== "ECONNABORTED") throw err;
 		});
 	});
 

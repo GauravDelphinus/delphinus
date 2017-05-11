@@ -14,6 +14,8 @@
 		"staticImages" : "../client/web/public/images/static/"
 	},
 	"url" : {
+		"challengeImages" : "/challenges/images/",
+		"userImages" : "/users/images/",
 		"staticImages" : "/images/static/"
 	},
 	"name" : {

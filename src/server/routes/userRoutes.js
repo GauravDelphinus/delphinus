@@ -63,7 +63,7 @@ var routes = function(db) {
 
                         fs.writeFileSync(fullpath, buffer);
                   
-                       user.image = name;
+                       user.image = config.url.userImages + name;
 
                        updateUserInDB(res, user);
                         

@@ -88,7 +88,7 @@ function setupImageHandlers(profileType) {
 			//alert("successful, image is " + data.image);
 			userInfo.image = data.image;
 
-			$("#profileImage").prop("src", "/users/images/" + data.image);
+			$("#profileImage").prop("src", data.image);
 			$("#profileImage").show();
 			$("#newImage").hide();
 			$("#saveImage").hide();
@@ -310,10 +310,8 @@ function setupSocialSection(profileType) {
 }
 
 function setupTabs(profileType) {
-	if (profileType == "mine") {
-		//if it's my profile, show the "Profile" tab
-		setupProfileTab();
-	}
+	//set up profile tab
+	setupProfileTab(profileType);
 
 	//challenges are shown irrespective of who is viewing, as long as there are challenges
 	setupChallengesTab();
@@ -322,23 +320,70 @@ function setupTabs(profileType) {
 	setupEntriesTab();
 }
 
-function setupProfileTab() {
 
-}
+function setupProfileTab(profileType) {
+	//if it's my profile, show the "Profile" tab
+	if (profileType == "mine") {
+		var tabDiv = appendNewTab("profile", "Profile");
+		var h3 = $("<h3>").text("Edit your profile");
+		tabDiv.append(h3);
 
-function appendNewTab(id, title) {
-	var active = false;
-	if ($("#tabs ul li").length == 0) {
-		active = true;
+		var profileSection = $("#profileSection").detach();
+		tabDiv.append(profileSection);
+		profileSection.show();
+
+		//set initial values
+		if (userInfo.username) {
+			$("#username").val(userInfo.username);
+		}
+		$("#username").prop("disabled", true);
+		if (userInfo.email) {
+			$("#email").val(userInfo.email);
+		}
+		$("#email").prop("disabled", true);
+		if (userInfo.location) {
+			$("#location").val(userInfo.location);
+		}
+		$("#location").prop("disabled", true);
+
+		$("#editProfileButton").click(function() {
+			$("#editProfileButton").hide();
+			$("#saveProfileButton").show();
+
+			$("#username").prop("disabled", false);
+			$("#email").prop("disabled", false);
+			$("#location").prop("disabled", false);
+		});
+
+		$("#saveProfileButton").click(function() {
+			var jsonObj = {};
+			jsonObj.user = {};
+			jsonObj.user.id = userInfo.id;
+			jsonObj.user.username = $("#username").val();
+			jsonObj.user.email = $("#email").val();
+			jsonObj.user.location = $('#location').find(":selected").val();
+
+			$.ajax({
+				type: "PUT",
+				url: "/api/users/",
+		        dataType: "json", // return data type
+		        contentType: "application/json; charset=UTF-8",
+		        data: JSON.stringify(jsonObj)
+	      	})
+			.done(function(data, textStatus, jqXHR) {
+
+	          $("#username").prop("disabled", true);
+	          $("#email").prop("disabled", true);
+	          $("#location").prop("disabled", true);
+	          $("#saveProfileButton").hide();
+	          $("#editProfileButton").show();
+	      	})
+			.fail(function(jqXHR, textStatus, errorThrown) {
+				alert("some error was found, " + errorThrown);
+
+			});
+		});
 	}
-
-	var li = $("<li>", {class: active ? "active" : ""}).append($("<a>", {"data-toggle" : "tab", href: "#" + id}).text(title));
-	$("#tabs ul").append(li);
-
-	var div = $("<div>", {id: id, class: "tab-pane fade" + (active ? " in active" : "")});
-	$("#tabs .tab-content").append(div);
-
-	return div;
 }
 
 function setupChallengesTab(active) {
@@ -346,7 +391,7 @@ function setupChallengesTab(active) {
 	$.getJSON('/api/challenges/?user=' + userInfo.id, function(challenges) {
 		if (challenges.length > 0) {
 			//show the tab
-			var tabDiv = appendNewTab("challenges", "Challenges", false);
+			var tabDiv = appendNewTab("challenges", "Challenges");
 			var h3 = $("<h3>").text("Challenges posted by " + userInfo.displayName);
 			var table = $("<table>", {id: "challengesTable", class: "gridTable"});
 			
@@ -381,7 +426,7 @@ function setupEntriesTab() {
 	$.getJSON('/api/entries/?user=' + userInfo.id, function(entries) {
 		if (entries.length > 0) {
 			//show the tab
-			var tabDiv = appendNewTab("entries", "Entries", false);
+			var tabDiv = appendNewTab("entries", "Entries");
 			var h3 = $("<h3>").text("Entries posted by " + userInfo.displayName);
 			var table = $("<table>", {id: "entriesTable", class: "gridTable"});
 			

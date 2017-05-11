@@ -30,10 +30,12 @@ var routes = function(db) {
 			var cypherQuery;
 
 			// In case a challenge is mentioned, extract all entries linked to that challenge
-			if (req.query.challengeId) {
-				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge) WHERE id(c) = " + req.query.challengeId + " RETURN e;"
+			if (req.query.challengeId && req.query.user) {
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge) WHERE id(c) = " + req.query.challengeId + " RETURN e, u;"
+			} else if (req.query.challengeId) {
+				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge), (e)-[:POSTED_BY]->(u:User) WHERE id(c) = " + req.query.challengeId + " RETURN e, u;"
 			} else if (req.query.user) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) RETURN e;";
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) RETURN e, u;";
 			} else {
 				cypherQuery = "MATCH (n:Entry) RETURN n;";
 			}
@@ -184,18 +186,21 @@ var routes = function(db) {
 				Returns a single JSON object of type entry
 			**/
 
-			var cypherQuery = "MATCH (e:Entry) WHERE id(e) = " + req.params.entryId + " RETURN e;";
+			var cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) WHERE id(e) = " + req.params.entryId + " RETURN e, u;";
 
-			//console.log("GET Received, Running cypherQuery: " + cypherQuery);
+			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
+    			console.log(result.data); // delivers an array of query results
+    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			if (result.data.length > 0) {
+    				var entryObject = result.data[0][0];
+    				var userObject = result.data[0][1];
 
-    			var entryObject = result.data[0];
-    			entryObject.image = "/entries/images/" + req.params.entryId;
-    			res.json(entryObject);
+    				entryObject.image = "/entries/images/" + req.params.entryId;
+    				res.json([entryObject, userObject]);
+    			}
 			});
 		})
 

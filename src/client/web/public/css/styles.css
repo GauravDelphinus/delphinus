@@ -126,6 +126,123 @@
 	height: 50px;
 }
 
+/************** Main Image *******************/
+
+.clear { clear:  both; }
+
+.postedBySection {
+	width: 90%;
+	position: relative;
+	overflow: auto;
+	margin: 0 auto;
+}
+
+.postedByDate {
+	float: left;
+	font-size: 1 em;
+	font-family: sans-serif;
+	font-style: italic;
+
+	/* below is a trick to vertically center the date - see http://stackoverflow.com/questions/19461521/how-to-center-an-element-horizontally-and-vertically */
+	position: absolute;
+	left: 2px;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.postedBy {
+	float: right;
+}
+
+.postedByName {
+	font-size: 1 em;
+}
+
+.postedByImage {
+	height: 50px;
+	margin: 3px 2px;
+}
+
+.mainImage {
+	width: 90%;
+	display: block;
+	margin: 0 auto;
+}
+
+.mainEntry {
+	border-radius: 10px;
+	border-style: dotted;
+	border-width: 0.5px;
+	padding: 20px;
+	margin: 0 auto;
+	width: 70%;
+}
+
+.socialStatus {
+	float: left;
+}
+
+.socialStatusSection {
+	width: 90%;
+	margin: 0 auto;
+	padding: 5px;
+	overflow: auto;
+}
+
+.socialActionSection {
+	width: 90%;
+	margin: 0 auto;
+	padding: 5px;
+	overflow: auto;
+}
+
+.socialActionButton {
+	background-color: #5DADE2;
+	margin: 10px 5px;
+}
+
+.thumbnailTitle {
+	font-size: 2em;
+	font-family: sans-serif;
+	text-align: center;
+	width: 90%;
+	display: block;
+	margin: 0 auto;
+}
+
+.captionSection {
+	width: 90%;
+	margin: 0 auto;
+	background-color: #EAECEE;
+	border-bottom-left-radius: 5px;
+	border-bottom-right-radius: 5px;
+	text-align: center;
+	padding: 10px;
+}
+
+.caption {
+	font-size: 2em;
+	font-style: italic;
+	font-family: serif;
+}
+
+.scrollableElement {
+	border-radius: 5px;
+	border-color: black;
+	border-style: dotted;
+	border-width: 0.5px;
+	margin: 20px;
+	padding: 10px;
+}
+/*************  Glyicon Sizes   *******************/
+
+.gi-2x{font-size: 2em;}
+.gi-3x{font-size: 3em;}
+.gi-4x{font-size: 4em;}
+.gi-5x{font-size: 5em;}
+
+/*************     *******************/
+
 .header {
 	width: 100%;
 }
