@@ -38,13 +38,16 @@ function setupMainItem() {
 }
 
 function setupTabs() {
+	var tabGroup = createNewTabGroup("mainTabGroup");
+	$("body").append(tabGroup);
+
 	setupChallengeTab();
 
 	setupCommentsTab();
 }
 
 function setupChallengeTab() {
-	var tabDiv = appendNewTab("challenge", "Challenge");
+	var tabDiv = appendNewTab("mainTabGroup", "challenge", "Challenge");
 	var h3 = $("<h3>").text("Challenge");
 	tabDiv.append(h3);
 

@@ -44,6 +44,10 @@ var routes = function(db) {
     			console.log(result.data); // delivers an array of query results
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
+    			for (var i = 0; i < result.data.length; i++) {
+    				var c = result.data[i][0];
+    				c.image = config.url.challengeImages + c.image;
+    			}
     			res.json(result.data);
 			});
 		})
@@ -88,7 +92,7 @@ var routes = function(db) {
 							"image : '" + name + "'," +
 							//"imageType : '" + ext + "'," + 
 							"created : '" + req.body.created + "'," + 
-							"title : '" + req.body.caption + "'" +
+							"title : '" + escapeSingleQuotes(req.body.caption) + "'" +
 							"})-[r:POSTED_BY]->(u) RETURN n;";
 
 				console.log("Running cypherQuery: " + cypherQuery);
@@ -125,7 +129,7 @@ var routes = function(db) {
     			var challenge = result.data[0][0];
     			var user = result.data[0][1];
     			//image is /challenges/images/challengeId which in turn will be mapped to the actual image by the separate route
-    			challenge.image = "/challenges/images/" + challenge.image;
+    			challenge.image = config.url.challengeImages + challenge.image;
     			res.json([challenge, user]);
 			});
 		})
@@ -229,5 +233,13 @@ var routes = function(db) {
 
 	return challengeRouter;
 };
+
+function escapeSingleQuotes (str) {
+	return str.replace(/'/g, "\\'");
+	//str.replace(/h/g, "v");
+	//console.log("str is now " + str);
+
+	return str;
+}
 
 module.exports = routes;

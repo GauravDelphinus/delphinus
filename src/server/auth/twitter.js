@@ -78,7 +78,7 @@ module.exports = function () {
 				}
 
                 console.log("calling saveUser, user = " + JSON.stringify(user));
-                dataUtils.saveUser(user, function(err) {
+                dataUtils.saveUser(user, function(err, user) {
                     if (err) throw err;
 
                     done(null, user);

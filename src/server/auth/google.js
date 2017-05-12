@@ -76,7 +76,7 @@ module.exports = function () {
 					user.image = config.url.staticImages + config.name.defaultProfileImageName;
 				}
                 
-                dataUtils.saveUser(user, function(err) {
+                dataUtils.saveUser(user, function(err, user) {
                     if (err) throw err;
 
                     done(null, user);

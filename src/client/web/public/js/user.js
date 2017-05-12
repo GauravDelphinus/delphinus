@@ -310,6 +310,9 @@ function setupSocialSection(profileType) {
 }
 
 function setupTabs(profileType) {
+	var tabGroup = createNewTabGroup("mainTabGroup");
+	$("body").append(tabGroup);
+
 	//set up profile tab
 	setupProfileTab(profileType);
 
@@ -324,7 +327,7 @@ function setupTabs(profileType) {
 function setupProfileTab(profileType) {
 	//if it's my profile, show the "Profile" tab
 	if (profileType == "mine") {
-		var tabDiv = appendNewTab("profile", "Profile");
+		var tabDiv = appendNewTab("mainTabGroup", "profile", "Profile");
 		var h3 = $("<h3>").text("Edit your profile");
 		tabDiv.append(h3);
 
@@ -391,7 +394,7 @@ function setupChallengesTab(active) {
 	$.getJSON('/api/challenges/?user=' + userInfo.id, function(challenges) {
 		if (challenges.length > 0) {
 			//show the tab
-			var tabDiv = appendNewTab("challenges", "Challenges");
+			var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
 			var h3 = $("<h3>").text("Challenges posted by " + userInfo.displayName);
 			var table = $("<table>", {id: "challengesTable", class: "gridTable"});
 			
@@ -426,7 +429,7 @@ function setupEntriesTab() {
 	$.getJSON('/api/entries/?user=' + userInfo.id, function(entries) {
 		if (entries.length > 0) {
 			//show the tab
-			var tabDiv = appendNewTab("entries", "Entries");
+			var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
 			var h3 = $("<h3>").text("Entries posted by " + userInfo.displayName);
 			var table = $("<table>", {id: "entriesTable", class: "gridTable"});
 			

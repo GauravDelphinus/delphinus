@@ -11,7 +11,7 @@ module.exports = function () {
             passReqToCallback: true
         },
         function(req, email, password, done){
-
+        	console.log("req.body.displayName is " + req.body.displayName);
             console.log("Local-signup callback, email: " + email + ", password: " + password);
 
             var query = {};
@@ -53,10 +53,12 @@ module.exports = function () {
                         user.local = {};
                         user.local.email = email;
                         user.local.password = password;
+                        user.local.displayName = req.body.displayName;
+                        user.displayName = req.body.displayName;
                         user.image = config.url.staticImages + config.name.defaultProfileImageName;
                         
                         console.log("calling saveUser with user = " + JSON.stringify(user));
-                        dataUtils.saveUser(user, function(err) {
+                        dataUtils.saveUser(user, function(err, user) {
                             if (err) throw err;
 
                             done(null, user);

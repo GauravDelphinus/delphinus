@@ -7,22 +7,11 @@
 </head>
 <body>
 <% include ./header %>
-<div id="challenges">
-  <span class="sectionHeader">Challenges</span><br>
-
-  <table id="challengesTable" class="gridTable">
-  </table>
-</div>
 <br><br>
 <div class="center">
   <button class="submitButton" id="postChallenge">Post a New Challenge!</button>
 </div>
 <br><br>
-<div id="entries">
-  <span class="sectionHeader">Entries</span><br>
-    <table id="entriesTable" class="gridTable">
-  </table>
-</div>
 <script>
 	var user = <%- JSON.stringify(user) %>;
 </script>
@@ -30,5 +19,6 @@
 <script src="/js/bootstrap.js"></script>
 <script src="/js/index.js"></script>
 <script src="/js/header.js"></script>
+<script src="/js/utils.js"></script>
 </body>
 </html>

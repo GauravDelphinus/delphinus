@@ -37,7 +37,7 @@ var routes = function(db) {
 			} else if (req.query.user) {
 				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) RETURN e, u;";
 			} else {
-				cypherQuery = "MATCH (n:Entry) RETURN n;";
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) RETURN e, u;";
 			}
 			
 

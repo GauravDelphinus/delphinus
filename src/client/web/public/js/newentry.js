@@ -1,8 +1,10 @@
 $(document).ready(function(){
 	console.log("setting image source to " + challengeId);
 
+	setupMainItem();
+
 	// GLOBAL FOR ALL CHANGES
-	$("#newentryimage").attr("src", "/challenges/images/" + challengeId);
+	//$("#newentryimage").attr("src", "/challenges/images/" + challengeId);
 
 	$("#apply").click(postEntry);
 	$("#goToHomePage").click(function() {
@@ -108,6 +110,18 @@ $(document).ready(function(){
 	createLoginHeader();
 	
 });
+
+function setupMainItem() {
+	$.getJSON('/api/challenges/' + challengeId, function(result) {
+		console.log("result is " + JSON.stringify(result));
+		if (result.length > 0) {
+			var c = result[0];
+			var u = result[1];
+
+			$("#newentryimage").prop("src", c.image);
+		}
+	});
+}
 
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 	for (var i = 0; i < listOfValuesAndSectionIds.length; i++) {

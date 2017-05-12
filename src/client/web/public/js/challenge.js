@@ -35,6 +35,9 @@ function setupMainItem() {
 }
 
 function setupTabs() {
+	var tabGroup = createNewTabGroup("mainTabGroup");
+	$("body").append(tabGroup);
+
 	setupMyEntryTab();
 
 	setupEntriesTab();
@@ -43,7 +46,7 @@ function setupTabs() {
 }
 
 function setupMyEntryTab() {
-	var tabDiv = appendNewTab("myentry", "My Entry");
+	var tabDiv = appendNewTab("mainTabGroup", "myentry", "My Entry");
 
 	if (user) {
 		$.getJSON('/api/entries/?challengeId=' + challengeId + "&user=" + user.id, function(entries) {
@@ -56,6 +59,10 @@ function setupMyEntryTab() {
 
 				var postEntryButton = $("<button>", {id: "postEntryButton", class: "btn btn-primary btn-lg", text: "Post Entry"});
 				tabDiv.append(postEntryButton);
+
+				$("#postEntryButton").click(function () {
+					window.open("/challenge/" + challengeId + "/newentry", "_self");
+				});
 			}
 		});
 	} else {
@@ -64,15 +71,17 @@ function setupMyEntryTab() {
 
 		var postEntryButton = $("<button>", {id: "postEntryButton", class: "btn btn-primary btn-lg", text: "Post Entry"});
 		tabDiv.append(postEntryButton);
+
+		$("#postEntryButton").click(function () {
+			window.open("/challenge/" + challengeId + "/newentry", "_self");
+		});
 	}
 
-	$("#postEntryButton").click(function () {
-		postEntry();
-	});
+
 }
 
 function setupEntriesTab() {
-	var tabDiv = appendNewTab("entries", "Entries");
+	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
 	var h3 = $("<h3>").text("Entries");
 	tabDiv.append(h3);
 
@@ -142,7 +151,7 @@ function parseUser(users) {
 }
 
 function postEntry() {
-	window.open("/challenge/" + challengeId + "/newentry", "_self");
+	
 }
 
 function extractEntries(entries) {

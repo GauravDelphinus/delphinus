@@ -866,6 +866,7 @@ module.exports = {
 				cypherQuery = "CREATE(u:User {";
 
 				var uuid1 = uuid.v4();
+				user.id = uuid1;
 				cypherQuery += "id: '" + uuid1 + "'";
 
 				if (user.displayName) {
@@ -975,7 +976,11 @@ module.exports = {
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 
-				next(null);
+				/**
+					It's critical to pass the user to this function, because in case we created
+					a new user node, we want to pass on the new id, which is generated above (uuid).
+				**/
+				next(null, user);
 			});
 		});
 	}

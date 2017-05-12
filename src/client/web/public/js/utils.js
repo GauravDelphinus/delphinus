@@ -93,18 +93,25 @@ function numDaysBetween (d1, d2) {
 	return diff / (1000 * 60 * 60 * 24);
 };
 
+function createNewTabGroup(id) {
+	var tabGroup = $("<div>", {id: id, class: "container"});
+	tabGroup.append($("<ul>", {class: "nav nav-tabs"}));
+	tabGroup.append($("<div>", {class: "tab-content"}));
 
-function appendNewTab(id, title) {
+	return tabGroup;
+}
+
+function appendNewTab(tabGroupId, id, title) {
 	var active = false;
-	if ($("#tabs ul li").length == 0) {
+	if ($("#" + tabGroupId + " ul li").length == 0) {
 		active = true;
 	}
 
 	var li = $("<li>", {class: active ? "active" : ""}).append($("<a>", {"data-toggle" : "tab", href: "#" + id}).text(title));
-	$("#tabs ul").append(li);
+	$("#" + tabGroupId + " ul").append(li);
 
 	var div = $("<div>", {id: id, class: "tab-pane fade" + (active ? " in active" : "")});
-	$("#tabs .tab-content").append(div);
+	$("#" + tabGroupId + " .tab-content").append(div);
 
 	return div;
 }
