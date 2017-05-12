@@ -55,7 +55,7 @@ function postChallenge() {
 	})
 	.done(function(data, textStatus, jqXHR) {
 		//alert("Challenge posted successfully, challenge id = " + data._id);
-    window.open("/challenge/" + data._id, "_self");
+    window.open("/challenge/" + data.id, "_self");
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
 		alert("some error was found, " + errorThrown);

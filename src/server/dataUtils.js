@@ -1,5 +1,5 @@
 var config = require('./config');
-var uuid = require("node-uuid");
+var shortid = require("shortid");
 
 module.exports = {
 
@@ -7,6 +7,26 @@ module.exports = {
 
 	initializeDB : function(db) {
 		myDB = db;
+
+		/*
+		var setConstraintsQuery = "CREATE CONSTRAINT ON (c:Challenge) ASSERT c.id IS UNIQUE";
+		db.cypherQuery(setConstraintsQuery, function(err, result) {
+			if (err) throw err;
+
+		});
+
+		setConstraintsQuery = "CREATE CONSTRAINT ON (e:Entry) ASSERT e.id IS UNIQUE";
+		db.cypherQuery(setConstraintsQuery, function(err, result) {
+			if (err) throw err;
+
+		});
+
+		setConstraintsQuery = "CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE";
+		db.cypherQuery(setConstraintsQuery, function(err, result) {
+			if (err) throw err;
+
+		});
+		*/
 	},
 
 	getDB : function() {
@@ -19,14 +39,14 @@ module.exports = {
 		calls the function next with an err and the challengeId
 	**/
 	getChallengeForEntry : function(db, entryId, next) {
-		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry) WHERE id(e) = " + entryId + " RETURN id(c);"
+		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id;"
 		db.cypherQuery(fetchChallengeQuery, function(err, result){
 	    		if (err) {
 	    			next(err, -1);
 	    			return;
 	    		}
 
-	    		var challengeId = parseInt(result.data[0]);
+	    		var challengeId = result.data[0];
 
 	    		next(0, challengeId);
 	    });
@@ -41,7 +61,7 @@ module.exports = {
 		Calls the function in the last argument with 3 parameters - err, imageName and imageType.
 	**/
 	getImageDataForChallenge : function(db, challengeId, next) {
-		var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + challengeId + " RETURN c.imageType, c.image;";
+		var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) RETURN c.imageType, c.image;";
 
 		console.log("cypherQuery is " + cypherQuery);
 		db.cypherQuery(cypherQuery, function(err, result){
@@ -73,7 +93,7 @@ module.exports = {
 	getImageDataForEntry : function(db, entryId, next) {
 
 		// First get the original image from the challenge
-		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry) WHERE id(e) = " + entryId + " RETURN c.image;"
+		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.image;"
 		db.cypherQuery(fetchChallengeQuery, function(err, output){
 	    		if (err) throw err;
 
@@ -85,7 +105,7 @@ module.exports = {
 
 	    		// Now, get the steps attached to this image
 
-				var cypherQuery = "MATCH (e:Entry)-[u:USES]->(s) WHERE id(e) = " + entryId + " RETURN LABELS(s),s ORDER BY u.order;";
+				var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[u:USES]->(s) RETURN LABELS(s),s ORDER BY u.order;";
 
 				db.cypherQuery(cypherQuery, function(err, result){
 	    			if(err) throw err;
@@ -865,9 +885,8 @@ module.exports = {
 			} else { // user doesn't exist in DB
 				cypherQuery = "CREATE(u:User {";
 
-				var uuid1 = uuid.v4();
-				user.id = uuid1;
-				cypherQuery += "id: '" + uuid1 + "'";
+				user.id = shortid.generate();
+				cypherQuery += "id: '" + user.id + "'";
 
 				if (user.displayName) {
 					cypherQuery += ", displayName: '" + user.displayName + "'";

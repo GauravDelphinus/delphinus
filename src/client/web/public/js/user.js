@@ -391,70 +391,75 @@ function setupProfileTab(profileType) {
 
 function setupChallengesTab(active) {
 	//get challenges posted by this user
-	$.getJSON('/api/challenges/?user=' + userInfo.id, function(challenges) {
-		if (challenges.length > 0) {
-			//show the tab
-			var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
-			var h3 = $("<h3>").text("Challenges posted by " + userInfo.displayName);
-			var table = $("<table>", {id: "challengesTable", class: "gridTable"});
-			
-			tabDiv.append(h3);
-			tabDiv.append(table);
+	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
+	var h3 = $("<h3>").text("Challenges posted by " + userInfo.displayName);
+	tabDiv.append(h3);
 
-			var numCols = 5; // max columns
-			$("#challengesTable").empty();
+	$.getJSON('/api/challenges/?user=' + userInfo.id, function(result) {
+					console.log("result is " + JSON.stringify(result));
+		for (var i = 0; i < result.length; i++) {
+			//console.log("result " + i + " is " + JSON.stringify(result[i]));
+			var c = result[i][0];
+			var u = result[i][1];
 
-			for (var i = 0; i < challenges.length; i++) {
-				var col = i % numCols;
-				var challenge = challenges[i];
-				var tr;
 
-				var td = $("<td>").append($("<img>").attr("src", "/challenges/images/" + challenge._id).attr("width", "100"));
-				td.append($("<br>"));
-				td.append($("<a>").attr("href", "/challenge/" + challenge._id).text(challenge.title));
-		        
-				if (col == 0) {
-					tr = $("<tr>").append(td);
-					$("#challengesTable").append(tr);
-				} else {
-					tr.append(td);
-				}
-			}
+			console.log("c is " + JSON.stringify(c));
+			console.log("u is " + JSON.stringify(u));
+			var data = {};
+			data.image = c.image;
+			data.postedDate = new Date(parseInt(c.created));
+			data.postedByUser = {};
+			data.postedByUser.id = u.id;
+			data.postedByUser.displayName = u.displayName;
+			data.postedByUser.image = u.image;
+
+			data.socialStatus = {};
+			data.socialStatus.numLikes = 121;
+			data.socialStatus.numShares = 23;
+			data.socialStatus.numComments = 45;
+
+			data.link = "/challenge/" + c.id;
+
+			var scrollableElement = createScrollableElement(data);
+			tabDiv.append(scrollableElement);
 		}
 	});
 }
 
 function setupEntriesTab() {
 	//get entries posted by this user
-	$.getJSON('/api/entries/?user=' + userInfo.id, function(entries) {
-		if (entries.length > 0) {
-			//show the tab
-			var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
-			var h3 = $("<h3>").text("Entries posted by " + userInfo.displayName);
-			var table = $("<table>", {id: "entriesTable", class: "gridTable"});
-			
-			tabDiv.append(h3);
-			tabDiv.append(table);
+	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
+	var h3 = $("<h3>").text("Entries posted by " + userInfo.displayName);
+	tabDiv.append(h3);
 
-			var numCols = 5; // max columns
+	$.getJSON('/api/entries/?user=' + userInfo.id, function(result) {
 
-			$("#entriesTable").empty();
+		for (var i = 0; i < result.length; i++) {
+			//console.log("result " + i + " is " + JSON.stringify(result[i]));
+			var e = result[i][0];
+			var u = result[i][1];
+			//console.log("e = " + JSON.stringify(e));
+			//console.log("u = " + JSON.stringify(u));
+			var data = {};
+			data.image = "/entries/images/" + e.id;
+			data.postedDate = new Date(parseInt(e.created));
+			data.postedByUser = {};
+			data.postedByUser.id = u.id;
+			data.postedByUser.displayName = u.displayName;
+			data.postedByUser.image = u.image;
+			data.link = "/entry/" + e.id;
 
-			for (var i = 0; i < entries.length; i++) {
-				var col = i % numCols;
-		        var entry = entries[i];
+			data.socialStatus = {};
+			data.socialStatus.numLikes = 121;
+			data.socialStatus.numShares = 23;
+			data.socialStatus.numComments = 45;
 
-				var td = $("<td>").append($("<img>").attr("src", "/entries/images/" + entry._id).attr("width", "100"));
-				td.append($("<br>"));
-				td.append($("<a>").attr("href", "/entry/" + entry._id).text("Entry " + entry._id));
-		        
-				if (col == 0) {
-					tr = $("<tr>").append(td);
-					$("#entriesTable").append(tr);
-				} else {
-					tr.append(td);
-				}
+			if (e.caption) {
+				data.caption = e.caption;
 			}
+
+			var scrollableElement = createScrollableElement(data);
+			tabDiv.append(scrollableElement);
 		}
 	});
 }

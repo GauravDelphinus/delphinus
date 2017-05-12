@@ -10,44 +10,13 @@
 
 <div id="main">
 	<h1 id="mainTitle" class="title"></h1>
-	<!--
-	<div class="mainEntry">
-		<div id="postedBySection" class="postedBySection">
-			<span id="postedDate" class="postedDate"></span>
-			<div id="postedBy" class="postedBy">
-				<span id="postedByName" class="postedByName"></span>
-				<img id="postedByImage" class="postedByImage">
-			</div>
-
-		</div>
-		<img id="mainImage" class="mainImage">
-		<div class="socialStatusSection">
-			<div class="socialStatus">
-				<span id="numLikes" class="glyphicon glyphicon-thumbs-up gi-2x">34  </span>
-				<span id="numShares" class="glyphicon glyphicon-share-alt gi-2x">4  </span>
-				<span id="numComments" class="glyphicon glyphicon-comment gi-2x">45  </span>
-			</div>
-		</div>
-	</div>
-	<div class="socialActionSection">
-		<button id="likeButton" type="button" class="btn btn-primary btn-lg socialActionButton">
-			<span class="glyphicon glyphicon-thumbs-up"></span> Like
-		</button>
-		<button id="shareButton" type="button" class="btn btn-primary btn-lg socialActionButton">
-			<span class="glyphicon glyphicon-share-alt"></span> Share
-		</button>
-		<button id="commentButton" type="button" class="btn btn-primary btn-lg socialActionButton">
-			<span class="glyphicon glyphicon-comment"></span> Comment
-		</button>
-	</div>
-	-->
 </div>
 
 <br><br>
 
 
 <script>
-	var challengeId = <%= challengeId %>;
+	var challengeId = '<%=challengeId%>';
 	var user = <%- JSON.stringify(user) %>;
 </script>
 <script src="/js/jquery-3.1.1.min.js"></script>

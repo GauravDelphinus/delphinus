@@ -44,7 +44,7 @@ function setupChallengesTab() {
 			data.socialStatus.numShares = 23;
 			data.socialStatus.numComments = 45;
 
-			data.link = "/challenge/" + c._id;
+			data.link = "/challenge/" + c.id;
 
 			var scrollableElement = createScrollableElement(data);
 			tabDiv.append(scrollableElement);
@@ -71,7 +71,7 @@ function setupEntriesTab() {
 			data.postedByUser.id = u.id;
 			data.postedByUser.displayName = u.displayName;
 			data.postedByUser.image = u.image;
-			data.link = "/entry/" + e._id;
+			data.link = "/entry/" + e.id;
 
 			data.socialStatus = {};
 			data.socialStatus.numLikes = 121;

@@ -70,7 +70,7 @@ function setupChallengeTab() {
 			data.socialStatus.numShares = 23;
 			data.socialStatus.numComments = 45;
 
-			data.link = "/challenge/" + challengeId;
+			data.link = "/challenge/" + c.id;
 
 			var scrollableElement = createScrollableElement(data);
 			tabDiv.append(scrollableElement);

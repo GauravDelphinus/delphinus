@@ -1,6 +1,7 @@
 var express = require("express");
 var async = require("async");
 var dataUtils = require("../dataUtils");
+var shortid = require("shortid");
 
 var routes = function(db) {
 
@@ -31,9 +32,9 @@ var routes = function(db) {
 
 			// In case a challenge is mentioned, extract all entries linked to that challenge
 			if (req.query.challengeId && req.query.user) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge) WHERE id(c) = " + req.query.challengeId + " RETURN e, u;"
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}) RETURN e, u;"
 			} else if (req.query.challengeId) {
-				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge), (e)-[:POSTED_BY]->(u:User) WHERE id(c) = " + req.query.challengeId + " RETURN e, u;"
+				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) RETURN e, u;"
 			} else if (req.query.user) {
 				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) RETURN e, u;";
 			} else {
@@ -58,12 +59,13 @@ var routes = function(db) {
 				POST a new entry node, and link it to a Challenge node.
 			**/
 
-
+			var id = shortid.generate();
 			/**
 				First create the entry node.  Then later, link them to Filter nodes.
 			**/
-			var cypherQuery = "MATCH (c:Challenge) WHERE (id(c) = " + req.body.challengeId +
-							") MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
+			var cypherQuery = "MATCH (c:Challenge {id: '" + req.body.challengeId + "'}) " + 
+							" MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
+							"id: '" + id + "', " + 
 							"created : '" + req.body.created + "'" + 
 							"})-[:PART_OF]->(c), (u)<-[r:POSTED_BY]-(e) RETURN e;";
 
@@ -72,8 +74,8 @@ var routes = function(db) {
 				db.cypherQuery(cypherQuery, function(err, result){
     				if(err) throw err;
 
-    				//console.log(result.data); // delivers an array of query results
-    				var newEntryId = result.data[0]._id;
+    				console.log(result.data); // delivers an array of query results
+    				var newEntryId = result.data[0].id;
 
     				//res.json(result.data[0]);
 
@@ -141,7 +143,7 @@ var routes = function(db) {
 					async.series(createFilterNodesFunctions, 
 						function(err, filterNodes) {
 
-							var cypherQuery = "MATCH (e:Entry) WHERE id(e) = " + newEntryId + "";
+							var cypherQuery = "MATCH (e:Entry {id: '" + newEntryId + "'}) ";
 							//console.log("filterNodes, num values = " + filterNodes.length);
 							for (var i = 0; i < filterNodes.length; i++) {
 								//console.log("filterNodes, " + i + " = " + filterNodes[i]);
@@ -159,16 +161,16 @@ var routes = function(db) {
 								cypherQuery += " (s" + i + ")<-[:USES {order : '" + i + "'}]-(e) ";
 							}
 
-							cypherQuery += ";";
+							cypherQuery += " return e;";
 
 							//console.log("cypherQuery is: " + cypherQuery);
 
 							db.cypherQuery(cypherQuery, function(err, result){
     							if(err) throw err;
 
-    							var responseJSON = {};
-								responseJSON.entryId = newEntryId;
-								res.json(JSON.stringify(responseJSON));
+    							if (result.data.length > 0) {
+    								res.json(result.data[0]);
+    							}
     						});
 							
 						});
@@ -186,7 +188,7 @@ var routes = function(db) {
 				Returns a single JSON object of type entry
 			**/
 
-			var cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) WHERE id(e) = " + req.params.entryId + " RETURN e, u;";
+			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'})-[:POSTED_BY]->(u:User) RETURN e, u;";
 
 			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -211,7 +213,7 @@ var routes = function(db) {
 				Returns the updated JSON object.
 			**/
 
-			var cypherQuery = "MATCH (e:Challenge) WHERE id(e) = " + req.params.entryId;
+			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'}) ";
 
 			cypherQuery += " SET ";
 
@@ -240,7 +242,7 @@ var routes = function(db) {
 				Returns the updated JSON object.
 			**/
 
-			var cypherQuery = "MATCH (e:Challenge) WHERE id(e) = " + req.params.entryId;
+			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'}) ";
 
 			cypherQuery += " SET ";
 
@@ -288,7 +290,7 @@ var routes = function(db) {
 				DELETE will permantently delete the specified node.  Call with Caution!
 			**/
 
-			var cypherQuery = "MATCH (e: Challenge) WHERE id(e) = '" + req.params.challengeId + "' DELETE e;";
+			var cypherQuery = "MATCH (e: Entry {id: '" + req.params.entryId + "'}) DELETE e;";
 			//console.log("DELETE received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;

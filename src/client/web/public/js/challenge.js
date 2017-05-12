@@ -94,13 +94,13 @@ function setupEntriesTab() {
 			//console.log("e = " + JSON.stringify(e));
 			//console.log("u = " + JSON.stringify(u));
 			var data = {};
-			data.image = "/entries/images/" + e._id;
+			data.image = "/entries/images/" + e.id;
 			data.postedDate = new Date(parseInt(e.created));
 			data.postedByUser = {};
 			data.postedByUser.id = u.id;
 			data.postedByUser.displayName = u.displayName;
 			data.postedByUser.image = u.image;
-			data.link = "/entry/" + e._id;
+			data.link = "/entry/" + e.id;
 
 			data.socialStatus = {};
 			data.socialStatus.numLikes = 121;

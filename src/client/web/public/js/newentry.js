@@ -421,10 +421,11 @@ function postEntry() {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
+			console.log("received JsonData is " + JSON.stringify(jsonData));
 
-			var jsonObj = JSON.parse(jsonData);
+			//var jsonObj = JSON.parse(jsonData);
 
-			window.open("/entry/" + jsonObj.entryId, "_self");
+			window.open("/entry/" + jsonData.id, "_self");
 
 			//$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
 		},

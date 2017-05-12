@@ -224,7 +224,7 @@ module.exports = function() {
 				});
 
     });
-	
+
 	/**
 		STATIC ROUTERS
 		Serve static files in public directory

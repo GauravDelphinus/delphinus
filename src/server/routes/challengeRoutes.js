@@ -2,6 +2,7 @@ var express = require("express");
 var tmp = require("tmp");
 var path = require("path");
 var config = require("../config");
+var shortid = require("shortid");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -88,9 +89,11 @@ var routes = function(db) {
 
     			console.log(JSON.stringify(req.user));
     			
+    			var id = shortid.generate();
+
 				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) CREATE (n:Challenge {" +
+							"id: '" + id + "'," +
 							"image : '" + name + "'," +
-							//"imageType : '" + ext + "'," + 
 							"created : '" + req.body.created + "'," + 
 							"title : '" + escapeSingleQuotes(req.body.caption) + "'" +
 							"})-[r:POSTED_BY]->(u) RETURN n;";
@@ -117,7 +120,7 @@ var routes = function(db) {
 				Returns a single JSON object of type challenge
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge)-[:POSTED_BY]->(u:User) WHERE id(c) = " + req.params.challengeId + " RETURN c, u;";
+			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[:POSTED_BY]->(u:User) RETURN c, u;";
 
 			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -141,7 +144,7 @@ var routes = function(db) {
 				Returns the updated JSON object.
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId;
+			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'}) ";
 
 			cypherQuery += " SET ";
 
@@ -170,7 +173,7 @@ var routes = function(db) {
 				Returns the updated JSON object.
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge) WHERE id(c) = " + req.params.challengeId;
+			var cypherQuery = "MATCH (c:Challenge {id : '" + req.params.challengeId + "'}) ";
 
 			cypherQuery += " SET ";
 
@@ -218,7 +221,7 @@ var routes = function(db) {
 				DELETE will permantently delete the specified node.  Call with Caution!
 			**/
 
-			var cypherQuery = "MATCH (c: Challenge) WHERE id(c) = '" + req.params.challengeId + "' DELETE c;";
+			var cypherQuery = "MATCH (c: Challenge {id : '" + req.params.challengeId + "'}) DELETE c;";
 			//console.log("DELETE received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
