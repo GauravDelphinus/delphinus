@@ -11,208 +11,219 @@
 <img id="newentryimage" class="centerImage"/>
 </div>
 
+<div id="steps">
 	<!-- LAYOUT SECTION -->
-	<div id="layoutSection" class="settingsBlock">
-		<span class="title">Step 1: Adjust Layout</span><br>
-		<input type="radio" id="radioLayoutNone" name="layout" value="none" checked="checked"><b>None</b><br>
-		<input type="radio" id="radioLayoutPreset" name="layout" value="preset"><b>Preset</b><br>
-		<input type="radio" id="radioLayoutUserDefined" name="layout" value="user_defined"><b>User Defined</b><br>
-		<input type="radio" id="radioLayoutCustom" name="layout" value="custom"><b>Custom</b>
-
-		<!-- NONE LAYOUT SUBSECTION -->
-		<div id="noneLayoutSection" class="settingsSubBlock">
-		<p>No Layout Selected</p>
-		</div>
-
-		<!-- PRESET LAYOUT SUBSECTION -->
-		<div id="presetLayoutSection" class="settingsSubBlock">
-		</div>
-
-		<!-- USER DEFINED LAYOUT SUBSECTION -->
-		<div id="userDefinedLayoutSection" class="settingsSubBlock">
-		</div>
-
-		<!-- CUSTOM LAYOUT SUBSECTION -->
-		<div id="customLayoutSection" class="settingsSubBlock" style="display: none;">
-			<input type="checkbox" id="checkboxFlip" value="flip"><b>Flip</b>
-				<input type="radio" id="radioFlipHorizontally" name="flip" value="flipHorizontally" checked="checked"><b>Horizontally</b>
-				<input type="radio" id="radioFlipVertically" name="flip" value="flipVertically"><b>Vertically</b><br>
-			<input type="checkbox" id="checkboxCrop" value="crop"><b>Crop</b>
-				<b>X:</b><input type="number" id="cropX" value="0">
-				<b>Y:</b><input type="number" id="cropY" value="0">
-				<b>Width:</b><input type="number" id="cropWidth" value="100">
-				<b>Height:</b><input type="number" id="cropHeight" value="100"><br>
-			<input type="checkbox" id="checkboxRotate" value="rotate"><b>Rotate</b>
-				<b>Degrees:</b><input type="number" id="rotateDegrees" value="0">
-				<b>Color:</b><input type="color" id="rotateColor" value="#000000"><br>
-			<input type="checkbox" id="checkboxShear" value="shear"><b>Shear</b>
-				<b>X Degrees:</b><input type="number" id="shearX" value="0">
-				<b>Y Degrees:</b><input type="number" id="shearY" value="0"><br>
-			<br><br>
-		</div>
-		<div class="center">
-			<button class="submitButton" id="step1Next">Next >></button>
-		</div>
-	</div>
-	<br>
-
-	<!-- FILTER SECTION -->
-	<div id="filterSection" class="settingsBlock" style="display: none;">
-		<span class="title">Step 2: Apply Filter</span><br>
-		<input type="radio" id="radioNone" name="filter" value="none"><b>None</b><br>
-		<input type="radio" id="radioPreset" name="filter" value="preset" checked="checked"><b>Preset</b><br>
-		<input type="radio" id="radioUserDefined" name="filter" value="user_defined"><b>User Defined</b><br>
-		<input type="radio" id="radioCustom" name="filter" value="custom"><b>Custom</b>
-
-		<!-- NONE FILTER SUBSECTION -->
-		<div id="noneFilterSection" class="settingsSubBlock">
-		<p>No Filter Selected</p>
-		</div>
-
-		<!-- PRESET FILTER SUBSECTION -->
-		<div id="presetFilterSection" class="settingsSubBlock">
-			<span class="subTitle">Preset Filters</span><br>
-
-			<input type="radio" id="radioRainyDay" name="preset" value="1"><b>Rainy Day</b>
-			<input type="radio" id="radioSolaris" name="preset" value="2"><b>Glass Wall</b>
-			<input type="radio" id="radioNightingale" name="preset" value="3"><b>Nightingale</b>
-			<input type="radio" id="radioWhirlpool" name="preset" value="4"><b>Whirlpool</b>
-			<input type="radio" id="radioComical" name="preset" value="5"><b>Comical</b>
-		</div>
-
-		<!-- USER DEFINED FILTER SUBSECTION -->
-		<div id="userDefinedFilterSection" class="settingsSubBlock" style="display: none;">
-			<span class="subTitle">User Defined Filters</span><br>
-		</div>
-
-		<!-- CUSTOM FILTER SUBSECTION -->
-		<div id="customFilterSection" class="settingsSubBlock" style="display: none;">
-			<span class="subTitle">Custom Filters</span><br>
-		
-			<span class="subTitle">Effects</span><br>
-			<input type="checkbox" id="radioPaint" name="effects" value="paint"><b>Paint</b><input id="rangePaint" type="range" min="0" max="100" value="0" step="5"><span id="paintValue"></span><br>
-			<input type="checkbox" id="radioGrayscale" name="effects" value="grayscale"><b>Grayscale</b><br>
-			<input type="checkbox" id="radioCharcoal" name="effects" value="charcoal"><b>Charcoal</b><input id="rangeCharcoal" type="range" min="1" max="100" value="1" step="5"><span id="charcoalValue"></span><br>
-			<input type="checkbox" id="radioMosaic" name="effects" value="mosaic"><b>Mosaic</b><br>
-			<input type="checkbox" id="radioNegative" name="effects" value="negative"><b>Negative</b><br>
-			<input type="checkbox" id="radioSolarize" name="effects" value="solarize"><b>Solarize</b><input id="rangeSolarize" type="range" min="0" max="100" value="100" step="5"><span id="solarizeValue"></span><br>
-			<input type="checkbox" id="radioMonochrome" name="effects" value="monochrome"><b>Monochrome</b><br>
-			<input type="checkbox" id="radioSwirl" name="effects" value="swirl"><b>Swirl</b><input id="rangeSwirl" type="range" min="0" max="360" value="0" step="5"><span id="swirlValue"></span><br>
-			<input type="checkbox" id="radioWave" name="effects" value="wave"><b>Wave</b>Amplitude<input id="rangeWaveAmp" type="range" min="0" max="100" value="100" step="5"><span id="waveAmpValue"></span><br>Wavelength<input id="rangeWaveLength" type="range" min="0" max="100" value="100" step="5"><span id="waveLengthValue"></span><br>
-			<input type="checkbox" id="radioSpread" name="effects" value="spread"><b>Spread</b><input id="rangeSpread" type="range" min="0" max="100" value="0" step="5"><span id="spreadValue"></span><br>
-		
-
-			<br>
-	
-			<span class="subTitle">Settings</span><br>
-			<b>Contrast</b>-100<input id="contrast" type="range" min="-100" max="100" value="0" step="5">100<span id="contrastValue"></span><br>
-			<b>Brightness</b><input id="brightness" type="range" min="-100" max="100" value="0" step="5"><span id="brightnessValue"></span><br>
-			<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
-			<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
-		</div>
-
-		<br><br>
-		<div class="center">
-			<button class="submitButton" id="step2Previous"><< Previous</button>
-			<button class="submitButton" id="step2Next">Next >></button>
-		</div>
-	</div>
-	<br>
-
-	<!-- ARTIFACT SECION -->
-	<div id="artifactSection" class="settingsBlock" style="display: none;">
-		<span class="title">Step 3: Add Artifacts</span><br>
-		<input type="radio" id="radioArtifactNone" name="artifact" value="none" checked="checked"><b>None</b><br>
-		<input type="radio" id="radioArtifactPreset" name="artifact" value="preset"><b>Preset</b><br>
-		<input type="radio" id="radioArtifactUserDefined" name="artifact" value="user_defined"><b>User Defined</b><br>
-		<input type="radio" id="radioArtifactCustom" name="artifact" value="custom"><b>Custom</b>
-		
-		<!-- NONE ARTIFACT SUBSECTION -->
-		<div id="noneArtifactSection" class="settingsSubBlock">
-		<p>No Artifact Selected</p>
-		</div>
-
-		<!-- PRESET ARTIFACT SUBSECTION -->
-		<div id="presetArtifactSection" class="settingsSubBlock">
-		<p>Preset Artifacts</p>
-		</div>
-
-		<!-- USER DEFINED ARTIFACT SUBSECTION -->
-		<div id="userDefinedArtifactSection" class="settingsSubBlock" style="display: none;">
-			<span class="subTitle">User Defined Artifacts</span><br>
-		</div>
-
-		<!-- CUSTOM ARTIFACT SUBSECTION -->
-		<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
-			<input type="checkbox" id="checkboxBanner" name="artifact" value="banner"><b>Add Banner</b>
-			<div id="bannerSection">
-				<b>Banner Text:</b><input type="text" id="textBanner">
-				<b>Font Size</b><input type="number" id="bannerTextFontSize" value="30">
-				<b>Font Name</b><select id="bannerTextFontName">
-									<option value="arial">Arial</option>
-									<option value="times">Times</option>
-									<option value="courier">Courier</option>
-									</select>
-				<b>Text Color</b><input type="color" id="bannerTextColor" value="#000000"><br>
-				<b>Banner Location:</b><input type="radio" id="radioBannerLocationBottom" name="banner" value="bannerLocationBottom" checked="checked"><b>Bottom</b>
-				<input type="radio" id="radioBannerLocationTop" name="banner" value="bannerLocationTop"><b>Top</b><br>
-
-				<b>Background Color</b><input type="color" id="bannerBackgroundColor" value="#FFFFFF">
+	<div id="stepSection" class="stepSection">
+		<div id="stepHeader" class="stepHeader">
+			<span id="stepTitle" class="stepTitle"></span>
+			<div id="stepNavigation" class="stepNavigation">
+				<button id="prevButton" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-prev"></span> Previous</button>
+				<button id="nextButton" type="button" class="btn btn-primary">Next <span class="glyphicon glyphicon-next"></span></button>
 			</div>
 		</div>
-		<br><br>
+		<div id="stepContent" class="stepContent">
+			<div id="layoutSection">
+				
+				<span class="title">Step 1: Adjust Layout</span><br>
+				<!--
+				<input type="radio" id="radioLayoutNone" name="layout" value="none" checked="checked"><b>None</b><br>
+				<input type="radio" id="radioLayoutPreset" name="layout" value="preset"><b>Preset</b><br>
+				<input type="radio" id="radioLayoutUserDefined" name="layout" value="user_defined"><b>User Defined</b><br>
+				<input type="radio" id="radioLayoutCustom" name="layout" value="custom"><b>Custom</b>
+				-->
 
-		<div class="center">
-			<button class="submitButton" id="step3Previous"><< Previous</button>
-			<button class="submitButton" id="step3Next">Next >></button>
-		</div>
-	</div>
-	<br>
+				<select id="layoutTypeSelection" class="form-control">
+					<option value="none" selected="selected">None</option>
+					<option value="preset">Preset</option>
+					<option value="userDefined">User Defined</option>
+					<option value="custom">Custom</option>
+				</select>
 
-	<!-- DECORATION SECTION -->
-	<div id="decorationSection" class="settingsBlock" style="display: none;">
-		<span class="title">Step 4: Add Decorations</span><br>
+				<!-- NONE LAYOUT SUBSECTION -->
+				<div id="noneLayoutSection" class="settingsSubBlock">
+				<p>No Layout Selected</p>
+				</div>
 
-		<input type="radio" id="radioDecorationNone" name="decoration" value="none" checked="checked"><b>None</b><br>
-		<input type="radio" id="radioDecorationPreset" name="decoration" value="preset"><b>Preset</b><br>
-		<input type="radio" id="radioDecorationUserDefined" name="decoration" value="user_defined"><b>User Defined</b><br>
-		<input type="radio" id="radioDecorationCustom" name="decoration" value="custom"><b>Custom</b>
+				<!-- PRESET LAYOUT SUBSECTION -->
+				<div id="presetLayoutSection" class="settingsSubBlock">
+				</div>
 
-		<!-- NONE DECORATION SUBSECTION -->
-		<div id="noneDecorationSection" class="settingsSubBlock">
-		<p>No Decoration Selected</p>
-		</div>
+				<!-- USER DEFINED LAYOUT SUBSECTION -->
+				<div id="userDefinedLayoutSection" class="settingsSubBlock">
+				</div>
 
-		<!-- PRESET DECORATION SUBSECTION -->
-		<div id="presetDecorationSection" class="settingsSubBlock">
-		<p>Preset Decorations</p>
-		</div>
-
-		<!-- USER DEFINED DECORATION SUBSECTION -->
-		<div id="userDefinedDecorationSection" class="settingsSubBlock" style="display: none;">
-			<span class="subTitle">User Defined Decorations</span><br>
-		</div>
-
-		<!-- CUSTOM DECORATION SUBSECTION -->
-		<div id="customDecorationSection" class="settingsSubBlock" style="display: none;">
-			<input type="checkbox" id="checkboxBorder" name="border" value="border"><b>Add Border</b>
-			<div id="borderSection">
-				<b>Border Width:</b><input type="number" id="borderWidth" value="0">
-				<b>Border Color</b><input type="color" id="borderColor" value="#000000">
+				<!-- CUSTOM LAYOUT SUBSECTION -->
+				<div id="customLayoutSection" class="settingsSubBlock" style="display: none;">
+					<input type="checkbox" id="checkboxFlip" value="flip"><b>Flip</b>
+						<input type="radio" id="radioFlipHorizontally" name="flip" value="flipHorizontally" checked="checked"><b>Horizontally</b>
+						<input type="radio" id="radioFlipVertically" name="flip" value="flipVertically"><b>Vertically</b><br>
+					<input type="checkbox" id="checkboxCrop" value="crop"><b>Crop</b>
+						<b>X:</b><input type="number" id="cropX" value="0">
+						<b>Y:</b><input type="number" id="cropY" value="0">
+						<b>Width:</b><input type="number" id="cropWidth" value="100">
+						<b>Height:</b><input type="number" id="cropHeight" value="100"><br>
+					<input type="checkbox" id="checkboxRotate" value="rotate"><b>Rotate</b>
+						<b>Degrees:</b><input type="number" id="rotateDegrees" value="0">
+						<b>Color:</b><input type="color" id="rotateColor" value="#000000"><br>
+					<input type="checkbox" id="checkboxShear" value="shear"><b>Shear</b>
+						<b>X Degrees:</b><input type="number" id="shearX" value="0">
+						<b>Y Degrees:</b><input type="number" id="shearY" value="0"><br>
+					<br><br>
+				</div>
 			</div>
+
+			<!-- FILTER SECTION -->
+			<div id="filterSection" class="settingsBlock" style="display: none;">
+				<span class="title">Step 2: Apply Filter</span><br>
+				<!--
+				<input type="radio" id="radioNone" name="filter" value="none"><b>None</b><br>
+				<input type="radio" id="radioPreset" name="filter" value="preset" checked="checked"><b>Preset</b><br>
+				<input type="radio" id="radioUserDefined" name="filter" value="user_defined"><b>User Defined</b><br>
+				<input type="radio" id="radioCustom" name="filter" value="custom"><b>Custom</b>
+				-->
+
+				<select id="filterTypeSelection" class="form-control">
+					<option value="none" selected="selected">None</option>
+					<option value="preset">Preset</option>
+					<option value="userDefined">User Defined</option>
+					<option value="custom">Custom</option>
+				</select>
+
+				<!-- NONE FILTER SUBSECTION -->
+				<div id="noneFilterSection" class="settingsSubBlock">
+				<p>No Filter Selected</p>
+				</div>
+
+				<!-- PRESET FILTER SUBSECTION -->
+				<div id="presetFilterSection" class="settingsSubBlock" style="display:none;"">
+
+				</div>
+
+				<!-- USER DEFINED FILTER SUBSECTION -->
+				<div id="userDefinedFilterSection" class="settingsSubBlock" style="display: none;">
+					<span class="subTitle">User Defined Filters</span><br>
+				</div>
+
+				<!-- CUSTOM FILTER SUBSECTION -->
+				<div id="customFilterSection" class="settingsSubBlock" style="display: none;">
+					<span class="subTitle">Custom Filters</span><br>
+				
+					<span class="subTitle">Effects</span><br>
+					<input type="checkbox" id="radioPaint" name="effects" value="paint"><b>Paint</b><input id="rangePaint" type="range" min="0" max="100" value="0" step="5"><span id="paintValue"></span><br>
+					<input type="checkbox" id="radioGrayscale" name="effects" value="grayscale"><b>Grayscale</b><br>
+					<input type="checkbox" id="radioCharcoal" name="effects" value="charcoal"><b>Charcoal</b><input id="rangeCharcoal" type="range" min="1" max="100" value="1" step="5"><span id="charcoalValue"></span><br>
+					<input type="checkbox" id="radioMosaic" name="effects" value="mosaic"><b>Mosaic</b><br>
+					<input type="checkbox" id="radioNegative" name="effects" value="negative"><b>Negative</b><br>
+					<input type="checkbox" id="radioSolarize" name="effects" value="solarize"><b>Solarize</b><input id="rangeSolarize" type="range" min="0" max="100" value="100" step="5"><span id="solarizeValue"></span><br>
+					<input type="checkbox" id="radioMonochrome" name="effects" value="monochrome"><b>Monochrome</b><br>
+					<input type="checkbox" id="radioSwirl" name="effects" value="swirl"><b>Swirl</b><input id="rangeSwirl" type="range" min="0" max="360" value="0" step="5"><span id="swirlValue"></span><br>
+					<input type="checkbox" id="radioWave" name="effects" value="wave"><b>Wave</b>Amplitude<input id="rangeWaveAmp" type="range" min="0" max="100" value="100" step="5"><span id="waveAmpValue"></span><br>Wavelength<input id="rangeWaveLength" type="range" min="0" max="100" value="100" step="5"><span id="waveLengthValue"></span><br>
+					<input type="checkbox" id="radioSpread" name="effects" value="spread"><b>Spread</b><input id="rangeSpread" type="range" min="0" max="100" value="0" step="5"><span id="spreadValue"></span><br>
+				
+
+					<br>
 			
-		</div>
-		<br><br>
+					<span class="subTitle">Settings</span><br>
+					<b>Contrast</b>-100<input id="contrast" type="range" min="-100" max="100" value="0" step="5">100<span id="contrastValue"></span><br>
+					<b>Brightness</b><input id="brightness" type="range" min="-100" max="100" value="0" step="5"><span id="brightnessValue"></span><br>
+					<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
+					<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
+				</div>
 
-		<div class="center">
-			<button class="submitButton" id="step4Previous"><< Previous</button>
+			</div>
+			<br>
+
+			<!-- ARTIFACT SECION -->
+			<div id="artifactSection" class="settingsBlock" style="display: none;">
+				<span class="title">Step 3: Add Artifacts</span><br>
+				<input type="radio" id="radioArtifactNone" name="artifact" value="none" checked="checked"><b>None</b><br>
+				<input type="radio" id="radioArtifactPreset" name="artifact" value="preset"><b>Preset</b><br>
+				<input type="radio" id="radioArtifactUserDefined" name="artifact" value="user_defined"><b>User Defined</b><br>
+				<input type="radio" id="radioArtifactCustom" name="artifact" value="custom"><b>Custom</b>
+				
+				<!-- NONE ARTIFACT SUBSECTION -->
+				<div id="noneArtifactSection" class="settingsSubBlock">
+				<p>No Artifact Selected</p>
+				</div>
+
+				<!-- PRESET ARTIFACT SUBSECTION -->
+				<div id="presetArtifactSection" class="settingsSubBlock">
+				<p>Preset Artifacts</p>
+				</div>
+
+				<!-- USER DEFINED ARTIFACT SUBSECTION -->
+				<div id="userDefinedArtifactSection" class="settingsSubBlock" style="display: none;">
+					<span class="subTitle">User Defined Artifacts</span><br>
+				</div>
+
+				<!-- CUSTOM ARTIFACT SUBSECTION -->
+				<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
+					<input type="checkbox" id="checkboxBanner" name="artifact" value="banner"><b>Add Banner</b>
+					<div id="bannerSection">
+						<b>Banner Text:</b><input type="text" id="textBanner">
+						<b>Font Size</b><input type="number" id="bannerTextFontSize" value="30">
+						<b>Font Name</b><select id="bannerTextFontName">
+											<option value="arial">Arial</option>
+											<option value="times">Times</option>
+											<option value="courier">Courier</option>
+											</select>
+						<b>Text Color</b><input type="color" id="bannerTextColor" value="#000000"><br>
+						<b>Banner Location:</b><input type="radio" id="radioBannerLocationBottom" name="banner" value="bannerLocationBottom" checked="checked"><b>Bottom</b>
+						<input type="radio" id="radioBannerLocationTop" name="banner" value="bannerLocationTop"><b>Top</b><br>
+
+						<b>Background Color</b><input type="color" id="bannerBackgroundColor" value="#FFFFFF">
+					</div>
+				</div>
+			</div>
+			<br>
+
+			<!-- DECORATION SECTION -->
+			<div id="decorationSection" class="settingsBlock" style="display: none;">
+				<span class="title">Step 4: Add Decorations</span><br>
+
+				<input type="radio" id="radioDecorationNone" name="decoration" value="none" checked="checked"><b>None</b><br>
+				<input type="radio" id="radioDecorationPreset" name="decoration" value="preset"><b>Preset</b><br>
+				<input type="radio" id="radioDecorationUserDefined" name="decoration" value="user_defined"><b>User Defined</b><br>
+				<input type="radio" id="radioDecorationCustom" name="decoration" value="custom"><b>Custom</b>
+
+				<!-- NONE DECORATION SUBSECTION -->
+				<div id="noneDecorationSection" class="settingsSubBlock">
+				<p>No Decoration Selected</p>
+				</div>
+
+				<!-- PRESET DECORATION SUBSECTION -->
+				<div id="presetDecorationSection" class="settingsSubBlock">
+				<p>Preset Decorations</p>
+				</div>
+
+				<!-- USER DEFINED DECORATION SUBSECTION -->
+				<div id="userDefinedDecorationSection" class="settingsSubBlock" style="display: none;">
+					<span class="subTitle">User Defined Decorations</span><br>
+				</div>
+
+				<!-- CUSTOM DECORATION SUBSECTION -->
+				<div id="customDecorationSection" class="settingsSubBlock" style="display: none;">
+					<input type="checkbox" id="checkboxBorder" name="border" value="border"><b>Add Border</b>
+					<div id="borderSection">
+						<b>Border Width:</b><input type="number" id="borderWidth" value="0">
+						<b>Border Color</b><input type="color" id="borderColor" value="#000000">
+					</div>
+					
+				</div>
+			</div>
+			<div id="postSection" class="settingsBlock" style="display: none;">
+			<input type="button" value="Post Entry!" class="btn btn-primary" id="apply">
+			</div>
 		</div>
 	</div>
+</div>
+
+<div id="backpack" style="display:hidden;"">
+	
+</div>
+
 <br><br>
-<div class="center">
-	<input type="button" value="Post Entry!" class="submitButton" id="apply" style="display: none;">
-	<input type="button" value="Return to Challenge" class="submitButton" id="goToChallenge">
-	<input type="button" value="Go Back to Home Page" class="submitButton" id="goToHomePage">
+
 </div>
 	
 </div>
@@ -224,5 +235,6 @@
 <script src="/js/bootstrap.js"></script>
 <script src="/js/newentry.js"></script>
 <script src="/js/header.js"></script>
+<script src="/js/utils.js"></script>
 </body>
 </html>

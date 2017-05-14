@@ -3,6 +3,8 @@ $(document).ready(function(){
 
 	setupMainItem();
 
+	setupSteps();
+
 	// GLOBAL FOR ALL CHANGES
 	//$("#newentryimage").attr("src", "/challenges/images/" + challengeId);
 
@@ -13,13 +15,6 @@ $(document).ready(function(){
 	$("#goToChallenge").click(function() {
 		window.open("/challenge/" + challengeId, "_self");
 	});
-
-	$("#step1Next").click(showFilterStep);
-	$("#step2Previous").click(showLayoutStep);
-	$("#step2Next").click(showArtifactStep);
-	$("#step3Previous").click(showFilterStep);
-	$("#step3Next").click(showDecorationStep);
-	$("#step4Previous").click(showArtifactStep);
 
 	// LAYOUT SECTION --------------------------
 	$("input[type=radio][name=layout]").change(function () {
@@ -123,6 +118,203 @@ function setupMainItem() {
 	});
 }
 
+function setupSteps() {
+	setupLayoutStep();
+
+	setupFilterStep();
+
+	setupArtifactStep();
+
+	setupDecorationStep();
+
+	setupNavigation();
+}
+
+function setupLayoutStep() {
+	$("#layoutTypeSelection").on("change", function() {
+		console.log("selectino triggered, selected option = " + this.value);
+
+		if (this.value == "none") {
+			$("#noneLayoutSection").show();
+			$("#presetLayoutSection").hide();
+			$("#userDefinedLayoutSection").hide();
+			$("#customLayoutSection").hide();
+		} else if (this.value == "preset") {
+			$("#presetLayoutSection").show();
+			$("#noneLayoutSection").hide();
+			$("#userDefinedLayoutSection").hide();
+			$("#customLayoutSection").hide();
+		} else if (this.value == "userDefined") {
+			$("#userDefinedLayoutSection").show();
+			$("#noneLayoutSection").hide();
+			$("#presetLayoutSection").hide();
+			$("#customLayoutSection").hide();
+		} else if (this.value == "custom") {
+			$("#customLayoutSection").show();
+			$("#noneLayoutSection").hide();
+			$("#userDefinedLayoutSection").hide();
+			$("#presetLayoutSection").hide();
+		}
+	});
+}
+
+function setupNavigation() {
+	moveToStep("layout");
+
+	$("#prevButton").click(function() {
+		var currentStep = getCurrentStep();
+		if (currentStep == "filter") {
+			moveToStep("layout");
+		} else if (currentStep == "artifact") {
+			moveToStep("filter");
+		} else if (currentStep == "decoration") {
+			moveToStep("artifact");
+		} else if (currentStep == "post") {
+			moveToStep("decoration");
+		}
+	});
+
+	$("#nextButton").click(function() {
+		var currentStep = getCurrentStep();
+				console.log("next button clickedm currentStep is " + currentStep);
+
+		if (currentStep == "layout") {
+			moveToStep("filter");
+		} else if (currentStep == "filter") {
+			moveToStep("artifact");
+		} else if (currentStep == "artifact") {
+			moveToStep("decoration");
+		} else if (currentStep == "decoration") {
+			moveToStep("post");
+		}
+	});
+}
+
+function moveToStep(stepName) {
+	console.log("moveToStep, stepName is " + stepName);
+	if (stepName == "layout") {
+		$("#layoutSection").show();
+		$("#filterSection").hide();
+		$("#artifactSection").hide();
+		$("#decorationSection").hide();
+		$("#postSection").hide();
+		$("#nextButton").show();
+		$("#prevButton").hide();
+	} else if (stepName == "filter") {
+		$("#layoutSection").hide();
+		$("#filterSection").show();
+		$("#artifactSection").hide();
+		$("#decorationSection").hide();
+		$("#postSection").hide();
+		$("#nextButton").show();
+		$("#prevButton").show();
+	} else if (stepName == "artifact") {
+		console.log("moving to artifact");
+		$("#layoutSection").hide();
+		$("#filterSection").hide();
+		$("#artifactSection").show();
+		$("#decorationSection").hide();
+		$("#postSection").hide();
+		$("#nextButton").show();
+		$("#prevButton").show();
+	} else if (stepName == "decoration") {
+		$("#layoutSection").hide();
+		$("#filterSection").hide();
+		$("#artifactSection").hide();
+		$("#decorationSection").show();
+		$("#postSection").hide();
+		$("#nextButton").show();
+		$("#prevButton").show();
+	} else if (stepName == "post") {
+		$("#layoutSection").hide();
+		$("#filterSection").hide();
+		$("#artifactSection").hide();
+		$("#decorationSection").hide();
+		$("#postSection").show();
+		$("#nextButton").hide();
+		$("#prevButton").show();
+	}
+}
+
+function setupFilterStep() {
+	$("#filterTypeSelection").on("change", function() {
+		console.log("selectino triggered, selected option = " + this.value);
+
+		if (this.value == "none") {
+			$("#noneFilterSection").show();
+			$("#presetFilterSection").hide();
+			$("#userDefinedFilterSection").hide();
+			$("#customFilterSection").hide();
+		} else if (this.value == "preset") {
+			$("#noneFilterSection").hide();
+			$("#presetFilterSection").show();
+			$("#userDefinedFilterSection").hide();
+			$("#customFilterSection").hide();
+
+			$.getJSON('/api/filters?type=filter' + "&filterType=preset", function(result) {
+				console.log("result is " + JSON.stringify(result));	
+				if (result.length > 0) {
+					var list = [];
+					for (var i = 0; i < result.length; i++) {
+						var f = result[i][0];
+						//var u = result[i][1];
+
+						var data = {};
+						data.id = f.id;
+						data.caption = f.name;
+						data.image = "/images/static/progress.gif";
+			
+						data.socialStatus = {};
+						data.socialStatus.numLikes = 121;
+						data.socialStatus.numShares = 23;
+						data.socialStatus.numComments = 45;
+
+						data.link = "/filter/" + f.id;
+
+						var jsonObj = {};
+						constructJSONObject(jsonObj);
+						jsonObj.steps.filters[0].type = "preset";
+						jsonObj.steps.filters[0].preset = f.id;
+						console.log("jsonObj to be sent is " + JSON.stringify(jsonObj));
+						generateChanges(f.id, jsonObj, function(id, imgPath) {
+							$("#" + id + " img").prop("src", imgPath);
+						});
+
+						list.push(data);
+					}
+
+					$("#presetFilters").remove();
+					var grid = createGrid("presetFilters", list, 3, true, true, function(id) {
+						console.log("clicked on item with id = " + id);
+						$("#presetFilterSection").data("selectedFilterID", id);
+						applyChanges();
+					});
+					$("#presetFilterSection").append(grid);
+					console.log("finished appending the grid to the page");
+				}
+			});
+		} else if (this.value == "userDefined") {
+			$("#noneFilterSection").hide();
+			$("#presetFilterSection").hide();
+			$("#userDefinedFilterSection").show();
+			$("#customFilterSection").hide();
+		} else if (this.value == "custom") {
+			$("#noneFilterSection").hide();
+			$("#presetFilterSection").hide();
+			$("#userDefinedFilterSection").hide();
+			$("#customFilterSection").show();
+		}
+	});
+}
+
+function setupArtifactStep() {
+
+}
+
+function setupDecorationStep() {
+
+}
+
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 	for (var i = 0; i < listOfValuesAndSectionIds.length; i++) {
 		console.log("i = " + i + ", valueToMatch = " + valueToMatch + ", value = " + listOfValuesAndSectionIds[i].value + ", id = " + listOfValuesAndSectionIds[i].id);
@@ -152,39 +344,8 @@ function setChangeCallback(callback, listOfIds) {
 	}
 }
 
-function showFilterStep() {
-	$("#layoutSection").hide();
-	$("#filterSection").show();
-	$("#artifactSection").hide();
-	$("#decorationSection").hide();
-	$("#apply").hide();
-}
-
-function showLayoutStep() {
-	$("#layoutSection").show();
-	$("#filterSection").hide();
-	$("#artifactSection").hide();
-	$("#decorationSection").hide();
-	$("#apply").hide();
-}
-
-function showArtifactStep() {
-	$("#layoutSection").hide();
-	$("#filterSection").hide();
-	$("#artifactSection").show();
-	$("#decorationSection").hide();
-	$("#apply").hide();
-}
-
-function showDecorationStep() {
-	$("#layoutSection").hide();
-	$("#filterSection").hide();
-	$("#artifactSection").hide();
-	$("#decorationSection").show();
-	$("#apply").show();
-}
-
 function constructJSONObject(jsonObj) {
+	console.log("constructJSONObject called");
 	jsonObj.imageSource = "challengeId"; // Can be "url" | "challenge" | "blob"
 										// url is path to any web url
 										// challengeId is the challengeId
@@ -200,13 +361,13 @@ function constructJSONObject(jsonObj) {
 
 	var layout = {};
 
-	if ($("#radioLayoutNone").prop("checked")) {
+	if ($("#layoutTypeSelection").val() == "none") {
 		layout.type = "none";
-	} else if ($("#radioLayoutPreset").prop("checked")) {
+	} else if ($("#layoutTypeSelection").val() == "preset") {
 		layout.type = "preset";
-	} else if ($("#radioLayoutUserDefined").prop("checked")) {
+	} else if ($("#layoutTypeSelection").val() == "userDefined") {
 		layout.type = "user_defined";
-	} else if ($("#radioLayoutCustom").prop("checked")) {
+	} else if ($("#layoutTypeSelection").val() == "custom") {
 		layout.type = "custom";
 		
 		if ($("#checkboxFlip").prop("checked")) {
@@ -214,6 +375,7 @@ function constructJSONObject(jsonObj) {
 				layout.mirror = "flop";
 			} else if ($("#radioFlipVertically").prop("checked")) {
 				layout.mirror = "flip";
+				console.log("setting layout.mirror to flip");
 			}
 		}
 
@@ -245,16 +407,19 @@ function constructJSONObject(jsonObj) {
 
 	var filter = {};
 
-	if ($("#radioNone").prop("checked")) { // NO FILTER
+	if ($("#filterTypeSelection").val() == "none") { // NO FILTER
 		filter.type = "none";
-	} else if ($("#radioPreset").prop("checked")) { // PRESET FILTER
+	} else if ($("#filterTypeSelection").val() == "preset") { // PRESET FILTER
 		filter.type = "preset";
 
-		filter.preset = $("input[name=preset]:checked").val();
-	} else if ($("#radioUserDefined").prop("checked")) { // USER DEFINED FILTER
+		filter.preset = $("#presetFilterSection").data("selectedFilterID");
+		if (jQuery.hasData($("#presetFilterSection"))) {
+			filter.preset = $("#presetFilterSection").data("selectedFilterID");
+		}
+	} else if ($("#filterTypeSelection").val() == "userDefined") { // USER DEFINED FILTER
 		filter.type = "user_defined";
 		filter.user_defined = "some_unique_name";
-	} else if ($("#radioCustom").prop("checked")) { // CUSTOM FILTER
+	} else if ($("#filterTypeSelection").val() == "custom") { // CUSTOM FILTER
 		filter.type = "custom";
 
 		// ADD EFFECTS
@@ -377,6 +542,23 @@ function constructJSONObject(jsonObj) {
 	jsonObj.steps.decorations.push(decoration);
 }
 
+function generateChanges(id, jsonObj, done) {
+	$.ajax({
+		type: "POST",
+		url: "/api/filters/apply",
+		dataType: "json",
+		contentType: "application/json; charset=UTF-8",
+		data: JSON.stringify(jsonObj),
+		success: function(jsonData) {
+			console.log("response from server, jsonData length is " + JSON.stringify(jsonData).length);
+			done(id, "data:image/jpeg;base64," + jsonData.imageData);
+		},
+		error: function(jsonData) {
+			alert("some error was found, " + jsonData.error);
+		}
+	});
+}
+
 function applyChanges() {
 	//alert("applyChanges called");
 	var jsonObj = {};
@@ -436,6 +618,20 @@ function postEntry() {
 		}
 	});
 
+}
+
+function getCurrentStep() {
+	if ($("#layoutSection").is(":visible")) {
+		return "layout";
+	} else if ($("#filterSection").is(":visible")) {
+		return "filter";
+	} else if ($("#artifactSection").is(":visible")) {
+		return "artifact";
+	} else if ($("#decorationSection").is(":visible")) {
+		return "decoration";
+	} else if ($("#postSection").is(":visible")) {
+		return "post";
+	}
 }
 
 function parseEntry(entry) {

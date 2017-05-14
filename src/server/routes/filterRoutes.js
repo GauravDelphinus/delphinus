@@ -8,9 +8,31 @@ var routes = function(db) {
 	var filterRouter = express.Router();
 	var imageProcessor = require("../imageProcessor");
 
+	filterRouter.route("/")
+	.get(function(req, res) {
+		if (req.query.type == "filter" && req.query.filterType == "preset") {
+			var output = [];
+			/*
+		"rainyDay" : 1,
+		"glassWall" : 2,
+		"nightingale" : 3,
+		"whirlpool" : 4,
+		"comical" : 5 */
+			var f = {id: 1, name: "Rain Day"};
+			output.push([{id: 1, name: "Rainy Day"}]);
+			output.push([{id: 2, name: "Glass Wall"}]);
+			output.push([{id: 3, name: "Nightingale"}]);
+			output.push([{id: 4, name: "Whirlpool"}]);
+			output.push([{id: 5, name: "Comical"}]);
+
+			console.log("for /api/filters returning to client: " + JSON.stringify(output));
+			res.json(output);
+		}
+	});
+
 	filterRouter.route("/apply") // /api/filters/apply ROUTE
 	.post(function(req, res){
-		//console.log("received post, body is = " + req.body.filters);
+		console.log("/api/filters/apply received post, body is = " + JSON.stringify(req.body));
 
 		var sourceImagePath;
 		var purgeImageAfterUse = false;
@@ -26,30 +48,6 @@ var routes = function(db) {
 
 				sourceImagePath = global.appRoot + config.path.challengeImages + image;
 
-				/*
-				/// TODO - add "normalization" code for the json obj filters
-				var filtersFromClient = req.body.filters;
-	    		var filters = [];
-
-	    		// Now construct the filters array in the JSON format
-	    		for (var i = 0; i < filtersFromClient.length; i++) {
-	    			var filterFromClient = filtersFromClient[i];
-	    			var filter = {};
-
-	    			filter.type = filterFromClient.type;
-	    			
-	    			if (filterFromClient.settings) {
-	    				filter.settings = filterFromClient.settings;
-	    			} 
-
-	    			if (filterFromClient.effects) {
-	    				filter.effects = filterFromClient.effects;
-	    			}
-	    			
-	    			filters.push(filter);
-	    		}
-	    		*/
-
 	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
 	    			imageProcessor.applyStepsToImage(sourceImagePath, steps, function(err, imagePath){
 						if (err) throw err;
@@ -59,6 +57,7 @@ var routes = function(db) {
 						var imageBase64 = new Buffer(imageBlob).toString('base64');
 						var jsonObj = {"imageData" : imageBase64};
 						res.setHeader('Content-Type', 'application/json');
+						//console.log("sending response to /api/filters/apply, jsonObj is " + JSON.stringify(jsonObj));
 						res.send(JSON.stringify(jsonObj));
 
 						//dispose off the temp file

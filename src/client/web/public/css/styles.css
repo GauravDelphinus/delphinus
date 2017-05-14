@@ -130,6 +130,11 @@
 
 .clear { clear:  both; }
 
+.mainElement {
+	width: 70%;
+	margin: 0 auto;
+}
+
 .postedBySection {
 	width: 90%;
 	position: relative;
@@ -233,6 +238,23 @@
 	border-width: 0.5px;
 	margin: 20px;
 	padding: 10px;
+}
+
+.thumbnailElement {
+	border-radius: 5px;
+	border-color: black;
+	border-style: dotted;
+	border-width: 0.5px;
+	margin: 10px;
+	padding: 5px;
+}
+
+.elementHover:hover {
+	background-color: #F5CBA7;
+}
+
+.elementSelected {
+	background-color: #F5CBA7;
 }
 /*************  Glyicon Sizes   *******************/
 
@@ -493,4 +515,43 @@ hr.small {
 .twitter {
     background: #55acee;
     color: #ffffff;
+}
+
+/****************** New Entry ***********************/
+
+.stepSection {
+	width: 70%;
+	margin: 0 auto;
+	border-radius: 5px;
+	border-style: dotted;
+	border-width: 0.5px;
+	background-color: #FDF2E9;
+}
+
+.stepHeader {
+	overflow: auto;
+	padding: 5px;
+}
+
+.stepTitle {
+	float: left;
+	font-family: serif;
+	font-size: 2em;
+	font-weight: bold;
+}
+
+.stepContent {
+	padding: 10px;
+}
+
+.stepNavigation {
+	float: right;
+}
+
+/* Changing the look and feel of the select element to match bootstrap - see http://stackoverflow.com/questions/1895476/how-to-style-a-select-dropdown-with-css-only-without-javascript */
+select {
+   -webkit-appearance: none; 
+   -moz-appearance: none;
+   appearance: none;       /* remove default arrow */
+   background-image: url(...);   /* add custom arrow */
 }

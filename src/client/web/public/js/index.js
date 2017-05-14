@@ -65,7 +65,7 @@ function setupEntriesTab() {
 			console.log("e = " + JSON.stringify(e));
 			console.log("u = " + JSON.stringify(u));
 			var data = {};
-			data.image = "/entries/images/" + e._id;
+			data.image = "/entries/images/" + e.id;
 			data.postedDate = new Date(parseInt(e.created));
 			data.postedByUser = {};
 			data.postedByUser.id = u.id;

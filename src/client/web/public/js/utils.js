@@ -202,4 +202,60 @@ function createScrollableElement(data) {
 	return element;
 }
 
+function createThumbnailElement(data) {
+	var element = $("<div>", {class: "thumbnailElement"});
+
+	if (data.postedDate) {
+		element.append(createPostedBySectionElement(data));
+	}
+	
+	element.append(createImageElement(data));
+
+	if (data.caption) {
+		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
+		element.append(link);
+	}
+
+	element.append(createSocialStatusSectionElement(data));
+
+	return element;
+}
+
+function createGrid(id, list, numCols, allowHover, allowSelection, selectionCallback) {
+	var table = $("<table>", {id: id, class: "gridTable"});
+
+	for (var i = 0; i < list.length; i++) {
+		var col = i % numCols;
+		var tr;
+		//var row = i / numCols;
+
+		var data = list[i];
+
+		var td = $("<td>", {id: data.id});
+		var element = createThumbnailElement(data);
+
+		if (allowHover) {
+			element.addClass("elementHover");
+		}
+
+		if (allowSelection) {
+			element.click({id: data.id, element: element}, function(e) {
+				$("#" + id + " .thumbnailElement").removeClass("elementSelected"); //unselect all first
+				e.data.element.addClass("elementSelected"); //now make the selection
+				selectionCallback(e.data.id);
+			});
+		}
+
+		td.append(element);
+		
+		if (col == 0) {
+			tr = $("<tr>");
+			table.append(tr);
+		}
+		tr.append(td);
+	}
+
+	return table;
+}
+
 

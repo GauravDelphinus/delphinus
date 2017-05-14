@@ -38,46 +38,56 @@ function setupTabs() {
 	var tabGroup = createNewTabGroup("mainTabGroup");
 	$("body").append(tabGroup);
 
-	setupMyEntryTab();
+	setupMyEntriesTab();
 
 	setupEntriesTab();
 
 	setupCommentsTab();
 }
 
-function setupMyEntryTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "myentry", "My Entry");
+function setupMyEntriesTab() {
+	var tabDiv = appendNewTab("mainTabGroup", "myentries", "My Entries");
+	var h3 = $("<h3>").text("Add a new Entry");
+	tabDiv.append(h3);
+
+	var postEntryButton = $("<button>", {id: "postEntryButton", class: "btn btn-primary btn-lg", text: "Post Entry"});
+	tabDiv.append(postEntryButton);
+
+	$("#postEntryButton").click(function () {
+		window.open("/challenge/" + challengeId + "/newentry", "_self");
+	});
 
 	if (user) {
-		$.getJSON('/api/entries/?challengeId=' + challengeId + "&user=" + user.id, function(entries) {
-			if (entries.length > 0) {
-				var h3 = $("<h3>").text("My Entry");
-				tabDiv.append(h3);
-			} else {
-				var h3 = $("<h3>").text("Add an Entry");
-				tabDiv.append(h3);
+		$.getJSON('/api/entries/?challengeId=' + challengeId + "&user=" + user.id, function(result) {
+			for (var i = 0; i < result.length; i++) {
+				//console.log("result " + i + " is " + JSON.stringify(result[i]));
+				var e = result[i][0];
+				var u = result[i][1];
+				//console.log("e = " + JSON.stringify(e));
+				//console.log("u = " + JSON.stringify(u));
+				var data = {};
+				data.image = "/entries/images/" + e.id;
+				data.postedDate = new Date(parseInt(e.created));
+				data.postedByUser = {};
+				data.postedByUser.id = u.id;
+				data.postedByUser.displayName = u.displayName;
+				data.postedByUser.image = u.image;
+				data.link = "/entry/" + e.id;
 
-				var postEntryButton = $("<button>", {id: "postEntryButton", class: "btn btn-primary btn-lg", text: "Post Entry"});
-				tabDiv.append(postEntryButton);
+				data.socialStatus = {};
+				data.socialStatus.numLikes = 121;
+				data.socialStatus.numShares = 23;
+				data.socialStatus.numComments = 45;
 
-				$("#postEntryButton").click(function () {
-					window.open("/challenge/" + challengeId + "/newentry", "_self");
-				});
+				if (e.caption) {
+					data.caption = e.caption;
+				}
+
+				var scrollableElement = createScrollableElement(data);
+				tabDiv.append(scrollableElement);
 			}
 		});
-	} else {
-		var h3 = $("<h3>").text("Add an Entry");
-		tabDiv.append(h3);
-
-		var postEntryButton = $("<button>", {id: "postEntryButton", class: "btn btn-primary btn-lg", text: "Post Entry"});
-		tabDiv.append(postEntryButton);
-
-		$("#postEntryButton").click(function () {
-			window.open("/challenge/" + challengeId + "/newentry", "_self");
-		});
 	}
-
-
 }
 
 function setupEntriesTab() {
@@ -85,7 +95,7 @@ function setupEntriesTab() {
 	var h3 = $("<h3>").text("Entries");
 	tabDiv.append(h3);
 
-	$.getJSON('/api/entries/?challengeId=' + challengeId, function(result) {
+	$.getJSON('/api/entries/?challengeId=' + challengeId + (user? "&excludeUser=" + user.id : ""), function(result) {
 
 		for (var i = 0; i < result.length; i++) {
 			//console.log("result " + i + " is " + JSON.stringify(result[i]));
@@ -114,31 +124,6 @@ function setupEntriesTab() {
 			var scrollableElement = createScrollableElement(data);
 			tabDiv.append(scrollableElement);
 		}
-		
-		/*
-		var numCols = 5; // max columns
-
-		var entriesTable = $("<table>", {id: "entriesTable", class: "gridTable"});
-		tabDiv.append(entriesTable);
-
-		for (var i = 0; i < entries.length; i++) {
-			var col = i % numCols;
-			//var row = i / numCols;
-
-			var entry = entries[i];
-
-			var td = $("<td>").append($("<img>").attr("src", "/entries/images/" + entry._id).attr("width", "100"));
-			td.append($("<br>"));
-			td.append($("<a>").attr("href", "/entry/" + entry._id).text("Entry " + entry._id));
-			
-			if (col == 0) {
-				tr = $("<tr>").append(td);
-				$("#entriesTable").append(tr);
-			} else {
-				tr.append(td);
-			}
-		}
-		*/
 	});
 }
 

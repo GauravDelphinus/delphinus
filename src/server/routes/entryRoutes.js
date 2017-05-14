@@ -30,9 +30,12 @@ var routes = function(db) {
 
 			var cypherQuery;
 
+			console.log("/api/entries, query is " + JSON.stringify(req.query));
 			// In case a challenge is mentioned, extract all entries linked to that challenge
 			if (req.query.challengeId && req.query.user) {
 				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}) RETURN e, u;"
+			} else if (req.query.challengeId && req.query.excludeUser) {
+				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) WHERE NOT ('" + req.query.excludeUser + "' IN u.id) RETURN e, u;"
 			} else if (req.query.challengeId) {
 				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) RETURN e, u;"
 			} else if (req.query.user) {
@@ -42,11 +45,11 @@ var routes = function(db) {
 			}
 			
 
-			//console.log("Running cypherQuery: " + cypherQuery);
+			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			//console.log(result.data); // delivers an array of query results
+    			console.log("result is " + JSON.stringify(result.data)); // delivers an array of query results
     			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data);
