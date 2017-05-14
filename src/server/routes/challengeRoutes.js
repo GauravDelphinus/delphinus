@@ -36,7 +36,7 @@ var routes = function(db) {
 				cypherQuery += "-[r:POSTED_BY]->(u:User) ";
 			}
 
-			cypherQuery += " RETURN c, u;";
+			cypherQuery += " RETURN c, u ORDER BY c.created DESC;";
 
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){

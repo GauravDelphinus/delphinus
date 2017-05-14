@@ -33,18 +33,18 @@ var routes = function(db) {
 			console.log("/api/entries, query is " + JSON.stringify(req.query));
 			// In case a challenge is mentioned, extract all entries linked to that challenge
 			if (req.query.challengeId && req.query.user) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}) RETURN e, u;"
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}) "
 			} else if (req.query.challengeId && req.query.excludeUser) {
-				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) WHERE NOT ('" + req.query.excludeUser + "' IN u.id) RETURN e, u;"
+				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) WHERE NOT ('" + req.query.excludeUser + "' IN u.id) "
 			} else if (req.query.challengeId) {
-				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) RETURN e, u;"
+				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) "
 			} else if (req.query.user) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) RETURN e, u;";
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) ";
 			} else {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) RETURN e, u;";
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) ";
 			}
 			
-
+			cypherQuery += " RETURN e,u ORDER BY e.created DESC;";
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
