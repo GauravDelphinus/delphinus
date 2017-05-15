@@ -44,7 +44,18 @@ var routes = function(db) {
 				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) ";
 			}
 			
-			cypherQuery += " RETURN e,u ORDER BY e.created DESC;";
+			cypherQuery += " RETURN e,u ";
+			
+			if (req.query.sortBy) {
+				if (req.query.sortBy == "popularity") {
+					cypherQuery += " ;";
+				} else if (req.query.sortBy == "date") {
+					cypherQuery += " ORDER BY e.created DESC;";
+				}
+			} else {
+				cypherQuery += " ORDER BY e.created DESC;";
+			}
+		
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;

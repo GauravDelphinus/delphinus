@@ -31,12 +31,21 @@ var routes = function(db) {
 
 			// Filter by user who posted the challenge
 			if (req.query.user) {
-				cypherQuery += "-[r:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) ";
+				cypherQuery += "-[r:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) RETURN c, u ";
 			} else {
-				cypherQuery += "-[r:POSTED_BY]->(u:User) ";
+				cypherQuery += "-[r:POSTED_BY]->(u:User) RETURN c, u ";
 			}
 
-			cypherQuery += " RETURN c, u ORDER BY c.created DESC;";
+			if (req.query.sortBy) {
+				if (req.query.sortBy == "popularity") {
+					cypherQuery += " ;";
+				} else if (req.query.sortBy == "date") {
+					cypherQuery += " ORDER BY c.created DESC;";
+				}
+			} else {
+				cypherQuery += " ORDER BY c.created DESC;";
+			}
+			
 
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){

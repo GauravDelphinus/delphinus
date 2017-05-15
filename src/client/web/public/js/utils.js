@@ -258,4 +258,235 @@ function createGrid(id, list, numCols, allowHover, allowSelection, selectionCall
 	return table;
 }
 
+function createScrollableList(id, list) {
+	var container = $("<div>", {id: id, class: "scrollabeList"});
 
+	for (var i = 0; i < list.length; i++) {
+		var data = list[i];
+
+		var scrollableElement = createScrollableElement(data);
+		container.append(scrollableElement);
+	}
+
+	return container;
+}
+
+/**
+	Create and append a content container with the content.
+	appendTo: parent element to which to append this container.  The reason we pass this is so we can append
+	the content in the parent early and allow for jquery lookups for child elements (such as buttons when setting up click event handlers)
+	contentTag: a page-unique string identifier to identify this particular content.  This is prepended to relevant id names
+	viewData: the data that is used to determine the viewing order, and the defaults
+	{
+		defaultViewingMode: "thumbnail" | "filmstrip"
+		showThumbnailView: true,
+		showFilmStripView: true
+	},
+	sortData: the data that is used to determine the sorting order and the urls to be used, as well as the default sort order
+	{
+		defaultSortOrder: "date" | 'popularity'
+		getURLDateSort: "get url for sorting by date",
+		getURLPopularitySort: "get url for sorting by popularity"
+	}
+**/
+function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sortOptions) {
+
+	/** 
+		both viewOptions and sortOptions must contain at least one item each.
+	**/
+	if (!viewOptions || viewOptions.length == 0 || !sortOptions || sortOptions.length == 0) {
+		return;
+	}
+
+	var container = $("<div>", {id: contentTag + "Container"});
+	appendTo.append(container);
+
+	if (viewOptions && viewOptions.length > 1) {
+		var viewGroup = $("<div>", {id: contentTag + "ViewGroup", class: "btn-group", "data-toggle": "buttons"});
+		for (var i = 0; i < viewOptions.length; i++) {
+			var viewOption = viewOptions[i];
+			if (viewOption.type == "thumbnail") {
+				viewGroup.append($("<button>", {id: "thumbnailViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-th"})).append(" Thumbnail View"));
+			} else if (viewOption.type == "filmstrip") {
+				viewGroup.append($("<button>", {id: "scrollableViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-film"})).append(" Filmstrip View"));
+			}
+		}
+		container.append(viewGroup);
+	}
+
+	if (sortOptions && sortOptions.length > 1) {
+		var sortGroup = $("<div>", {id: contentTag + "SortGroup", class: "btn-group pull-right"});
+		for (var i = 0; i < sortOptions.length; i++) {
+			var sortOption = sortOptions[i];
+			if (sortOption.type == "date") {
+				sortGroup.append($("<button>", {id: "postedDateSortButton", type: "button", class: "btn btn-default", "data-getURL": sortOption.url}).append($("<span>", {class: "glyphicon glyphicon glyphicon-time"})).append(" Sort by Date"));
+			} else if (sortOption.type == "popularity") {
+				sortGroup.append($("<button>", {id: "popularitySortButton", type: "button", class: "btn btn-default", "data-getURL": sortOption.url}).append($("<span>", {class: "glyphicon glyphicon glyphicon-thumbs-up"})).append(" Sort by Popularity"));
+			}
+		}
+		container.append(sortGroup);
+	}
+
+	var getURL = sortOptions[0].url;
+
+	/*
+	$.getJSON(getURL, function(result) {
+		var list = [];
+		for (var i = 0; i < result.length; i++) {
+			var c = result[i][0];
+			var u = result[i][1];
+
+			var data = {};
+			data.image = c.image;
+			data.postedDate = new Date(parseInt(c.created));
+			data.postedByUser = {};
+			data.postedByUser.id = u.id;
+			data.postedByUser.displayName = u.displayName;
+			data.postedByUser.image = u.image;
+
+			data.socialStatus = {};
+			data.socialStatus.numLikes = 121;
+			data.socialStatus.numShares = 23;
+			data.socialStatus.numComments = 45;
+
+			data.link = "/challenge/" + c.id;
+
+			list.push(data);
+		}
+
+		jQuery.data(document.body, contentTag + "List", list);
+
+		if (viewOptions[0].type == "thumbnail") {
+			var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+			container.append(grid);
+		} else if (viewOptions[0].type == "filmstrip") {
+			var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+			container.append(scrollableList);
+		}
+		
+	});
+	*/
+
+	refreshListAndUpdateContent(getURL, contentTag);
+
+	$("#" + contentTag + "ViewGroup button").click(function() {
+		$("#" + contentTag + "ScrollableList").remove();
+		$("#" + contentTag + "GridTable").remove();
+
+		var buttonID = this.id;
+
+		var list = jQuery.data(document.body, contentTag + "List");
+		
+		if (buttonID == "thumbnailViewButton") {
+			var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+			container.append(grid);
+		} else if (buttonID == "scrollableViewButton") {
+			var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+			container.append(scrollableList);
+		}
+
+		//toggle state, and reset all other buttons to not active
+		$(this).toggleClass('active')
+			.siblings().not(this).removeClass('active');
+	});
+
+	$("#" + contentTag + "SortGroup button").click(function() {
+		var buttonID = this.id;
+		var getURL;
+		for (var i = 0; i < sortOptions.length; i++) {
+			if (sortOptions[i].type == "date" && buttonID == "postedDateSortButton") {
+				getURL = sortOptions[i].url;
+			} else if (sortOptions[i].type == "popularity" && buttonID == "popularitySortButton") {
+				getURL = sortOptions[i].url;
+			}
+		}
+
+		/*
+		$.getJSON(getURL, function(result) {
+			console.log("result from getJSON is " + JSON.stringify(result));
+			var list = [];
+			for (var i = 0; i < result.length; i++) {
+				var c = result[i][0];
+				var u = result[i][1];
+
+				var data = {};
+				data.image = c.image;
+				data.postedDate = new Date(parseInt(c.created));
+				data.postedByUser = {};
+				data.postedByUser.id = u.id;
+				data.postedByUser.displayName = u.displayName;
+				data.postedByUser.image = u.image;
+
+				data.socialStatus = {};
+				data.socialStatus.numLikes = 121;
+				data.socialStatus.numShares = 23;
+				data.socialStatus.numComments = 45;
+
+				data.link = "/challenge/" + c.id;
+
+				list.push(data);
+			}
+
+			jQuery.data(document.body, contentTag + "List", list);
+
+			var viewOptionsButtonID = $("#" + contentTag + "ViewGroup button.active").attr("id");
+
+			$("#" + contentTag + "ScrollableList").remove();
+			$("#" + contentTag + "GridTable").remove();
+			if (viewOptionsButtonID == "thumbnailViewButton") {
+				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+				$("#" + contentTag + "Container").append(grid);
+			} else if (viewOptionsButtonID == "scrollableViewButton") {
+				var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+				$("#" + contentTag + "Container").append(scrollableList);
+			}
+		});
+		*/
+
+		refreshListAndUpdateContent(getURL, contentTag);
+	});
+
+	return container;
+}
+
+function refreshListAndUpdateContent(getURL, contentTag) {
+	$.getJSON(getURL, function(result) {
+		console.log("result from getJSON is " + JSON.stringify(result));
+		var list = [];
+		for (var i = 0; i < result.length; i++) {
+			var c = result[i][0];
+			var u = result[i][1];
+
+			var data = {};
+			data.image = c.image;
+			data.postedDate = new Date(parseInt(c.created));
+			data.postedByUser = {};
+			data.postedByUser.id = u.id;
+			data.postedByUser.displayName = u.displayName;
+			data.postedByUser.image = u.image;
+
+			data.socialStatus = {};
+			data.socialStatus.numLikes = 121;
+			data.socialStatus.numShares = 23;
+			data.socialStatus.numComments = 45;
+
+			data.link = "/challenge/" + c.id;
+
+			list.push(data);
+		}
+
+		jQuery.data(document.body, contentTag + "List", list);
+
+		var viewOptionsButtonID = $("#" + contentTag + "ViewGroup button.active").attr("id");
+
+		$("#" + contentTag + "ScrollableList").remove();
+		$("#" + contentTag + "GridTable").remove();
+		if (viewOptionsButtonID == "thumbnailViewButton") {
+			var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+			$("#" + contentTag + "Container").append(grid);
+		} else if (viewOptionsButtonID == "scrollableViewButton") {
+			var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+			$("#" + contentTag + "Container").append(scrollableList);
+		}
+	});
+}

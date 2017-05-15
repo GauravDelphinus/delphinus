@@ -194,6 +194,10 @@
 	overflow: auto;
 }
 
+.forceOverflow {
+	overflow: auto;
+}
+
 .socialActionSection {
 	width: 90%;
 	margin: 0 auto;
