@@ -2,6 +2,7 @@ var express = require("express");
 var async = require("async");
 var dataUtils = require("../dataUtils");
 var shortid = require("shortid");
+var config = require("../config");
 
 var routes = function(db) {
 
@@ -48,13 +49,17 @@ var routes = function(db) {
 			
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "popularity") {
-					cypherQuery += " ;";
+					cypherQuery += " ";
 				} else if (req.query.sortBy == "date") {
-					cypherQuery += " ORDER BY e.created DESC;";
+					cypherQuery += " ORDER BY e.created DESC";
 				}
-			} else {
-				cypherQuery += " ORDER BY e.created DESC;";
 			}
+
+			if (req.query.count) {
+				cypherQuery += " LIMIT " + req.query.count;
+			}
+
+			cypherQuery += " ;";
 		
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -63,7 +68,32 @@ var routes = function(db) {
     			console.log("result is " + JSON.stringify(result.data)); // delivers an array of query results
     			//console.log(result.columns); // delivers an array of names of objects getting returned
 
-    			res.json(result.data);
+    			var output = [];
+    			for (var i = 0; i < result.data.length; i++) {
+    				var e = result.data[i][0];
+    				var u = result.data[i][1];
+
+    				var data = {};
+    				data.image = config.url.entryImages + e.id;
+					data.postedDate = e.created;
+					data.postedByUser = {};
+					data.postedByUser.id = u.id;
+					data.postedByUser.displayName = u.displayName;
+					data.postedByUser.image = u.image;
+
+					data.socialStatus = {};
+					data.socialStatus.numLikes = 121;
+					data.socialStatus.numShares = 23;
+					data.socialStatus.numComments = 45;
+
+					data.caption = e.caption;
+
+					data.link = config.url.entry + e.id;
+
+					output.push(data);
+    			}
+
+    			res.json(output);
 			});
 		})
 

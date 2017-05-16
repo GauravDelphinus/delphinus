@@ -92,6 +92,10 @@ function setupMyEntriesTab() {
 
 function setupEntriesTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
+	createAndAppendContentContainer(tabDiv, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=date" + (user? "&excludeUser=" + user.id : "")}, {type: "popularity", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=popularity" + (user? "&excludeUser=" + user.id : "")}]);
+
+	/*
+	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
 	var h3 = $("<h3>").text("Entries");
 	tabDiv.append(h3);
 
@@ -125,6 +129,8 @@ function setupEntriesTab() {
 			tabDiv.append(scrollableElement);
 		}
 	});
+
+	*/
 }
 
 function setupCommentsTab() {

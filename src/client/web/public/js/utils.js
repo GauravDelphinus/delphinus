@@ -56,7 +56,9 @@ function extractImage(files, callback) {
     }
 }
 
-function formatDate(date) {
+function formatDate(input) {
+	var date = new Date(parseInt(input));
+
 	var dayList = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 	var monthList = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
@@ -209,7 +211,8 @@ function createThumbnailElement(data) {
 		element.append(createPostedBySectionElement(data));
 	}
 	
-	element.append(createImageElement(data));
+	var imageLink = $("<a>", {href: data.link}).append(createImageElement(data));
+	element.append(imageLink);
 
 	if (data.caption) {
 		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
@@ -301,6 +304,8 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 	var container = $("<div>", {id: contentTag + "Container"});
 	appendTo.append(container);
 
+	console.log("viewOptions is " + JSON.stringify(viewOptions));
+
 	if (viewOptions && viewOptions.length > 1) {
 		var viewGroup = $("<div>", {id: contentTag + "ViewGroup", class: "btn-group", "data-toggle": "buttons"});
 		for (var i = 0; i < viewOptions.length; i++) {
@@ -329,45 +334,7 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 
 	var getURL = sortOptions[0].url;
 
-	/*
-	$.getJSON(getURL, function(result) {
-		var list = [];
-		for (var i = 0; i < result.length; i++) {
-			var c = result[i][0];
-			var u = result[i][1];
-
-			var data = {};
-			data.image = c.image;
-			data.postedDate = new Date(parseInt(c.created));
-			data.postedByUser = {};
-			data.postedByUser.id = u.id;
-			data.postedByUser.displayName = u.displayName;
-			data.postedByUser.image = u.image;
-
-			data.socialStatus = {};
-			data.socialStatus.numLikes = 121;
-			data.socialStatus.numShares = 23;
-			data.socialStatus.numComments = 45;
-
-			data.link = "/challenge/" + c.id;
-
-			list.push(data);
-		}
-
-		jQuery.data(document.body, contentTag + "List", list);
-
-		if (viewOptions[0].type == "thumbnail") {
-			var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
-			container.append(grid);
-		} else if (viewOptions[0].type == "filmstrip") {
-			var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
-			container.append(scrollableList);
-		}
-		
-	});
-	*/
-
-	refreshListAndUpdateContent(getURL, contentTag);
+	refreshListAndUpdateContent(getURL, contentTag, viewOptions[0].type);
 
 	$("#" + contentTag + "ViewGroup button").click(function() {
 		$("#" + contentTag + "ScrollableList").remove();
@@ -401,38 +368,25 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 			}
 		}
 
-		/*
-		$.getJSON(getURL, function(result) {
-			console.log("result from getJSON is " + JSON.stringify(result));
-			var list = [];
-			for (var i = 0; i < result.length; i++) {
-				var c = result[i][0];
-				var u = result[i][1];
+		refreshListAndUpdateContent(getURL, contentTag);
+	});
 
-				var data = {};
-				data.image = c.image;
-				data.postedDate = new Date(parseInt(c.created));
-				data.postedByUser = {};
-				data.postedByUser.id = u.id;
-				data.postedByUser.displayName = u.displayName;
-				data.postedByUser.image = u.image;
+	return container;
+}
 
-				data.socialStatus = {};
-				data.socialStatus.numLikes = 121;
-				data.socialStatus.numShares = 23;
-				data.socialStatus.numComments = 45;
+function refreshListAndUpdateContent(getURL, contentTag, defaultViewType) {
+	$.getJSON(getURL, function(list) {
+		console.log("result from getJSON is " + JSON.stringify(list));
 
-				data.link = "/challenge/" + c.id;
+		jQuery.data(document.body, contentTag + "List", list);
 
-				list.push(data);
-			}
+		$("#" + contentTag + "ScrollableList").remove();
+		$("#" + contentTag + "GridTable").remove();
 
-			jQuery.data(document.body, contentTag + "List", list);
+		//var  = $("#" + contentTag + "ViewGroup button.active");
 
+		if ($("#" + contentTag + "ViewGroup button.active").length) {
 			var viewOptionsButtonID = $("#" + contentTag + "ViewGroup button.active").attr("id");
-
-			$("#" + contentTag + "ScrollableList").remove();
-			$("#" + contentTag + "GridTable").remove();
 			if (viewOptionsButtonID == "thumbnailViewButton") {
 				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
 				$("#" + contentTag + "Container").append(grid);
@@ -440,53 +394,15 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 				var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
 				$("#" + contentTag + "Container").append(scrollableList);
 			}
-		});
-		*/
-
-		refreshListAndUpdateContent(getURL, contentTag);
-	});
-
-	return container;
-}
-
-function refreshListAndUpdateContent(getURL, contentTag) {
-	$.getJSON(getURL, function(result) {
-		console.log("result from getJSON is " + JSON.stringify(result));
-		var list = [];
-		for (var i = 0; i < result.length; i++) {
-			var c = result[i][0];
-			var u = result[i][1];
-
-			var data = {};
-			data.image = c.image;
-			data.postedDate = new Date(parseInt(c.created));
-			data.postedByUser = {};
-			data.postedByUser.id = u.id;
-			data.postedByUser.displayName = u.displayName;
-			data.postedByUser.image = u.image;
-
-			data.socialStatus = {};
-			data.socialStatus.numLikes = 121;
-			data.socialStatus.numShares = 23;
-			data.socialStatus.numComments = 45;
-
-			data.link = "/challenge/" + c.id;
-
-			list.push(data);
-		}
-
-		jQuery.data(document.body, contentTag + "List", list);
-
-		var viewOptionsButtonID = $("#" + contentTag + "ViewGroup button.active").attr("id");
-
-		$("#" + contentTag + "ScrollableList").remove();
-		$("#" + contentTag + "GridTable").remove();
-		if (viewOptionsButtonID == "thumbnailViewButton") {
-			var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
-			$("#" + contentTag + "Container").append(grid);
-		} else if (viewOptionsButtonID == "scrollableViewButton") {
-			var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
-			$("#" + contentTag + "Container").append(scrollableList);
+		} else {
+			console.log("view options button does not exist, defaultViewType is " + defaultViewType);
+			if (defaultViewType == "thumbnail") {
+				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+				$("#" + contentTag + "Container").append(grid);
+			} else if (defaultViewType == "filmstrip") {
+				var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+				$("#" + contentTag + "Container").append(scrollableList);
+			}
 		}
 	});
 }

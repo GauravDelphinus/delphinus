@@ -10,19 +10,37 @@ function setupTabs() {
 	var tabGroup = createNewTabGroup("mainTabGroup");
 	$("body").append(tabGroup);
 
-	setupChallengesTab();
+	setupChallenges();
 
-	setupEntriesTab();
+	setupEntries();
+
+	setupButtons();
 }
 
-function setupChallengesTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
-	createAndAppendContentContainer(tabDiv, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges?sortBy=date"}, {type: "popularity", url: "/api/challenges?sortBy=popularity"}]);
+function setupChallenges() {
+	createAndAppendContentContainer($("#challenges"), "challenges", [{type: "thumbnail"}], [{type: "date", url: "/api/challenges?sortBy=date&count=6"}]);
 }
 
-function setupEntriesTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
-	createAndAppendContentContainer(tabDiv, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries?sortBy=date"}, {type: "popularity", url: "/api/entries?sortBy=popularity"}]);
+function setupEntries() {
+	createAndAppendContentContainer($("#entries"), "entries", [{type: "thumbnail"}], [{type: "date", url: "/api/entries?sortBy=date&count=6"}]);
+}
+
+function setupButtons() {
+	$("#postChallenge").click(function() {
+		window.open("/newchallenge", "_self");
+	});
+
+	$("#browseChallenges").click(function() {
+		window.open("/challenges", "_self");
+	});
+
+	$("#postEntry").click(function() {
+		window.open("/newentry", "_self");
+	});
+
+	$("#browseEntries").click(function() {
+		window.open("/entries", "_self");
+	});
 }
 
 /*

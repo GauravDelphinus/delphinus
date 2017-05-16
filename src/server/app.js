@@ -76,6 +76,14 @@ module.exports = function() {
 		res.render("index", {user: normalizeUser(req.user)});
 	});
 
+	app.get("/challenges", function(req, res) {
+		res.render("challenges", {user: normalizeUser(req.user)});
+	});
+
+	app.get("/entries", function(req, res) {
+		res.render("entries", {user: normalizeUser(req.user)});
+	});
+
 	// 1 - Challenge Page
 	app.get("/challenge/:challengeId", function(req, res) {
 		res.render("challenge", {challengeId: req.params.challengeId, user: normalizeUser(req.user)});

@@ -38,14 +38,17 @@ var routes = function(db) {
 
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "popularity") {
-					cypherQuery += " ;";
+					cypherQuery += " ";
 				} else if (req.query.sortBy == "date") {
-					cypherQuery += " ORDER BY c.created DESC;";
+					cypherQuery += " ORDER BY c.created DESC";
 				}
-			} else {
-				cypherQuery += " ORDER BY c.created DESC;";
+			}
+
+			if (req.query.count) {
+				cypherQuery += " LIMIT " + req.query.count;
 			}
 			
+			cypherQuery += " ;";
 
 			console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -54,11 +57,31 @@ var routes = function(db) {
     			console.log(result.data); // delivers an array of query results
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
+    			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
     				var c = result.data[i][0];
-    				c.image = config.url.challengeImages + c.image;
+    				var u = result.data[i][1];
+
+    				var data = {};
+    				data.image = config.url.challengeImages + c.image;
+					data.postedDate = c.created;
+					data.postedByUser = {};
+					data.postedByUser.id = u.id;
+					data.postedByUser.displayName = u.displayName;
+					data.postedByUser.image = u.image;
+
+					data.socialStatus = {};
+					data.socialStatus.numLikes = 121;
+					data.socialStatus.numShares = 23;
+					data.socialStatus.numComments = 45;
+					data.caption = c.title;
+
+					data.link = config.url.challenge + c.id;
+
+					output.push(data);
+
     			}
-    			res.json(result.data);
+    			res.json(output);
 			});
 		})
 

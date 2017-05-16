@@ -389,6 +389,17 @@ function setupProfileTab(profileType) {
 	}
 }
 
+function setupChallengesTab() {
+	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
+	createAndAppendContentContainer(tabDiv, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/challenges/?user=" + userInfo.id + "&sortBy=popularity"}]);
+}
+
+function setupEntriesTab() {
+	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
+	createAndAppendContentContainer(tabDiv, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/entries/?user=" + userInfo.id + "&sortBy=popularity"}]);
+}
+
+/*
 function setupChallengesTab(active) {
 	//get challenges posted by this user
 	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
@@ -463,6 +474,7 @@ function setupEntriesTab() {
 		}
 	});
 }
+*/
 
 function setupAndShowCarousel() {
 	var alreadyAddedImages = [];
