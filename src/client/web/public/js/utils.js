@@ -153,22 +153,77 @@ function createSocialStatusSectionElement(data) {
 	var numLikes = $("<span>", {class: "glyphicon glyphicon-thumbs-up"});
 	var numShares = $("<span>", {class: "glyphicon glyphicon-share-alt"});
 	var numComments = $("<span>", {class: "glyphicon glyphicon-comment"});
-	var likeButton = $("<button>", {id: data.id + "likeButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
-	var shareButton = $("<button>", {id: data.id + "shareButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
-	var commentButton = $("<button>", {id: data.id + "commentButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
-	likeButton.append(numLikes).append("  " + data.socialStatus.numLikes);
-	shareButton.append(numShares).append("  " + data.socialStatus.numShares);
-	commentButton.append(numComments).append("  " + data.socialStatus.numComments);
+	var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	var shareButton = $("<button>", {id: data.id + "ShareButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	var commentButton = $("<button>", {id: data.id + "CommentButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	likeButton.append(numLikes).append(" ").append($("<span>", {id: data.id + "NumLikes", text: data.socialStatus.numLikes}));
+	shareButton.append(numShares).append("  ").append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.numShares}));
+	commentButton.append(numComments).append("  ").append($("<span>", {id: data.id + "NumComments", text: data.socialStatus.numComments}));
 	socialStatus.append(likeButton);
 	socialStatus.append(shareButton);
 	socialStatus.append(commentButton);
 	socialStatusSection.append(socialStatus);
 
-	
+	console.log("user is " + JSON.stringify(user));
+	var restURL;
+	if (data.type == "challenge") {
+		restURL = "/api/challenges/" + data.id + "/like";
+	} else if (data.type == "entry") {
+		restURL = "/api/entries/" + data.id + "/like";
+	}
+
+	if (user) {
+		$.getJSON(restURL, function(result) {
+			console.log("received like status from server: " + JSON.stringify(result));
+			if (result.likeStatus == "on") {
+				//show button as depressed
+				console.log("button " + data.id + "LikeButton length is " + $("#" + data.id + "LikeButton").length);
+				$("#" + data.id + "LikeButton").addClass("active");
+			}
+		});
+	}
+
 	//set up social button callbacks
 	likeButton.click(function(e) {
 		console.log("button clicked, this is " + this + ", id is " + this.id);
-
+		if (user) {
+			var jsonObj = {};
+			if ($("#" + this.id).hasClass("active")) {
+				//already liked, so send unlike request
+				console.log("currently on");
+				jsonObj.likeAction = "unlike";
+			} else {
+				console.log("currently off");
+				jsonObj.likeAction = "like";
+			}
+			$.ajax({
+				type: "PUT",
+				url: restURL,
+				dataType: "json",
+				contentType: "application/json; charset=UTF-8",
+				data: JSON.stringify(jsonObj),
+				success: function(jsonData) {
+					console.log("received jsonData = " + JSON.stringify(jsonData));
+					var numLikes = parseInt($("#" + data.id + "NumLikes").text());
+					if (jsonData.likeStatus == "on") {
+						console.log("setting on");
+						$("#" + data.id + "LikeButton").addClass("active");
+						$("#" + data.id + "NumLikes").text(numLikes + 1);
+					} else {
+						console.log("setting off");
+						$("#" + data.id + "LikeButton").removeClass("active");
+						$("#" + data.id + "NumLikes").text(numLikes - 1);
+					}
+				},
+				error: function(jsonData) {
+					//alert("error, data is " + jsonData);
+					//var jsonData = $.parseJSON(data);
+					alert("some error was found, " + jsonData.error);
+				}
+			});
+		} else {
+			window.open("/auth", "_self");
+		}
 		
 	});
 
@@ -379,8 +434,6 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 
 		refreshListAndUpdateContent(getURL, contentTag);
 	});
-
-	return container;
 }
 
 function refreshListAndUpdateContent(getURL, contentTag, defaultViewType) {

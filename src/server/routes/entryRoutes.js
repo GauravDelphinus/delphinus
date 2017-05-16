@@ -368,6 +368,77 @@ var routes = function(db) {
 			});
 		});
 
+		entryRouter.route("/:entryId/like") // /api/entries/:entryId/like
+
+		.get(function(req, res) { //get current like status
+			if (req.user && req.user.id) {
+	      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
+	      			"'})-[:LIKES]->(e:Entry {id: '" + req.params.entryId + "'}) RETURN e;";
+	      		console.log("running cypherQuery: " + cypherQuery);
+	      		db.cypherQuery(cypherQuery, function(err, result){
+	                if(err) throw err;
+
+	                console.log("result of get likes is " + JSON.stringify(result.data)); // delivers an array of query results
+	                //console.log(result.columns); // delivers an array of names of objects getting returned
+
+	                console.log(result.data);
+	                var output = {};
+	                if (result.data.length == 1) {
+	                	output = {likeStatus : "on"};
+	                } else {
+	                	output = {likeStatus : "off"};
+	                }
+
+	                console.log("sending back to client: " + JSON.stringify(output));
+	                res.json(output);
+				});
+      		} else {
+      			res.json({error: "Not Logged In"});
+      		}
+		})
+		.put(function(req, res) {
+			if (req.body.likeAction == "like") {
+      			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
+      				"'}), (e:Entry {id: '" + req.params.entryId + "'}) CREATE (u)-[r:LIKES]->(e) RETURN r;";
+      			db.cypherQuery(cypherQuery, function(err, result){
+	                if(err) throw err;
+
+	                //console.log(result.data); // delivers an array of query results
+	                //console.log(result.columns); // delivers an array of names of objects getting returned
+
+	                var output = {};
+
+	                console.log(result.data);
+	                if (result.data.length == 1) {
+
+	                	output.likeStatus = "on";
+	                } else {
+
+	                	output.likeStatus = "off";
+	                }
+	                res.json(output);
+				});
+      		} else if (req.body.likeAction == "unlike") {
+      			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
+      				"'})-[r:LIKES]->(e:Entry {id: '" + req.params.entryId + "'}) DELETE r RETURN COUNT(r);";
+      			db.cypherQuery(cypherQuery, function(err, result){
+	                if(err) throw err;
+
+					console.log("result of deletion: " + JSON.stringify(result));
+					var output = {};
+
+					if (result.data.length == 1) {
+						output.likeStatus = "off";
+					} else {
+						output.likeStatus = "on";
+					}
+					
+					res.json(output);
+				});
+      		}
+		});
+
+
 	return entryRouter;
 };
 

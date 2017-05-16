@@ -1002,13 +1002,14 @@ module.exports = {
 				next(null, user);
 			});
 		});
+	},
+
+	escapeSingleQuotes : function(str) {
+		return str.replace(/'/g, "\\'");
+		//str.replace(/h/g, "v");
+		//console.log("str is now " + str);
+
+		return str;
 	}
 }
 
-function escapeSingleQuotes (str) {
-	return str.replace(/'/g, "\\'");
-	//str.replace(/h/g, "v");
-	//console.log("str is now " + str);
-
-	return str;
-}

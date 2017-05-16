@@ -3,6 +3,7 @@ var tmp = require("tmp");
 var path = require("path");
 var config = require("../config");
 var shortid = require("shortid");
+var dataUtils = require("../dataUtils");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -133,7 +134,7 @@ var routes = function(db) {
 							"id: '" + id + "'," +
 							"image : '" + name + "'," +
 							"created : '" + req.body.created + "'," + 
-							"title : '" + escapeSingleQuotes(req.body.caption) + "'" +
+							"title : '" + dataUtils.escapeSingleQuotes(req.body.caption) + "'" +
 							"})-[r:POSTED_BY]->(u) RETURN n;";
 
 				console.log("Running cypherQuery: " + cypherQuery);
@@ -299,7 +300,7 @@ var routes = function(db) {
 	      		db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-	                console.log(JSON.stringify(result.data)); // delivers an array of query results
+	                console.log("result of get likes is " + JSON.stringify(result.data)); // delivers an array of query results
 	                //console.log(result.columns); // delivers an array of names of objects getting returned
 
 	                console.log(result.data);
@@ -309,6 +310,8 @@ var routes = function(db) {
 	                } else {
 	                	output = {likeStatus : "off"};
 	                }
+
+	                console.log("sending back to client: " + JSON.stringify(output));
 	                res.json(output);
 				});
       		} else {
