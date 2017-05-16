@@ -45,7 +45,8 @@ var routes = function(db) {
 				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) ";
 			}
 			
-			cypherQuery += " RETURN e,u ";
+			// add social count check
+			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(e) RETURN e, u, COUNT(u2)";
 			
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "popularity") {
@@ -72,8 +73,11 @@ var routes = function(db) {
     			for (var i = 0; i < result.data.length; i++) {
     				var e = result.data[i][0];
     				var u = result.data[i][1];
+    				var numLikes = result.data[i][2];
 
     				var data = {};
+    				data.type = "entry";
+    				data.id = e.id;
     				data.image = config.url.entryImages + e.id;
 					data.postedDate = e.created;
 					data.postedByUser = {};
@@ -82,7 +86,7 @@ var routes = function(db) {
 					data.postedByUser.image = u.image;
 
 					data.socialStatus = {};
-					data.socialStatus.numLikes = 121;
+					data.socialStatus.numLikes = numLikes;
 					data.socialStatus.numShares = 23;
 					data.socialStatus.numComments = 45;
 
@@ -232,21 +236,39 @@ var routes = function(db) {
 				Returns a single JSON object of type entry
 			**/
 
-			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'})-[:POSTED_BY]->(u:User) RETURN e, u;";
+			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'})-[:POSTED_BY]->(u:User) ";
 
+			// add social count check
+			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(e) RETURN e, u, COUNT(u2)";
+			
 			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
-    			if (result.data.length > 0) {
-    				var entryObject = result.data[0][0];
-    				var userObject = result.data[0][1];
+				var e = result.data[0][0];
+				var u = result.data[0][1];
+				var numLikes = result.data[0][2];
 
-    				entryObject.image = "/entries/images/" + req.params.entryId;
-    				res.json([entryObject, userObject]);
-    			}
+				var data = {};
+				data.type = "entry";
+				data.id = e.id;
+				data.image = config.url.entryImages + e.id;
+				data.postedDate = e.created;
+				data.postedByUser = {};
+				data.postedByUser.id = u.id;
+				data.postedByUser.displayName = u.displayName;
+				data.postedByUser.image = u.image;
+
+				data.socialStatus = {};
+				data.socialStatus.numLikes = numLikes;
+				data.socialStatus.numShares = 23;
+				data.socialStatus.numComments = 45;
+
+				data.caption = e.caption;
+
+				data.link = config.url.entry + e.id;
+    			
+    			res.json(data);
 			});
 		})
 

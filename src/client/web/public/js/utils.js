@@ -146,15 +146,16 @@ function createCaptionSectionElement(data) {
 }
 
 function createSocialStatusSectionElement(data) {
+	console.log("createSocialStatusSectionElement, data is " + JSON.stringify(data));
 	// Social Status Section
 	var socialStatusSection = $("<div>", {class: "socialStatusSection"});
 	var socialStatus = $("<div>", {class: "socialStatus"});
 	var numLikes = $("<span>", {class: "glyphicon glyphicon-thumbs-up"});
 	var numShares = $("<span>", {class: "glyphicon glyphicon-share-alt"});
 	var numComments = $("<span>", {class: "glyphicon glyphicon-comment"});
-	var likeButton = $("<button>", {id: "likeButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
-	var shareButton = $("<button>", {id: "shareButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
-	var commentButton = $("<button>", {id: "commentButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	var likeButton = $("<button>", {id: data.id + "likeButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	var shareButton = $("<button>", {id: data.id + "shareButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+	var commentButton = $("<button>", {id: data.id + "commentButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
 	likeButton.append(numLikes).append("  " + data.socialStatus.numLikes);
 	shareButton.append(numShares).append("  " + data.socialStatus.numShares);
 	commentButton.append(numComments).append("  " + data.socialStatus.numComments);
@@ -162,6 +163,14 @@ function createSocialStatusSectionElement(data) {
 	socialStatus.append(shareButton);
 	socialStatus.append(commentButton);
 	socialStatusSection.append(socialStatus);
+
+	
+	//set up social button callbacks
+	likeButton.click(function(e) {
+		console.log("button clicked, this is " + this + ", id is " + this.id);
+
+		
+	});
 
 	return socialStatusSection;
 }

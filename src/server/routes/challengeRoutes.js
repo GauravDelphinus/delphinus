@@ -31,10 +31,13 @@ var routes = function(db) {
 
 			// Filter by user who posted the challenge
 			if (req.query.user) {
-				cypherQuery += "-[r:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) RETURN c, u ";
+				cypherQuery += "-[r:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) ";
 			} else {
-				cypherQuery += "-[r:POSTED_BY]->(u:User) RETURN c, u ";
+				cypherQuery += "-[r:POSTED_BY]->(u:User) ";
 			}
+
+			// add social count check
+			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(c) RETURN c, u, COUNT(u2)";
 
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "popularity") {
@@ -61,8 +64,11 @@ var routes = function(db) {
     			for (var i = 0; i < result.data.length; i++) {
     				var c = result.data[i][0];
     				var u = result.data[i][1];
+    				var numLikes = result.data[i][2];
 
     				var data = {};
+    				data.type = "challenge";
+    				data.id = c.id;
     				data.image = config.url.challengeImages + c.image;
 					data.postedDate = c.created;
 					data.postedByUser = {};
@@ -71,8 +77,8 @@ var routes = function(db) {
 					data.postedByUser.image = u.image;
 
 					data.socialStatus = {};
-					data.socialStatus.numLikes = 121;
-					data.socialStatus.numShares = 23;
+					data.socialStatus.numLikes = numLikes;
+					data.socialStatus.numShares = 25;
 					data.socialStatus.numComments = 45;
 					data.caption = c.title;
 
@@ -152,7 +158,7 @@ var routes = function(db) {
 				Returns a single JSON object of type challenge
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[:POSTED_BY]->(u:User) RETURN c, u;";
+			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[:POSTED_BY]->(u:User) OPTIONAL MATCH (u2:User)-[:LIKES]->(c) RETURN c, u, COUNT(u2);";
 
 			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -161,11 +167,29 @@ var routes = function(db) {
     			console.log(result.data); // delivers an array of query results
     			console.log(result.columns); // delivers an array of names of objects getting returned
 
-    			var challenge = result.data[0][0];
-    			var user = result.data[0][1];
-    			//image is /challenges/images/challengeId which in turn will be mapped to the actual image by the separate route
-    			challenge.image = config.url.challengeImages + challenge.image;
-    			res.json([challenge, user]);
+			    var c = result.data[0][0];
+				var u = result.data[0][1];
+				var numLikes = result.data[0][2];
+
+				var data = {};
+				data.type = "challenge";
+				data.id = c.id;
+				data.image = config.url.challengeImages + c.image;
+				data.postedDate = c.created;
+				data.postedByUser = {};
+				data.postedByUser.id = u.id;
+				data.postedByUser.displayName = u.displayName;
+				data.postedByUser.image = u.image;
+
+				data.socialStatus = {};
+				data.socialStatus.numLikes = numLikes;
+				data.socialStatus.numShares = 23;
+				data.socialStatus.numComments = 45;
+				data.caption = c.title;
+
+				data.link = config.url.challenge + c.id;
+
+    			res.json(data);
 			});
 		})
 
@@ -265,16 +289,75 @@ var routes = function(db) {
 			});
 		});
 
+	challengeRouter.route("/:challengeId/like") // /api/challenges/:challengeId/like
 
-	return challengeRouter;
-};
+		.get(function(req, res) { //get current like status
+			if (req.user && req.user.id) {
+	      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
+	      			"'})-[:LIKES]->(c:Challenge {id: '" + req.params.challengeId + "'}) RETURN c;";
+	      		console.log("running cypherQuery: " + cypherQuery);
+	      		db.cypherQuery(cypherQuery, function(err, result){
+	                if(err) throw err;
 
-function escapeSingleQuotes (str) {
-	return str.replace(/'/g, "\\'");
-	//str.replace(/h/g, "v");
-	//console.log("str is now " + str);
+	                console.log(JSON.stringify(result.data)); // delivers an array of query results
+	                //console.log(result.columns); // delivers an array of names of objects getting returned
 
-	return str;
+	                console.log(result.data);
+	                var output = {};
+	                if (result.data.length == 1) {
+	                	output = {likeStatus : "on"};
+	                } else {
+	                	output = {likeStatus : "off"};
+	                }
+	                res.json(output);
+				});
+      		} else {
+      			res.json({error: "Not Logged In"});
+      		}
+		})
+		.put(function(req, res) {
+			if (req.body.likeAction == "like") {
+      			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
+      				"'}), (c:Challenge {id: '" + req.params.challengeId + "'}) CREATE (u)-[r:LIKES]->(c) RETURN r;";
+      			db.cypherQuery(cypherQuery, function(err, result){
+	                if(err) throw err;
+
+	                //console.log(result.data); // delivers an array of query results
+	                //console.log(result.columns); // delivers an array of names of objects getting returned
+
+	                var output = {};
+
+	                console.log(result.data);
+	                if (result.data.length == 1) {
+
+	                	output.likeStatus = "on";
+	                } else {
+
+	                	output.likeStatus = "off";
+	                }
+	                res.json(output);
+				});
+      		} else if (req.body.likeAction == "unlike") {
+      			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
+      				"'})-[r:LIKES]->(c:Challenge {id: '" + req.params.challengeId + "'}) DELETE r RETURN COUNT(r);";
+      			db.cypherQuery(cypherQuery, function(err, result){
+	                if(err) throw err;
+
+					console.log("result of deletion: " + JSON.stringify(result));
+					var output = {};
+
+					if (result.data.length == 1) {
+						output.likeStatus = "off";
+					} else {
+						output.likeStatus = "on";
+					}
+					
+					res.json(output);
+				});
+      		}
+		});
+
+		return challengeRouter;
 }
 
 module.exports = routes;

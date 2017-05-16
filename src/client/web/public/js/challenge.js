@@ -7,30 +7,12 @@ $(document).ready(function(){
 });
 
 function setupMainItem() {
-	$.getJSON('/api/challenges/' + challengeId, function(result) {
-		console.log("result is " + JSON.stringify(result));
-		if (result.length > 0) {
-			var c = result[0];
-			var u = result[1];
+	$.getJSON('/api/challenges/' + challengeId, function(data) {
+		console.log("result is " + JSON.stringify(data));
+		var mainElement = createMainElement(data);
+		$("#main").append(mainElement);
 
-			var data = {};
-			data.image = c.image;
-			data.postedDate = new Date(parseInt(c.created));
-			data.postedByUser = {};
-			data.postedByUser.id = u.id;
-			data.postedByUser.displayName = u.displayName;
-			data.postedByUser.image = u.image;
-
-			data.socialStatus = {};
-			data.socialStatus.numLikes = 121;
-			data.socialStatus.numShares = 23;
-			data.socialStatus.numComments = 45;
-
-			var mainElement = createMainElement(data);
-			$("#main").append(mainElement);
-
-			$("#mainTitle").text(c.title);
-		}
+		$("#mainTitle").text(data.caption);
 	});
 }
 
