@@ -2,13 +2,19 @@
 <head>
 <title>Delphinus - New Entry</title>
 <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css">
-<link ref="stylesheet" href="/css/font-awesome/css/font-awesome.css">
+<link ref="stylesheet" href="/css/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="/css/styles.css">
+<link rel="stylesheet" type="text/css" href="/css/cropper/cropper.css">
+<script src="https://use.fontawesome.com/6ce6a7bf69.js"></script>
 </head>
 <body>
 <% include ./header %>
-<div id="newentry" style="text-align: center;">
-<img id="newentryimage" class="centerImage"/>
+<div id="newentry" class="fullWidth" style="text-align: center;">
+	<div class="imageSection">
+		<img id="newentryimage" class="centerImage"/>
+		<input id="saveCrop" class="buttonOverImage" type="button" value="Save"/>
+		<input id="cancelCrop" class="buttonOverImage" type="button" value="Cancel"/>
+	</div>
 </div>
 
 <div id="steps">
@@ -25,13 +31,6 @@
 			<div id="layoutSection">
 				
 				<span class="title">Step 1: Adjust Layout</span><br>
-				<!--
-				<input type="radio" id="radioLayoutNone" name="layout" value="none" checked="checked"><b>None</b><br>
-				<input type="radio" id="radioLayoutPreset" name="layout" value="preset"><b>Preset</b><br>
-				<input type="radio" id="radioLayoutUserDefined" name="layout" value="user_defined"><b>User Defined</b><br>
-				<input type="radio" id="radioLayoutCustom" name="layout" value="custom"><b>Custom</b>
-				-->
-
 				<select id="layoutTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
 					<option value="preset">Preset</option>
@@ -54,21 +53,37 @@
 
 				<!-- CUSTOM LAYOUT SUBSECTION -->
 				<div id="customLayoutSection" class="settingsSubBlock" style="display: none;">
-					<input type="checkbox" id="checkboxFlip" value="flip"><b>Flip</b>
-						<input type="radio" id="radioFlipHorizontally" name="flip" value="flipHorizontally" checked="checked"><b>Horizontally</b>
-						<input type="radio" id="radioFlipVertically" name="flip" value="flipVertically"><b>Vertically</b><br>
-					<input type="checkbox" id="checkboxCrop" value="crop"><b>Crop</b>
-						<b>X:</b><input type="number" id="cropX" value="0">
-						<b>Y:</b><input type="number" id="cropY" value="0">
-						<b>Width:</b><input type="number" id="cropWidth" value="100">
-						<b>Height:</b><input type="number" id="cropHeight" value="100"><br>
-					<input type="checkbox" id="checkboxRotate" value="rotate"><b>Rotate</b>
-						<b>Degrees:</b><input type="number" id="rotateDegrees" value="0">
-						<b>Color:</b><input type="color" id="rotateColor" value="#000000"><br>
-					<input type="checkbox" id="checkboxShear" value="shear"><b>Shear</b>
-						<b>X Degrees:</b><input type="number" id="shearX" value="0">
-						<b>Y Degrees:</b><input type="number" id="shearY" value="0"><br>
-					<br><br>
+					<div class="checkbox"><input type="checkbox" id="checkboxCrop" value="crop"><b><i class="fa fa-crop" aria-hidden="true"></i> Crop</b></div>
+					<div id="cropSection" class="settingsSubBlock">
+						<p id="cropSectionSettings" class="sectionSettings">Not Set</p>
+						<button type="button" class="btn btn-default" id="resetCropButton">Reset Crop</button>
+						<button type="button" class="btn btn-default" id="editCropButton"><i class="fa fa-crop" aria-hidden="true"></i> Edit Crop</button>
+					</div>
+					<div class="checkbox"><input type="checkbox" id="checkboxFlip" value="flip"><b><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip</b></div>
+					<div id="flipSection" class="settingsSubBlock">
+						<p id="flipSectionSettings" class="sectionSettings">Not Set</p>
+						<button type="button" class="btn btn-default" id="flipHorizontalButton"><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip Horizontal</button>
+						<button type="button" class="btn btn-default" id="flipVerticalButton"><i class="fa fa-arrows-v" aria-hidden="true"></i> Flip Vertical</button>
+					</div>
+					<div class="checkbox"><input type="checkbox" id="checkboxRotate" value="rotate"><b><i class="fa fa-repeat" aria-hidden="true"></i> Rotate</b></div>
+					<div id="rotateSection" class="settingsSubBlock">
+						<p id="rotateSectionSettings" class="sectionSettings">Not Set</p>
+						<button type="button" class="btn btn-default" id="resetRotationButton">Reset Rotation</button>
+						<button type="button" class="btn btn-default" id="anticlockwise10RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 10&#176;</button>
+						<button type="button" class="btn btn-default" id="anticlockwise90RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 90&#176;</button>
+						<button type="button" class="btn btn-default" id="clockwise90RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 90&#176;</button>
+						<button type="button" class="btn btn-default" id="clockwise10RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 10&#176;</button><br><br>
+						<b>Background Color: </b><input type="color" class="btn btn-default" id="rotateColor" value="#000000">
+					</div>
+					<div class="checkbox"><input type="checkbox" id="checkboxShear" value="shear"><b><i class="fa fa-exchange" aria-hidden="true"></i> Shear</b></div>
+					<div id="shearSection" class="settingsSubBlock">
+						<p id="shearSectionSettings" class="sectionSettings">Not Set</p>
+						<button type="button" class="btn btn-default" id="resetSheerButton">Reset Shear</button>
+						<button type="button" class="btn btn-default" id="negative10ShearXButton"><i class="fa fa-arrow-left" aria-hidden="true"></i> Shear 10&#176;</button>
+						<button type="button" class="btn btn-default" id="positive10ShearXButton"><i class="fa fa-arrow-right" aria-hidden="true"></i> Shear 10&#176;</button>
+						<button type="button" class="btn btn-default" id="negative10ShearYButton"><i class="fa fa-arrow-up" aria-hidden="true"></i> Shear 10&#176;</button>
+						<button type="button" class="btn btn-default" id="positive10ShearYButton"><i class="fa fa-arrow-down" aria-hidden="true"></i> Shear 10&#176;</button>
+					</div>
 				</div>
 			</div>
 
@@ -231,10 +246,12 @@
 	var challengeId = '<%=challengeId%>';
 	var user = <%- JSON.stringify(user) %>;
 </script>
-<script src="/js/jquery-3.1.1.min.js"></script>
+<script src="/js/jquery.js"></script>
 <script src="/js/bootstrap.js"></script>
+<script src="/js/cropper/cropper.js"></script>
 <script src="/js/newentry.js"></script>
 <script src="/js/header.js"></script>
 <script src="/js/utils.js"></script>
+
 </body>
 </html>

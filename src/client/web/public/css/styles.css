@@ -64,7 +64,7 @@
 .settingsSubBlock {
 	margin: auto;
 	width: 100%;
-	font: 20px arial;
+	margin-left: 20px;
 }
 
 .selectImageSection {
@@ -293,7 +293,7 @@
 	height: 200px;
 }
 
-.profileInfo {
+.fullWidth {
 	width: 100%;
 	text-align: center;
 }
@@ -331,7 +331,7 @@
     position:absolute;
     background: rgba(0, 0, 0, 0);
     border: 0px;
-   	color: white;
+  	color: white;
     display:none;
 }
 
@@ -376,6 +376,16 @@
 #saveName {
 	right: 5px;
 	bottom: 2px;
+}
+
+#saveCrop {
+	right: 5px;
+	bottom: 2px;
+}
+
+#cancelCrop {
+	left: 5px;
+    bottom: 2px;	
 }
 
 .imageCarousel {
@@ -568,4 +578,13 @@ select {
    -moz-appearance: none;
    appearance: none;       /* remove default arrow */
    background-image: url(...);   /* add custom arrow */
+}
+
+/****************** GLOBAL RULES *************************/
+
+/* Limit image width to avoid overflow the container
+	as recommnded by cropper - see https://github.com/fengyuanchen/cropper
+	*/
+img {
+	max-width: 100%;
 }

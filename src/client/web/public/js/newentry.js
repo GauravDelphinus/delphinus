@@ -5,102 +5,7 @@ $(document).ready(function(){
 
 	setupSteps();
 
-	// GLOBAL FOR ALL CHANGES
-	//$("#newentryimage").attr("src", "/challenges/images/" + challengeId);
-
 	$("#apply").click(postEntry);
-	$("#goToHomePage").click(function() {
-		window.open("/", "_self");
-	});
-	$("#goToChallenge").click(function() {
-		window.open("/challenge/" + challengeId, "_self");
-	});
-
-	// LAYOUT SECTION --------------------------
-	$("input[type=radio][name=layout]").change(function () {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneLayoutSection"}, 
-			{value: "preset", id: "#presetLayoutSection"}, 
-			{value: "user_defined", id: "#userDefinedLayoutSection"}, 
-			{value: "custom", id: "#customLayoutSection"}]);
-		applyChanges();
-	});
-
-	// Flip
-	enableDisableOnCheck("#checkboxFlip", ["input[type=radio][name=flip]"]);
-	setChangeCallback(applyChanges, [
-				"#checkboxFlip",
-				"input[type=radio][name=flip]"]);
-
-	// Crop
-	enableDisableOnCheck("#checkboxCrop", ["#cropX", "#cropY", "#cropWidth", "#cropHeight"]);
-	setChangeCallback(applyChanges, ["#checkboxCrop", "#cropX", "#cropY", "#cropWidth", "#cropHeight"]);
-
-	// Rotate
-	enableDisableOnCheck("#checkboxRotate", ["#rotateDegrees", "#rotateColor"]);
-	setChangeCallback(applyChanges, ["#checkboxRotate", "#rotateDegrees", "#rotateColor"]);
-
-	// Shear
-	enableDisableOnCheck("#checkboxShear", ["#shearX", "#shearY"]);
-	setChangeCallback(applyChanges, ["#checboxShear", "#shearX", "shearY"]);
-
-	// FILTERS SECTION ----------------------
-	$("input[type=radio][name=filter]").change(function () {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneFilterSection"}, 
-			{value: "preset", id: "#presetFilterSection"}, 
-			{value: "user_defined", id: "#userDefinedFilterSection"}, 
-			{value: "custom", id: "#customFilterSection"}]);
-		applyChanges();
-	});
-
-	setChangeCallback(applyChanges, [
-		"input[type=checkbox][name=effects]", 
-		"input[type=radio][name=preset]",
-		"input[type=range]",
-		"#contrast",
-		"#brightness",
-		"#hue",
-		"#saturation"
-		]);
-
-	// ARTIFACTS SECTION ------------------------
-	$("input[type=radio][name=artifact]").change(function () {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneArtifactSection"}, 
-			{value: "preset", id: "#presetArtifactSection"}, 
-			{value: "user_defined", id: "#userDefinedArtifactSection"}, 
-			{value: "custom", id: "#customArtifactSection"}]);
-		applyChanges();
-	});
-
-	enableDisableOnCheck("#checkboxBanner", ["#bannerSection"]);
-	setChangeCallback(applyChanges, [
-		"#textBanner", 
-		"input[type=radio][name=banner]",
-		"#checkboxBanner",
-		"#bannerTextFontSize",
-		"#bannerTextFontName",
-		"#bannerBackgroundColor",
-		"#bannerTextColor"
-		]);
-
-	// DECORATIONS SECTION ------------------------
-	$("input[type=radio][name=decoration]").change(function () {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneDecorationSection"}, 
-			{value: "preset", id: "#presetDecorationSection"}, 
-			{value: "user_defined", id: "#userDefinedDecorationSection"}, 
-			{value: "custom", id: "#customDecorationSection"}]);
-		applyChanges();
-	});
-
-	enableDisableOnCheck("#checkboxBorder", ["#borderSection"]);
-	setChangeCallback(applyChanges, [
-		"#checkboxBorder", 
-		"#borderWidth",
-		"#borderColor"
-		]);
 
 	createLoginHeader();
 	
@@ -109,52 +14,7 @@ $(document).ready(function(){
 function setupMainItem() {
 	$.getJSON('/api/challenges/' + challengeId, function(result) {
 		console.log("result is " + JSON.stringify(result));
-		if (result.length > 0) {
-			var c = result[0];
-			var u = result[1];
-
-			$("#newentryimage").prop("src", c.image);
-		}
-	});
-}
-
-function setupSteps() {
-	setupLayoutStep();
-
-	setupFilterStep();
-
-	setupArtifactStep();
-
-	setupDecorationStep();
-
-	setupNavigation();
-}
-
-function setupLayoutStep() {
-	$("#layoutTypeSelection").on("change", function() {
-		console.log("selectino triggered, selected option = " + this.value);
-
-		if (this.value == "none") {
-			$("#noneLayoutSection").show();
-			$("#presetLayoutSection").hide();
-			$("#userDefinedLayoutSection").hide();
-			$("#customLayoutSection").hide();
-		} else if (this.value == "preset") {
-			$("#presetLayoutSection").show();
-			$("#noneLayoutSection").hide();
-			$("#userDefinedLayoutSection").hide();
-			$("#customLayoutSection").hide();
-		} else if (this.value == "userDefined") {
-			$("#userDefinedLayoutSection").show();
-			$("#noneLayoutSection").hide();
-			$("#presetLayoutSection").hide();
-			$("#customLayoutSection").hide();
-		} else if (this.value == "custom") {
-			$("#customLayoutSection").show();
-			$("#noneLayoutSection").hide();
-			$("#userDefinedLayoutSection").hide();
-			$("#presetLayoutSection").hide();
-		}
+		$("#newentryimage").prop("src", result.image);
 	});
 }
 
@@ -236,6 +96,124 @@ function moveToStep(stepName) {
 	}
 }
 
+
+function setupSteps() {
+	setupLayoutStep();
+
+	setupFilterStep();
+
+	setupArtifactStep();
+
+	setupDecorationStep();
+
+	setupNavigation();
+}
+
+function setupLayoutStep() {
+	//show hide logic
+	$("#layoutTypeSelection").on("change", function() {
+		showHideSection(this.value, 
+			[{value: "none", id: "#noneLayoutSection"}, 
+			{value: "preset", id: "#presetLayoutSection"}, 
+			{value: "user_defined", id: "#userDefinedLayoutSection"}, 
+			{value: "custom", id: "#customLayoutSection"}]);
+		applyChanges();
+	});
+
+	/*** CROP Handling ****/
+	$("#saveCrop").click(function() {
+		var cropData = $("#newentryimage").cropper("getData");
+		console.log("cropData is " + JSON.stringify(cropData));
+
+		jQuery.data(document.body, "cropData", cropData);
+
+		endCrop();
+
+		applyChanges();
+	});
+
+	$("#cancelCrop").click(function() {
+		endCrop();
+	});
+
+	$("#resetCropButton").click(function() {
+		//reset cached data
+		jQuery.data(document.body, "cropData", null);
+
+		applyChanges();
+	});
+
+	$("#editCropButton").click(function() {
+		var cropData = jQuery.data(document.body, "cropData");
+
+		//first switch off crop and bring image back to original size
+		jQuery.data(document.body, "cropData", null);
+
+		applyChanges(function() {
+			startCrop(cropData);
+		});
+	});
+
+	// Crop
+	enableDisableOnCheck("#checkboxCrop", ["#resetCropButton", "#editCropButton"]);
+	$("#checkboxCrop").on("change", function() {
+		if ($(this).prop("checked")) {
+			var cropData = jQuery.data(document.body, "cropData");
+			startCrop(cropData);
+		} else {
+			applyChanges();
+		}
+	});
+
+	// Flip
+	enableDisableOnCheck("#checkboxFlip", ["input[type=radio][name=flip]"]);
+	setChangeCallback(applyChanges, [
+				"#checkboxFlip",
+				"input[type=radio][name=flip]"]);
+
+	// Rotate
+	enableDisableOnCheck("#checkboxRotate", ["#rotateDegrees", "#rotateColor"]);
+	setChangeCallback(applyChanges, ["#checkboxRotate", "#rotateDegrees", "#rotateColor"]);
+
+	// Shear
+	enableDisableOnCheck("#checkboxShear", ["#shearX", "#shearY"]);
+	setChangeCallback(applyChanges, ["#checboxShear", "#shearX", "shearY"]);
+
+}
+
+
+/**
+	Enter Crop Mode / UI.
+	CropData is used to restore to previously stored crop box data, if available.
+**/
+function startCrop(cropData) {
+	if ($("#checkboxCrop").prop("checked")) {
+
+		var options = {};
+
+		if (cropData) {
+			options.data = cropData;
+		}
+
+		$("#newentryimage").cropper(options);
+
+		$(".imageSection").addClass("imageSectionHover");
+
+		//disable everything else until we're out of the crop mode
+		$("#steps").hide();
+	}
+}
+
+/**
+	Exit Crop Mode / UI.
+**/
+function endCrop() {
+	$("#newentryimage").cropper("destroy");
+	$(".imageSection").removeClass("imageSectionHover");
+
+	$("#steps").show();
+}
+
 function setupFilterStep() {
 	$("#filterTypeSelection").on("change", function() {
 		console.log("selectino triggered, selected option = " + this.value);
@@ -305,14 +283,68 @@ function setupFilterStep() {
 			$("#customFilterSection").show();
 		}
 	});
+
+	// FILTERS SECTION ----------------------
+	$("input[type=radio][name=filter]").change(function () {
+		showHideSection(this.value, 
+			[{value: "none", id: "#noneFilterSection"}, 
+			{value: "preset", id: "#presetFilterSection"}, 
+			{value: "user_defined", id: "#userDefinedFilterSection"}, 
+			{value: "custom", id: "#customFilterSection"}]);
+		applyChanges();
+	});
+
+	setChangeCallback(applyChanges, [
+		"input[type=checkbox][name=effects]", 
+		"input[type=radio][name=preset]",
+		"input[type=range]",
+		"#contrast",
+		"#brightness",
+		"#hue",
+		"#saturation"
+		]);
 }
 
 function setupArtifactStep() {
+	// ARTIFACTS SECTION ------------------------
+	$("input[type=radio][name=artifact]").change(function () {
+		showHideSection(this.value, 
+			[{value: "none", id: "#noneArtifactSection"}, 
+			{value: "preset", id: "#presetArtifactSection"}, 
+			{value: "user_defined", id: "#userDefinedArtifactSection"}, 
+			{value: "custom", id: "#customArtifactSection"}]);
+		applyChanges();
+	});
 
+	enableDisableOnCheck("#checkboxBanner", ["#bannerSection"]);
+	setChangeCallback(applyChanges, [
+		"#textBanner", 
+		"input[type=radio][name=banner]",
+		"#checkboxBanner",
+		"#bannerTextFontSize",
+		"#bannerTextFontName",
+		"#bannerBackgroundColor",
+		"#bannerTextColor"
+		]);
 }
 
 function setupDecorationStep() {
+	// DECORATIONS SECTION ------------------------
+	$("input[type=radio][name=decoration]").change(function () {
+		showHideSection(this.value, 
+			[{value: "none", id: "#noneDecorationSection"}, 
+			{value: "preset", id: "#presetDecorationSection"}, 
+			{value: "user_defined", id: "#userDefinedDecorationSection"}, 
+			{value: "custom", id: "#customDecorationSection"}]);
+		applyChanges();
+	});
 
+	enableDisableOnCheck("#checkboxBorder", ["#borderSection"]);
+	setChangeCallback(applyChanges, [
+		"#checkboxBorder", 
+		"#borderWidth",
+		"#borderColor"
+		]);
 }
 
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
@@ -380,11 +412,11 @@ function constructJSONObject(jsonObj) {
 		}
 
 		if ($("#checkboxCrop").prop("checked")) {
-			layout.crop = {};
-			layout.crop.x = $("#cropX").val();
-			layout.crop.y = $("#cropY").val();
-			layout.crop.width = $("#cropWidth").val();
-			layout.crop.height = $("#cropHeight").val();
+			var cropData = jQuery.data(document.body, "cropData");
+
+			if (cropData) {
+				layout.crop = {x: cropData.x, y: cropData.y, width: cropData.width, height: cropData.height};
+			}
 		}
 
 		if ($("#checkboxRotate").prop("checked")) {
@@ -559,7 +591,7 @@ function generateChanges(id, jsonObj, done) {
 	});
 }
 
-function applyChanges() {
+function applyChanges(done) {
 	//alert("applyChanges called");
 	var jsonObj = {};
 	
@@ -577,9 +609,13 @@ function applyChanges() {
 			//alert("success, data is " + jsonData);
 			//var jsonData = $.parseJSON(data);
 			//alert("image received: " + jsonData.image);
+			console.log("new image received from server");
 
 			//$("#newentryimage").attr("src", jsonData.image);
 			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
+			if (done) {
+				done();
+			}
 		},
 		error: function(jsonData) {
 			//alert("error, data is " + jsonData);
