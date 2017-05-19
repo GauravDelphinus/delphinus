@@ -109,6 +109,10 @@ function setupSteps() {
 	setupNavigation();
 }
 
+function changeCallback(event) {
+	applyChanges(null);
+}
+
 function setupLayoutStep() {
 	//show hide logic
 	$("#layoutTypeSelection").on("change", function() {
@@ -127,6 +131,8 @@ function setupLayoutStep() {
 
 		jQuery.data(document.body, "cropData", cropData);
 
+		$("#cropSectionSettings").text("Left: " + Math.round(cropData.x) + " Top: " + Math.round(cropData.y) + " Width: " + Math.round(cropData.width) + " Height: " + Math.round(cropData.height));
+
 		endCrop();
 
 		applyChanges();
@@ -139,6 +145,8 @@ function setupLayoutStep() {
 	$("#resetCropButton").click(function() {
 		//reset cached data
 		jQuery.data(document.body, "cropData", null);
+
+		$("#cropSectionSettings").text("Not Set");
 
 		applyChanges();
 	});
@@ -154,7 +162,6 @@ function setupLayoutStep() {
 		});
 	});
 
-	// Crop
 	enableDisableOnCheck("#checkboxCrop", ["#resetCropButton", "#editCropButton"]);
 	$("#checkboxCrop").on("change", function() {
 		if ($(this).prop("checked")) {
@@ -165,20 +172,108 @@ function setupLayoutStep() {
 		}
 	});
 
-	// Flip
-	enableDisableOnCheck("#checkboxFlip", ["input[type=radio][name=flip]"]);
-	setChangeCallback(applyChanges, [
+	//*********** FLIP Handling
+	enableDisableOnCheck("#checkboxFlip", ["#flipHorizontalButton", "#flipVerticalButton"]);
+	setChangeCallback(changeCallback, [
 				"#checkboxFlip",
-				"input[type=radio][name=flip]"]);
+				"#flipHorizontalButton", "#flipVerticalButton"]);
+
+
+	$("#flipVerticalButton, #flipHorizontalButton").click(function() {
+		if ($(this).hasClass("active")) {
+			//flip is on, turn it off
+			$(this).removeClass("active");
+		} else {
+			$(this).addClass("active");
+		}
+
+		var flipSettings = "Flip Vertical: ";
+		if ($("#flipVerticalButton").hasClass("active")) {
+			flipSettings += "ON";
+		} else {
+			flipSettings += "OFF";
+		}
+
+		flipSettings += ", Flip Horizontal: ";
+		if ($("#flipHorizontalButton").hasClass("active")) {
+			flipSettings += "ON";
+		} else {
+			flipSettings += "OFF";
+		}
+		$("#flipSectionSettings").text(flipSettings);
+
+		applyChanges();
+	});
 
 	// Rotate
-	enableDisableOnCheck("#checkboxRotate", ["#rotateDegrees", "#rotateColor"]);
-	setChangeCallback(applyChanges, ["#checkboxRotate", "#rotateDegrees", "#rotateColor"]);
+	enableDisableOnCheck("#checkboxRotate", ["#resetRotationButton", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton", "#rotateColorButton"]);
+	setChangeCallback(changeCallback, ["#checkboxRotate", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton", "#rotateColorButton"]);
+
+	
+	$("#anticlockwise10RotationButton, #anticlockwise90RotationButton, #clockwise90RotationButton, #clockwise10RotationButton").click(function() {
+		var rotationData = jQuery.data(document.body, "rotationData");
+		if (!rotationData) {
+			rotationData = {degrees: 0};
+		}
+
+		console.log("this.id is " + this.id);
+		if (this.id == "anticlockwise10RotationButton") {
+			rotationData.degrees -= 10;
+		} else if (this.id == "anticlockwise90RotationButton") {
+			rotationData.degrees -= 90;
+		} else if (this.id == "clockwise90RotationButton") {
+			rotationData.degrees += 90;
+		} else if (this.id == "clockwise10RotationButton") {
+			rotationData.degrees += 10;
+		}
+		
+		$("#rotationSectionSettings").html("Rotation: " + rotationData.degrees + "&#176;");
+		jQuery.data(document.body, "rotationData", rotationData);
+
+		applyChanges();
+	});
+
+	$("#resetRotationButton").click(function() {
+		jQuery.data(document.body, "rotationData", null);
+
+		$("#rotationSectionSettings").html("Not Set");
+
+		applyChanges();
+	});
 
 	// Shear
-	enableDisableOnCheck("#checkboxShear", ["#shearX", "#shearY"]);
-	setChangeCallback(applyChanges, ["#checboxShear", "#shearX", "shearY"]);
+	enableDisableOnCheck("#checkboxShear", ["#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton"]);
+	setChangeCallback(changeCallback, ["#checkboxShear", "#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton"]);
 
+	$("#negative10ShearXButton, #positive10ShearXButton, #negative10ShearYButton, #positive10ShearYButton").click(function() {
+		var shearData = jQuery.data(document.body, "shearData");
+		if (!shearData) {
+			shearData = {xDegrees: 0, yDegrees: 0};
+		}
+
+		if (this.id == "negative10ShearXButton") {
+			shearData.xDegrees -= 10;
+		} else if (this.id == "positive10ShearXButton") {
+			shearData.xDegrees += 10;
+		} else if (this.id == "negative10ShearYButton") {
+			shearData.yDegrees -= 10;
+		} else if (this.id == "positive10ShearYButton") {
+			shearData.yDegrees += 10;
+		}
+		
+		$("#shearSectionSettings").html("Shear X: " + shearData.xDegrees + "&#176;, Y: " + shearData.yDegrees + "&#176;");
+		jQuery.data(document.body, "shearData", shearData);
+
+		applyChanges();
+	});
+
+	$("#resetShearButton").click(function() {
+		jQuery.data(document.body, "shearData", null);
+
+		$("#shearSectionSettings").html("Not Set");
+
+		applyChanges();
+	});
 }
 
 
@@ -294,7 +389,7 @@ function setupFilterStep() {
 		applyChanges();
 	});
 
-	setChangeCallback(applyChanges, [
+	setChangeCallback(changeCallback, [
 		"input[type=checkbox][name=effects]", 
 		"input[type=radio][name=preset]",
 		"input[type=range]",
@@ -317,7 +412,7 @@ function setupArtifactStep() {
 	});
 
 	enableDisableOnCheck("#checkboxBanner", ["#bannerSection"]);
-	setChangeCallback(applyChanges, [
+	setChangeCallback(changeCallback, [
 		"#textBanner", 
 		"input[type=radio][name=banner]",
 		"#checkboxBanner",
@@ -340,7 +435,7 @@ function setupDecorationStep() {
 	});
 
 	enableDisableOnCheck("#checkboxBorder", ["#borderSection"]);
-	setChangeCallback(applyChanges, [
+	setChangeCallback(changeCallback, [
 		"#checkboxBorder", 
 		"#borderWidth",
 		"#borderColor"
@@ -359,6 +454,14 @@ function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 }
 
 function enableDisableOnCheck(checkBoxId, itemIds) {
+	for (var i = 0; i < itemIds.length; i++) {
+		if ($(checkBoxId).prop("checked")) {
+			$(itemIds[i]).prop("disabled", false);
+		} else {
+			$(itemIds[i]).prop("disabled", true);
+		}
+	}
+
 	$(checkBoxId).change(function () {
 		for (var i = 0; i < itemIds.length; i++) {
 			if ($(checkBoxId).prop("checked")) {
@@ -372,7 +475,7 @@ function enableDisableOnCheck(checkBoxId, itemIds) {
 
 function setChangeCallback(callback, listOfIds) {
 	for (var i = 0; i < listOfIds.length; i++) {
-		$(listOfIds[i]).change(callback);
+		$(listOfIds[i]).change({callback: null}, callback);
 	}
 }
 
@@ -402,15 +505,7 @@ function constructJSONObject(jsonObj) {
 	} else if ($("#layoutTypeSelection").val() == "custom") {
 		layout.type = "custom";
 		
-		if ($("#checkboxFlip").prop("checked")) {
-			if ($("#radioFlipHorizontally").prop("checked")) {
-				layout.mirror = "flop";
-			} else if ($("#radioFlipVertically").prop("checked")) {
-				layout.mirror = "flip";
-				console.log("setting layout.mirror to flip");
-			}
-		}
-
+		//crop
 		if ($("#checkboxCrop").prop("checked")) {
 			var cropData = jQuery.data(document.body, "cropData");
 
@@ -419,16 +514,33 @@ function constructJSONObject(jsonObj) {
 			}
 		}
 
+		//flip
+		if ($("#checkboxFlip").prop("checked")) {
+			if ($("#flipHorizontalButton").hasClass("active")) {
+				layout.mirror = "flop";
+			} else if ($("#flipVerticalButton").hasClass("active")) {
+				layout.mirror = "flip";
+			}
+		}
+
 		if ($("#checkboxRotate").prop("checked")) {
-			layout.rotation = {};
-			layout.rotation.degrees = $("#rotateDegrees").val();
-			layout.rotation.color = $("#rotateColor").val();
+			var rotationData = jQuery.data(document.body, "rotationData");
+
+			if (rotationData) {
+				layout.rotation = {};
+				layout.rotation.degrees = rotationData.degrees;
+				layout.rotation.color = $("#rotateColorButton").val();
+			}
 		}
 
 		if ($("#checkboxShear").prop("checked")) {
-			layout.shear = {};
-			layout.shear.xDegrees = $("#shearX").val();
-			layout.shear.yDegrees = $("#shearY").val();
+			var shearData = jQuery.data(document.body, "shearData");
+
+			if (shearData) {
+				layout.shear = {};
+				layout.shear.xDegrees = shearData.xDegrees;
+				layout.shear.yDegrees = shearData.yDegrees;
+			}
 		}
 	}
 
@@ -613,6 +725,7 @@ function applyChanges(done) {
 
 			//$("#newentryimage").attr("src", jsonData.image);
 			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
+			//console.log("done is " + JSON.stringify(done));
 			if (done) {
 				done();
 			}

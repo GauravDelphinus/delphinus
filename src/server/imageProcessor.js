@@ -636,10 +636,6 @@ function applyLayouts (image, size, layouts) {
 			}
 		}
 
-		if (layout.rotation) {
-			image.rotate(layout.rotation.color, layout.rotation.degrees);
-		}
-
 		if (layout.crop) {
 			image.crop(layout.crop.width, layout.crop.height, layout.crop.x, layout.crop.y);
 		}
@@ -652,7 +648,14 @@ function applyLayouts (image, size, layouts) {
 			}
 		}
 
+		if (layout.rotation) {
+			image.rotate(layout.rotation.color, layout.rotation.degrees);
+		}
+
+
+
 		if (layout.shear) {
+			//image.fill("#00FF00"); TODO - how to set fill background color in case of shear?
 			image.shear(layout.shear.xDegrees, layout.shear.yDegrees);
 		}
 	}
