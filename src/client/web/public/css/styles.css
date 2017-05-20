@@ -63,7 +63,7 @@
 
 .settingsSubBlock {
 	margin: auto;
-	width: 100%;
+	width: 80%;
 	margin-left: 20px;
 }
 
@@ -543,8 +543,25 @@ hr.small {
 
 /****************** New Entry ***********************/
 
+input[type=range] {
+	display: inline;
+	width: 300px;
+}
+.rangeInput {
+	float: right;
+}
+
+.rangeStart {
+	/*float: left;*/
+	display: inline;
+}
+
+.rangeEnd {
+	/*float: right;*/
+	display: inline;
+}
 .stepSection {
-	width: 70%;
+	width: 80%;
 	margin: 0 auto;
 	border-radius: 5px;
 	border-style: dotted;
@@ -566,6 +583,8 @@ hr.small {
 
 .stepContent {
 	padding: 10px;
+	width: 80%;
+	margin: 0 auto;
 }
 
 .stepNavigation {

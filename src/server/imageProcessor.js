@@ -643,7 +643,9 @@ function applyLayouts (image, size, layouts) {
 		if (layout.mirror) {
 			if (layout.mirror == "flop") {
 				image.flop();
-			} else if (layout.mirror == "flip") {
+			}
+
+			if (layout.mirror == "flip") {
 				image.flip();
 			}
 		}

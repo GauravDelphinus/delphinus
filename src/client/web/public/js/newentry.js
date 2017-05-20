@@ -380,6 +380,81 @@ function setupFilterStep() {
 	});
 
 	// FILTERS SECTION ----------------------
+
+	//charcoal
+	$("#charcoalSection").append(createRangeSection("charcoalValueText", "charcoalRangeInput", 0, 100, 0, 5));
+	enableDisableOnCheck("#checkboxCharcoal", ["#charcoalRangeInput"]);
+
+	//paint
+	$("#paintSection").append(createRangeSection("paintValueText", "paintRangeInput", 0, 100, 0, 5));
+	enableDisableOnCheck("#checkboxPaint", ["#paintRangeInput"]);
+
+	//solarize
+	$("#solarizeSection").append(createRangeSection("solarizeValueText", "solarizeRangeInput", 0, 100, 0, 5));
+	enableDisableOnCheck("#checkboxSolarize", ["#solarizeRangeInput"]);
+
+	//spread
+	$("#spreadSection").append(createRangeSection("spreadValueText", "spreadRangeInput", 0, 100, 0, 5));
+	enableDisableOnCheck("#checkboxSpread", ["#spreadRangeInput"]);
+
+	//swirl
+	$("#swirlSection").append(createRangeSection("swirlValueText", "swirlRangeInput", 0, 100, 0, 5));
+	enableDisableOnCheck("#checkboxSwirl", ["#swirlRangeInput"]);
+
+	//Wave
+	$("#waveSection").append(createRangeSection("waveAmplitudeValueText", "waveAmplitudeRangeInput", 0, 100, 0, 5));
+	$("#waveSection").append(createRangeSection("waveLengthValueText", "waveLengthRangeInput", 0, 100, 0, 5));
+	enableDisableOnCheck("#checkboxWave", ["#waveAmplitudeRangeInput", "#waveLengthRangeInput"]);
+
+	//contrast
+	$("#contrastSection").append(createRangeSection("contrastValueText", "contrastRangeInput", -100, 100, 0, 5));
+	//enableDisableOnCheck("#checkboxContrast", ["#contrastRangeInput"]);
+
+	//brightness
+	$("#brightnessSection").append(createRangeSection("brightnessValueText", "brightnessRangeInput", -100, 100, 0, 5));
+	//enableDisableOnCheck("#checkboxBrightness", ["#brightnessRangeInput"]);
+
+	//hue
+	$("#hueSection").append(createRangeSection("hueValueText", "hueRangeInput", -100, 100, 0, 5));
+	//enableDisableOnCheck("#checkboxHue", ["#hueRangeInput"]);
+
+	//saturation
+	$("#saturationSection").append(createRangeSection("saturationValueText", "saturationRangeInput", -100, 100, 0, 5));
+	//enableDisableOnCheck("#checkboxSaturation", ["#saturationRangeInput"]);
+
+	//set change callback for all range inputs
+	$("input[type=range]").change(function() {
+		console.log("range change callback called, this.id is " + this.id);
+		if (this.id == "charcoalRangeInput") {
+			$("#charcoalValueText").text("Factor: " + $("#" + this.id).val());
+		} else if (this.id == "paintRangeInput") {
+			$("#paintValueText").text("Radius: " + $("#" + this.id).val());
+		} else if (this.id == "solarizeRangeInput") {
+			$("#solarizeValueText").text("Threshold: " + $("#" + this.id).val());
+		} else if (this.id == "spreadRangeInput") {
+			$("#spreadValueText").text("Amount: " + $("#" + this.id).val());
+		} else if (this.id == "SwirlRangeInput") {
+			$("#swirlValueText").text("Degrees: " + $("#" + this.id).val());
+		} else if (this.id == "waveAmplitudeRangeInput") {
+			$("#waveAmplitudeValueText").text("Amplitude: " + $("#" + this.id).val());
+		} else if (this.id == "waveLengthRangeInput") {
+			$("#waveLengthValueText").text("Wavelength: " + $("#" + this.id).val());
+		} else if (this.id == "contrastRangeInput") {
+			$("#contrastValueText").text("Value: " + $("#" + this.id).val());
+		} else if (this.id == "brightnessRangeInput") {
+			$("#brightnessValueText").text("Value: " + $("#" + this.id).val());
+		} else if (this.id == "hueRangeInput") {
+			$("#hueValueText").text("Value: " + $("#" + this.id).val());
+		} else if (this.id == "saturationRangeInput") {
+			$("#saturationValueText").text("Value: " + $("#" + this.id).val());
+		} 
+	});
+	
+
+
+
+
+	/*
 	$("input[type=radio][name=filter]").change(function () {
 		showHideSection(this.value, 
 			[{value: "none", id: "#noneFilterSection"}, 
@@ -388,6 +463,7 @@ function setupFilterStep() {
 			{value: "custom", id: "#customFilterSection"}]);
 		applyChanges();
 	});
+	*/
 
 	setChangeCallback(changeCallback, [
 		"input[type=checkbox][name=effects]", 
@@ -398,6 +474,19 @@ function setupFilterStep() {
 		"#hue",
 		"#saturation"
 		]);
+}
+
+function createRangeSection(valueTextID, rangeInputID, min, max, value, step) {
+	var paintRangeSection = $("<div>", {class: "rangeSection"});
+	paintRangeSection.append($("<span>", {id: valueTextID, class: "sectionSettings"}).text("Not Set"));
+	var rangeInput = $("<div>", {class: "rangeInput"});
+	rangeInput.append($("<span>").append(min));
+	var input = $("<input>", {id: rangeInputID, type: "range", min: min, max: max, value: value, step: step});
+	rangeInput.append(input);
+	rangeInput.append($("<span>").append(max));
+	paintRangeSection.append(rangeInput);
+
+	return paintRangeSection;
 }
 
 function setupArtifactStep() {
@@ -518,7 +607,9 @@ function constructJSONObject(jsonObj) {
 		if ($("#checkboxFlip").prop("checked")) {
 			if ($("#flipHorizontalButton").hasClass("active")) {
 				layout.mirror = "flop";
-			} else if ($("#flipVerticalButton").hasClass("active")) {
+			}
+
+			if ($("#flipVerticalButton").hasClass("active")) {
 				layout.mirror = "flip";
 			}
 		}
@@ -568,52 +659,62 @@ function constructJSONObject(jsonObj) {
 
 		// ADD EFFECTS
 		filter.effects = {};
-
-		if ($("#radioPaint").prop("checked")) {
-			filter.effects.paint = {radius: $("#rangePaint").val() };
+		if ($("#checkboxCharcoal").prop("checked")) {
+			filter.effects.charcoal = {factor: $("#charcoalRangeInput").val()};
 		}
-		if ($("#radioGrayscale").prop("checked")) {
+
+		if ($("#checkboxGrayscale").prop("checked")) {
 			filter.effects.grayscale = "on";
 		}
-		if ($("#radioMosaic").prop("checked")) {
-			filter.effects.mosaic = "on";
-		}
-		if ($("#radioNegative").prop("checked")) {
-			filter.effects.negative = "on";
-		}
-		if ($("#radioSolarize").prop("checked")) {
-			filter.effects.solarize = {threshold: $("#rangeSolarize").val()};
-		}
-		if ($("#radioMonochrome").prop("checked")) {
+
+		if ($("#checkboxMonochrome").prop("checked")) {
 			filter.effects.monochrome = "on";
 		}
-		if ($("#radioSwirl").prop("checked")) {
-			filter.effects.swirl = {degrees: $("#rangeSwirl").val()};
+
+		if ($("#checkboxMosaic").prop("checked")) {
+			filter.effects.mosaic = "on";
 		}
-		if ($("#radioWave").prop("checked")) {
-			filter.effects.wave = {amplitude : $("#rangeWaveAmp").val(), wavelength: $("#rangeWaveLength").val()};
+
+		if ($("#checkboxNegative").prop("checked")) {
+			filter.effects.negative = "on";
 		}
-		if ($("#radioSpread").prop("checked")) {
-			filter.effects.spread = {amount : $("#rangeSpread").val()};
+
+		if ($("#checkboxPaint").prop("checked")) {
+			filter.effects.paint = {radius: $("#paintRangeInput").val() };
 		}
-		if ($("#radioCharcoal").prop("checked")) {
-			filter.effects.charcoal = {factor: $("#rangeCharcoal").val()};
+
+		if ($("#checkboxSolarize").prop("checked")) {
+			filter.effects.solarize = {threshold: $("#solarizeRangeInput").val()};
 		}
+
+		if ($("#checkboxSpread").prop("checked")) {
+			filter.effects.spread = {amount : $("#spreadRangeInput").val()};
+		}
+
+		if ($("#checkboxSwirl").prop("checked")) {
+			filter.effects.swirl = {degrees: $("#swirlRangeInput").val()};
+		}
+
+		if ($("#checkboxWave").prop("checked")) {
+			filter.effects.wave = {amplitude : $("#waveAmplitudeRangeInput").val(), wavelength: $("#waveLengthRangeInput").val()};
+		}
+
+
 
 		// ADD SETTINGS
 		filter.settings = {};
 
-		if ($("#contrast").val != $("#contrast").prop("defaultValue")) {
-			filter.settings.contrast = {value: $("#contrast").val()};
+		if ($("#contrastRangeInput").val != $("#contrastRangeInput").prop("defaultValue")) {
+			filter.settings.contrast = {value: $("#contrastRangeInput").val()};
 		}
-		if ($("#brightness").val != $("#brightness").prop("defaultValue")) {
-			filter.settings.brightness = {value: $("#brightness").val()};
+		if ($("#brightnessRangeInput").val != $("#brightnessRangeInput").prop("defaultValue")) {
+			filter.settings.brightness = {value: $("#brightnessRangeInput").val()};
 		}
-		if ($("#hue").val != $("#hue").prop("defaultValue")) {
-			filter.settings.hue = {value: $("#hue").val()};
+		if ($("#hueRangeInput").val != $("#hueRangeInput").prop("defaultValue")) {
+			filter.settings.hue = {value: $("#hueRangeInput").val()};
 		}
-		if ($("#saturation").val != $("#saturation").prop("defaultValue")) {
-			filter.settings.saturation = {value: $("#saturation").val()};
+		if ($("#saturationRangeInput").val != $("#saturationRangeInput").prop("defaultValue")) {
+			filter.settings.saturation = {value: $("#saturationRangeInput").val()};
 		}
 	}
 

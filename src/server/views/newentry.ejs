@@ -88,14 +88,8 @@
 			</div>
 
 			<!-- FILTER SECTION -->
-			<div id="filterSection" class="settingsBlock" style="display: none;">
+			<div id="filterSection" style="display: none;">
 				<span class="title">Step 2: Apply Filter</span><br>
-				<!--
-				<input type="radio" id="radioNone" name="filter" value="none"><b>None</b><br>
-				<input type="radio" id="radioPreset" name="filter" value="preset" checked="checked"><b>Preset</b><br>
-				<input type="radio" id="radioUserDefined" name="filter" value="user_defined"><b>User Defined</b><br>
-				<input type="radio" id="radioCustom" name="filter" value="custom"><b>Custom</b>
-				-->
 
 				<select id="filterTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
@@ -121,28 +115,67 @@
 
 				<!-- CUSTOM FILTER SUBSECTION -->
 				<div id="customFilterSection" class="settingsSubBlock" style="display: none;">
-					<span class="subTitle">Custom Filters</span><br>
 				
 					<span class="subTitle">Effects</span><br>
-					<input type="checkbox" id="radioPaint" name="effects" value="paint"><b>Paint</b><input id="rangePaint" type="range" min="0" max="100" value="0" step="5"><span id="paintValue"></span><br>
-					<input type="checkbox" id="radioGrayscale" name="effects" value="grayscale"><b>Grayscale</b><br>
-					<input type="checkbox" id="radioCharcoal" name="effects" value="charcoal"><b>Charcoal</b><input id="rangeCharcoal" type="range" min="1" max="100" value="1" step="5"><span id="charcoalValue"></span><br>
-					<input type="checkbox" id="radioMosaic" name="effects" value="mosaic"><b>Mosaic</b><br>
-					<input type="checkbox" id="radioNegative" name="effects" value="negative"><b>Negative</b><br>
-					<input type="checkbox" id="radioSolarize" name="effects" value="solarize"><b>Solarize</b><input id="rangeSolarize" type="range" min="0" max="100" value="100" step="5"><span id="solarizeValue"></span><br>
-					<input type="checkbox" id="radioMonochrome" name="effects" value="monochrome"><b>Monochrome</b><br>
-					<input type="checkbox" id="radioSwirl" name="effects" value="swirl"><b>Swirl</b><input id="rangeSwirl" type="range" min="0" max="360" value="0" step="5"><span id="swirlValue"></span><br>
-					<input type="checkbox" id="radioWave" name="effects" value="wave"><b>Wave</b>Amplitude<input id="rangeWaveAmp" type="range" min="0" max="100" value="100" step="5"><span id="waveAmpValue"></span><br>Wavelength<input id="rangeWaveLength" type="range" min="0" max="100" value="100" step="5"><span id="waveLengthValue"></span><br>
-					<input type="checkbox" id="radioSpread" name="effects" value="spread"><b>Spread</b><input id="rangeSpread" type="range" min="0" max="100" value="0" step="5"><span id="spreadValue"></span><br>
-				
 
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxCharcoal" value="charcoal"><b><i class="fa fa-crop" aria-hidden="true"></i> Charcoal</b></div>
+					<div id="charcoalSection" class="settingsSubBlock">
+					</div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxGrayscale" value="grayscale"><b><i class="fa fa-crop" aria-hidden="true"></i> Grayscale</b></div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxMonochrome" value="monochrome"><b><i class="fa fa-crop" aria-hidden="true"></i> Monochrome</b></div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxMosaic" value="mosaic"><b><i class="fa fa-crop" aria-hidden="true"></i> Mosaic</b></div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxNegative" value="negative"><b><i class="fa fa-crop" aria-hidden="true"></i> Negative</b></div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxPaint" value="paint"><b><i class="fa fa-crop" aria-hidden="true"></i> Paint</b></div>
+					<div id="paintSection" class="settingsSubBlock">
+					</div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxSolarize" value="solarize"><b><i class="fa fa-crop" aria-hidden="true"></i> Solarize</b></div>
+					<div id="solarizeSection" class="settingsSubBlock">
+					</div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxSpread" value="spread"><b><i class="fa fa-crop" aria-hidden="true"></i> Spread</b></div>
+					<div id="spreadSection" class="settingsSubBlock">
+					</div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxSwirl" value="swirl"><b><i class="fa fa-crop" aria-hidden="true"></i> Swirl</b></div>
+					<div id="swirlSection" class="settingsSubBlock">
+					</div>
+
+					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxWave" value="wave"><b><i class="fa fa-crop" aria-hidden="true"></i> Wave</b></div>
+					<div id="waveSection" class="settingsSubBlock">
+					</div>
 					<br>
 			
 					<span class="subTitle">Settings</span><br>
+
+					<b><i class="fa fa-crop" aria-hidden="true"></i> Contrast</b>
+					<div id="contrastSection" class="settingsSubBlock">
+					</div>
+
+					<b><i class="fa fa-crop" aria-hidden="true"></i> Brightness</b>
+					<div id="brightnessSection" class="settingsSubBlock">
+					</div>
+
+					<b><i class="fa fa-crop" aria-hidden="true"></i> Hue</b>
+					<div id="hueSection" class="settingsSubBlock">
+					</div>
+
+					<b><i class="fa fa-crop" aria-hidden="true"></i> Saturation</b>
+					<div id="saturationSection" class="settingsSubBlock">
+					</div>
+
+					<!--
+
 					<b>Contrast</b>-100<input id="contrast" type="range" min="-100" max="100" value="0" step="5">100<span id="contrastValue"></span><br>
 					<b>Brightness</b><input id="brightness" type="range" min="-100" max="100" value="0" step="5"><span id="brightnessValue"></span><br>
 					<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
 					<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
+					-->
 				</div>
 
 			</div>
