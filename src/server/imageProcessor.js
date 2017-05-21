@@ -782,31 +782,32 @@ function applyFilters (image, size, filters) {
 					if (filter.settings.brightness) {
 						// Brightness values are from -100 to 100, 0 meaning no change
 						// Image Processor expects the values from -200% to 200%, 100% meaning no change
-						brightness = absoluteToPercentageChangeSigned(filter.settings.brightness.value);
+						brightness = absoluteToPercentageChangeSigned(parseInt(filter.settings.brightness.value));
 					} else {
 						brightness = 100; // no change, 100%
 					}
 
 					if (filter.settings.saturation) {
-						saturation = absoluteToPercentageChangeSigned(filter.settings.saturation.value);
+						saturation = absoluteToPercentageChangeSigned(parseInt(filter.settings.saturation.value));
 					} else {
 						saturation = 100; // no change, 100%
 					}
 
 					if (filter.settings.hue) {
-						hue = absoluteToPercentageChangeSigned(filter.settings.hue.value);
+						hue = absoluteToPercentageChangeSigned(parseInt(filter.settings.hue.value));
 					} else {
 						hue = 100; // no change, 100%
 					}
 
 					// now, do the thing
+					console.log("calling image.modulate with brightness = " + brightness + ", hue = " + hue + ", saturation = " + saturation);
 					image.modulate(brightness, saturation, hue);
 				}
 		
 						
 				// Contrast
 				if (filter.settings.contrast) {
-					image.contrast(absoluteToMultiplierSigned(filter.settings.contrast.value));
+					image.contrast(absoluteToMultiplierSigned(parseInt(filter.settings.contrast.value)));
 				}
 					
 			// ADD MORE
@@ -820,6 +821,7 @@ function applyFilters (image, size, filters) {
 					image.colorspace("GRAY");
 				}
 				if (filter.effects.mosaic == "on") {
+					console.log("setting image.mosaic");
 					image.mosaic();
 				}
 				if (filter.effects.negative == "on") {
@@ -903,10 +905,21 @@ function applyArtifacts (image, size, artifacts) {
 
 			} else if (artifact.banner.location == "top") {
 				image.region(size.width, labelHeight, 0, 0).gravity("Center");
+			} else if (artifact.banner.location == "below") {
+				image.extent(size.width, size.height + labelHeight);
+				image.region(size.width, labelHeight, 0, size.height).gravity("Center");
+			} else if (artifact.banner.location == "above") {
+				image.extent(size.width, size.height + labelHeight, "+0-" + labelHeight);
+				image.region(size.width, labelHeight, 0, 0).gravity("Center");
 			}
 
 			// Fill the background
-			image.fill(artifact.banner.backgroundColor);
+			console.log("calling image.fill with " + artifact.banner.backgroundColor);
+			if (artifact.banner.backgroundColor == "transparent") {
+				image.fill("none");
+			} else {
+				image.fill(artifact.banner.backgroundColor);
+			}
 			image.drawRectangle(0, 0, size.width, size.height);
 
 			// Draw the text

@@ -382,7 +382,7 @@ function setupFilterStep() {
 	// FILTERS SECTION ----------------------
 
 	//charcoal
-	$("#charcoalSection").append(createRangeSection("charcoalValueText", "charcoalRangeInput", 0, 100, 0, 5));
+	$("#charcoalSection").append(createRangeSection("charcoalValueText", "charcoalRangeInput", 0, 20, 0, 1));
 	enableDisableOnCheck("#checkboxCharcoal", ["#charcoalRangeInput"]);
 
 	//paint
@@ -390,7 +390,7 @@ function setupFilterStep() {
 	enableDisableOnCheck("#checkboxPaint", ["#paintRangeInput"]);
 
 	//solarize
-	$("#solarizeSection").append(createRangeSection("solarizeValueText", "solarizeRangeInput", 0, 100, 0, 5));
+	$("#solarizeSection").append(createRangeSection("solarizeValueText", "solarizeRangeInput", 0, 100, 100, 5));
 	enableDisableOnCheck("#checkboxSolarize", ["#solarizeRangeInput"]);
 
 	//spread
@@ -403,7 +403,7 @@ function setupFilterStep() {
 
 	//Wave
 	$("#waveSection").append(createRangeSection("waveAmplitudeValueText", "waveAmplitudeRangeInput", 0, 100, 0, 5));
-	$("#waveSection").append(createRangeSection("waveLengthValueText", "waveLengthRangeInput", 0, 100, 0, 5));
+	$("#waveSection").append(createRangeSection("waveLengthValueText", "waveLengthRangeInput", 0, 100, 100, 5));
 	enableDisableOnCheck("#checkboxWave", ["#waveAmplitudeRangeInput", "#waveLengthRangeInput"]);
 
 	//contrast
@@ -490,25 +490,47 @@ function createRangeSection(valueTextID, rangeInputID, min, max, value, step) {
 }
 
 function setupArtifactStep() {
-	// ARTIFACTS SECTION ------------------------
-	$("input[type=radio][name=artifact]").change(function () {
+		//show hide logic
+	$("#artifactTypeSelection").on("change", function() {
 		showHideSection(this.value, 
 			[{value: "none", id: "#noneArtifactSection"}, 
 			{value: "preset", id: "#presetArtifactSection"}, 
-			{value: "user_defined", id: "#userDefinedArtifactSection"}, 
+			{value: "userDefined", id: "#userDefinedArtifactSection"}, 
 			{value: "custom", id: "#customArtifactSection"}]);
 		applyChanges();
 	});
 
-	enableDisableOnCheck("#checkboxBanner", ["#bannerSection"]);
+	$("#topBannerButton, #bottomBannerButton, #aboveBannerButton, #belowBannerButton").click(function() {
+
+		$(this).toggleClass('active')
+			.siblings().not(this).not("#transparentBannerButton").not("#bannerColorButton").removeClass('active');
+
+		applyChanges();
+	});
+
+	$("#transparentBannerButton, #bannerColorButton").click(function() {
+		if (this.id == "transparentBannerButton") {
+			$("#" + this.id).addClass("active");
+			$("#bannerColorButton").removeClass("active");
+		} else if (this.id == "bannerColorButton") {
+			$("#" + this.id).addClass("active");
+			$("#transparentBannerButton").removeClass("active");
+		}
+
+		applyChanges();
+	});
+
 	setChangeCallback(changeCallback, [
-		"#textBanner", 
-		"input[type=radio][name=banner]",
-		"#checkboxBanner",
+		"#topBannerButton",
+		"#bottomBannerButton",
+		"#aboveBannerButton",
+		"#belowBannerButton",
+		"#transparentBannerButton",
+		"#bannerColorButton", 
+		"#bannerText",
 		"#bannerTextFontSize",
 		"#bannerTextFontName",
-		"#bannerBackgroundColor",
-		"#bannerTextColor"
+		"#bannerTextColorButton"
 		]);
 }
 
@@ -535,8 +557,10 @@ function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 	for (var i = 0; i < listOfValuesAndSectionIds.length; i++) {
 		console.log("i = " + i + ", valueToMatch = " + valueToMatch + ", value = " + listOfValuesAndSectionIds[i].value + ", id = " + listOfValuesAndSectionIds[i].id);
 		if (valueToMatch == listOfValuesAndSectionIds[i].value) {
+			console.log("going to call show for " + listOfValuesAndSectionIds[i].id);
 			$(listOfValuesAndSectionIds[i].id).show();
 		} else {
+			console.log("going to call hide for " + listOfValuesAndSectionIds[i].id);
 			$(listOfValuesAndSectionIds[i].id).hide();
 		}
 	}
@@ -726,34 +750,41 @@ function constructJSONObject(jsonObj) {
 
 	jsonObj.steps.artifacts = [];
 
-	console.log("jsonObj is " + JSON.stringify(jsonObj));
+	
 
 	var artifact = {};
 
-	if ($("#radioArtifactNone").prop("checked")) {
+	if ($("#artifactTypeSelection").val() == "none") {
 		artifact.type = "none";
-	} else if ($("#radioArtifactPreset").prop("checked")) {
+	} else if ($("#artifactTypeSelection").val() == "preset") {
 		artifact.type = "preset";
-	} else if ($("#radioArtifactUserDefined").prop("checked")) {
+	} else if ($("#artifactTypeSelection").val() == "userDefined") {
 		artifact.type = "user_defined";
-	} else if ($("#radioArtifactCustom").prop("checked")) {
+	} else if ($("#artifactTypeSelection").val() == "custom") {
 		artifact.type = "custom";
 
-		if ($("#checkboxBanner").prop("checked")) {
 			artifact.banner = {};
-			artifact.banner.text = $("#textBanner").prop("value");
+			artifact.banner.text = $("#bannerText").prop("value");
 
-			if ($("#radioBannerLocationBottom").prop("checked")) {
-				artifact.banner.location = "bottom";
-			} else if ($("#radioBannerLocationTop").prop("checked")) {
+			if ($("#topBannerButton").hasClass("active")) {
 				artifact.banner.location = "top";
+			} else if ($("#bottomBannerButton").hasClass("active")) {
+				artifact.banner.location = "bottom";
+			} else if ($("#aboveBannerButton").hasClass("active")) {
+				artifact.banner.location = "above";
+			} else if ($("#belowBannerButton").hasClass("active")) {
+				artifact.banner.location = "below";
 			}
 
 			artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
 			artifact.banner.fontName = $("#bannerTextFontName").val();
-			artifact.banner.backgroundColor = $("#bannerBackgroundColor").prop("value");
-			artifact.banner.textColor = $("#bannerTextColor").prop("value");
-		}
+			if ($("#bannerColorButton").hasClass("active")) {
+				artifact.banner.backgroundColor = $("#bannerColorButton").val();
+			} else if ($("#transparentBannerButton").hasClass("active")) {
+				artifact.banner.backgroundColor = "transparent";
+			}
+			
+			artifact.banner.textColor = $("#bannerTextColorButton").val();
 	}
 
 
@@ -785,6 +816,8 @@ function constructJSONObject(jsonObj) {
 	}
 
 	jsonObj.steps.decorations.push(decoration);
+
+	console.log("jsonObj is " + JSON.stringify(jsonObj));
 }
 
 function generateChanges(id, jsonObj, done) {

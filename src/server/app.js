@@ -243,6 +243,7 @@ module.exports = function() {
 	app.listen(config.port, function() {
 		console.log("Listening on port " + config.port);
 	});
+
 }
 
 function ensureLoggedIn(req, res, next) {

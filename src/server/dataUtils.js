@@ -33,6 +33,8 @@ module.exports = {
 		return myDB;
 	},
 
+
+
 	/**
 		Given an Entry ID, return the corresponding
 		Challenge ID that this entry belongs to.
@@ -512,6 +514,15 @@ module.exports = {
 		});
 	},
 
+	escapeSingleQuotes : function(str) {
+		console.log("escapeSingleQuotes called");
+		return str.replace(/'/g, "\\'");
+		//str.replace(/h/g, "v");
+		//console.log("str is now " + str);
+
+		return str;
+	},
+
 	createArtifactNode : function(db, artifact, callback) {
 		//console.log("createArtifactNode: artifact = " + JSON.stringify(artifact));
 		var cypherQuery = "CREATE (a:Artifact {";
@@ -526,9 +537,12 @@ module.exports = {
 		if (artifact.type == "custom") {
 			cypherQuery += " artifact_type : 'custom' ";
 
+			var bannerText = artifact.banner.text;
+			bannerText = bannerText.replace(/'/g, "\\'");
+
 			if (artifact.banner) {
 				cypherQuery += ", banner : 'on'";
-				cypherQuery += ", banner_text : '" + escapeSingleQuotes(artifact.banner.text) + "'";
+				cypherQuery += ", banner_text : '" + bannerText + "'";
 
 				cypherQuery += ", banner_location : '" + artifact.banner.location + "'";
 				cypherQuery += ", banner_fontSize : '" + artifact.banner.fontSize + "'";
@@ -1002,14 +1016,8 @@ module.exports = {
 				next(null, user);
 			});
 		});
-	},
-
-	escapeSingleQuotes : function(str) {
-		return str.replace(/'/g, "\\'");
-		//str.replace(/h/g, "v");
-		//console.log("str is now " + str);
-
-		return str;
 	}
+
+	
 }
 

@@ -3,8 +3,9 @@
 <title>Delphinus - New Entry</title>
 <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css">
 <link ref="stylesheet" href="/css/font-awesome/css/font-awesome.min.css">
-<link rel="stylesheet" type="text/css" href="/css/styles.css">
+
 <link rel="stylesheet" type="text/css" href="/css/cropper/cropper.css">
+<link rel="stylesheet" type="text/css" href="/css/styles.css">
 <script src="https://use.fontawesome.com/6ce6a7bf69.js"></script>
 </head>
 <body>
@@ -53,37 +54,67 @@
 
 				<!-- CUSTOM LAYOUT SUBSECTION -->
 				<div id="customLayoutSection" class="settingsSubBlock" style="display: none;">
-					<div class="checkbox"><input type="checkbox" id="checkboxCrop" value="crop"><b><i class="fa fa-crop" aria-hidden="true"></i> Crop</b></div>
-					<div id="cropSection" class="settingsSubBlock">
-						<p id="cropSectionSettings" class="sectionSettings">Not Set</p>
-						<button type="button" class="btn btn-default" id="resetCropButton">Reset Crop</button>
-						<button type="button" class="btn btn-default" id="editCropButton"><i class="fa fa-crop" aria-hidden="true"></i> Edit Crop</button>
+					<div id="customLayoutTabGroup" class="tabContainer">
+						<ul class="nav nav-tabs">
+						<li class="active">
+							<a data-toggle="tab" href="#crop">Crop</a>
+						</li>
+						<li>
+							<a data-toggle="tab" href="#flip">Flip</a>
+						</li>
+						<li>
+							<a data-toggle="tab" href="#rotate">Rotate</a>
+						</li>
+						<li>
+							<a data-toggle="tab" href="#shear">Shear</a>
+						</li>
+						</ul>
+						<div class="tab-content">
+						<div id="crop" class="tab-pane fade in active">
+
+							<div class="mycheckbox"><input type="checkbox" id="checkboxCrop" value="crop"><b><i class="fa fa-crop" aria-hidden="true"></i> Crop</b></div>
+							<div id="cropSection" class="settingsSubBlock">
+								<p id="cropSectionSettings" class="sectionSettings">Not Set</p>
+								<button type="button" class="btn btn-default" id="resetCropButton">Reset Crop</button>
+								<button type="button" class="btn btn-default" id="editCropButton"><i class="fa fa-crop" aria-hidden="true"></i> Edit Crop</button>
+							</div>
+						</div>
+						<div id="flip" class="tab-pane fade in">
+							<div class="mycheckbox"><input type="checkbox" id="checkboxFlip" value="flip"><b><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip</b></div>
+							<div id="flipSection" class="settingsSubBlock">
+								<p id="flipSectionSettings" class="sectionSettings">Not Set</p>
+								<button type="button" class="btn btn-default" id="flipHorizontalButton"><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip Horizontal</button>
+								<button type="button" class="btn btn-default" id="flipVerticalButton"><i class="fa fa-arrows-v" aria-hidden="true"></i> Flip Vertical</button>
+							</div>
+						</div>
+						<div id="rotate" class="tab-pane fade in">
+							<div class="mycheckbox"><input type="checkbox" id="checkboxRotate" value="rotate"><b><i class="fa fa-repeat" aria-hidden="true"></i> Rotate</b></div>
+							<div id="rotateSection" class="settingsSubBlock">
+								<p id="rotationSectionSettings" class="sectionSettings">Not Set</p>
+								<button type="button" class="btn btn-default" id="resetRotationButton">Reset Rotation</button>
+								<button type="button" class="btn btn-default" id="anticlockwise10RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 10&#176;</button>
+								<button type="button" class="btn btn-default" id="anticlockwise90RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 90&#176;</button>
+								<button type="button" class="btn btn-default" id="clockwise90RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 90&#176;</button>
+								<button type="button" class="btn btn-default" id="clockwise10RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 10&#176;</button><br><br>
+								<b>Background Color: </b><input type="color" class="btn btn-default" id="rotateColorButton" value="#000000">
+							</div>
+						</div>
+						<div id="shear" class="tab-pane fade in">
+							<div class="mycheckbox"><input type="checkbox" id="checkboxShear" value="shear"><b><i class="fa fa-exchange" aria-hidden="true"></i> Shear</b></div>
+							<div id="shearSection" class="settingsSubBlock">
+								<p id="shearSectionSettings" class="sectionSettings">Not Set</p>
+								<button type="button" class="btn btn-default" id="resetShearButton">Reset Shear</button>
+								<button type="button" class="btn btn-default" id="negative10ShearXButton"><i class="fa fa-arrow-left" aria-hidden="true"></i> Shear 10&#176;</button>
+								<button type="button" class="btn btn-default" id="positive10ShearXButton"><i class="fa fa-arrow-right" aria-hidden="true"></i> Shear 10&#176;</button>
+								<button type="button" class="btn btn-default" id="negative10ShearYButton"><i class="fa fa-arrow-up" aria-hidden="true"></i> Shear 10&#176;</button>
+								<button type="button" class="btn btn-default" id="positive10ShearYButton"><i class="fa fa-arrow-down" aria-hidden="true"></i> Shear 10&#176;</button>
+							</div>
+						</div>
+						</div>
 					</div>
-					<div class="checkbox"><input type="checkbox" id="checkboxFlip" value="flip"><b><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip</b></div>
-					<div id="flipSection" class="settingsSubBlock">
-						<p id="flipSectionSettings" class="sectionSettings">Not Set</p>
-						<button type="button" class="btn btn-default" id="flipHorizontalButton"><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip Horizontal</button>
-						<button type="button" class="btn btn-default" id="flipVerticalButton"><i class="fa fa-arrows-v" aria-hidden="true"></i> Flip Vertical</button>
-					</div>
-					<div class="checkbox"><input type="checkbox" id="checkboxRotate" value="rotate"><b><i class="fa fa-repeat" aria-hidden="true"></i> Rotate</b></div>
-					<div id="rotateSection" class="settingsSubBlock">
-						<p id="rotationSectionSettings" class="sectionSettings">Not Set</p>
-						<button type="button" class="btn btn-default" id="resetRotationButton">Reset Rotation</button>
-						<button type="button" class="btn btn-default" id="anticlockwise10RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 10&#176;</button>
-						<button type="button" class="btn btn-default" id="anticlockwise90RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 90&#176;</button>
-						<button type="button" class="btn btn-default" id="clockwise90RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 90&#176;</button>
-						<button type="button" class="btn btn-default" id="clockwise10RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 10&#176;</button><br><br>
-						<b>Background Color: </b><input type="color" class="btn btn-default" id="rotateColorButton" value="#000000">
-					</div>
-					<div class="checkbox"><input type="checkbox" id="checkboxShear" value="shear"><b><i class="fa fa-exchange" aria-hidden="true"></i> Shear</b></div>
-					<div id="shearSection" class="settingsSubBlock">
-						<p id="shearSectionSettings" class="sectionSettings">Not Set</p>
-						<button type="button" class="btn btn-default" id="resetShearButton">Reset Shear</button>
-						<button type="button" class="btn btn-default" id="negative10ShearXButton"><i class="fa fa-arrow-left" aria-hidden="true"></i> Shear 10&#176;</button>
-						<button type="button" class="btn btn-default" id="positive10ShearXButton"><i class="fa fa-arrow-right" aria-hidden="true"></i> Shear 10&#176;</button>
-						<button type="button" class="btn btn-default" id="negative10ShearYButton"><i class="fa fa-arrow-up" aria-hidden="true"></i> Shear 10&#176;</button>
-						<button type="button" class="btn btn-default" id="positive10ShearYButton"><i class="fa fa-arrow-down" aria-hidden="true"></i> Shear 10&#176;</button>
-					</div>
+					
+					
+					
 				</div>
 			</div>
 
@@ -115,80 +146,101 @@
 
 				<!-- CUSTOM FILTER SUBSECTION -->
 				<div id="customFilterSection" class="settingsSubBlock" style="display: none;">
-				
-					<span class="subTitle">Effects</span><br>
+					<div id="customLayoutTabGroup" class="tabContainer">
+						<ul class="nav nav-tabs">
+						<li class="active">
+							<a data-toggle="tab" href="#antique">Antique</a>
+						</li>
+						<li>
+							<a data-toggle="tab" href="#distortion">Distortion</a>
+						</li>
+						<li>
+							<a data-toggle="tab" href="#artistic">Artistic</a>
+						</li>
+						<li>
+							<a data-toggle="tab" href="#color">Color/Contrast</a>
+						</li>
+						</ul>
+						<div class="tab-content">
+						<div id="antique" class="tab-pane fade in active">
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxGrayscale" value="grayscale"><b><i class="fa fa-crop" aria-hidden="true"></i> Grayscale</b></div>
 
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxCharcoal" value="charcoal"><b><i class="fa fa-crop" aria-hidden="true"></i> Charcoal</b></div>
-					<div id="charcoalSection" class="settingsSubBlock">
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxMonochrome" value="monochrome"><b><i class="fa fa-crop" aria-hidden="true"></i> Monochrome</b></div>
+
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxNegative" value="negative"><b><i class="fa fa-crop" aria-hidden="true"></i> Negative</b></div>
+
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxSolarize" value="solarize"><b><i class="fa fa-crop" aria-hidden="true"></i> Solarize</b></div>
+							<div id="solarizeSection" class="settingsSubBlock">
+							</div>
+						</div>
+						<div id="distortion" class="tab-pane fade in">
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxSpread" value="spread"><b><i class="fa fa-crop" aria-hidden="true"></i> Spread</b></div>
+							<div id="spreadSection" class="settingsSubBlock">
+							</div>
+
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxSwirl" value="swirl"><b><i class="fa fa-crop" aria-hidden="true"></i> Swirl</b></div>
+							<div id="swirlSection" class="settingsSubBlock">
+							</div>
+
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxWave" value="wave"><b><i class="fa fa-crop" aria-hidden="true"></i> Wave</b></div>
+							<div id="waveSection" class="settingsSubBlock">
+							</div>
+						</div>
+						<div id="artistic" class="tab-pane fade in">
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxCharcoal" value="charcoal"><b><i class="fa fa-crop" aria-hidden="true"></i> Charcoal</b></div>
+							<div id="charcoalSection" class="settingsSubBlock">
+							</div>
+
+							
+
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxMosaic" value="mosaic"><b><i class="fa fa-crop" aria-hidden="true"></i> Mosaic</b></div>
+
+							
+							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxPaint" value="paint"><b><i class="fa fa-crop" aria-hidden="true"></i> Paint</b></div>
+							<div id="paintSection" class="settingsSubBlock">
+							</div>
+
+						</div>
+						<div id="color" class="tab-pane fade in">
+							<b><i class="fa fa-crop" aria-hidden="true"></i> Contrast</b>
+							<div id="contrastSection" class="settingsSubBlock">
+							</div>
+
+							<b><i class="fa fa-crop" aria-hidden="true"></i> Brightness</b>
+							<div id="brightnessSection" class="settingsSubBlock">
+							</div>
+
+							<b><i class="fa fa-crop" aria-hidden="true"></i> Hue</b>
+							<div id="hueSection" class="settingsSubBlock">
+							</div>
+
+							<b><i class="fa fa-crop" aria-hidden="true"></i> Saturation</b>
+							<div id="saturationSection" class="settingsSubBlock">
+							</div>
+						</div>
+						</div>
 					</div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxGrayscale" value="grayscale"><b><i class="fa fa-crop" aria-hidden="true"></i> Grayscale</b></div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxMonochrome" value="monochrome"><b><i class="fa fa-crop" aria-hidden="true"></i> Monochrome</b></div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxMosaic" value="mosaic"><b><i class="fa fa-crop" aria-hidden="true"></i> Mosaic</b></div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxNegative" value="negative"><b><i class="fa fa-crop" aria-hidden="true"></i> Negative</b></div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxPaint" value="paint"><b><i class="fa fa-crop" aria-hidden="true"></i> Paint</b></div>
-					<div id="paintSection" class="settingsSubBlock">
-					</div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxSolarize" value="solarize"><b><i class="fa fa-crop" aria-hidden="true"></i> Solarize</b></div>
-					<div id="solarizeSection" class="settingsSubBlock">
-					</div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxSpread" value="spread"><b><i class="fa fa-crop" aria-hidden="true"></i> Spread</b></div>
-					<div id="spreadSection" class="settingsSubBlock">
-					</div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxSwirl" value="swirl"><b><i class="fa fa-crop" aria-hidden="true"></i> Swirl</b></div>
-					<div id="swirlSection" class="settingsSubBlock">
-					</div>
-
-					<div class="checkbox"><input type="checkbox" name="effects" id="checkboxWave" value="wave"><b><i class="fa fa-crop" aria-hidden="true"></i> Wave</b></div>
-					<div id="waveSection" class="settingsSubBlock">
-					</div>
-					<br>
-			
-					<span class="subTitle">Settings</span><br>
-
-					<b><i class="fa fa-crop" aria-hidden="true"></i> Contrast</b>
-					<div id="contrastSection" class="settingsSubBlock">
-					</div>
-
-					<b><i class="fa fa-crop" aria-hidden="true"></i> Brightness</b>
-					<div id="brightnessSection" class="settingsSubBlock">
-					</div>
-
-					<b><i class="fa fa-crop" aria-hidden="true"></i> Hue</b>
-					<div id="hueSection" class="settingsSubBlock">
-					</div>
-
-					<b><i class="fa fa-crop" aria-hidden="true"></i> Saturation</b>
-					<div id="saturationSection" class="settingsSubBlock">
-					</div>
-
-					<!--
-
-					<b>Contrast</b>-100<input id="contrast" type="range" min="-100" max="100" value="0" step="5">100<span id="contrastValue"></span><br>
-					<b>Brightness</b><input id="brightness" type="range" min="-100" max="100" value="0" step="5"><span id="brightnessValue"></span><br>
-					<b>Hue</b><input id="hue" type="range" min="-100" max="100" value="0" step="5"><span id="hueValue"></span><br>
-					<b>Saturation</b><input id="saturation" type="range" min="-100" max="100" value="0" step="5"><span id="saturationValue"></span><br>
-					-->
 				</div>
 
 			</div>
 			<br>
 
 			<!-- ARTIFACT SECION -->
-			<div id="artifactSection" class="settingsBlock" style="display: none;">
+			<div id="artifactSection" style="display: none;">
 				<span class="title">Step 3: Add Artifacts</span><br>
+				<!--
 				<input type="radio" id="radioArtifactNone" name="artifact" value="none" checked="checked"><b>None</b><br>
 				<input type="radio" id="radioArtifactPreset" name="artifact" value="preset"><b>Preset</b><br>
 				<input type="radio" id="radioArtifactUserDefined" name="artifact" value="user_defined"><b>User Defined</b><br>
 				<input type="radio" id="radioArtifactCustom" name="artifact" value="custom"><b>Custom</b>
-				
+				-->
+				<select id="artifactTypeSelection" class="form-control">
+					<option value="none" selected="selected">None</option>
+					<option value="preset">Preset</option>
+					<option value="userDefined">User Defined</option>
+					<option value="custom">Custom</option>
+				</select>
+
 				<!-- NONE ARTIFACT SUBSECTION -->
 				<div id="noneArtifactSection" class="settingsSubBlock">
 				<p>No Artifact Selected</p>
@@ -206,8 +258,35 @@
 
 				<!-- CUSTOM ARTIFACT SUBSECTION -->
 				<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
-					<input type="checkbox" id="checkboxBanner" name="artifact" value="banner"><b>Add Banner</b>
 					<div id="bannerSection">
+						<span class="settingsSubBlockTitle">Banner</span>
+						<div class="settingsSubBlock">
+							<b>Location:</b>
+							<button type="button" class="btn btn-default" id="topBannerButton">Top</button>
+							<button type="button" class="btn btn-default active" id="bottomBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Bottom</button>
+							<button type="button" class="btn btn-default" id="aboveBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Above</button>
+							<button type="button" class="btn btn-default" id="belowBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Below</button><br><br>
+							<b>Background Color:</b>
+							<button type="button" class="btn btn-default active" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
+							<input type="color" class="btn btn-default" id="bannerColorButton" value="#000000">
+						</div>
+						<span class="settingsSubBlockTitle">Text</span>
+						<div class="settingsSubBlock">
+							<b>Font:</b>
+							<select id="bannerTextFontName" class="fontDropDown">
+								<option value="arial">Arial</option>
+								<option value="times">Times</option>
+								<option value="courier">Courier</option>
+							</select>
+							<input type="number" id="bannerTextFontSize" value="30">
+							<b>Text Color:</b>
+							<input type="color" class="btn btn-default" id="bannerTextColorButton" value="#000000">
+						</div>
+						<span class="settingsSubBlockTitle">Caption</span>
+						<div class="settingsSubBlock">
+							<input type="text" id="bannerText" class="form-control" value="Enter your caption here!">
+						</div>
+						<!--
 						<b>Banner Text:</b><input type="text" id="textBanner">
 						<b>Font Size</b><input type="number" id="bannerTextFontSize" value="30">
 						<b>Font Name</b><select id="bannerTextFontName">
@@ -220,6 +299,7 @@
 						<input type="radio" id="radioBannerLocationTop" name="banner" value="bannerLocationTop"><b>Top</b><br>
 
 						<b>Background Color</b><input type="color" id="bannerBackgroundColor" value="#FFFFFF">
+						-->
 					</div>
 				</div>
 			</div>
