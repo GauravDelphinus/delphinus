@@ -291,6 +291,7 @@ function createThumbnailElement(data) {
 function createGrid(id, list, numCols, allowHover, allowSelection, selectionCallback) {
 	var table = $("<table>", {id: id, class: "gridTable"});
 
+	var tdWidth = 100 / numCols;
 	for (var i = 0; i < list.length; i++) {
 		var col = i % numCols;
 		var tr;
@@ -298,7 +299,7 @@ function createGrid(id, list, numCols, allowHover, allowSelection, selectionCall
 
 		var data = list[i];
 
-		var td = $("<td>", {id: data.id});
+		var td = $("<td>", {id: data.id, width: tdWidth + "%"});
 		var element = createThumbnailElement(data);
 
 		if (allowHover) {

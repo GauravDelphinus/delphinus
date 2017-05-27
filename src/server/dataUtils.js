@@ -1,4 +1,5 @@
 var config = require('./config');
+var presets = require("./presets");
 var shortid = require("shortid");
 
 module.exports = {
@@ -27,6 +28,69 @@ module.exports = {
 
 		});
 		*/
+
+		//enumerate preset filters and create the nodes if not present
+
+		for (var key in presets.presetLayout) {
+			var id = key;
+			var presetLayoutName = presets.presetLayout[key];
+
+			var cypherQuery = "MERGE (l:Layout {id: '" + id + "'}) ON CREATE SET l.name = '" + presetLayoutName + "', l.layout_type = 'preset' RETURN l;";
+
+			console.log("INIT DB Running cypherQuery: " + cypherQuery);
+				
+			db.cypherQuery(cypherQuery, function(err, result){
+				if(err) throw err;
+
+				console.log(result.data); // delivers an array of query results
+
+			});
+		}
+		for (var key in presets.presetFilter) {
+			var id = key;
+			var presetFilterName = presets.presetFilter[key];
+
+			var cypherQuery = "MERGE (f:Filter {id: '" + id + "'}) ON CREATE SET f.name = '" + presetFilterName + "', f.filter_type = 'preset' RETURN f;";
+
+			console.log("INIT DB Running cypherQuery: " + cypherQuery);
+				
+			db.cypherQuery(cypherQuery, function(err, result){
+				if(err) throw err;
+
+				console.log(result.data); // delivers an array of query results
+
+			});
+		}
+		for (var key in presets.presetArtifact) {
+			var id = key;
+			var presetArtifactName = presets.presetArtifact[key];
+
+			var cypherQuery = "MERGE (a:Artifact {id: '" + id + "'}) ON CREATE SET a.name = '" + presetArtifactName + "', a.artifact_type = 'preset' RETURN a;";
+
+			console.log("INIT DB Running cypherQuery: " + cypherQuery);
+				
+			db.cypherQuery(cypherQuery, function(err, result){
+				if(err) throw err;
+
+				console.log(result.data); // delivers an array of query results
+
+			});
+		}
+		for (var key in presets.presetDecoration) {
+			var id = key;
+			var presetDecorationName = presets.presetDecoration[key];
+
+			var cypherQuery = "MERGE (d:Decoration {id: '" + id + "'}) ON CREATE SET d.name = '" + presetDecorationName + "', d.decoration_type = 'preset' RETURN d;";
+
+			console.log("INIT DB Running cypherQuery: " + cypherQuery);
+				
+			db.cypherQuery(cypherQuery, function(err, result){
+				if(err) throw err;
+
+				console.log(result.data); // delivers an array of query results
+
+			});
+		}
 	},
 
 	getDB : function() {
@@ -135,7 +199,7 @@ module.exports = {
 		    				} else if (filterFromDB.filter_type == "preset") {
 		    					filter.type = "preset";
 
-		    					filter.preset = parseInt(filterFromDB.filter_preset);
+		    					filter.preset = filterFromDB.id;
 
 		    				} else if (filterFromDB.filter_type == "user_defined" || filterFromDB.filter_type == "custom") {
 		    					
@@ -213,7 +277,7 @@ module.exports = {
 		    				} else if (layoutFromDB.layout_type == "preset") {
 		    					layout.type = "preset";
 
-		    					layout.preset = layoutFromDB.preset;
+		    					layout.preset = layoutFromDB.id;
 
 		    				} else if (layoutFromDB.layout_type == "user_defined" || layoutFromDB.layout_type == "custom") {
 		    					
@@ -259,7 +323,7 @@ module.exports = {
 	    					} else if (artifactFromDB.artifact_type == "preset") {
 	    						artifact.type = "preset";
 
-	    						artifact.preset = artifactFromDB.preset;
+	    						artifact.preset = artifactFromDB.id;
 	    					} else if (artifactFromDB.artifact_type == "user_defined" || artifactFromDB.artifact_type == "custom") {
 	    						artifact.type = artifactFromDB.artifact_type;
 
@@ -287,7 +351,7 @@ module.exports = {
 	    					} else if (decorationFromDB.decoration_type == "preset") {
 	    						decoration.type = "preset";
 
-	    						decoration.preset = decorationFromDB.preset;
+	    						decoration.preset = decorationFromDB.id;
 	    					} else if (decorationFromDB.decoration_type == "user_defined" || decorationFromDB.decoration_type == "custom") {
 	    						decoration.type = decorationFromDB.decoration_type;
 
@@ -389,16 +453,14 @@ module.exports = {
 			// This shouldn't be called, and should get handled by caller
 			throw err;
 		} else if (filter.type == "user_defined") {
-			callback(null, parseInt(filter.user_defined));
+			callback(null, filter.user_defined);
+			return;
+		} else if (filter.type == "preset") {
+			callback(null, filter.preset);
 			return;
 		}
 
-
-		if (filter.type == "preset") {
-			cypherQuery += " filter_type : 'preset' ";
-
-			cypherQuery += ", filter_preset : '" + filter.preset + "' ";
-		} else if (filter.type == "custom") {
+		if (filter.type == "custom") {
 			cypherQuery += " filter_type : 'custom'";
 
 			if (filter.effects) {
@@ -488,6 +550,9 @@ module.exports = {
 		} else if (decoration.type == "user_defined") {
 			callback(null, parseInt(decoration.user_defined));
 			return;
+		} else if (decoration.type == "preset") {
+			callback(null, decoration.preset);
+			return;
 		}
 
 		if (decoration.type == "custom") {
@@ -532,6 +597,9 @@ module.exports = {
 		} else if (artifact.type == "user_defined") {
 			callback(null, parseInt(artifact.user_defined));
 			return;
+		} else if (artifact.type == "preset") {
+			callback(null, artifact.preset);
+			return;
 		}
 
 		if (artifact.type == "custom") {
@@ -575,6 +643,9 @@ module.exports = {
 			throw err;
 		} else if (layout.type == "user_defined") {
 			callback(null, parseInt(layout.user_defined));
+			return;
+		} else if (layout.type == "preset") {
+			callback(null, layout.preset);
 			return;
 		}
 

@@ -27,12 +27,5 @@
 	"image" : {
 		"maxHeight" : 1500,
 		"maxWidth" : 1500
-	},
-	"presetFilter" : {
-		"rainyDay" : 1,
-		"glassWall" : 2,
-		"nightingale" : 3,
-		"whirlpool" : 4,
-		"comical" : 5
 	}
 }

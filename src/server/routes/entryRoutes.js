@@ -117,114 +117,112 @@ var routes = function(db) {
 							"created : '" + req.body.created + "'" + 
 							"})-[:PART_OF]->(c), (u)<-[r:POSTED_BY]-(e) RETURN e;";
 
-				console.log("Running cypherQuery: " + cypherQuery);
-				
-				db.cypherQuery(cypherQuery, function(err, result){
-    				if(err) throw err;
+			console.log("Running cypherQuery: " + cypherQuery);
+			
+			db.cypherQuery(cypherQuery, function(err, result){
+				if(err) throw err;
 
-    				console.log(result.data); // delivers an array of query results
-    				var newEntryId = result.data[0].id;
+				console.log(result.data); // delivers an array of query results
+				var newEntryId = result.data[0].id;
 
-    				//res.json(result.data[0]);
+				//res.json(result.data[0]);
 
-    				/**
-						Next extract all the filters, decorations, layouts and artifacts, and create the
-						respective nodes, and link them to the entry node.
-					**/
+				/**
+					Next extract all the filters, decorations, layouts and artifacts, and create the
+					respective nodes, and link them to the entry node.
+				**/
 
-					var createFilterNodesFunctions = []; // array of functions that will create the Filter Nodes
+				var createFilterNodesFunctions = []; // array of functions that will create the Filter Nodes
 
-					// FILTERS
-					if (req.body.steps) {
-						if (req.body.steps.layouts && req.body.steps.layouts.constructor === Array) {
-							for (var i = 0; i < req.body.steps.layouts.length; i++) {
-								var layout = req.body.steps.layouts[i];
+				// FILTERS
+				if (req.body.steps) {
+					if (req.body.steps.layouts && req.body.steps.layouts.constructor === Array) {
+						for (var i = 0; i < req.body.steps.layouts.length; i++) {
+							var layout = req.body.steps.layouts[i];
 
-								if (layout.type == "none") {
-									// No layout, do nothing
-								} else {
-									createFilterNodesFunctions.push(async.apply(dataUtils.createLayoutNode, db, layout));
-								}
-							}
-						}
-
-						if (req.body.steps.filters && (req.body.steps.filters.constructor === Array)) {
-							for (var i = 0; i < req.body.steps.filters.length; i++) {
-								var filter = req.body.steps.filters[i];
-
-								if (filter.type == "none") {
-									// No filter added - do nothing
-								} else {
-									createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter));
-								}
-							}
-						}
-
-						if (req.body.steps.artifacts && req.body.steps.artifacts.constructor === Array) {
-							for (var i = 0; i < req.body.steps.artifacts.length; i++) {
-								var artifact = req.body.steps.artifacts[i];
-
-								if (artifact.type == "none") {
-									// No Artifact, do nothing
-								} else {
-									createFilterNodesFunctions.push(async.apply(dataUtils.createArtifactNode, db, artifact));
-								}
-							}
-						}
-
-						if (req.body.steps.decorations && req.body.steps.decorations.constructor === Array) {
-							for (var i = 0; i < req.body.steps.decorations.length; i++) {
-								var decoration = req.body.steps.decorations[i];
-
-								if (decoration.type == "none") {
-									// No Decoration, do nothing
-								} else {
-									createFilterNodesFunctions.push(async.apply(dataUtils.createDecorationNode, db, decoration));
-								}
+							if (layout.type == "none") {
+								// No layout, do nothing
+							} else {
+								createFilterNodesFunctions.push(async.apply(dataUtils.createLayoutNode, db, layout));
 							}
 						}
 					}
-					
 
-					// LAYOUTS
+					if (req.body.steps.filters && (req.body.steps.filters.constructor === Array)) {
+						for (var i = 0; i < req.body.steps.filters.length; i++) {
+							var filter = req.body.steps.filters[i];
 
-					async.series(createFilterNodesFunctions, 
-						function(err, filterNodes) {
-
-							var cypherQuery = "MATCH (e:Entry {id: '" + newEntryId + "'}) ";
-							//console.log("filterNodes, num values = " + filterNodes.length);
-							for (var i = 0; i < filterNodes.length; i++) {
-								//console.log("filterNodes, " + i + " = " + filterNodes[i]);
-
-								// Now associate filters to the new entry
-								cypherQuery += " MATCH (s" + i + ") WHERE id(s" + i + ") = " + filterNodes[i] + "";
+							if (filter.type == "none") {
+								// No filter added - do nothing
+							} else {
+								createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter));
 							}
+						}
+					}
 
-							cypherQuery += " CREATE ";
+					if (req.body.steps.artifacts && req.body.steps.artifacts.constructor === Array) {
+						for (var i = 0; i < req.body.steps.artifacts.length; i++) {
+							var artifact = req.body.steps.artifacts[i];
 
-							for (var i = 0; i < filterNodes.length; i++) {
-								if (i > 0) {
-									cypherQuery += " , ";
-								}
-								cypherQuery += " (s" + i + ")<-[:USES {order : '" + i + "'}]-(e) ";
+							if (artifact.type == "none") {
+								// No Artifact, do nothing
+							} else {
+								createFilterNodesFunctions.push(async.apply(dataUtils.createArtifactNode, db, artifact));
 							}
+						}
+					}
 
-							cypherQuery += " return e;";
+					if (req.body.steps.decorations && req.body.steps.decorations.constructor === Array) {
+						for (var i = 0; i < req.body.steps.decorations.length; i++) {
+							var decoration = req.body.steps.decorations[i];
 
-							//console.log("cypherQuery is: " + cypherQuery);
+							if (decoration.type == "none") {
+								// No Decoration, do nothing
+							} else {
+								createFilterNodesFunctions.push(async.apply(dataUtils.createDecorationNode, db, decoration));
+							}
+						}
+					}
+				}
+				
 
-							db.cypherQuery(cypherQuery, function(err, result){
-    							if(err) throw err;
+				// LAYOUTS
 
-    							if (result.data.length > 0) {
-    								res.json(result.data[0]);
-    							}
-    						});
-							
-						});
-						});
+				async.series(createFilterNodesFunctions, function(err, filterNodes) {
 
-			
+					var cypherQuery = "MATCH (e:Entry {id: '" + newEntryId + "'}) ";
+					//console.log("filterNodes, num values = " + filterNodes.length);
+					for (var i = 0; i < filterNodes.length; i++) {
+						//console.log("filterNodes, " + i + " = " + filterNodes[i]);
+
+						// Now associate filters to the new entry
+						cypherQuery += " MATCH (s" + i + " {id: '" + filterNodes[i] + "'}) ";
+					}
+
+					cypherQuery += " CREATE ";
+
+					for (var i = 0; i < filterNodes.length; i++) {
+						if (i > 0) {
+							cypherQuery += " , ";
+						}
+						cypherQuery += " (s" + i + ")<-[:USES {order : '" + i + "'}]-(e) ";
+					}
+
+					cypherQuery += " return e;";
+
+					console.log("cypherQuery is: " + cypherQuery);
+
+					db.cypherQuery(cypherQuery, function(err, result){
+						if(err) throw err;
+
+						console.log("result is " + JSON.stringify(result.data));
+						if (result.data.length > 0) {
+							res.json(result.data[0]);
+						}
+					});
+						
+				});
+			});
 		});
 
 	entryRouter.route("/:entryId")

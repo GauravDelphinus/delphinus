@@ -10,24 +10,31 @@ var routes = function(db) {
 
 	filterRouter.route("/")
 	.get(function(req, res) {
-		if (req.query.type == "filter" && req.query.filterType == "preset") {
-			var output = [];
-			/*
-		"rainyDay" : 1,
-		"glassWall" : 2,
-		"nightingale" : 3,
-		"whirlpool" : 4,
-		"comical" : 5 */
-			var f = {id: 1, name: "Rain Day"};
-			output.push([{id: 1, name: "Rainy Day"}]);
-			output.push([{id: 2, name: "Glass Wall"}]);
-			output.push([{id: 3, name: "Nightingale"}]);
-			output.push([{id: 4, name: "Whirlpool"}]);
-			output.push([{id: 5, name: "Comical"}]);
+		var cypherQuery;
 
-			console.log("for /api/filters returning to client: " + JSON.stringify(output));
-			res.json(output);
+		if (req.query.type == "filter" && req.query.filterType == "preset") {
+			cypherQuery = "MATCH (f:Filter {filter_type : 'preset'}) RETURN f;";
+		} else if (req.query.type == "layout" && req.query.layoutType == "preset") {
+			cypherQuery = "MATCH (l:Layout {layout_type : 'preset'}) RETURN l;";
+		} else if (req.query.type == "artifact" && req.query.artifactType == "preset") {
+			cypherQuery = "MATCH (a:Artifact {artifact_type : 'preset'}) RETURN a;";
+		} else if (req.query.type == "decoration" && req.query.decorationType == "preset") {
+			cypherQuery = "MATCH (d:Decoration {decoration_type : 'preset'}) RETURN d;";
 		}
+
+		console.log("Running cypherQuery: " + cypherQuery);
+		db.cypherQuery(cypherQuery, function(err, result){
+			if(err) throw err;
+
+			var output = [];
+			for (var i = 0; i < result.data.length; i++) {
+				output.push([{id: result.data[i].id, name: result.data[i].name}]);
+			}
+		
+			console.log("for /api/filters returning to client: " + JSON.stringify(output));
+
+			res.json(output);
+		});
 	});
 
 	filterRouter.route("/apply") // /api/filters/apply ROUTE

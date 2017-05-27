@@ -228,12 +228,6 @@
 			<!-- ARTIFACT SECION -->
 			<div id="artifactSection" style="display: none;">
 				<span class="title">Step 3: Add Artifacts</span><br>
-				<!--
-				<input type="radio" id="radioArtifactNone" name="artifact" value="none" checked="checked"><b>None</b><br>
-				<input type="radio" id="radioArtifactPreset" name="artifact" value="preset"><b>Preset</b><br>
-				<input type="radio" id="radioArtifactUserDefined" name="artifact" value="user_defined"><b>User Defined</b><br>
-				<input type="radio" id="radioArtifactCustom" name="artifact" value="custom"><b>Custom</b>
-				-->
 				<select id="artifactTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
 					<option value="preset">Preset</option>
@@ -286,33 +280,21 @@
 						<div class="settingsSubBlock">
 							<input type="text" id="bannerText" class="form-control" value="Enter your caption here!">
 						</div>
-						<!--
-						<b>Banner Text:</b><input type="text" id="textBanner">
-						<b>Font Size</b><input type="number" id="bannerTextFontSize" value="30">
-						<b>Font Name</b><select id="bannerTextFontName">
-											<option value="arial">Arial</option>
-											<option value="times">Times</option>
-											<option value="courier">Courier</option>
-											</select>
-						<b>Text Color</b><input type="color" id="bannerTextColor" value="#000000"><br>
-						<b>Banner Location:</b><input type="radio" id="radioBannerLocationBottom" name="banner" value="bannerLocationBottom" checked="checked"><b>Bottom</b>
-						<input type="radio" id="radioBannerLocationTop" name="banner" value="bannerLocationTop"><b>Top</b><br>
-
-						<b>Background Color</b><input type="color" id="bannerBackgroundColor" value="#FFFFFF">
-						-->
 					</div>
 				</div>
 			</div>
 			<br>
 
 			<!-- DECORATION SECTION -->
-			<div id="decorationSection" class="settingsBlock" style="display: none;">
+			<div id="decorationSection" style="display: none;">
 				<span class="title">Step 4: Add Decorations</span><br>
 
-				<input type="radio" id="radioDecorationNone" name="decoration" value="none" checked="checked"><b>None</b><br>
-				<input type="radio" id="radioDecorationPreset" name="decoration" value="preset"><b>Preset</b><br>
-				<input type="radio" id="radioDecorationUserDefined" name="decoration" value="user_defined"><b>User Defined</b><br>
-				<input type="radio" id="radioDecorationCustom" name="decoration" value="custom"><b>Custom</b>
+				<select id="decorationTypeSelection" class="form-control">
+					<option value="none" selected="selected">None</option>
+					<option value="preset">Preset</option>
+					<option value="userDefined">User Defined</option>
+					<option value="custom">Custom</option>
+				</select>
 
 				<!-- NONE DECORATION SUBSECTION -->
 				<div id="noneDecorationSection" class="settingsSubBlock">
@@ -331,12 +313,11 @@
 
 				<!-- CUSTOM DECORATION SUBSECTION -->
 				<div id="customDecorationSection" class="settingsSubBlock" style="display: none;">
-					<input type="checkbox" id="checkboxBorder" name="border" value="border"><b>Add Border</b>
-					<div id="borderSection">
+					<div class="mycheckbox"><input type="checkbox" name="border" id="checkboxBorder" value="border"><b><i class="fa fa-crop" aria-hidden="true"></i> Add Border</b></div>
+					<div id="borderSection" class="settingsSubBlock">
 						<b>Border Width:</b><input type="number" id="borderWidth" value="0">
-						<b>Border Color</b><input type="color" id="borderColor" value="#000000">
+						<b>Border Color</b><input type="color" class="btn btn-default" id="borderColor" value="#000000">
 					</div>
-					
 				</div>
 			</div>
 			<div id="postSection" class="settingsBlock" style="display: none;">

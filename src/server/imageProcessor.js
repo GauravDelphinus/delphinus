@@ -622,43 +622,45 @@ function applyLayouts (image, size, layouts) {
 
 		var layout = layouts[i];
 
-		if (layout.size) {
-			if (layout.size == "auto") {
-				// determine the best size for the image
-				// TODO - only call below if the size of the image is bigger than those values
-				image.resize(config.image.maxWidth, config.image.maxHeight);
-			} else if (layout.size == "custom" && layout.customSize) {
-				if (layout.customSize.height) {
-					image.resize(layout.customSize.width, layout.customSize.height);
-				} else {
-					image.resize(layout.customSize.width);
+		if (layout.type == "preset") {
+			applyPresetLayout(image, size, layout.preset);
+		} else if (layout.type == "custom") {
+			if (layout.size) {
+				if (layout.size == "auto") {
+					// determine the best size for the image
+					// TODO - only call below if the size of the image is bigger than those values
+					image.resize(config.image.maxWidth, config.image.maxHeight);
+				} else if (layout.size == "custom" && layout.customSize) {
+					if (layout.customSize.height) {
+						image.resize(layout.customSize.width, layout.customSize.height);
+					} else {
+						image.resize(layout.customSize.width);
+					}
 				}
 			}
-		}
 
-		if (layout.crop) {
-			image.crop(layout.crop.width, layout.crop.height, layout.crop.x, layout.crop.y);
-		}
-
-		if (layout.mirror) {
-			if (layout.mirror == "flop") {
-				image.flop();
+			if (layout.crop) {
+				image.crop(layout.crop.width, layout.crop.height, layout.crop.x, layout.crop.y);
 			}
 
-			if (layout.mirror == "flip") {
-				image.flip();
+			if (layout.mirror) {
+				if (layout.mirror == "flop") {
+					image.flop();
+				}
+
+				if (layout.mirror == "flip") {
+					image.flip();
+				}
 			}
-		}
 
-		if (layout.rotation) {
-			image.rotate(layout.rotation.color, layout.rotation.degrees);
-		}
+			if (layout.rotation) {
+				image.rotate(layout.rotation.color, layout.rotation.degrees);
+			}
 
-
-
-		if (layout.shear) {
-			//image.fill("#00FF00"); TODO - how to set fill background color in case of shear?
-			image.shear(layout.shear.xDegrees, layout.shear.yDegrees);
+			if (layout.shear) {
+				//image.fill("#00FF00"); TODO - how to set fill background color in case of shear?
+				image.shear(layout.shear.xDegrees, layout.shear.yDegrees);
+			}
 		}
 	}
 }
@@ -772,7 +774,7 @@ function applyFilters (image, size, filters) {
 		//console.log("filter is: " + JSON.stringify(filter));
 
 		if (filter.type == "preset") {
-			applyPresetFilter(image, filter.preset);
+			applyPresetFilter(image, size, filter.preset);
 		} else if (filter.type == "custom") {
 			if (filter.settings) {
 
@@ -894,38 +896,42 @@ function applyArtifacts (image, size, artifacts) {
 
 		var artifact = artifacts[i];
 
-		if (artifact.banner) {
-			var labelHeight = 200; // testing
+		if (artifact.type == "preset") {
+			applyPresetArtifact(image, size, artifact.preset);
+		} else if (artifact.type == "custom") {
+			if (artifact.banner) {
+				var labelHeight = 200; // testing
 
-			image.fontSize(parseInt(artifact.banner.fontSize));
-			image.font(artifact.banner.fontName);
+				image.fontSize(parseInt(artifact.banner.fontSize));
+				image.font(artifact.banner.fontName);
 
-			if (artifact.banner.location == "bottom") {
-				image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
+				if (artifact.banner.location == "bottom") {
+					image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
 
-			} else if (artifact.banner.location == "top") {
-				image.region(size.width, labelHeight, 0, 0).gravity("Center");
-			} else if (artifact.banner.location == "below") {
-				image.extent(size.width, size.height + labelHeight);
-				image.region(size.width, labelHeight, 0, size.height).gravity("Center");
-			} else if (artifact.banner.location == "above") {
-				image.extent(size.width, size.height + labelHeight, "+0-" + labelHeight);
-				image.region(size.width, labelHeight, 0, 0).gravity("Center");
+				} else if (artifact.banner.location == "top") {
+					image.region(size.width, labelHeight, 0, 0).gravity("Center");
+				} else if (artifact.banner.location == "below") {
+					image.extent(size.width, size.height + labelHeight);
+					image.region(size.width, labelHeight, 0, size.height).gravity("Center");
+				} else if (artifact.banner.location == "above") {
+					image.extent(size.width, size.height + labelHeight, "+0-" + labelHeight);
+					image.region(size.width, labelHeight, 0, 0).gravity("Center");
+				}
+
+				// Fill the background
+				console.log("calling image.fill with " + artifact.banner.backgroundColor);
+				if (artifact.banner.backgroundColor == "transparent") {
+					image.fill("none");
+				} else {
+					image.fill(artifact.banner.backgroundColor);
+				}
+				image.drawRectangle(0, 0, size.width, size.height);
+
+				// Draw the text
+				image.strokeWidth(1);
+				image.stroke(artifact.banner.textColor);
+				image.drawText(0, 0, artifact.banner.text);
 			}
-
-			// Fill the background
-			console.log("calling image.fill with " + artifact.banner.backgroundColor);
-			if (artifact.banner.backgroundColor == "transparent") {
-				image.fill("none");
-			} else {
-				image.fill(artifact.banner.backgroundColor);
-			}
-			image.drawRectangle(0, 0, size.width, size.height);
-
-			// Draw the text
-			image.strokeWidth(1);
-			image.stroke(artifact.banner.textColor);
-			image.drawText(0, 0, artifact.banner.text);
 		}
 	}
 	
@@ -950,35 +956,118 @@ function applyDecorations (image, size, decorations) {
 	for (var i = 0; i < numDecorations; i++) {
 		var decoration = decorations[i];
 
-		if (decoration.border) {
-			image.borderColor(decoration.border.color);
-			image.border(decoration.border.width, decoration.border.width);
-
+		if (decoration.type == "preset") {
+			applyPresetDecoration(image, size, decoration.preset);
+		} else if (decoration.type == "custom") {
+			if (decoration.border) {
+				image.borderColor(decoration.border.color);
+				image.border(decoration.border.width, decoration.border.width);
+			}
 		}
 	}
 
 }
 
-function applyPresetFilter(image, presetFilter) {
+function applyPresetLayout(image, size, presetLayout) {
+	switch (presetLayout) {
+		case "rotateClock90White":
+			image.rotate("white", 90);
+			break;
+		case "rotateAnticlock90White":
+			image.rotate("white", -90);
+			break;
+		case "flipVertical":
+			image.flip();
+			break;
+		case "flipHorizontal":
+			image.flop();
+			break;
+		default:
+			break;
+	}
+}
+
+function applyPresetFilter(image, size, presetFilter) {
 	//console.log("applyPresetFilter, presetFilter is " + presetFilter + ", config rainyDay is " + config.presetFilter.rainyDay);
-	switch (parseInt(presetFilter)) {
-		case config.presetFilter.rainyDay:
+	switch (presetFilter) {
+		case "rainyDay":
 			image.wave(5, 100);
 			break;
-		case config.presetFilter.glassWall:
+		case "glassWall":
 			image.spread(15);
 			break;
-		case config.presetFilter.nightingale:
+		case "nightingale":
 			image.colorspace("GRAY");
 			image.negative();
 			image.monochrome();
 			break;
-		case config.presetFilter.whirlpool:
+		case "whirlpool":
 			image.swirl(360);
 			break;
-		case config.presetFilter.comical:
+		case "comical":
 			image.paint(20);
 			image.colorspace("GRAY");
+			break;
+		default:
+			break;
+	}
+}
+
+function applyPresetArtifact(image, size, presetArtifact) {
+	var labelHeight = 200; // testing
+	switch (presetArtifact) {
+		case "bannerBottomWhite":
+			image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
+			image.fill("white");
+			image.drawRectangle(0, 0, size.width, size.height);
+			break;
+		case "bannerBottomBlack":
+			image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
+			image.fill("black");
+			image.drawRectangle(0, 0, size.width, size.height);
+			break;
+		case "bannerBottomTransparent":
+			image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
+			image.fill("none");
+			image.drawRectangle(0, 0, size.width, size.height);
+			break;
+		case "bannerTopWhite":
+			image.region(size.width, labelHeight, 0, 0).gravity("Center");
+			image.fill("white");
+			image.drawRectangle(0, 0, size.width, size.height);
+			break;
+		case "bannerTopBlack":
+			image.region(size.width, labelHeight, 0, 0).gravity("Center");
+			image.fill("black");
+			image.drawRectangle(0, 0, size.width, size.height);
+			break;
+		case "bannerTopTransparent":
+			image.region(size.width, labelHeight, 0, 0).gravity("Center");
+			image.fill("none");
+			image.drawRectangle(0, 0, size.width, size.height);
+			break;
+		default:
+			break;
+	}
+}
+
+function applyPresetDecoration(image, size, presetDecoration) {
+	switch (presetDecoration) {
+		case "whiteBorder10":
+			image.borderColor("white");
+			image.border(10, 10);
+			break;
+		case "blackBorder10":
+			image.borderColor("black");
+			image.border(10, 10);
+			break;
+		case "whiteBorder20":
+			image.borderColor("white");
+			image.border(20, 20);
+			break;
+		case "blackBorder20":
+			image.borderColor("black");
+			image.border(20, 20);
 			break;
 		default:
 			break;
