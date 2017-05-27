@@ -446,7 +446,7 @@ module.exports = {
 			}
 	**/
 	createFilterNode : function(db, filter, callback) {
-		var cypherQuery = "CREATE (f:Filter {";
+		
 
 		if (filter.type == "none") {
 			// There's no need to create a filter node in this case.
@@ -460,8 +460,12 @@ module.exports = {
 			return;
 		}
 
+		var cypherQuery = "CREATE (f:Filter {";
+		var id = shortid.generate();
+
 		if (filter.type == "custom") {
-			cypherQuery += " filter_type : 'custom'";
+			cypherQuery += " id : '" + id + "' ";
+			cypherQuery += ", filter_type : 'custom'";
 
 			if (filter.effects) {
 				if (filter.effects.paint) {
@@ -535,15 +539,14 @@ module.exports = {
 
     		//console.log(result.data[0]); // delivers an array of query results
 
-    		var filterID = result.data[0]._id;
-			callback(null, filterID);
+			callback(null, id);
 		});
 	},
 
 	createDecorationNode : function(db, decoration, callback) {
 		//console.log("createDecorationNode: decoration = " + JSON.stringify(decoration));
 
-		var cypherQuery = "CREATE (d:Decoration {";
+		
 
 		if (decoration.type == "none") {
 			throw err; // shouldn't happen
@@ -555,8 +558,12 @@ module.exports = {
 			return;
 		}
 
+		var cypherQuery = "CREATE (d:Decoration {";
+		var id = shortid.generate();
+
 		if (decoration.type == "custom") {
-			cypherQuery += " decoration_type : 'custom' ";
+			cypherQuery += " id : '" + id + "' ";
+			cypherQuery += ", decoration_type : 'custom' ";
 
 			if (decoration.border) {
 				cypherQuery += ", border : 'on'";
@@ -574,8 +581,7 @@ module.exports = {
 
 			//console.log(result.data[0]);
 
-			var decorationId = result.data[0]._id;
-			callback(null, decorationId);
+			callback(null, id);
 		});
 	},
 
@@ -590,7 +596,7 @@ module.exports = {
 
 	createArtifactNode : function(db, artifact, callback) {
 		//console.log("createArtifactNode: artifact = " + JSON.stringify(artifact));
-		var cypherQuery = "CREATE (a:Artifact {";
+		
 
 		if (artifact.type == "none") {
 			throw err; // shouldn't happen
@@ -602,8 +608,13 @@ module.exports = {
 			return;
 		}
 
+		var cypherQuery = "CREATE (a:Artifact {";
+
+		var id = shortid.generate();
+
 		if (artifact.type == "custom") {
-			cypherQuery += " artifact_type : 'custom' ";
+			cypherQuery += " id : '" + id + "' ";
+			cypherQuery += ", artifact_type : 'custom' ";
 
 			var bannerText = artifact.banner.text;
 			bannerText = bannerText.replace(/'/g, "\\'");
@@ -629,14 +640,14 @@ module.exports = {
 
 			//console.log(result.data[0]);
 
-			var artifactId = result.data[0]._id;
-			callback(null, artifactId);
+			callback(null, id);
 		});
 	},
 
 	createLayoutNode : function(db, layout, callback) {
-		var cypherQuery = "CREATE (l:Layout {";
+		
 
+		
 		if (layout.type == "none") {
 			// There's no need to create a layout node in this case.
 			// This shouldn't be called, and should get handled by caller
@@ -649,8 +660,13 @@ module.exports = {
 			return;
 		}
 
+		var id = shortid.generate();
+
+		var cypherQuery = "CREATE (l:Layout {";
+
 		if (layout.type == "custom") {
-			cypherQuery += " layout_type : 'custom' ";
+			cypherQuery += " id : '" + id + "' ";
+			cypherQuery += ", layout_type : 'custom' ";
 
 			if (layout.mirror) {
 				if (layout.mirror == "flip") {
@@ -690,8 +706,7 @@ module.exports = {
 
     		//console.log(result.data[0]); // delivers an array of query results
 
-    		var layoutID = result.data[0]._id;
-			callback(null, layoutID);
+			callback(null, id);
 		});
 	},
 
