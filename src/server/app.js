@@ -64,6 +64,9 @@ module.exports = function() {
 	var filterRouter = require("./routes/filterRoutes")(db);
 	app.use("/api/filters", filterRouter);
 
+	var commentRouter = require("./routes/commentRoutes")(db);
+	app.use("/api/comments", commentRouter);
+
 	/**
 		FILE ROUTERS
 		This is the list of file routers that allow for serving of file

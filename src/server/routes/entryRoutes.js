@@ -46,7 +46,7 @@ var routes = function(db) {
 			}
 			
 			// add social count check
-			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(e) RETURN e, u, COUNT(u2)";
+			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(e) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) RETURN e, u, COUNT(u2), COUNT(comment)";
 			
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "popularity") {
@@ -74,6 +74,7 @@ var routes = function(db) {
     				var e = result.data[i][0];
     				var u = result.data[i][1];
     				var numLikes = result.data[i][2];
+    				var numComments = result.data[i][3];
 
     				var data = {};
     				data.type = "entry";
@@ -88,7 +89,7 @@ var routes = function(db) {
 					data.socialStatus = {};
 					data.socialStatus.numLikes = numLikes;
 					data.socialStatus.numShares = 23;
-					data.socialStatus.numComments = 45;
+					data.socialStatus.numComments = numComments;
 
 					data.caption = e.caption;
 

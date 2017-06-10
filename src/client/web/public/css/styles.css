@@ -23,6 +23,11 @@
 	margin: 0 auto;
 }
 
+.section40 {
+	width: 40%;
+	margin: 0 auto;
+}
+
 .sectionHeader {
 	font-family: arial;	
 	font-size: 30px;
@@ -49,10 +54,15 @@
 	border-radius: 20px;
 	color: gray;
 	font: bold 24px/200px arial;
-	height: 200px;
+	height: 300px;
 	margin: 30px auto;
 	text-align: center;
-	width: 200px;
+	width: 300px;
+	padding: 30px;
+}
+
+#dropzone p {
+	line-height: 1em;
 }
 
 .settingsBlock {
@@ -189,6 +199,7 @@
 .postedByImage {
 	height: 50px;
 	margin: 3px 2px;
+	border-radius: 50%;
 }
 
 .mainImage {
@@ -306,9 +317,8 @@
 	height: 200px;
 }
 
-.fullWidth {
+.section100 {
 	width: 100%;
-	text-align: center;
 }
 
 .mainProfileSection {
@@ -333,6 +343,19 @@
 .imageSection:hover input
 {
   display: block;
+}
+*/
+
+input[type="file"] {
+    display: none;
+}
+
+/*
+.custom-file-upload {
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
 }
 */
 
@@ -630,6 +653,88 @@ img {
 .mycheckbox input[type=checkbox] {
 	margin-left: 5px;
 	margin-right: 10px;
-	margin-top: 7px;
+	margin-top: 10px;
 	margin-bottom: 7px;
+	font-size: 1.4em;
+}
+
+.mycheckbox {
+	font-size: 1.4em;
+	font-weight: bold;
+}
+
+.settingsSubBlock p {
+	font-size: 1.4em;
+	font-weight: normal;
+}
+
+.formCaption {
+	margin-top: 10px;
+	font-size: 1.5em;
+	font-weight: bold;
+}
+
+/* Overload bootstrap */
+.form-control {
+	font-size: 1.4em;
+	height: 50px;
+}
+
+.btn {
+	font-size: 1.4em;
+	height: 50px;
+}
+
+/*********************** COMMENTS LIST ************************/
+
+.commentsList {
+	width: 70%;
+	margin: 0 auto;
+}
+
+.commentsTable {
+	width: 100%;
+}
+
+.commentsRow {
+
+}
+
+.commentsLeftColumn {
+	width: 150px;
+	text-align: right;
+	vertical-align: top;
+	padding: 10px;
+}
+
+.commentsRightColumn {
+	padding: 10px;
+}
+
+.commentPostedDate {
+
+}
+
+.replyElement {
+	margin-left: 40px;
+}
+
+.likeButtonSimple {
+	background: none;
+	color: #1155cc;
+	font-weight: normal;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	padding: 5px;
+}
+
+.likeButtonSimple.active {
+	background: none;
+	color: #1155cc;
+	font-weight: bold;
+	border: none;
+	padding: 0;
+	cursor: pointer;
+	padding: 5px;
 }

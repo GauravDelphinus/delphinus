@@ -8,7 +8,7 @@ $(document).ready(function(){
 
 function setupMainItem() {
 	$.getJSON('/api/challenges/' + challengeId, function(data) {
-		console.log("result is " + JSON.stringify(data));
+		//console.log("result is " + JSON.stringify(data));
 		var mainElement = createMainElement(data);
 		$("#main").append(mainElement);
 
@@ -50,5 +50,6 @@ function setupEntriesTab() {
 }
 
 function setupCommentsTab() {
-
+	var tabDiv = appendNewTab("mainTabGroup", "comments", "Comments");
+	createAndAppendContentContainer(tabDiv, "comments", [{type: "comments"}], [{type: "date", url: "/api/comments/?entityId=" + challengeId + "&sortBy=reverseDate"}]);
 }
