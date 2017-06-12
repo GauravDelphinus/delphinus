@@ -203,7 +203,8 @@
 }
 
 .mainImage {
-	width: 90%;
+	max-width: 90%;
+	max-height: 600px;
 	display: block;
 	margin: 0 auto;
 }
@@ -221,7 +222,15 @@
 	float: left;
 }
 
-.socialStatusSection {
+.timelapseSection {
+	float: right;
+}
+
+.timelapseRange {
+	width: 100%;
+}
+
+.bottomBar {
 	width: 90%;
 	margin: 0 auto;
 	padding: 5px;
@@ -580,10 +589,12 @@ hr.small {
 
 /****************** New Entry ***********************/
 
+/*
 input[type=range] {
 	display: inline;
 	width: 200px;
 }
+*/
 .rangeInput {
 	float: right;
 }

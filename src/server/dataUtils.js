@@ -384,7 +384,7 @@ module.exports = {
 	    				
 	    			}
 
-	    			next(0, { "image" : imagePath, "steps" : steps});
+	    			next(0, { "image" : image, "steps" : steps});
 	    	});
 
 		});

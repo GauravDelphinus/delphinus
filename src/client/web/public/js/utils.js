@@ -120,7 +120,7 @@ function appendNewTab(tabGroupId, id, title) {
 
 function createPostedBySectionElement(data) {
 	// Posted By Section
-	var postedBySection = $("<div>", {class: "postedBySection"});
+	var postedBySection = $("<div>", {id: data.id + "PostedBySection", class: "postedBySection"});
 	var postedByDate = $("<span>", {id: "postedByDate", class: "postedByDate", text: "Posted " + formatDate(data.postedDate)});
 	var postedBy = $("<div>", {class: "postedBy"});
 	var postedByName = $("<span>", {id: "postedByName", class: "postedByName"});
@@ -235,11 +235,96 @@ function sendLikeAction(restURL, likeAction, callback) {
 	});
 }
 
+function createTimelapseView(data) {
+	var timelapseStartButtonSection = $("<div>", {id: data.id + "TimelapseSection", class: "timelapseSection"});
+	var startTimelapseIcon = $("<span>", {class: "glyphicon glyphicon-play-circle"});
+	var startTimelapseButton = $("<button>", {id: data.id + "StartTimeLapseButton", type: "button", class: "btn btn-primary btn-lg timelapseButton"});
+	startTimelapseButton.append(startTimelapseIcon).append("  ").append("Timelapse View");
+	timelapseStartButtonSection.append(startTimelapseButton);
+
+	startTimelapseButton.click(function() {
+		$.getJSON('/api/filters/timelapse/' + entityId, function(data) {
+			startTimelapse(entityId, data.timelapseData);
+		});
+	});
+
+	return timelapseStartButtonSection;
+}
+
+var timelapseIndex = 0;
+var timelapseTimer;
+var rangeUpdateTimer;
+var rangeUpdateCount = 0;
+
+function startTimelapse(entityId, data) {
+	//change the look to that of a theatre
+	console.log("startTimelapse, entityId is " + entityId);
+	$("#" + entityId + "MainElement").css("background", "black");
+	$("#" + entityId + "PostedBySection").css("visibility", "hidden");
+	$("#" + entityId + "TimelapseSection").css("visibility", "hidden");
+	$("#" + entityId + "SocialStatus").css("visibility", "hidden");
+
+	//show the slider view
+	var rangeSelector = $("<input>", {id: entityId + "TimelapseRange", class: "timelapseRange", type: "range", min:"0", max:"" + (data.length - 1) * 2000})
+	$("#" + entityId + "BottomBar").append(rangeSelector);
+
+	nextTimelapse(entityId, data);
+	timelapseTimer = window.setInterval(function() {nextTimelapse(entityId, data);}, 2000);
+	rangeUpdateTimer = window.setInterval(updateTimelapseRange, 10);
+}
+
+function updateTimelapseRange() {
+	rangeUpdateCount += 10;
+	$("#" + entityId + "TimelapseRange").val(rangeUpdateCount);
+}
+
+function fadeToImage(imageId, newSrc) {
+	$("#" + imageId).attr("src", newSrc);
+
+	/*
+	$("#" + imageId).fadeTo(1000,0.30, function() {
+		$("#" + imageId).attr("src", newSrc);
+  	}).fadeTo(500,1);
+  	*/
+}
+
+function nextTimelapse(entityId, data) {
+	console.log("nextTimelapse, index = " + timelapseIndex);
+	if (data[timelapseIndex].imageType == "url") {
+		//$("#mainImage").attr("src", data[timelapseIndex].imageData);
+		fadeToImage("mainImage", data[timelapseIndex].imageData);
+	} else {
+		//$("#mainImage").attr("src", "data:image/jpeg;base64," + data[timelapseIndex].imageData);
+		fadeToImage("mainImage", "data:image/jpeg;base64," + data[timelapseIndex].imageData);
+	}
+	
+	//set the range input
+	$("#" + entityId + "TimelapseRange").val(timelapseIndex * 2000);
+	timelapseIndex++;
+
+	if (timelapseIndex == data.length) {
+		window.clearInterval(timelapseTimer);	 
+		window.clearInterval(rangeUpdateTimer);
+		window.setTimeout(function() {stopTimelapse(entityId, data);}, 2000);
+	}
+}
+
+function stopTimelapse(entityId, data) {
+	console.log("stopTimelapse, entityId is " + entityId);
+	
+
+	//change the look to that of a theatre
+	$("#" + entityId + "MainElement").css("background", "");
+	$("#" + entityId + "PostedBySection").css("visibility", "");
+	$("#" + entityId + "TimelapseSection").css("visibility", "");
+	$("#" + entityId + "SocialStatus").css("visibility", "");
+	$("#" + entityId + "TimelapseRange").css("visibility", "hidden");
+}
+
 function createSocialStatusSectionElement(data) {
 	//console.log("createSocialStatusSectionElement, data is " + JSON.stringify(data));
 	// Social Status Section
-	var socialStatusSection = $("<div>", {class: "socialStatusSection"});
-	var socialStatus = $("<div>", {class: "socialStatus"});
+	var socialStatus = $("<div>", {id: data.id + "SocialStatus", class: "socialStatus"});
 	var numLikes = $("<span>", {class: "glyphicon glyphicon-thumbs-up"});
 	var numShares = $("<span>", {class: "glyphicon glyphicon-share-alt"});
 	var numComments = $("<span>", {class: "glyphicon glyphicon-comment"});
@@ -252,7 +337,8 @@ function createSocialStatusSectionElement(data) {
 	socialStatus.append(likeButton);
 	socialStatus.append(shareButton);
 	socialStatus.append(commentButton);
-	socialStatusSection.append(socialStatus);
+
+	
 
 	//console.log("user is " + JSON.stringify(user));
 	var restURL;
@@ -298,11 +384,13 @@ function createSocialStatusSectionElement(data) {
 	
 	});
 
-	return socialStatusSection;
+	return socialStatus;
 }
 
+
+
 function createImageElement(data) {
-	var mainImage = $("<img>", {class: "mainImage"});
+	var mainImage = $("<img>", {id: "mainImage", class: "mainImage"});
 	mainImage.prop("src", data.image);
 	return mainImage;
 }
@@ -313,8 +401,8 @@ function createTextElement(data) {
 	return textElement;
 }
 
-function createMainElement(data) {
-	var element = $("<div>", {class: "mainElement"});
+function createMainElement(data, setupTimelapseView) {
+	var element = $("<div>", {id: data.id + "MainElement", class: "mainElement"});
 
 	element.append(createPostedBySectionElement(data));
 	element.append(createImageElement(data));
@@ -323,7 +411,13 @@ function createMainElement(data) {
 		element.append(createCaptionSectionElement(data));
 	}
 
-	element.append(createSocialStatusSectionElement(data));
+	var bottomBar = $("<div>", {id: data.id + "BottomBar", class: "bottomBar"});
+	bottomBar.append(createSocialStatusSectionElement(data));
+	if (setupTimelapseView) {
+		bottomBar.append(createTimelapseView(data));
+	}
+	
+	element.append(bottomBar);
 
 	return element;
 }

@@ -137,7 +137,8 @@ module.exports = function() {
 		dataUtils.getImageDataForEntry(db, req.params.entryId, function(err, imageData){
 			if (err) throw err;
 
-			imageProcessor.applyStepsToImage(imageData.image, imageData.steps, function(err, image){
+			var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image;
+			imageProcessor.applyStepsToImage(sourceImagePath, imageData.steps, function(err, image){
 				if (err) throw err;
 
 				//console.log("calling res.sendFile with " + image);
