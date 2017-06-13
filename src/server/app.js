@@ -134,30 +134,38 @@ module.exports = function() {
 		// not need to story the image itself, but the steps that need to be performed on the challenge image
 		//res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
 
-		dataUtils.getImageDataForEntry(db, req.params.entryId, function(err, imageData){
-			if (err) throw err;
+		dataUtils.checkCachedFile(global.appRoot + config.path.entryImages + req.params.entryId, function(err) {
+			if (!err) {
+				//cache found, so just send that back
+				res.sendFile(global.appRoot + config.path.entryImages + req.params.entryId);
+			} else {
+				//cache not found, do the whole loop and make sure to save to cache
+				dataUtils.getImageDataForEntry(db, req.params.entryId, function(err, imageData){
+					if (err) throw err;
 
-			var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image;
-			imageProcessor.applyStepsToImage(sourceImagePath, imageData.steps, function(err, image){
-				if (err) throw err;
-
-				//console.log("calling res.sendFile with " + image);
-				res.sendFile(image, function(err) {
-					if (err) {
-						if (err.code == "ECONNABORTED") {
-						//console.log("err is " + err + ", continuing as usual ... ");
-						//console.log("err JSON is " + JSON.stringify(err));
-						//console.log("err.name is " + err.name);
-						} else {
-							throw err;
-						}
-					}
-					//dispose off the file
-					fs.unlink(image, function(err) {
+					var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image;
+					imageProcessor.applyStepsToImage(sourceImagePath, global.appRoot + config.path.entryImages + req.params.entryId, imageData.steps, function(err, image){
 						if (err) throw err;
+
+						//console.log("calling res.sendFile with " + image);
+						res.sendFile(image, function(err) {
+							if (err) {
+								if (err.code == "ECONNABORTED") {
+								//console.log("err is " + err + ", continuing as usual ... ");
+								//console.log("err JSON is " + JSON.stringify(err));
+								//console.log("err.name is " + err.name);
+								} else {
+									throw err;
+								}
+							}
+							//dispose off the file
+							//fs.unlink(image, function(err) {
+							//	if (err) throw err;
+							//});
+						});
 					});
 				});
-			});
+			}
 		});
 	});
 

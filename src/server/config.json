@@ -11,7 +11,8 @@
 	"path" : {
 		"challengeImages" : "/data/challenges/images/",
 		"userImages" : "/data/users/images/",
-		"staticImages" : "../client/web/public/images/static/"
+		"staticImages" : "../client/web/public/images/static/",
+		"entryImages" : "/data/entries/images/"
 	},
 	"url" : {
 		"challenge" : "/challenge/",

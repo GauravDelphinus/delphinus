@@ -57,7 +57,7 @@ var routes = function(db) {
 				sourceImagePath = global.appRoot + config.path.challengeImages + image;
 
 	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
-	    			imageProcessor.applyStepsToImage(sourceImagePath, steps, function(err, imagePath){
+	    			imageProcessor.applyStepsToImage(sourceImagePath, null, steps, function(err, imagePath){
 						if (err) throw err;
 
 						//send the image as a base64 encoded image blob
@@ -107,7 +107,7 @@ var routes = function(db) {
 
 	    			for (var i = 0; i < singleStepList.length; i++) {
 	    				console.log("singleStepList " + i + " is:" + JSON.stringify(singleStepList[i]));
-	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, singleStepList[i]));
+	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, null, singleStepList[i]));
 	    			}
 
 	    			var imagePaths = []; //list of image paths for each sub step
@@ -219,7 +219,7 @@ function extractSingleStepList(steps) {
 
 				if (steps.filters[i].effects) {
 					step.filters[i].effects = {};
-					
+
 					if (steps.filters[i].effects.paint) {
 						step.filters[i].effects.paint = steps.filters[i].effects.paint;
 						singleStepList.push(cloneObject(step));

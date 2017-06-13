@@ -407,41 +407,20 @@ module.exports = {
 		The caller is responsible for disposing of the returned
 		image once it has finished processing it.
 	**/
-	applyStepsToImage : function(sourceImage, steps, next) {
+	applyStepsToImage : function(sourceImage, targetImage, steps, next) {
 		var tmp = require('tmp');
 
 		//console.log("applyStepsToImage: steps = " + JSON.stringify(steps));
-		tmp.tmpName(function _tempNameGenerated(err, path) {
-    		if (err) throw err;
+		if (targetImage) {
+			applySteps(sourceImage, targetImage, steps, next);
+		} else {
+			tmp.tmpName(function _tempNameGenerated(err, path) {
+    			if (err) throw err;
 
-    		// initialize the image
-    		var image = gm(sourceImage);
-    		
-    		image.size(function (err, size) {
-				if (err) throw err;
-
-	    		if (steps.layouts) {
-	    			applyLayouts(image, size, steps.layouts);
-	    		}
-
-	    		if (steps.filters) {
-	    			applyFilters(image, size, steps.filters);
-	    		}
-
-	    		if (steps.artifacts) {
-	    			applyArtifacts(image, size, steps.artifacts);
-	    		}
-
-	    		if (steps.decorations) {
-	    			applyDecorations(image, size, steps.decorations);
-	    		}
-
-				writeImage(image, path, next);
+    			applySteps(sourceImage, path, steps, next);
 			});
-		});
+		}
 	},
-
-	
 		
 	applyFiltersToImage : function(sourceImage, filters, next) {
 
@@ -555,6 +534,7 @@ function writeImage(image, imagePath, next) {
 	image.write(imagePath, function(err) {
 		if (err) throw err;
 
+		console.log("next is " + next);
 		next(0, imagePath);
 	});
 
@@ -588,6 +568,34 @@ function absoluteToMultiplierSigned(absoluteValue) {
 
 	return multiplierValue;
 }
+
+function applySteps(sourceImage, targetImage, steps, next) {
+	// initialize the image
+	var image = gm(sourceImage);
+	
+	image.size(function (err, size) {
+		if (err) throw err;
+
+		if (steps.layouts) {
+			applyLayouts(image, size, steps.layouts);
+		}
+
+		if (steps.filters) {
+			applyFilters(image, size, steps.filters);
+		}
+
+		if (steps.artifacts) {
+			applyArtifacts(image, size, steps.artifacts);
+		}
+
+		if (steps.decorations) {
+			applyDecorations(image, size, steps.decorations);
+		}
+
+		writeImage(image, targetImage, next);
+	});
+}
+	
 
 /**
 	layouts: [

@@ -1,6 +1,7 @@
 var config = require('./config');
 var presets = require("./presets");
 var shortid = require("shortid");
+var fs = require("fs");
 
 module.exports = {
 
@@ -1101,6 +1102,12 @@ module.exports = {
 				**/
 				next(null, user);
 			});
+		});
+	},
+
+	checkCachedFile : function(cachePath, callback) {
+		fs.stat(cachePath, function(err, stats) {
+			callback(err);
 		});
 	}
 
