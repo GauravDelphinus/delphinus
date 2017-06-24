@@ -23,7 +23,7 @@ var routes = function(db) {
 			cypherQuery = "MATCH (d:Decoration {decoration_type : 'preset'}) RETURN d;";
 		}
 
-		console.log("Running cypherQuery: " + cypherQuery);
+		//console.log("Running cypherQuery: " + cypherQuery);
 		db.cypherQuery(cypherQuery, function(err, result){
 			if(err) throw err;
 
@@ -32,7 +32,7 @@ var routes = function(db) {
 				output.push([{id: result.data[i].id, name: result.data[i].name}]);
 			}
 		
-			console.log("for /api/filters returning to client: " + JSON.stringify(output));
+			//console.log("for /api/filters returning to client: " + JSON.stringify(output));
 
 			res.json(output);
 		});
@@ -40,7 +40,7 @@ var routes = function(db) {
 
 	filterRouter.route("/apply") // /api/filters/apply ROUTE
 	.post(function(req, res){
-		console.log("/api/filters/apply received post, body is = " + JSON.stringify(req.body));
+		//console.log("/api/filters/apply received post, body is = " + JSON.stringify(req.body));
 
 		var sourceImagePath;
 		var purgeImageAfterUse = false;
@@ -85,7 +85,7 @@ var routes = function(db) {
 
 	filterRouter.route("/timelapse/:entryId") // /api/filters/timelapse ROUTE
 	.get(function(req, res){
-		console.log("/api/filters/timelapse received get");
+		//console.log("/api/filters/timelapse received get");
 
 		var sourceImagePath;
 		var purgeImageAfterUse = false;
@@ -106,7 +106,7 @@ var routes = function(db) {
 	    			var applySingleStepToImageFunctions = [];
 
 	    			for (var i = 0; i < singleStepList.length; i++) {
-	    				console.log("singleStepList " + i + " is:" + JSON.stringify(singleStepList[i]));
+	    				//console.log("singleStepList " + i + " is:" + JSON.stringify(singleStepList[i]));
 	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, null, singleStepList[i]));
 	    			}
 
@@ -123,7 +123,7 @@ var routes = function(db) {
 
 	    				for (var j = 0; j < imagePaths.length; j++) {
 	    					//send the image as a base64 encoded image blob
-	    					console.log("imagePaths " + j + " is " + imagePaths[j]);
+	    					//console.log("imagePaths " + j + " is " + imagePaths[j]);
 							var imageBlob = fs.readFileSync(imagePaths[j]); //TODO - change to async WARNING - PERFORMANCE ISSUE
 							var imageBase64 = new Buffer(imageBlob).toString('base64');
 							jsonObj.timelapseData.push({"imageType" : "data", "imageData" : imageBase64});
@@ -156,7 +156,7 @@ function cloneObject(input) {
 }
 
 function extractSingleStepList(steps) {
-	console.log("extractSingleStepList, input steps: " + JSON.stringify(steps));
+	//console.log("extractSingleStepList, input steps: " + JSON.stringify(steps));
 	var singleStepList = [];
 
 	var step = {};
@@ -361,7 +361,7 @@ function extractSingleStepList(steps) {
 	}
 	*/
 
-	console.log("output stepList: " + singleStepList);
+	//console.log("output stepList: " + singleStepList);
 	return singleStepList;
 }
 

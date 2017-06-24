@@ -1,6 +1,4 @@
 $(document).ready(function(){
-	console.log("setting image source to " + challengeId);
-
 	setupMainItem();
 
 	setupSteps();
@@ -13,7 +11,6 @@ $(document).ready(function(){
 
 function setupMainItem() {
 	$.getJSON('/api/challenges/' + challengeId, function(result) {
-		console.log("result is " + JSON.stringify(result));
 		$("#newentryimage").prop("src", result.image);
 	});
 }
@@ -36,7 +33,6 @@ function setupNavigation() {
 
 	$("#nextButton").click(function() {
 		var currentStep = getCurrentStep();
-				console.log("next button clickedm currentStep is " + currentStep);
 
 		if (currentStep == "layout") {
 			moveToStep("filter");
@@ -51,7 +47,6 @@ function setupNavigation() {
 }
 
 function moveToStep(stepName) {
-	console.log("moveToStep, stepName is " + stepName);
 	if (stepName == "layout") {
 		$("#layoutSection").show();
 		$("#filterSection").hide();
@@ -69,7 +64,6 @@ function moveToStep(stepName) {
 		$("#nextButton").show();
 		$("#prevButton").show();
 	} else if (stepName == "artifact") {
-		console.log("moving to artifact");
 		$("#layoutSection").hide();
 		$("#filterSection").hide();
 		$("#artifactSection").show();
@@ -124,7 +118,6 @@ function setupLayoutStep() {
 
 		if ($("#presetLayoutSection").is(":visible")) {
 			$.getJSON('/api/filters?type=layout' + "&layoutType=preset", function(result) {
-				console.log("result is " + JSON.stringify(result));	
 				if (result.length > 0) {
 					var list = [];
 					for (var i = 0; i < result.length; i++) {
@@ -147,7 +140,6 @@ function setupLayoutStep() {
 						constructJSONObject(jsonObj);
 						jsonObj.steps.layouts[0].type = "preset";
 						jsonObj.steps.layouts[0].preset = l.id;
-						console.log("jsonObj to be sent is " + JSON.stringify(jsonObj));
 						generateChanges(l.id, jsonObj, function(id, imgPath) {
 							$("#" + id + " img").prop("src", imgPath);
 						});
@@ -157,12 +149,10 @@ function setupLayoutStep() {
 
 					$("#presetLayouts").remove();
 					var grid = createGrid("presetLayouts", list, 3, true, true, function(id) {
-						console.log("clicked on item with id = " + id);
 						$("#presetLayoutSection").data("selectedLayoutID", id);
 						applyChanges();
 					});
 					$("#presetLayoutSection").append(grid);
-					console.log("finished appending the grid to the page");
 				}
 			});
 		}
@@ -173,7 +163,6 @@ function setupLayoutStep() {
 	/*** CROP Handling ****/
 	$("#saveCrop").click(function() {
 		var cropData = $("#newentryimage").cropper("getData");
-		console.log("cropData is " + JSON.stringify(cropData));
 
 		jQuery.data(document.body, "cropData", cropData);
 
@@ -262,7 +251,6 @@ function setupLayoutStep() {
 			rotationData = {degrees: 0};
 		}
 
-		console.log("this.id is " + this.id);
 		if (this.id == "anticlockwise10RotationButton") {
 			rotationData.degrees -= 10;
 		} else if (this.id == "anticlockwise90RotationButton") {
@@ -367,7 +355,6 @@ function setupFilterStep() {
 
 		if ($("#presetFilterSection").is(":visible")) {
 			$.getJSON('/api/filters?type=filter' + "&filterType=preset", function(result) {
-				console.log("result is " + JSON.stringify(result));	
 				if (result.length > 0) {
 					var list = [];
 					for (var i = 0; i < result.length; i++) {
@@ -390,7 +377,6 @@ function setupFilterStep() {
 						constructJSONObject(jsonObj);
 						jsonObj.steps.filters[0].type = "preset";
 						jsonObj.steps.filters[0].preset = f.id;
-						console.log("jsonObj to be sent is " + JSON.stringify(jsonObj));
 						generateChanges(f.id, jsonObj, function(id, imgPath) {
 							$("#" + id + " img").prop("src", imgPath);
 						});
@@ -400,12 +386,10 @@ function setupFilterStep() {
 
 					$("#presetFilters").remove();
 					var grid = createGrid("presetFilters", list, 3, true, true, function(id) {
-						console.log("clicked on item with id = " + id);
 						$("#presetFilterSection").data("selectedFilterID", id);
 						applyChanges();
 					});
 					$("#presetFilterSection").append(grid);
-					console.log("finished appending the grid to the page");
 				}
 			});
 		}
@@ -488,7 +472,6 @@ function setupFilterStep() {
 
 	//set change callback for all range inputs
 	$("input[type=range]").change(function() {
-		console.log("range change callback called, this.id is " + this.id);
 		if (this.id == "charcoalRangeInput") {
 			$("#charcoalValueText").text("Factor: " + $("#" + this.id).val());
 		} else if (this.id == "paintRangeInput") {
@@ -564,7 +547,6 @@ function setupArtifactStep() {
 
 		if ($("#presetArtifactSection").is(":visible")) {
 			$.getJSON('/api/filters?type=artifact' + "&artifactType=preset", function(result) {
-				console.log("result is " + JSON.stringify(result));	
 				if (result.length > 0) {
 					var list = [];
 					for (var i = 0; i < result.length; i++) {
@@ -588,7 +570,6 @@ function setupArtifactStep() {
 						jsonObj.steps.artifacts[0].type = "preset";
 						jsonObj.steps.artifacts[0].preset = a.id;
 						jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
-						console.log("jsonObj to be sent, " + i + " is " + JSON.stringify(jsonObj));
 						generateChanges(a.id, jsonObj, function(id, imgPath) {
 							$("#" + id + " img").prop("src", imgPath);
 						});
@@ -598,12 +579,10 @@ function setupArtifactStep() {
 
 					$("#presetArtifacts").remove();
 					var grid = createGrid("presetArtifacts", list, 3, true, true, function(id) {
-						console.log("clicked on item with id = " + id);
 						$("#presetArtifactSection").data("selectedArtifactID", id);
 						applyChanges();
 					});
 					$("#presetArtifactSection").append(grid);
-					console.log("finished appending the grid to the page");
 				}
 			});
 		}
@@ -656,7 +635,6 @@ function setupDecorationStep() {
 
 		if ($("#presetDecorationSection").is(":visible")) {
 			$.getJSON('/api/filters?type=decoration' + "&decorationType=preset", function(result) {
-				console.log("result is " + JSON.stringify(result));	
 				if (result.length > 0) {
 					var list = [];
 					for (var i = 0; i < result.length; i++) {
@@ -679,7 +657,6 @@ function setupDecorationStep() {
 						constructJSONObject(jsonObj);
 						jsonObj.steps.decorations[0].type = "preset";
 						jsonObj.steps.decorations[0].preset = d.id;
-						console.log("jsonObj to be sent is " + JSON.stringify(jsonObj));
 						generateChanges(d.id, jsonObj, function(id, imgPath) {
 							$("#" + id + " img").prop("src", imgPath);
 						});
@@ -689,12 +666,10 @@ function setupDecorationStep() {
 
 					$("#presetDecorations").remove();
 					var grid = createGrid("presetDecorations", list, 3, true, true, function(id) {
-						console.log("clicked on item with id = " + id);
 						$("#presetDecorationSection").data("selectedDecorationID", id);
 						applyChanges();
 					});
 					$("#presetDecorationSection").append(grid);
-					console.log("finished appending the grid to the page");
 				}
 			});
 		}
@@ -712,12 +687,9 @@ function setupDecorationStep() {
 
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 	for (var i = 0; i < listOfValuesAndSectionIds.length; i++) {
-		console.log("i = " + i + ", valueToMatch = " + valueToMatch + ", value = " + listOfValuesAndSectionIds[i].value + ", id = " + listOfValuesAndSectionIds[i].id);
 		if (valueToMatch == listOfValuesAndSectionIds[i].value) {
-			console.log("going to call show for " + listOfValuesAndSectionIds[i].id);
 			$(listOfValuesAndSectionIds[i].id).show();
 		} else {
-			console.log("going to call hide for " + listOfValuesAndSectionIds[i].id);
 			$(listOfValuesAndSectionIds[i].id).hide();
 		}
 	}
@@ -750,7 +722,6 @@ function setChangeCallback(callback, listOfIds) {
 }
 
 function constructJSONObject(jsonObj) {
-	console.log("constructJSONObject called");
 	jsonObj.imageSource = "challengeId"; // Can be "url" | "challenge" | "blob"
 										// url is path to any web url
 										// challengeId is the challengeId
@@ -976,7 +947,6 @@ function constructJSONObject(jsonObj) {
 
 	jsonObj.steps.decorations.push(decoration);
 
-	console.log("jsonObj is " + JSON.stringify(jsonObj));
 }
 
 function generateChanges(id, jsonObj, done) {
@@ -987,7 +957,6 @@ function generateChanges(id, jsonObj, done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			console.log("response from server, jsonData length is " + JSON.stringify(jsonData).length);
 			done(id, "data:image/jpeg;base64," + jsonData.imageData);
 		},
 		error: function(jsonData) {
@@ -1014,7 +983,6 @@ function applyChanges(done) {
 			//alert("success, data is " + jsonData);
 			//var jsonData = $.parseJSON(data);
 			//alert("image received: " + jsonData.image);
-			console.log("new image received from server");
 
 			//$("#newentryimage").attr("src", jsonData.image);
 			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
@@ -1045,7 +1013,6 @@ function postEntry() {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			console.log("received JsonData is " + JSON.stringify(jsonData));
 
 			//var jsonObj = JSON.parse(jsonData);
 

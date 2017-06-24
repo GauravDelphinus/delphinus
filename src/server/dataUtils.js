@@ -38,12 +38,12 @@ module.exports = {
 
 			var cypherQuery = "MERGE (l:Layout {id: '" + id + "'}) ON CREATE SET l.name = '" + presetLayoutName + "', l.layout_type = 'preset' RETURN l;";
 
-			console.log("INIT DB Running cypherQuery: " + cypherQuery);
+			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
 				
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) throw err;
 
-				console.log(result.data); // delivers an array of query results
+				//console.log(result.data); // delivers an array of query results
 
 			});
 		}
@@ -53,12 +53,12 @@ module.exports = {
 
 			var cypherQuery = "MERGE (f:Filter {id: '" + id + "'}) ON CREATE SET f.name = '" + presetFilterName + "', f.filter_type = 'preset' RETURN f;";
 
-			console.log("INIT DB Running cypherQuery: " + cypherQuery);
+			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
 				
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) throw err;
 
-				console.log(result.data); // delivers an array of query results
+				//console.log(result.data); // delivers an array of query results
 
 			});
 		}
@@ -68,12 +68,12 @@ module.exports = {
 
 			var cypherQuery = "MERGE (a:Artifact {id: '" + id + "'}) ON CREATE SET a.name = '" + presetArtifactName + "', a.artifact_type = 'preset' RETURN a;";
 
-			console.log("INIT DB Running cypherQuery: " + cypherQuery);
+			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
 				
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) throw err;
 
-				console.log(result.data); // delivers an array of query results
+				//console.log(result.data); // delivers an array of query results
 
 			});
 		}
@@ -83,12 +83,12 @@ module.exports = {
 
 			var cypherQuery = "MERGE (d:Decoration {id: '" + id + "'}) ON CREATE SET d.name = '" + presetDecorationName + "', d.decoration_type = 'preset' RETURN d;";
 
-			console.log("INIT DB Running cypherQuery: " + cypherQuery);
+			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
 				
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) throw err;
 
-				console.log(result.data); // delivers an array of query results
+				//console.log(result.data); // delivers an array of query results
 
 			});
 		}
@@ -130,11 +130,11 @@ module.exports = {
 	getImageDataForChallenge : function(db, challengeId, next) {
 		var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) RETURN c.imageType, c.image;";
 
-		console.log("cypherQuery is " + cypherQuery);
+		//console.log("cypherQuery is " + cypherQuery);
 		db.cypherQuery(cypherQuery, function(err, result){
 	    	if(err) throw err;
 
-	    	console.log("result is " + JSON.stringify(result));
+	    	//console.log("result is " + JSON.stringify(result));
 	    	var row = result.data[0].toString();
 	    	var dataArray = row.split(",");
 	    	var imageType = dataArray[0];
@@ -587,7 +587,7 @@ module.exports = {
 	},
 
 	escapeSingleQuotes : function(str) {
-		console.log("escapeSingleQuotes called");
+		//console.log("escapeSingleQuotes called");
 		return str.replace(/'/g, "\\'");
 		//str.replace(/h/g, "v");
 		//console.log("str is now " + str);
@@ -759,11 +759,11 @@ module.exports = {
 
 		findUserQuery += " RETURN u;";
 
-		console.log("running 2 cypherquery: " + findUserQuery);
+		//console.log("running 2 cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) throw err;
 
-			console.log("result is " + JSON.stringify(result.data[0]));
+			//console.log("result is " + JSON.stringify(result.data[0]));
 
 			if (result.data.length == 0) {
 				// no user found
@@ -831,7 +831,7 @@ module.exports = {
 					user.local.password = userFromDB.local_password;
 				}
 
-				console.log("calling callback with user = " + JSON.stringify(user));
+				//console.log("calling callback with user = " + JSON.stringify(user));
 				callback(null, user);
 			}
 		});

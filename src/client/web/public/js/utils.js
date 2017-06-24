@@ -19,7 +19,6 @@ function extractImage(files, callback) {
           var img = new Image();
 
           img.onload = function() {
-            console.log("image.onload called");
             var canvas = document.createElement('canvas');
             var ctx = canvas.getContext('2d');
             canvas.width = Math.min(img.width, 1200); // TBD - max width of image, see if we can pass this value down from somewhere
@@ -164,17 +163,14 @@ function createSocialStatusSectionSimple(data) {
 	var restURL = "/api/comments/" + data.id + "/like";
 	if (user) {
 		$.getJSON(restURL, function(result) {
-			console.log("received like status from server: " + JSON.stringify(result));
 			if (result.likeStatus == "on") {
 				//show button as depressed
-				console.log("button " + data.id + "LikeButton length is " + $("#" + data.id + "LikeButton").length);
 				$("#" + data.id + "LikeButton").addClass("active");
 			}
 		});
 	}
 
 	likeButton.click(function(e) {
-		console.log("button clicked, this is " + this + ", id is " + this.id);
 		if (user) {
 			sendLikeAction(restURL, !$("#" + this.id).hasClass("active"), function(err, likeStatus) {
 				if (err) {
@@ -182,11 +178,9 @@ function createSocialStatusSectionSimple(data) {
 				} else {
 					var numLikes = parseInt($("#" + data.id + "NumLikes").text());
 					if (likeStatus) {
-						console.log("setting on");
 						$("#" + data.id + "LikeButton").addClass("active");
 						$("#" + data.id + "NumLikes").text(" " + (numLikes + 1));
 					} else {
-						console.log("setting off");
 						$("#" + data.id + "LikeButton").removeClass("active");
 						$("#" + data.id + "NumLikes").text(" " + (numLikes - 1));
 					}
@@ -222,7 +216,6 @@ function sendLikeAction(restURL, likeAction, callback) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			console.log("received jsonData = " + JSON.stringify(jsonData));
 			if (jsonData.likeStatus == "on") {
 				callback(0, true);
 			} else {
@@ -258,7 +251,6 @@ var rangeUpdateCount = 0;
 
 function startTimelapse(entityId, data) {
 	//change the look to that of a theatre
-	console.log("startTimelapse, entityId is " + entityId);
 	$("#" + entityId + "MainElement").css("background", "black");
 	$("#" + entityId + "PostedBySection").css("visibility", "hidden");
 	$("#" + entityId + "TimelapseSection").css("visibility", "hidden");
@@ -289,7 +281,6 @@ function fadeToImage(imageId, newSrc) {
 }
 
 function nextTimelapse(entityId, data) {
-	console.log("nextTimelapse, index = " + timelapseIndex);
 	if (data[timelapseIndex].imageType == "url") {
 		//$("#mainImage").attr("src", data[timelapseIndex].imageData);
 		fadeToImage("mainImage", data[timelapseIndex].imageData);
@@ -359,17 +350,14 @@ function createSocialStatusSectionElement(data) {
 
 	if (user) {
 		$.getJSON(restURL, function(result) {
-			console.log("received like status from server: " + JSON.stringify(result));
 			if (result.likeStatus == "on") {
 				//show button as depressed
-				console.log("button " + data.id + "LikeButton length is " + $("#" + data.id + "LikeButton").length);
 				$("#" + data.id + "LikeButton").addClass("active");
 			}
 		});
 	}
 
 	likeButton.click(function(e) {
-		console.log("button clicked, this is " + this + ", id is " + this.id);
 		if (user) {
 			sendLikeAction(restURL, !$("#" + this.id).hasClass("active"), function(err, likeStatus) {
 				if (err) {
@@ -377,11 +365,9 @@ function createSocialStatusSectionElement(data) {
 				} else {
 					var numLikes = parseInt($("#" + data.id + "NumLikes").text());
 					if (likeStatus) {
-						console.log("setting on");
 						$("#" + data.id + "LikeButton").addClass("active");
 						$("#" + data.id + "NumLikes").text(numLikes + 1);
 					} else {
-						console.log("setting off");
 						$("#" + data.id + "LikeButton").removeClass("active");
 						$("#" + data.id + "NumLikes").text(numLikes - 1);
 					}
@@ -541,7 +527,6 @@ function createNewCommentElement(isReply, parentId) {
 			})
 			.done(function(data, textStatus, jqXHR) {
 				//alert("Challenge posted successfully, challenge id = " + data._id);
-				console.log("calling appendCommentElement with data: " + JSON.stringify(data));
 		    	//appendCommentElement("comments", data);
 		    	var commentElement = createCommentElement(data, isReply);
 		    	appendCommentElement(commentElement, parentId);
@@ -571,7 +556,6 @@ function appendNewCommentElement(newCommentElement, parentId, container, isReply
 	if (!isReply) { //new top level comment, append to the end of the list
 		//parentElementId should be the container ID
 		container.append(newCommentElement);
-		console.log("parentId is containerId, so appending to container");
 	} else {
 		//adding a new reply
 		var parentElement = $("#" + parentId + "CommentElement");
@@ -583,20 +567,16 @@ function appendNewCommentElement(newCommentElement, parentId, container, isReply
 				break;
 			}
 			if (next.hasClass("replyElement")) {
-				console.log(next.attr("id") + " has replyElement");
 			} else {
-				console.log(next.attr("id") + " 	does not have replyElement");
 				break;
 			}
 			current = next;
 		}
 		//var nextSibling = parentElement.next(":not(.replyElement)");
 		if (next.length == 0) {
-			console.log("next length is 0");
 			//append at end
 			parentElement.parent().append(newCommentElement);
 		} else {
-			console.log("nextSibling length is not 0");
 			next.before(newCommentElement);
 		}
 	}
@@ -604,9 +584,7 @@ function appendNewCommentElement(newCommentElement, parentId, container, isReply
 
 function appendCommentElement(commentElement, parentId) {
 	//var commentElement = createCommentElement(data);
-	console.log("appendCommentElement, parentId is " + parentId + ", entityId is " + entityId);
 	if (parentId == entityId) {
-		console.log("inserting before the enw comment element");
 		$("#" + entityId + "NewCommentElement").before(commentElement);
 	} else {
 		//reply
@@ -619,9 +597,7 @@ function appendCommentElement(commentElement, parentId) {
 				break;
 			}
 			if (next.hasClass("replyElement")) {
-				console.log(next.attr("id") + " has replyElement");
 			} else {
-				console.log(next.attr("id") + " 	does not have replyElement");
 				break;
 			}
 			current = next;
@@ -631,10 +607,8 @@ function appendCommentElement(commentElement, parentId) {
 		//console.log("nextSibling found by api is " + nextSibling.attr("id"));
 		if (next.length == 0) {
 			//append at end
-			console.log("nextSibling length is 0");
 			parentElement.parent().append(commentElement);
 		} else {
-			console.log("nextSibling length is not 0");
 			next.before(commentElement);
 		}
 	}
@@ -725,7 +699,6 @@ function createCommentsList(id, list) {
 		//passing the right array element to the callback by using the technique desribed at https://stackoverflow.com/questions/27364891/passing-additional-arguments-into-a-callback-function
 		(function(id) {
 			$.getJSON("/api/comments/?entityId=" + id + "&sortBy=reverseDate", function(replyList) {
-				console.log("in callback to reply comments, data.id is " + id);
 				if (replyList.length > 0) {
 					for (var j = 0; j < replyList.length; j++) {
 						var replyData = replyList[j];
@@ -738,7 +711,6 @@ function createCommentsList(id, list) {
 		})(data.id);
 	}
 
-	console.log("appending new comment, container ID is " + id + ", entityId is " + entityId);
 	if (user) {
 		//show new comment box if already logged in
 		var newCommentElement = createNewCommentElement(false, entityId);
@@ -782,7 +754,6 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 	var container = $("<div>", {id: contentTag + "Container"});
 	appendTo.append(container);
 
-	console.log("viewOptions is " + JSON.stringify(viewOptions));
 
 	if (viewOptions && viewOptions.length > 1) {
 		var viewGroup = $("<div>", {id: contentTag + "ViewGroup", class: "btn-group", "data-toggle": "buttons"});
@@ -857,7 +828,6 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 
 function refreshListAndUpdateContent(getURL, contentTag, defaultViewType) {
 	$.getJSON(getURL, function(list) {
-		console.log("result from getJSON is " + JSON.stringify(list));
 
 		jQuery.data(document.body, contentTag + "List", list);
 
@@ -876,7 +846,6 @@ function refreshListAndUpdateContent(getURL, contentTag, defaultViewType) {
 				$("#" + contentTag + "Container").append(scrollableList);
 			}
 		} else {
-			console.log("view options button does not exist, defaultViewType is " + defaultViewType);
 			if (defaultViewType == "thumbnail") {
 				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
 				$("#" + contentTag + "Container").append(grid);
@@ -894,7 +863,6 @@ function refreshListAndUpdateContent(getURL, contentTag, defaultViewType) {
 function setupTabRedirection() {
 	// Javascript to enable link to tab
 	var url = document.location.toString();
-	console.log("url is " + url);
 	if (url.match('#')) {
 	    $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
 	} //add a suffix
@@ -906,6 +874,5 @@ function setupTabRedirection() {
 
 	//var element = $(".nav-tabs").get(0);
 	var element = document.getElementById("mainTabGroup");
-	console.log("element to scroll to is " + element);
 	element.scrollIntoView(true);
 }

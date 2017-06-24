@@ -59,7 +59,7 @@ module.exports = function () {
                 
                 var facebook = require('../services/facebook')('1286014801445639', '81732e3d807f86c9099589f632897dce');
                 facebook.getImage(user.facebook.token, function (imageUrl) {
-                    console.log("getImage returned, imageUrl = " + imageUrl);
+                    //console.log("getImage returned, imageUrl = " + imageUrl);
                     user.facebook.image = imageUrl;
 
                     // set the user name and image, if not already set

@@ -534,7 +534,6 @@ function writeImage(image, imagePath, next) {
 	image.write(imagePath, function(err) {
 		if (err) throw err;
 
-		console.log("next is " + next);
 		next(0, imagePath);
 	});
 
@@ -570,7 +569,7 @@ function absoluteToMultiplierSigned(absoluteValue) {
 }
 
 function applySteps(sourceImage, targetImage, steps, next) {
-	console.log("applySteps, steps = " + JSON.stringify(steps));
+	//console.log("applySteps, steps = " + JSON.stringify(steps));
 	// initialize the image
 	var image = gm(sourceImage);
 	
@@ -811,7 +810,7 @@ function applyFilters (image, size, filters) {
 					}
 
 					// now, do the thing
-					console.log("calling image.modulate with brightness = " + brightness + ", hue = " + hue + ", saturation = " + saturation);
+					//console.log("calling image.modulate with brightness = " + brightness + ", hue = " + hue + ", saturation = " + saturation);
 					image.modulate(brightness, saturation, hue);
 				}
 		
@@ -832,7 +831,7 @@ function applyFilters (image, size, filters) {
 					image.colorspace("GRAY");
 				}
 				if (filter.effects.mosaic == "on") {
-					console.log("setting image.mosaic");
+					//console.log("setting image.mosaic");
 					image.mosaic();
 				}
 				if (filter.effects.negative == "on") {
@@ -904,7 +903,7 @@ function applyArtifacts (image, size, artifacts) {
 	for (var i = 0; i < numArtifacts; i++) {
 
 		var artifact = artifacts[i];
-		console.log("artifact is " + JSON.stringify(artifact));
+		//console.log("artifact is " + JSON.stringify(artifact));
 
 		if (artifact.type == "preset") {
 			var bannerText;
@@ -933,7 +932,7 @@ function applyArtifacts (image, size, artifacts) {
 				}
 
 				// Fill the background
-				console.log("calling image.fill with " + artifact.banner.backgroundColor);
+				//console.log("calling image.fill with " + artifact.banner.backgroundColor);
 				if (artifact.banner.backgroundColor == "transparent") {
 					image.fill("none");
 				} else {

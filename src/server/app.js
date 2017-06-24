@@ -119,7 +119,7 @@ module.exports = function() {
 
 	// 3 - Entry Page
 	app.get("/entry/:entryId", function(req, res) {
-		console.log("/entry/entryId, entry ID is " + req.params.entryId);
+		//console.log("/entry/entryId, entry ID is " + req.params.entryId);
 		dataUtils.getChallengeForEntry(db, req.params.entryId, function (err, challengeId) {
 			if (err) throw err;
 

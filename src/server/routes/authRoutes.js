@@ -13,7 +13,7 @@ var routes = function(db) {
                     on the "Sign In" link from some web page.  Check the referring site's URL
                     and set that to the redirectTo value in the session.
                 **/
-                console.log("referrer: " + req.get('Referrer'));
+                //console.log("referrer: " + req.get('Referrer'));
                 req.session.redirectTo = req.get('Referrer');
             }
 
@@ -28,8 +28,8 @@ var routes = function(db) {
             failureRedirect : "/auth/login",
             failureFlash: true
         }), function(req, res) {
-            console.log("**** Local login callback **** ");
-            console.log("req.session.redirectTo is " + req.session.redirectTo);
+            //console.log("**** Local login callback **** ");
+            //console.log("req.session.redirectTo is " + req.session.redirectTo);
             if (req.session.redirectTo) {
                 var redirectTo = req.session.redirectTo;
                 req.session.redirectTo = null;
@@ -47,8 +47,8 @@ var routes = function(db) {
             failureRedirect: "/auth/signup",
             failureFlash: true
         }), function(req, res) {
-            console.log(" ****** Local Signup callback ************* ");
-            console.log("req.session.redirectTo is " + req.session.redirectTo);
+            //console.log(" ****** Local Signup callback ************* ");
+            //console.log("req.session.redirectTo is " + req.session.redirectTo);
             if (req.session.redirectTo) {
                 var redirectTo = req.session.redirectTo;
                 req.session.redirectTo = null;
@@ -62,11 +62,11 @@ var routes = function(db) {
     
         .get(function (req, res, next) {
 
-            console.log("########## /auth/google ##############");
-            console.log("req.sessiom is " + JSON.stringify(req.session));
+            //console.log("########## /auth/google ##############");
+            //console.log("req.sessiom is " + JSON.stringify(req.session));
             if (!req.session.redirectTo) {
                 
-                console.log("referrer: " + req.get('Referrer'));
+                //console.log("referrer: " + req.get('Referrer'));
                 req.session.redirectTo = req.get('Referrer');
             }
 
@@ -77,8 +77,8 @@ var routes = function(db) {
         	scope: ['https://www.googleapis.com/auth/userinfo.profile',
             'https://www.googleapis.com/auth/userinfo.email']
     	   }) , function(req, res) {
-            console.log("########## /auth/google authenticate ##############");
-            console.log("req.sessiom is " + JSON.stringify(req.session));
+            //console.log("########## /auth/google authenticate ##############");
+            //console.log("req.sessiom is " + JSON.stringify(req.session));
         });
 
 	authRouter.route('/google/callback')
@@ -87,8 +87,8 @@ var routes = function(db) {
         	//successRedirect: '/user/',
         	failureRedirect: '/error/'
     	}), function(req, res) {
-            console.log("########## Google callback ##############");
-            console.log("req.sessiom is " + JSON.stringify(req.session));
+            //console.log("########## Google callback ##############");
+            //console.log("req.sessiom is " + JSON.stringify(req.session));
             if (req.session.redirectTo) {
                 var redirectTo = req.session.redirectTo;
                 req.session.redirectTo = null;
@@ -109,7 +109,7 @@ var routes = function(db) {
                 **/
                 
                 var referrer = req.get("Referrer");
-                console.log("referrer: " + referrer);
+                //console.log("referrer: " + referrer);
                 if (referrer) {
                     req.session.redirectTo = referrer;
                 }
@@ -144,7 +144,7 @@ var routes = function(db) {
                     on the "Sign In" link from some web page.  Check the referring site's URL
                     and set that to the redirectTo value in the session.
                 **/
-                console.log("referrer: " + req.get('Referrer'));
+                //console.log("referrer: " + req.get('Referrer'));
                 req.session.redirectTo = req.get('Referrer');
             }
 
@@ -179,7 +179,7 @@ var routes = function(db) {
             req.session.destroy(function(err) {
                 if (err) throw err;
 
-                console.log("session.destroy callback");
+                //console.log("session.destroy callback");
                 res.redirect("/");
             });
             

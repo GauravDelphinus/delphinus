@@ -12,7 +12,7 @@ module.exports = function () {
             passReqToCallback: true
         },
         function(req, token, tokenSecret, profile, done){
-            console.log("Twitter Profile is " + JSON.stringify(profile));
+            //console.log("Twitter Profile is " + JSON.stringify(profile));
             var query = {};
             
             if (req.user) {
@@ -77,7 +77,7 @@ module.exports = function () {
 					user.image = config.url.staticImages + config.name.defaultProfileImageName;
 				}
 
-                console.log("calling saveUser, user = " + JSON.stringify(user));
+                //console.log("calling saveUser, user = " + JSON.stringify(user));
                 dataUtils.saveUser(user, function(err, user) {
                     if (err) throw err;
 

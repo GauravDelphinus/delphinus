@@ -19,14 +19,14 @@ var routes = function(db) {
                         cypherQuery = "MATCH (u:User) RETURN u;";
                   }
 
-                  console.log("Running cypherQuery: " + cypherQuery);
+                  //console.log("Running cypherQuery: " + cypherQuery);
                   db.cypherQuery(cypherQuery, function(err, result){
                         if(err) throw err;
 
                         //console.log(result.data); // delivers an array of query results
                         //console.log(result.columns); // delivers an array of names of objects getting returned
 
-                        console.log(result.data);
+                        //console.log(result.data);
                         res.json(result.data);
                   });
       });
@@ -34,7 +34,7 @@ var routes = function(db) {
       userRouter.route("/")
       .put(function(req, res) {
             
-            console.log("PUT on /api/users, body is " + JSON.stringify(req.body));
+            //console.log("PUT on /api/users, body is " + JSON.stringify(req.body));
             var user = req.body.user;
 
             var index = -1;
@@ -75,18 +75,18 @@ var routes = function(db) {
 
       userRouter.route("/follow/:followedId") //api/users/follow
       .get(function(req, res) {
-      	console.log("GET on /api/users/follow, req.user is " + JSON.stringify(req.user));
+      	//console.log("GET on /api/users/follow, req.user is " + JSON.stringify(req.user));
       	if (req.user && req.user.id && req.params.followedId) {
       		var cypherQuery = "MATCH (u1:User {id: '" + req.user.id + 
       			"'})-[:FOLLOWING]->(u2:User {id: '" + req.params.followedId + "'}) RETURN u1;";
-      		console.log("running cypherQuery: " + cypherQuery);
+      		//console.log("running cypherQuery: " + cypherQuery);
       		db.cypherQuery(cypherQuery, function(err, result){
                 if(err) throw err;
 
-                console.log(JSON.stringify(result.data)); // delivers an array of query results
+                //console.log(JSON.stringify(result.data)); // delivers an array of query results
                 //console.log(result.columns); // delivers an array of names of objects getting returned
 
-                console.log(result.data);
+                //console.log(result.data);
                 var output = {};
                 if (result.data.length == 1) {
                 	output = {followStatus : "following"};
@@ -98,7 +98,7 @@ var routes = function(db) {
       	}
       })
       .put(function(req, res) {
-      	console.log("PUT on /api/users/follow, req.user is " + JSON.stringify(req.user));
+      	//console.log("PUT on /api/users/follow, req.user is " + JSON.stringify(req.user));
       	if (req.user && req.user.id && req.params.followedId) {
 
       		if (req.body.followAction == "follow") {
@@ -112,7 +112,7 @@ var routes = function(db) {
 
 	                var output = {};
 
-	                console.log(result.data);
+	                //console.log(result.data);
 	                if (result.data.length == 1) {
 
 	                	output.followStatus = "following";
@@ -128,7 +128,7 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-					console.log("result of deletion: " + JSON.stringify(result));
+					//console.log("result of deletion: " + JSON.stringify(result));
 					var output = {};
 
 					if (result.data.length == 1) {
@@ -151,7 +151,7 @@ var routes = function(db) {
 			db.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 
-				console.log("result of query = " + JSON.stringify(result));
+				//console.log("result of query = " + JSON.stringify(result));
 
 				var output = {};
 
@@ -168,7 +168,7 @@ function updateUserInDB(res, user) {
       dataUtils.saveUser(user, function(err) {
             if (err) throw err;
 
-            console.log("sending JSON back: " + JSON.stringify(user));
+            //console.log("sending JSON back: " + JSON.stringify(user));
             res.json(user);
       });
 }

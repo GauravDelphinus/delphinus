@@ -54,12 +54,12 @@ var routes = function(db) {
 			
 			cypherQuery += " ;";
 
-			console.log("Running cypherQuery: " + cypherQuery);
+			//console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
@@ -101,7 +101,7 @@ var routes = function(db) {
 				POST a new challenge node.
 			**/
 
-			console.log("received POST on /api/challenges");
+			//console.log("received POST on /api/challenges");
 			// Store the incoming base64 encoded image into a local image file first
 			var fs = require('fs');
 			var imageDataURI = req.body.imageDataURI;
@@ -129,7 +129,7 @@ var routes = function(db) {
 
     			fs.writeFileSync(fullpath, buffer);
 
-    			console.log(JSON.stringify(req.user));
+    			//console.log(JSON.stringify(req.user));
     			
     			var id = shortid.generate();
 
@@ -140,7 +140,7 @@ var routes = function(db) {
 							"title : '" + dataUtils.escapeSingleQuotes(req.body.caption) + "'" +
 							"})-[r:POSTED_BY]->(u) RETURN n;";
 
-				console.log("Running cypherQuery: " + cypherQuery);
+				//console.log("Running cypherQuery: " + cypherQuery);
 				
 				db.cypherQuery(cypherQuery, function(err, result){
     				if(err) throw err;
@@ -164,12 +164,12 @@ var routes = function(db) {
 
 			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[:POSTED_BY]->(u:User) OPTIONAL MATCH (u2:User)-[:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry);";
 
-			console.log("GET Received, Running cypherQuery: " + cypherQuery);
+			//console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			console.log(result.data); // delivers an array of query results
-    			console.log(result.columns); // delivers an array of names of objects getting returned
+    			//console.log(result.data); // delivers an array of query results
+    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
 			    var c = result.data[0][0];
 				var u = result.data[0][1];
@@ -302,14 +302,14 @@ var routes = function(db) {
 			if (req.user && req.user.id) {
 	      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
 	      			"'})-[:LIKES]->(c:Challenge {id: '" + req.params.challengeId + "'}) RETURN c;";
-	      		console.log("running cypherQuery: " + cypherQuery);
+	      		//console.log("running cypherQuery: " + cypherQuery);
 	      		db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-	                console.log("result of get likes is " + JSON.stringify(result.data)); // delivers an array of query results
+	                //console.log("result of get likes is " + JSON.stringify(result.data)); // delivers an array of query results
 	                //console.log(result.columns); // delivers an array of names of objects getting returned
 
-	                console.log(result.data);
+	                //console.log(result.data);
 	                var output = {};
 	                if (result.data.length == 1) {
 	                	output = {likeStatus : "on"};
@@ -317,7 +317,7 @@ var routes = function(db) {
 	                	output = {likeStatus : "off"};
 	                }
 
-	                console.log("sending back to client: " + JSON.stringify(output));
+	                //console.log("sending back to client: " + JSON.stringify(output));
 	                res.json(output);
 				});
       		} else {
@@ -336,7 +336,7 @@ var routes = function(db) {
 
 	                var output = {};
 
-	                console.log(result.data);
+	                //console.log(result.data);
 	                if (result.data.length == 1) {
 
 	                	output.likeStatus = "on";
@@ -352,7 +352,7 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-					console.log("result of deletion: " + JSON.stringify(result));
+					//console.log("result of deletion: " + JSON.stringify(result));
 					var output = {};
 
 					if (result.data.length == 1) {
