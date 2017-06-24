@@ -570,6 +570,7 @@ function absoluteToMultiplierSigned(absoluteValue) {
 }
 
 function applySteps(sourceImage, targetImage, steps, next) {
+	console.log("applySteps, steps = " + JSON.stringify(steps));
 	// initialize the image
 	var image = gm(sourceImage);
 	
@@ -903,9 +904,14 @@ function applyArtifacts (image, size, artifacts) {
 	for (var i = 0; i < numArtifacts; i++) {
 
 		var artifact = artifacts[i];
+		console.log("artifact is " + JSON.stringify(artifact));
 
 		if (artifact.type == "preset") {
-			applyPresetArtifact(image, size, artifact.preset);
+			var bannerText;
+			if (artifact.banner && artifact.banner.text) {
+				bannerText = artifact.banner.text;
+			}
+			applyPresetArtifact(image, size, artifact.preset, bannerText);
 		} else if (artifact.type == "custom") {
 			if (artifact.banner) {
 				var labelHeight = 200; // testing
@@ -1021,38 +1027,52 @@ function applyPresetFilter(image, size, presetFilter) {
 	}
 }
 
-function applyPresetArtifact(image, size, presetArtifact) {
+function applyPresetArtifact(image, size, presetArtifact, bannerText) {
 	var labelHeight = 200; // testing
+	image.strokeWidth(1);
+	
 	switch (presetArtifact) {
 		case "bannerBottomWhite":
 			image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
 			image.fill("white");
 			image.drawRectangle(0, 0, size.width, size.height);
+			image.stroke("black");
+			image.drawText(0, 0, bannerText);
 			break;
 		case "bannerBottomBlack":
 			image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
 			image.fill("black");
 			image.drawRectangle(0, 0, size.width, size.height);
+			image.stroke("white");
+			image.drawText(0, 0, bannerText);
 			break;
 		case "bannerBottomTransparent":
 			image.region(size.width, labelHeight, 0, size.height - labelHeight).gravity("Center");
 			image.fill("none");
 			image.drawRectangle(0, 0, size.width, size.height);
+			image.stroke("black");
+			image.drawText(0, 0, bannerText);
 			break;
 		case "bannerTopWhite":
 			image.region(size.width, labelHeight, 0, 0).gravity("Center");
 			image.fill("white");
 			image.drawRectangle(0, 0, size.width, size.height);
+			image.stroke("black");
+			image.drawText(0, 0, bannerText);
 			break;
 		case "bannerTopBlack":
 			image.region(size.width, labelHeight, 0, 0).gravity("Center");
 			image.fill("black");
 			image.drawRectangle(0, 0, size.width, size.height);
+			image.stroke("white");
+			image.drawText(0, 0, bannerText);
 			break;
 		case "bannerTopTransparent":
 			image.region(size.width, labelHeight, 0, 0).gravity("Center");
 			image.fill("none");
 			image.drawRectangle(0, 0, size.width, size.height);
+			image.stroke("black");
+			image.drawText(0, 0, bannerText);
 			break;
 		default:
 			break;

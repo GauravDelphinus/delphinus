@@ -322,7 +322,7 @@ function stopTimelapse(entityId, data) {
 }
 
 function createSocialStatusSectionElement(data) {
-	console.log("createSocialStatusSectionElement, data is " + JSON.stringify(data));
+	//console.log("createSocialStatusSectionElement, data is " + JSON.stringify(data));
 	// Social Status Section
 	var socialStatus = $("<div>", {id: data.id + "SocialStatus", class: "socialStatus"});
 	var numLikes = $("<span>", {class: "glyphicon glyphicon-thumbs-up"});

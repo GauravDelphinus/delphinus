@@ -35,7 +35,6 @@
 				<select id="layoutTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
 					<option value="preset">Preset</option>
-					<option value="userDefined">User Defined</option>
 					<option value="custom">Custom</option>
 				</select>
 
@@ -127,7 +126,6 @@
 				<select id="filterTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
 					<option value="preset">Preset</option>
-					<option value="userDefined">User Defined</option>
 					<option value="custom">Custom</option>
 				</select>
 
@@ -230,10 +228,14 @@
 			<!-- ARTIFACT SECION -->
 			<div id="artifactSection" style="display: none;">
 				<span class="title">Step 3: Add Artifacts</span><br>
+				<span class="settingsSubBlockTitle">Caption</span>
+					<div class="settingsSubBlock">
+						<input type="text" id="bannerText" class="form-control" value="Enter your caption here!">
+				</div>
+
 				<select id="artifactTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
 					<option value="preset">Preset</option>
-					<option value="userDefined">User Defined</option>
 					<option value="custom">Custom</option>
 				</select>
 
@@ -278,10 +280,7 @@
 							<b>Text Color:</b>
 							<input type="color" class="btn btn-default" id="bannerTextColorButton" value="#000000">
 						</div>
-						<span class="settingsSubBlockTitle">Caption</span>
-						<div class="settingsSubBlock">
-							<input type="text" id="bannerText" class="form-control" value="Enter your caption here!">
-						</div>
+
 					</div>
 				</div>
 			</div>
@@ -294,7 +293,6 @@
 				<select id="decorationTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
 					<option value="preset">Preset</option>
-					<option value="userDefined">User Defined</option>
 					<option value="custom">Custom</option>
 				</select>
 

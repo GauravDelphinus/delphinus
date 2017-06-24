@@ -587,7 +587,8 @@ function setupArtifactStep() {
 						constructJSONObject(jsonObj);
 						jsonObj.steps.artifacts[0].type = "preset";
 						jsonObj.steps.artifacts[0].preset = a.id;
-						console.log("jsonObj to be sent is " + JSON.stringify(jsonObj));
+						jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
+						console.log("jsonObj to be sent, " + i + " is " + JSON.stringify(jsonObj));
 						generateChanges(a.id, jsonObj, function(id, imgPath) {
 							$("#" + id + " img").prop("src", imgPath);
 						});
@@ -912,6 +913,9 @@ function constructJSONObject(jsonObj) {
 	} else if ($("#artifactTypeSelection").val() == "preset") {
 		artifact.type = "preset";
 		artifact.preset = $("#presetArtifactSection").data("selectedArtifactID");
+
+		artifact.banner = {};
+		artifact.banner.text = $("#bannerText").prop("value");
 	} else if ($("#artifactTypeSelection").val() == "userDefined") {
 		artifact.type = "user_defined";
 	} else if ($("#artifactTypeSelection").val() == "custom") {
