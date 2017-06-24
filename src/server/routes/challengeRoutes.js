@@ -38,7 +38,7 @@ var routes = function(db) {
 			}
 
 			// add social count check
-			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) RETURN c, u, COUNT(u2), COUNT(comment)";
+			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry)";
 
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "popularity") {
@@ -67,6 +67,7 @@ var routes = function(db) {
     				var u = result.data[i][1];
     				var numLikes = result.data[i][2];
     				var numComments = result.data[i][3];
+    				var numEntries = result.data[i][4];
 
     				var data = {};
     				data.type = "challenge";
@@ -82,6 +83,7 @@ var routes = function(db) {
 					data.socialStatus.numLikes = numLikes;
 					data.socialStatus.numShares = 25;
 					data.socialStatus.numComments = numComments;
+					data.socialStatus.numEntries = numEntries;
 					data.caption = c.title;
 
 					data.link = config.url.challenge + c.id;
@@ -160,7 +162,7 @@ var routes = function(db) {
 				Returns a single JSON object of type challenge
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[:POSTED_BY]->(u:User) OPTIONAL MATCH (u2:User)-[:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) RETURN c, u, COUNT(u2), COUNT(comment);";
+			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[:POSTED_BY]->(u:User) OPTIONAL MATCH (u2:User)-[:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry);";
 
 			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -173,6 +175,7 @@ var routes = function(db) {
 				var u = result.data[0][1];
 				var numLikes = result.data[0][2];
 				var numComments = result.data[0][3];
+				var numEntries = result.data[0][4];
 
 				var data = {};
 				data.type = "challenge";
@@ -188,6 +191,7 @@ var routes = function(db) {
 				data.socialStatus.numLikes = numLikes;
 				data.socialStatus.numShares = 23;
 				data.socialStatus.numComments = numComments;
+				data.socialStatus.numEntries = numEntries;
 				data.caption = c.title;
 
 				data.link = config.url.challenge + c.id;

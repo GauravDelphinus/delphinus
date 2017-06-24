@@ -322,7 +322,7 @@ function stopTimelapse(entityId, data) {
 }
 
 function createSocialStatusSectionElement(data) {
-	//console.log("createSocialStatusSectionElement, data is " + JSON.stringify(data));
+	console.log("createSocialStatusSectionElement, data is " + JSON.stringify(data));
 	// Social Status Section
 	var socialStatus = $("<div>", {id: data.id + "SocialStatus", class: "socialStatus"});
 	var numLikes = $("<span>", {class: "glyphicon glyphicon-thumbs-up"});
@@ -338,7 +338,16 @@ function createSocialStatusSectionElement(data) {
 	socialStatus.append(shareButton);
 	socialStatus.append(commentButton);
 
-	
+	if (data.socialStatus.numEntries) {
+		var numEntries = $("<span>", {class: "glyphicon glyphicon-flag"});
+		var entriesButton = $("<button>", {id: data.id + "EntriesButton", type: "button", class: "btn btn-primary btn-lg socialActionButton"});
+		entriesButton.append(numEntries).append("  ").append($("<span>", {id: data.id + "NumEntries", text: data.socialStatus.numEntries}));
+		socialStatus.append(entriesButton);
+
+		entriesButton.click(function(e) {
+		window.open(data.link + "#entries", "_self");
+	});
+	}
 
 	//console.log("user is " + JSON.stringify(user));
 	var restURL;
@@ -382,6 +391,10 @@ function createSocialStatusSectionElement(data) {
 			window.open("/auth", "_self");
 		}
 	
+	});
+
+	commentButton.click(function(e) {
+		window.open(data.link + "#comments", "_self");
 	});
 
 	return socialStatus;
@@ -726,8 +739,15 @@ function createCommentsList(id, list) {
 	}
 
 	console.log("appending new comment, container ID is " + id + ", entityId is " + entityId);
-	var newCommentElement = createNewCommentElement(false, entityId);
-	appendNewCommentElement(newCommentElement, entityId, container, false);
+	if (user) {
+		//show new comment box if already logged in
+		var newCommentElement = createNewCommentElement(false, entityId);
+		appendNewCommentElement(newCommentElement, entityId, container, false);
+	} else {
+		var newCommentLink = $("<a>", {href: "/auth/", class: "btn btn-primary center", text: "Add new comment"});
+		container.append(newCommentLink);
+	}
+	
 
 	return container;
 }
@@ -869,4 +889,23 @@ function refreshListAndUpdateContent(getURL, contentTag, defaultViewType) {
 			}
 		}
 	});
+}
+
+function setupTabRedirection() {
+	// Javascript to enable link to tab
+	var url = document.location.toString();
+	console.log("url is " + url);
+	if (url.match('#')) {
+	    $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+	} //add a suffix
+
+	// Change hash for page-reload
+	$('.nav-tabs a').on('shown.bs.tab', function (e) {
+	    window.location.hash = e.target.hash;
+	});
+
+	//var element = $(".nav-tabs").get(0);
+	var element = document.getElementById("mainTabGroup");
+	console.log("element to scroll to is " + element);
+	element.scrollIntoView(true);
 }

@@ -321,6 +321,8 @@ function setupTabs(profileType) {
 
 	//entries are shown irrespective of who is viewing, as long as there are entries
 	setupEntriesTab();
+
+	setupTabRedirection();
 }
 
 

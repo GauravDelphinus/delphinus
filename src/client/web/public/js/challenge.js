@@ -25,6 +25,8 @@ function setupTabs() {
 	setupEntriesTab();
 
 	setupCommentsTab();
+
+	setupTabRedirection();
 }
 
 function setupMyEntriesTab() {

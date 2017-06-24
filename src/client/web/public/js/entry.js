@@ -22,6 +22,8 @@ function setupTabs() {
 	setupChallengeTab();
 
 	setupCommentsTab();
+
+	setupTabRedirection();
 }
 
 function setupChallengeTab() {
