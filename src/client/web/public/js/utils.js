@@ -208,6 +208,7 @@ function sendLikeAction(restURL, likeAction, callback) {
 	} else {
 		jsonObj.likeAction = "unlike";
 	}
+	jsonObj.created = (new Date()).getTime();
 	
 	$.ajax({
 		type: "PUT",

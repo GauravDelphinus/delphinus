@@ -9,22 +9,10 @@
 <% include ./header %>
 <br><br>
 
-<div id="challenges" class="section">
-<div class="sectionHeader">
-	<span class="sectionTitle">Challenges</span>
-	<button id="postChallenge" type="button" class="btn btn-primary pull-right sectionButton"><span class="glyphicon glyphicon-plus"></span> Post New Challenge</button>
-	<button id="browseChallenges" type="button" class="btn btn-primary pull-right sectionButton"><span class="glyphicon glyphicon-folder-open"></span> Browse Challenges</button>
-</div>
-<hr/>
+<div id="feed" class="section">
+
 </div>
 
-<div id="entries" class="section">
-<div class="sectionHeader">
-	<span class="sectionTitle">Entries</span>
-	<button id="postEntry" type="button" class="btn btn-primary pull-right sectionButton"><span class="glyphicon glyphicon-plus"></span> Post New Entry</button>
-	<button id="browseEntries" type="button" class="btn btn-primary pull-right sectionButton"><span class="glyphicon glyphicon-folder-open"></span>  Browse Entries</button>
-</div>
-<hr/>
 </div>
 <script>
 	var user = <%- JSON.stringify(user) %>;

@@ -324,10 +324,11 @@ var routes = function(db) {
       			res.json({error: "Not Logged In"});
       		}
 		})
+
 		.put(function(req, res) {
 			if (req.body.likeAction == "like") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
-      				"'}), (c:Challenge {id: '" + req.params.challengeId + "'}) CREATE (u)-[r:LIKES]->(c) RETURN r;";
+      				"'}), (c:Challenge {id: '" + req.params.challengeId + "'}) CREATE (u)-[r:LIKES {created: '" + req.body.created + "'}]->(c) RETURN r;";
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 

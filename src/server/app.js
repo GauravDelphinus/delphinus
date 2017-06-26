@@ -67,6 +67,9 @@ module.exports = function() {
 	var commentRouter = require("./routes/commentRoutes")(db);
 	app.use("/api/comments", commentRouter);
 
+	var feedRouter = require("./routes/feedRoutes")(db);
+	app.use("/api/feeds", feedRouter);
+	
 	/**
 		FILE ROUTERS
 		This is the list of file routers that allow for serving of file

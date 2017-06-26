@@ -398,7 +398,7 @@ var routes = function(db) {
 		.put(function(req, res) {
 			if (req.body.likeAction == "like") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
-      				"'}), (e:Entry {id: '" + req.params.entryId + "'}) CREATE (u)-[r:LIKES]->(e) RETURN r;";
+      				"'}), (e:Entry {id: '" + req.params.entryId + "'}) CREATE (u)-[r:LIKES {created: '" + req.body.created + "'}]->(e) RETURN r;";
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
