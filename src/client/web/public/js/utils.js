@@ -826,7 +826,7 @@ function createThumbnailElement(data) {
 		element.append(createPostedBySectionElement(data));
 	}
 	
-	var imageLink = $("<a>", {href: data.link}).append(createImageElement(data));
+	var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data));
 	element.append(imageLink);
 
 	if (data.caption) {
