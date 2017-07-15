@@ -825,10 +825,8 @@ function createThumbnailElement(data) {
 	if (data.postedDate) {
 		element.append(createPostedBySectionElement(data));
 	}
-	
-	var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data));
-	element.append(imageLink);
 
+	element.append(createEntityImageElement(data));
 	if (data.caption) {
 		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
 		element.append(link);
