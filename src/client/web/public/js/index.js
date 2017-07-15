@@ -8,7 +8,7 @@ $(document).ready(function(){
 
 function setupFeed() {
 
-	createAndAppendContentContainer($("#feed"), "feed", [{type: "filmstrip"}], [{type: "date", url: "/api/feeds"}]);
+	createAndAppendContentContainer($("#feed"), "feed", [{type: "feed"}], [{type: "date", url: "/api/feeds"}]);
 	//setupChallenges();
 
 	//setupEntries();
