@@ -455,15 +455,17 @@ function createActivitySectionElement(data) {
 	var activitySection = $("<div>", {id: data.id + "ActivitySection", class: "activitySection"});
 	var activityText = $("<span>", {id: data.id + "ActivityText", class: "activityText"});
 
-	if (data.feedType == "recentlyLiked") {
-		if (data.activity && data.activity.user) {
-			var userLink = $("<a>", {href: "/user/" + data.activity.user.id}).append(data.activity.user.displayName);
-			activityText.append(userLink).append(" likes this");
-		}
-	} else if (data.feedType == "recentlyCommented") {
-		if (data.activity && data.activity.comment && data.activity.comment.postedByUser) {
-			var userLink = $("<a>", {href: "/user/" + data.activity.comment.postedByUser.id}).append(data.activity.comment.postedByUser.displayName);
-			activityText.append(userLink).append(" commented on this");
+	if (data.activity) {
+		if (data.activity.type == "recentlyLiked") {
+			if (data.activity.user) {
+				var userLink = $("<a>", {href: "/user/" + data.activity.user.id}).append(data.activity.user.displayName);
+				activityText.append(userLink).append(" likes this");
+			}
+		} else if (data.activity.type == "recentlyCommented") {
+			if (data.activity.comment && data.activity.comment.postedByUser) {
+				var userLink = $("<a>", {href: "/user/" + data.activity.comment.postedByUser.id}).append(data.activity.comment.postedByUser.displayName);
+				activityText.append(userLink).append(" commented on this");
+			}
 		}
 	}
 

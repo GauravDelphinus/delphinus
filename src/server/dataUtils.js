@@ -1109,6 +1109,55 @@ module.exports = {
 		fs.stat(cachePath, function(err, stats) {
 			callback(err);
 		});
+	},
+
+	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, activityType, lastComment, lastCommenter, likeTime, liker) {
+
+		var data = {
+			type : entityType,
+			id : entity.id,
+			link : entity.link,
+			postedDate: entity.created,
+			postedByUser: poster,
+			compareDate: compareDate,
+			socialStatus: {
+				numLikes: numLikes,
+				numShares: numShares,
+				numComments: numComments,
+				numEntries: numEntries
+			}
+		};
+
+		if (entityType == "challenge") {
+			data.image = config.url.challengeImages + entity.image;
+			data.caption = entity.title;
+		} else if (entityType == "entry") {
+			data.image = config.url.entryImages + entity.id
+			data.caption = entity.caption;
+		}
+
+		if (activityType != "none") {
+			data.activity = {};
+			data.activity.type = activityType;
+
+			if (activityType == "recentlyCommented") {
+				if (lastComment) {
+					data.activity.comment = lastComment;
+					data.activity.comment.postedDate = lastComment.created;
+				
+					if (lastCommenter) {
+						data.activity.comment.postedByUser = lastCommenter;
+					}
+				
+					data.activity.comment.socialStatus = {numLikes: 0};
+				}
+			}
+			
+			
+		}
+		
+		console.log("constructEntityData returning data = " + JSON.stringify(data));
+		return data;
 	}
 
 	
