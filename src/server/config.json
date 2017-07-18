@@ -28,5 +28,9 @@
 	"image" : {
 		"maxHeight" : 1500,
 		"maxWidth" : 1500
+	},
+	"businessLogic" : {
+		"minLikesForPopularity" : 2,
+		"minCommentsForPopularity" : 2
 	}
 }

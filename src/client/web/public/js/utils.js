@@ -457,19 +457,21 @@ function createActivitySectionElement(data) {
 
 	if (data.activity) {
 		if (data.activity.type == "recentlyLiked") {
-			if (data.activity.user) {
-				var userLink = $("<a>", {href: "/user/" + data.activity.user.id}).append(data.activity.user.displayName);
-				activityText.append(userLink).append(" likes this");
+			if (data.activity.like && data.activity.like.postedByUser) {
+				var userLink = $("<a>", {href: "/user/" + data.activity.like.postedByUser.id}).append(data.activity.like.postedByUser.displayName);
+				activityText.append(userLink).append(" likes this " + formatDate(data.activity.like.postedDate));
 			}
 		} else if (data.activity.type == "recentlyCommented") {
 			if (data.activity.comment && data.activity.comment.postedByUser) {
 				var userLink = $("<a>", {href: "/user/" + data.activity.comment.postedByUser.id}).append(data.activity.comment.postedByUser.displayName);
-				activityText.append(userLink).append(" commented on this");
+				activityText.append(userLink).append(" commented on this " + formatDate(data.activity.comment.postedDate));
 			}
+		} else if (data.activity.type == "highLikeCount" || data.activity.type == "highCommentCount") {
+			activityText.append("Popular among other users");
 		}
-	}
 
-	activitySection.append(activityText);
+		activitySection.append(activityText);
+	}
 
 	return activitySection;
 }
@@ -603,7 +605,7 @@ function createSocialActionsSectionElement(data) {
 function createFeedElement(data) {
 	var element = $("<div>", {class: "feedElement"});
 
-	if (data.activity) {
+	if (data.activity && data.activity.type != "recentlyPosted") {
 		element.append(createActivitySectionElement(data));
 	}
 
@@ -821,20 +823,29 @@ function appendCommentElement(commentElement, parentId, atEnd) {
 	//$("#" + contentTag + "CommentsList").append(commentElement);
 }
 
-function createThumbnailElement(data) {
+function createThumbnailElement(data, isClickable) {
 	var element = $("<div>", {class: "thumbnailElement"});
 
 	if (data.postedDate) {
 		element.append(createPostedBySectionElement(data));
 	}
 
-	element.append(createEntityImageElement(data));
+	var entityImage;
+	if (isClickable) {
+		entityImage = $("<a>", {href: data.link}).append(createEntityImageElement(data));
+	} else {
+		entityImage = createEntityImageElement(data);
+	}
+	element.append(entityImage);
+	
 	if (data.caption) {
 		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
 		element.append(link);
 	}
 
 	element.append(createSocialStatusSectionElement(data));
+
+	element.append(createSocialActionsSectionElement(data));
 
 	return element;
 }
@@ -851,7 +862,7 @@ function createGrid(id, list, numCols, allowHover, allowSelection, selectionCall
 		var data = list[i];
 
 		var td = $("<td>", {id: data.id, width: tdWidth + "%"});
-		var element = createThumbnailElement(data);
+		var element = createThumbnailElement(data, !allowSelection);
 
 		if (allowHover) {
 			element.addClass("elementHover");

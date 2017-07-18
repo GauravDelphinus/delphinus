@@ -1116,7 +1116,6 @@ module.exports = {
 		var data = {
 			type : entityType,
 			id : entity.id,
-			link : entity.link,
 			postedDate: entity.created,
 			postedByUser: poster,
 			compareDate: compareDate,
@@ -1131,9 +1130,11 @@ module.exports = {
 		if (entityType == "challenge") {
 			data.image = config.url.challengeImages + entity.image;
 			data.caption = entity.title;
+			data.link = config.url.challenge + entity.id;
 		} else if (entityType == "entry") {
 			data.image = config.url.entryImages + entity.id
 			data.caption = entity.caption;
+			data.link = config.url.entry + entity.id;
 		}
 
 		if (activityType != "none") {
@@ -1150,6 +1151,12 @@ module.exports = {
 					}
 				
 					data.activity.comment.socialStatus = {numLikes: 0};
+				}
+			} else if (activityType == "recentlyLiked") {
+				if (likeTime && liker) {
+					data.activity.like = {};
+					data.activity.like.postedByUser = liker;
+					data.activity.like.postedDate = likeTime;
 				}
 			}
 			
