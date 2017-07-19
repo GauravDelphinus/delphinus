@@ -819,14 +819,20 @@ function appendCommentElement(commentElement, parentId, atEnd) {
 	//$("#" + contentTag + "CommentsList").append(commentElement);
 }
 
-function createThumbnailElement(data) {
+function createThumbnailElement(data, createLink) {
 	var element = $("<div>", {class: "thumbnailElement"});
 
 	if (data.postedDate) {
 		element.append(createPostedBySectionElement(data));
 	}
 
-	element.append(createEntityImageElement(data));
+	if(createLink) {
+		var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data));
+		element.append(imageLink);
+	} else {
+		element.append(createEntityImageElement(data));
+	}
+
 	if (data.caption) {
 		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
 		element.append(link);
@@ -849,7 +855,7 @@ function createGrid(id, list, numCols, allowHover, allowSelection, selectionCall
 		var data = list[i];
 
 		var td = $("<td>", {id: data.id, width: tdWidth + "%"});
-		var element = createThumbnailElement(data);
+		var element = createThumbnailElement(data, !allowSelection);
 
 		if (allowHover) {
 			element.addClass("elementHover");

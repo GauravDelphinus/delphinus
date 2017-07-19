@@ -151,6 +151,7 @@ function setupLayoutStep() {
 					var grid = createGrid("presetLayouts", list, 3, true, true, function(id) {
 						$("#presetLayoutSection").data("selectedLayoutID", id);
 						applyChanges();
+						$(window).scrollTop(0);
 					});
 					$("#presetLayoutSection").append(grid);
 				}
@@ -388,6 +389,7 @@ function setupFilterStep() {
 					var grid = createGrid("presetFilters", list, 3, true, true, function(id) {
 						$("#presetFilterSection").data("selectedFilterID", id);
 						applyChanges();
+						$(window).scrollTop(0);
 					});
 					$("#presetFilterSection").append(grid);
 				}
@@ -581,6 +583,7 @@ function setupArtifactStep() {
 					var grid = createGrid("presetArtifacts", list, 3, true, true, function(id) {
 						$("#presetArtifactSection").data("selectedArtifactID", id);
 						applyChanges();
+						$(window).scrollTop(0);
 					});
 					$("#presetArtifactSection").append(grid);
 				}
@@ -668,6 +671,7 @@ function setupDecorationStep() {
 					var grid = createGrid("presetDecorations", list, 3, true, true, function(id) {
 						$("#presetDecorationSection").data("selectedDecorationID", id);
 						applyChanges();
+						$(window).scrollTop(0);
 					});
 					$("#presetDecorationSection").append(grid);
 				}
@@ -879,21 +883,19 @@ function constructJSONObject(jsonObj) {
 
 	var artifact = {};
 
+	artifact.banner = {};
+	artifact.banner.text = $("#bannerText").prop("value");
 	if ($("#artifactTypeSelection").val() == "none") {
 		artifact.type = "none";
 	} else if ($("#artifactTypeSelection").val() == "preset") {
 		artifact.type = "preset";
 		artifact.preset = $("#presetArtifactSection").data("selectedArtifactID");
 
-		artifact.banner = {};
-		artifact.banner.text = $("#bannerText").prop("value");
+		
 	} else if ($("#artifactTypeSelection").val() == "userDefined") {
 		artifact.type = "user_defined";
 	} else if ($("#artifactTypeSelection").val() == "custom") {
 		artifact.type = "custom";
-
-			artifact.banner = {};
-			artifact.banner.text = $("#bannerText").prop("value");
 
 			if ($("#topBannerButton").hasClass("active")) {
 				artifact.banner.location = "top";
@@ -971,8 +973,7 @@ function applyChanges(done) {
 	
 
 	constructJSONObject(jsonObj);
-
-
+console.log(JSON.stringify(jsonObj));
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
