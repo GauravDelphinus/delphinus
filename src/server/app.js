@@ -90,6 +90,10 @@ module.exports = function() {
 		res.render("entries", {user: normalizeUser(req.user)});
 	});
 
+	app.get("/users", function(req, res) {
+		res.render("users", {user: normalizeUser(req.user)});
+	})
+
 	// 1 - Challenge Page
 	app.get("/challenge/:challengeId", function(req, res) {
 		res.render("challenge", {challengeId: req.params.challengeId, user: normalizeUser(req.user)});

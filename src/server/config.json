@@ -20,7 +20,8 @@
 		"entryImages" : "/entries/images/",
 		"challengeImages" : "/challenges/images/",
 		"userImages" : "/users/images/",
-		"staticImages" : "/images/static/"
+		"staticImages" : "/images/static/",
+		"user" : "/user/"
 	},
 	"name" : {
 		"defaultProfileImageName" : "default.png"

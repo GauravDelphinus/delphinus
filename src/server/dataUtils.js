@@ -1111,21 +1111,39 @@ module.exports = {
 		});
 	},
 
-	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, activityType, lastComment, lastCommenter, likeTime, liker) {
+	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, numFollowers, numPosts, activityType, lastComment, lastCommenter, likeTime, liker) {
 
 		var data = {
 			type : entityType,
 			id : entity.id,
-			postedDate: entity.created,
-			postedByUser: poster,
 			compareDate: compareDate,
-			socialStatus: {
-				numLikes: numLikes,
-				numShares: numShares,
-				numComments: numComments,
-				numEntries: numEntries
-			}
 		};
+
+		//social status values
+		data.socialStatus = {};
+		if (numLikes) {
+			data.socialStatus.numLikes = numLikes;
+		}
+		if (numShares) {
+			data.socialStatus.numShares = numShares;
+		}
+		if (numComments) {
+			data.socialStatus.numComments = numComments;
+		}
+		if (numEntries) {
+			data.socialStatus.numEntries = numEntries;
+		}
+		if (numFollowers) {
+			data.socialStatus.numFollowers = numFollowers;
+		}
+		if (numPosts) {
+			data.socialStatus.numPosts = numPosts;
+		}
+
+		if (entityType == "challenge" || entityType == "entry") {
+			data.postedDate = entity.created;
+			data.postedByUser = poster;
+		}
 
 		if (entityType == "challenge") {
 			data.image = config.url.challengeImages + entity.image;
@@ -1135,6 +1153,10 @@ module.exports = {
 			data.image = config.url.entryImages + entity.id
 			data.caption = entity.caption;
 			data.link = config.url.entry + entity.id;
+		} else if (entityType == "user") {
+			data.image = entity.image;
+			data.caption = entity.displayName;
+			data.link = config.url.user + entity.id;
 		}
 
 		if (activityType != "none") {

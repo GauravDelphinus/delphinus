@@ -104,7 +104,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -128,7 +128,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -161,7 +161,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-							var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, "recentlyCommented", result.data[i][5], result.data[i][6], null, null);
+							var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyCommented", result.data[i][5], result.data[i][6], null, null);
 							output.push(data);
 		    			}
 
@@ -193,7 +193,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4].created, result.data[i][2], result.data[i][3], 0, 0, "recentlyCommented", result.data[i][4], result.data[i][5], null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyCommented", result.data[i][4], result.data[i][5], null, null);
 							output.push(data);
 		    			}
 
@@ -226,7 +226,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, "recentlyLiked", null, null, result.data[i][5], result.data[i][6]);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyLiked", null, null, result.data[i][5], result.data[i][6]);
 							output.push(data);
 		    			}
 
@@ -257,7 +257,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4], result.data[i][2], result.data[i][3], 0, 0, "recentlyLiked", null, null, result.data[i][4], result.data[i][5]);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4], result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyLiked", null, null, result.data[i][4], result.data[i][5]);
 							output.push(data);
 		    			}
 
@@ -296,7 +296,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -336,7 +336,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, "recentlyLiked", null, null, result.data[i][5], result.data[i][6]);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyLiked", null, null, result.data[i][5], result.data[i][6]);
 							output.push(data);
 		    			}
 
@@ -375,7 +375,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, "recentlyCommented", result.data[i][5], result.data[i][6], null, null);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyCommented", result.data[i][5], result.data[i][6], null, null);
 							output.push(data);
 		    			}
 
@@ -411,7 +411,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4], result.data[i][2], result.data[i][3], 0, 0, "recentlyLiked", null, null, result.data[i][4], result.data[i][5]);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4], result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyLiked", null, null, result.data[i][4], result.data[i][5]);
 							
 							output.push(data);
 		    			}
@@ -449,7 +449,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4].created, result.data[i][2], result.data[i][3], 0, 0, "recentlyCommented", result.data[i][4], result.data[i][5], null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyCommented", result.data[i][4], result.data[i][5], null, null);
 							
 							output.push(data);
 		    			}
@@ -483,7 +483,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -510,7 +510,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -547,7 +547,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, "highLikeCount", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "highLikeCount", null, null, null, null);
 						output.push(data);
 	    			}
 
@@ -577,7 +577,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, "highCommentCount", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "highCommentCount", null, null, null, null);
 						output.push(data);
 	    			}
 
@@ -605,7 +605,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, "highLikeCount", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "highLikeCount", null, null, null, null);
 						output.push(data);
 	    			}
 
@@ -633,7 +633,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, "highCommentCount", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "highCommentCount", null, null, null, null);
 						output.push(data);
 	    			}
 

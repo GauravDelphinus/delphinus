@@ -12,22 +12,37 @@ var routes = function(db) {
       .get(function(req, res) {
                   // Filter by user who posted the challenge
                   if (req.query.challengeId) {
-                        cypherQuery = "MATCH (c:Challenge) WHERE (id(c) = " + req.query.challengeId + ") MATCH (c)-[POSTED_BY]->(u:User) RETURN u;";
+                        cypherQuery = "MATCH (c:Challenge) WHERE (id(c) = " + req.query.challengeId + ") MATCH (c)-[POSTED_BY]->(u:User) ";
                   } else if (req.query.entryId) { // filter by user who posted the entry
-                        cypherQuery = "MATCH (e:Entry) WHERE (id(e) = " + req.query.entryId + ") MATCH (e)-[POSTED_BY]->(u:User) RETURN u;";
+                        cypherQuery = "MATCH (e:Entry) WHERE (id(e) = " + req.query.entryId + ") MATCH (e)-[POSTED_BY]->(u:User) ";
+                  } else if (req.user) { //return all users excluding this user
+                  		cypherQuery = "MATCH (u:User) WHERE u.id <> '" + req.user.id + "' ";
                   } else { // return all users
-                        cypherQuery = "MATCH (u:User) RETURN u;";
+                        cypherQuery = "MATCH (u:User) ";
                   }
 
-                  //console.log("Running cypherQuery: " + cypherQuery);
+                  cypherQuery += " WITH u " +
+                  		" OPTIONAL MATCH (u)<-[:FOLLOWING]-(follower:User) " +
+                  		" WITH u, COUNT(follower) AS numFollowers " +
+                  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(c:Challenge) " +
+                  		" WITH u, numFollowers, COLLECT(c) AS challengesPosted " +
+                  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(e:Entry) " +
+                  		" WITH u, numFollowers, challengesPosted, COLLECT(e) AS entriesPosted " +
+                  		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts; ";
+
+                  console.log("Running user cypherQuery: " + cypherQuery);
                   db.cypherQuery(cypherQuery, function(err, result){
                         if(err) throw err;
 
-                        //console.log(result.data); // delivers an array of query results
-                        //console.log(result.columns); // delivers an array of names of objects getting returned
-
-                        //console.log(result.data);
-                        res.json(result.data);
+                        var output = [];
+		    			for (var i = 0; i < result.data.length; i++) {
+		    				//var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "highLikeCount", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("user", result.data[i][0], null, result.data[i][0].lastSeen, null, null, null, null, result.data[i][1], result.data[i][2], "none", null, null, null, null);
+				
+							output.push(data);
+		    			}
+                        
+                        res.json(output);
                   });
       });
 

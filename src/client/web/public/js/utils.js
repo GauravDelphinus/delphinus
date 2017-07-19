@@ -484,25 +484,36 @@ function createTextSection(data) {
 function createSocialStatusSectionElement(data) {
 	var socialStatus = $("<div>", {id: data.id + "SocialStatus", class: "socialStatusSection"});
 
-	var likeButton = $("<button>", {id: data.id + "LikesButton", type: "button", class: "socialStatusButton"});
-	likeButton.append($("<span>", {id: data.id + "NumLikes", text: data.socialStatus.numLikes + " Likes"}));
-	if (data.socialStatus.numLikes <= 0) {
-		likeButton.hide();
+	// For Challenges and Entries
+	if (data.socialStatus.numLikes) {
+		var likeButton = $("<button>", {id: data.id + "LikesButton", type: "button", class: "socialStatusButton"});
+		likeButton.append($("<span>", {id: data.id + "NumLikes", text: data.socialStatus.numLikes + " Likes"}));
+		if (data.socialStatus.numLikes <= 0) {
+			likeButton.hide();
+		}
+		socialStatus.append(likeButton);
 	}
-
-	var shareButton = $("<button>", {id: data.id + "SharesButton", type: "button", class: "socialStatusButton"});
-	shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.numShares + " Shares"}));
-	if (data.socialStatus.numShares <= 0) {
-		shareButton.hide();
+	
+	if (data.socialStatus.numShares) {
+		var shareButton = $("<button>", {id: data.id + "SharesButton", type: "button", class: "socialStatusButton"});
+		shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.numShares + " Shares"}));
+		if (data.socialStatus.numShares <= 0) {
+			shareButton.hide();
+		}
+		socialStatus.append(shareButton);
 	}
-
-	var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "socialStatusButton"});
-	commentButton.append($("<span>", {id: data.id + "NumComments", text: data.socialStatus.numComments + " Comments"}));
-	if (data.socialStatus.numComments <= 0) {
-		commentButton.hide();
+	
+	if (data.socialStatus.numComments) {
+		var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "socialStatusButton"});
+		commentButton.append($("<span>", {id: data.id + "NumComments", text: data.socialStatus.numComments + " Comments"}));
+		if (data.socialStatus.numComments <= 0) {
+			commentButton.hide();
+		}
+		socialStatus.append(commentButton);
 	}
-
-	if (data.type == "challenge") {
+	
+	// For challenges only
+	if (data.socialStatus.numEntries) {
 		var entriesButton = $("<button>", {id: data.id + "EntriesButton", type: "button", class: "socialStatusButton"});
 		entriesButton.append($("<span>", {id: data.id + "NumEntries", text: data.socialStatus.numEntries + " Entries"}));
 		if (data.socialStatus.numEntries <= 0) {
@@ -512,12 +523,28 @@ function createSocialStatusSectionElement(data) {
 		entriesButton.click(function(e) {
 			window.open(data.link + "#entries", "_self");
 		});
+
+		socialStatus.append(entriesButton);
 	}
 
-	socialStatus.append(likeButton);
-	socialStatus.append(commentButton);
-	socialStatus.append(shareButton);
-	socialStatus.append(entriesButton);
+	// For Users
+	if (data.socialStatus.numFollowers) {
+		var followersButton = $("<button>", {id: data.id + "FollowersButton", type: "button", class: "socialStatusButton"});
+		followersButton.append($("<span>", {id: data.id + "NumFollowers", text: data.socialStatus.numFollowers + " Followers"}));
+		if (data.socialStatus.numFollowers <= 0) {
+			followersButton.hide();
+		}
+		socialStatus.append(followersButton);
+	}
+
+	if (data.socialStatus.numPosts) {
+		var postsButton = $("<button>", {id: data.id + "PostsButton", type: "button", class: "socialStatusButton"});
+		postsButton.append($("<span>", {id: data.id + "NumPosts", text: data.socialStatus.numPosts + " Posts"}));
+		if (data.socialStatus.numPosts <= 0) {
+			postsButton.hide();
+		}
+		socialStatus.append(postsButton);
+	}
 
 	return socialStatus;
 }
@@ -837,7 +864,7 @@ function createThumbnailElement(data, isClickable) {
 		entityImage = createEntityImageElement(data);
 	}
 	element.append(entityImage);
-	
+
 	if (data.caption) {
 		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
 		element.append(link);
