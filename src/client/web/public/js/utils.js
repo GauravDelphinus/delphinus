@@ -850,20 +850,20 @@ function appendCommentElement(commentElement, parentId, atEnd) {
 	//$("#" + contentTag + "CommentsList").append(commentElement);
 }
 
-function createThumbnailElement(data, isClickable) {
+function createThumbnailElement(data, createLink) {
 	var element = $("<div>", {class: "thumbnailElement"});
 
 	if (data.postedDate) {
 		element.append(createPostedBySectionElement(data));
 	}
 
-	var entityImage;
-	if (isClickable) {
-		entityImage = $("<a>", {href: data.link}).append(createEntityImageElement(data));
+
+	if(createLink) {
+		var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data));
+		element.append(imageLink);
 	} else {
-		entityImage = createEntityImageElement(data);
+		element.append(createEntityImageElement(data));
 	}
-	element.append(entityImage);
 
 	if (data.caption) {
 		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
