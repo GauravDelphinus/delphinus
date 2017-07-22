@@ -642,7 +642,7 @@ function createSocialActionsSectionElement(data) {
 		socialActionsSection.append(addEntryButton);
 
 		addEntryButton.click(function(e) {
-			window.open(data.link + "#entries", "_self");
+			window.open("/challenge/" + data.id + "/newentry", "_self");
 		});
 	}
 	
