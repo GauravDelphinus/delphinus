@@ -1111,7 +1111,7 @@ module.exports = {
 		});
 	},
 
-	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, numFollowers, numPosts, activityType, lastComment, lastCommenter, likeTime, liker) {
+	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, numFollowers, amFollowing, numPosts, amLiking, activityType, lastComment, lastCommenter, likeTime, liker) {
 
 		var data = {
 			type : entityType,
@@ -1121,23 +1121,24 @@ module.exports = {
 
 		//social status values
 		data.socialStatus = {};
-		if (numLikes) {
-			data.socialStatus.numLikes = numLikes;
+		if (numLikes != null && amLiking != null) {
+			data.socialStatus.likes = {numLikes: numLikes, amLiking: amLiking};
 		}
-		if (numShares) {
-			data.socialStatus.numShares = numShares;
+		if (numShares != null) {
+			data.socialStatus.shares = {numShares: numShares};
 		}
-		if (numComments) {
-			data.socialStatus.numComments = numComments;
+		if (numComments != null) {
+			data.socialStatus.comments = {numComments: numComments};
 		}
-		if (numEntries) {
-			data.socialStatus.numEntries = numEntries;
+		if (numEntries != null) {
+			data.socialStatus.entries = {numEntries: numEntries};
 		}
-		if (numFollowers) {
-			data.socialStatus.numFollowers = numFollowers;
+		if (numFollowers != null && amFollowing != null) {
+			data.socialStatus.follows = {numFollowers: numFollowers, amFollowing: amFollowing};
 		}
-		if (numPosts) {
-			data.socialStatus.numPosts = numPosts;
+
+		if (numPosts != null) {
+			data.socialStatus.posts = {numPosts: numPosts};
 		}
 
 		if (entityType == "challenge" || entityType == "entry") {
@@ -1185,7 +1186,7 @@ module.exports = {
 			
 		}
 		
-		console.log("constructEntityData returning data = " + JSON.stringify(data));
+		//console.log("constructEntityData returning data = " + JSON.stringify(data));
 		return data;
 	}
 

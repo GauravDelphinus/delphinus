@@ -28,31 +28,19 @@ var routes = function(db) {
 				effect will be an intersection.
 			**/
 
-			var cypherQuery = "MATCH (c:Challenge)";
+			var meId = (req.user) ? (req.user.id) : (0);
 
-			// Filter by user who posted the challenge
-			if (req.query.user) {
-				cypherQuery += "-[r:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) ";
-			} else {
-				cypherQuery += "-[r:POSTED_BY]->(u:User) ";
-			}
+			var cypherQuery = "MATCH (c:Challenge)-[r:POSTED_BY]->(poster:User) " +
+						" WITH c, poster " +
+						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
+						" WITH c, poster, COUNT(u2) AS like_count " + 
+						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
+						" WITH c, poster, like_count, COUNT(comment) as comment_count " + 
+						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
+						" WITH c, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
+						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like) ORDER BY c.created DESC;";
 
-			// add social count check
-			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry)";
-
-			if (req.query.sortBy) {
-				if (req.query.sortBy == "popularity") {
-					cypherQuery += " ";
-				} else if (req.query.sortBy == "date") {
-					cypherQuery += " ORDER BY c.created DESC";
-				}
-			}
-
-			if (req.query.count) {
-				cypherQuery += " LIMIT " + req.query.count;
-			}
-			
-			cypherQuery += " ;";
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -63,31 +51,8 @@ var routes = function(db) {
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
-    				var c = result.data[i][0];
-    				var u = result.data[i][1];
-    				var numLikes = result.data[i][2];
-    				var numComments = result.data[i][3];
-    				var numEntries = result.data[i][4];
 
-    				var data = {};
-    				data.type = "challenge";
-    				data.id = c.id;
-    				data.image = config.url.challengeImages + c.image;
-					data.postedDate = c.created;
-					data.postedByUser = {};
-					data.postedByUser.id = u.id;
-					data.postedByUser.displayName = u.displayName;
-					data.postedByUser.image = u.image;
-
-					data.socialStatus = {};
-					data.socialStatus.numLikes = numLikes;
-					data.socialStatus.numShares = 25;
-					data.socialStatus.numComments = numComments;
-					data.socialStatus.numEntries = numEntries;
-					data.caption = c.title;
-
-					data.link = config.url.challenge + c.id;
-
+    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][5] > 0, "none", null, null, null, null);
 					output.push(data);
 
     			}
@@ -173,41 +138,11 @@ var routes = function(db) {
 						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
 						" RETURN c, poster, like_count, comment_count, COUNT(entry) AS entry_count ORDER BY c.created DESC;";
 
-			//console.log("GET Received, Running cypherQuery: " + cypherQuery);
+			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			var data = dataUtils.constructEntityData("challenge", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], result.data[0][4], 0, null, null, "none", null, null, null, null);
-							
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
-
-    			/*
-			    var c = result.data[0][0];
-				var u = result.data[0][1];
-				var numLikes = result.data[0][2];
-				var numComments = result.data[0][3];
-				var numEntries = result.data[0][4];
-
-				var data = {};
-				data.type = "challenge";
-				data.id = c.id;
-				data.image = config.url.challengeImages + c.image;
-				data.postedDate = c.created;
-				data.postedByUser = {};
-				data.postedByUser.id = u.id;
-				data.postedByUser.displayName = u.displayName;
-				data.postedByUser.image = u.image;
-
-				data.socialStatus = {};
-				data.socialStatus.numLikes = numLikes;
-				data.socialStatus.numShares = 23;
-				data.socialStatus.numComments = numComments;
-				data.socialStatus.numEntries = numEntries;
-				data.caption = c.title;
-
-				data.link = config.url.challenge + c.id;
-				*/
+    			var data = dataUtils.constructEntityData("challenge", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], result.data[0][4], 0, null, null, null, "none", null, null, null, null);
     			res.json(data);
 			});
 		})

@@ -79,24 +79,27 @@ var routes = function(db) {
 
 			******************************************************************/
 
-
 			/************ FEED IF USER IS LOGGED IN ****************/
 
 			if (req.user) { 
 
 				// RECENT ACTIVITY BY USERS WHO I'M FOLLOWING
 
-				// Challenges Posted Recently by a user who I'm following
+				// Challenges Posted Recently by a user who I'm following (refined)
 				runQueryFunctions.push(function(callback){
 
 					var cypherQuery = "MATCH (c:Challenge)-[r:POSTED_BY]->(u:User) " +
 						" MATCH (:User {id: '" + req.user.id + "'})-[:FOLLOWING]->(u) " +
+						" WITH c, u " +
 						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
+						" WITH c, u, COUNT(u2) AS like_count " +
 						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
+						" WITH c, u, like_count, COUNT(comment) AS comment_count " +
 						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-						" RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry) ORDER BY c.created DESC;";
+						" WITH c, u, like_count, comment_count, COUNT(entry) AS entry_count " +
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(c) " +
+						" RETURN c, u, like_count, comment_count, entry_count, COUNT(like) ORDER BY c.created DESC;";
 
-					console.log("running cypherQuery: " + cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							callback(err, 0);
@@ -104,7 +107,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][5] > 0, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -113,13 +116,17 @@ var routes = function(db) {
 					});
 				});
 
-				// Entries posted recently by a user who I'm following
+				// Entries posted recently by a user who I'm following (refined)
 				runQueryFunctions.push(function(callback){
 					var cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) " +
 						" MATCH (:User {id: '" + req.user.id + "'})-[:FOLLOWING]->(u) " +
+						" WITH e, u " +
 						" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
+						" WITH e, u, COUNT(u2) AS like_count " +
 						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
-						" RETURN e, u, COUNT(u2), COUNT(comment) ORDER BY e.created DESC;";
+						" WITH e, u, like_count, COUNT(comment) AS comment_count " +
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(e) " +
+						" RETURN e, u, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
@@ -128,7 +135,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -137,9 +144,9 @@ var routes = function(db) {
 					});
 				});
 
-				// Challenges commented recently by a user who I'm following
+				// Challenges commented recently by a user who I'm following (refined)
 				runQueryFunctions.push(function(callback){
-					//var cypherQuery = "MATCH (c:Challenge)-[r:POSTED_BY]->(u:User) MATCH (comment:Comment)-[:POSTED_IN]->(c) OPTIONAL MATCH (u2:User)-[:LIKES]->(c)  OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry), comment ORDER BY comment.created DESC;";
+
 					var cypherQuery = "" +
 						" MATCH (c:Challenge)-[:POSTED_BY]->(poster:User)" +
 						" MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
@@ -147,13 +154,16 @@ var routes = function(db) {
 						" MATCH (:User {id: '" + req.user.id + "'})-[:FOLLOWING]->(commenter) " +
 						" WITH c, poster, comment, comment.created as commentedTime, commenter " +
 						" ORDER BY commentedTime DESC " + 
-						" WITH c, poster, collect(comment) AS comments, commenter " + 
+						" WITH c, poster, COLLECT(comment) AS comments, COLLECT(commenter) AS commenters " + 
 						" OPTIONAL MATCH (liker:User)-[:LIKES]->(c) " + 
-						" WITH c, poster, comments, commenter, COUNT(liker) as like_count " + 
+						" WITH c, poster, comments, commenters, COUNT(liker) as like_count " + 
 						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " + 
-						" WITH c, poster, comments, commenter, like_count, COUNT(entry) as entry_count " + 
-						" RETURN c, poster, like_count, size(comments) as comment_count, entry_count, comments[0], commenter ORDER BY comments[0].created DESC;";
-					console.log("running cypherQuery: " + cypherQuery);
+						" WITH c, poster, comments, commenters, like_count, COUNT(entry) as entry_count " + 
+						" OPTIONAL MATCH (c)<-[:POSTED_IN]-(comment:Comment) " +
+						" WITH c, poster, comments, commenters, like_count, entry_count, COUNT(comment) AS comment_count " +
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, like_count, comment_count, entry_count, comments[0], commenters[0], COUNT(like) ORDER BY comments[0].created DESC;";
+					
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							callback(err, 0);
@@ -161,7 +171,8 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-							var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyCommented", result.data[i][5], result.data[i][6], null, null);
+
+							var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][7] > 0, "recentlyCommented", result.data[i][5], result.data[i][6], null, null);
 							output.push(data);
 		    			}
 
@@ -170,9 +181,8 @@ var routes = function(db) {
 					});
 				});
 				
-				// Entries commented recently by a user who I'm following
+				// Entries commented recently by a user who I'm following (refined)
 				runQueryFunctions.push(function(callback){
-					//var cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) MATCH (comment:Comment)-[:POSTED_IN]->(e) OPTIONAL MATCH (u2:User)-[:LIKES]->(e) RETURN e, u, COUNT(u2), COUNT(comment), comment ORDER BY comment.created DESC;";
 
 					var cypherQuery = "" +
 						" MATCH (c:Entry)-[:POSTED_BY]->(poster:User)" +
@@ -181,10 +191,13 @@ var routes = function(db) {
 						" MATCH (:User {id: '" + req.user.id + "'})-[:FOLLOWING]->(commenter) " +
 						" WITH c, poster, comment, comment.created as commentedTime, commenter " +
 						" ORDER BY commentedTime DESC " + 
-						" WITH c, poster, collect(comment) AS comments, commenter " + 
+						" WITH c, poster, collect(comment) AS comments, COLLECT(commenter) AS commenters " + 
 						" OPTIONAL MATCH (liker:User)-[:LIKES]->(c) " + 
-						" WITH c, poster, comments, commenter, COUNT(liker) as like_count " + 
-						" RETURN c, poster, like_count, size(comments) as comment_count, comments[0], commenter ORDER BY comments[0].created DESC;";
+						" WITH c, poster, comments, commenters, COUNT(liker) as like_count " + 
+						" OPTIONAL MATCH (c)<-[:POSTED_IN]-(comment:Comment) " +
+						" WITH c, poster, comments, commenters, like_count, COUNT(comment) AS comment_count " +
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, like_count, comment_count, comments[0], commenters[0], COUNT(like) ORDER BY comments[0].created DESC;";
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
@@ -193,7 +206,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyCommented", result.data[i][4], result.data[i][5], null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][6] > 0, "recentlyCommented", result.data[i][4], result.data[i][5], null, null);
 							output.push(data);
 		    			}
 
@@ -202,10 +215,9 @@ var routes = function(db) {
 					});
 				});
 
-				// Challenges Liked Recently by a user who I'm following
+				// Challenges Liked Recently by a user who I'm following (refined)
 				runQueryFunctions.push(function(callback){
-					console.log("running challenges liked recently");
-					//var cypherQuery = "MATCH (c:Challenge)-[r:POSTED_BY]->(u:User) MATCH (u2:User)-[like:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry), like, collect(u2)[..1] AS likedUser ORDER BY like.created DESC;";
+					
 					var cypherQuery = "" +
 						" MATCH (c:Challenge)-[:POSTED_BY]->(poster:User)" +
 						" MATCH (c)<-[like:LIKES]-(liker:User) " +
@@ -213,11 +225,14 @@ var routes = function(db) {
 						" WITH c, poster, like.created as created, liker " +
 						" ORDER BY created DESC " + 
 						" WITH c, poster, collect(created) AS liked, collect(liker) as likers " + 
+						" OPTIONAL MATCH (c)<-[:LIKES]-(liker:User) " +
+						" WITH c, poster, liked, likers, COUNT(liker) as like_count " +
 						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
-						" WITH c, poster, liked, likers, COUNT(comment) as comment_count " + 
+						" WITH c, poster, liked, likers, like_count, COUNT(comment) as comment_count " + 
 						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " + 
-						" WITH c, poster, liked, likers, comment_count, COUNT(entry) as entry_count " + 
-						" RETURN c, poster, size(liked) as like_count, comment_count, entry_count, liked[0], likers[0] ORDER BY liked[0] DESC;";
+						" WITH c, poster, liked, likers, like_count, comment_count, COUNT(entry) as entry_count " + 
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, like_count, comment_count, entry_count, liked[0], likers[0], COUNT(like) ORDER BY liked[0] DESC;";
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {	
@@ -226,7 +241,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyLiked", null, null, result.data[i][5], result.data[i][6]);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][7] > 0, "recentlyLiked", null, null, result.data[i][5], result.data[i][6]);
 							output.push(data);
 		    			}
 
@@ -235,9 +250,8 @@ var routes = function(db) {
 					});
 				});
 
-				// Entries liked recently by a user who I'm following
+				// Entries liked recently by a user who I'm following (refined)
 				runQueryFunctions.push(function(callback){
-					//var cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) MATCH (u2:User)-[like:LIKES]->(e) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) RETURN e, u, COUNT(u2), COUNT(comment), like ORDER BY like.created DESC;";
 
 					var cypherQuery = "" +
 						" MATCH (c:Entry)-[:POSTED_BY]->(poster:User)" +
@@ -246,9 +260,12 @@ var routes = function(db) {
 						" WITH c, poster, like.created as created, liker " +
 						" ORDER BY created DESC " + 
 						" WITH c, poster, collect(created) AS liked, collect(liker) as likers " + 
+						" OPTIONAL MATCH (c)<-[:LIKES]-(liker:User) " +
+						" WITH c, poster, liked, likers, COUNT(liker) as like_count " +
 						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
-						" WITH c, poster, liked, likers, COUNT(comment) as comment_count " + 
-						" RETURN c, poster, size(liked) as like_count, comment_count, liked[0], likers[0] ORDER BY liked[0] DESC;";
+						" WITH c, poster, liked, likers, like_count, COUNT(comment) as comment_count " + 
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, like_count, comment_count, liked[0], likers[0], COUNT(like) ORDER BY liked[0] DESC;";
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
@@ -257,7 +274,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4], result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyLiked", null, null, result.data[i][4], result.data[i][5]);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4], result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][6] > 0, "recentlyLiked", null, null, result.data[i][4], result.data[i][5]);
 							output.push(data);
 		    			}
 
@@ -266,17 +283,19 @@ var routes = function(db) {
 					});
 				});
 
-				// RECENT ACTIVITY IN CHALLENGES AND ENTRIES THAT I HAVE LIKED, COMMENTED OR POSTED IN
+				// RECENT ACTIVITY IN CHALLENGES AND ENTRIES THAT I HAVE LIKED, COMMENTED OR POSTED IN OR I HAVE POSTED
 
-				// Entries posted in a challenge that I've liked, commented or posted in
+				// Entries posted in a challenge that I've posted, liked, commented or posted in (refined)
 				runQueryFunctions.push(function(callback){
 					var cypherQuery = "" +
-						" MATCH (u:User {id: '" + req.user.id + "'})-[:LIKES]->(c:Challenge) " +
-						" WITH COLLECT(c) AS likedChallenges " + 
+						" MATCH (u:User {id: '" + req.user.id + "'})<-[:POSTED_BY]-(c:Challenge) " +
+						" WITH u, COLLECT(c) AS allChallenges " +
+						" MATCH (u)-[:LIKES]->(c:Challenge) " +
+						" WITH u, allChallenges + COLLECT(c) AS allChallenges " + 
 						" MATCH (c:Challenge)<-[:POSTED_IN]-(comment:Comment)-[:POSTED_BY]->(u) " +
-						" WITH likedChallenges, COLLECT(c) AS commentedChallenges " + 
+						" WITH u, allChallenges + COLLECT(c) AS allChallenges " + 
 						" MATCH (c:Challenge)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(u) " +
-						" WITH likedChallenges + commentedChallenges + COLLECT(c) AS allChallenges " +
+						" WITH allChallenges + COLLECT(c) AS allChallenges " +
 						" UNWIND allChallenges as c " +
 						" WITH DISTINCT c " +
 						" MATCH (e:Entry)-[:PART_OF]->(c) " +
@@ -286,9 +305,9 @@ var routes = function(db) {
 						" WITH e, poster, COUNT(u2) AS like_count " + 
 						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
 						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
-						" RETURN e, poster, like_count, comment_count ORDER BY e.created DESC;";
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(e) " +
+						" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
 
-					console.log("cypherQuery for entries posted in a challenge that I've liked, commented or posted in: " + cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {	
 							callback(err, 0);
@@ -296,7 +315,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -305,15 +324,17 @@ var routes = function(db) {
 					});
 				});
 
-				// Someone likes a challenge that I've liked, commented or posted in
+				// Someone likes a challenge that I've posted, liked, commented or posted in (refined)
 				runQueryFunctions.push(function(callback){
 					var cypherQuery = "" +
-						" MATCH (u:User {id: '" + req.user.id + "'})-[:LIKES]->(c:Challenge) " +
-						" WITH COLLECT(c) AS likedChallenges " + 
+						" MATCH (u:User {id: '" + req.user.id + "'})<-[:POSTED_BY]-(c:Challenge) " +
+						" WITH u, COLLECT(c) AS allChallenges " +
+						" MATCH (u)-[:LIKES]->(c:Challenge) " +
+						" WITH u, allChallenges + COLLECT(c) AS allChallenges " + 
 						" MATCH (c:Challenge)<-[:POSTED_IN]-(comment:Comment)-[:POSTED_BY]->(u) " +
-						" WITH likedChallenges, COLLECT(c) AS commentedChallenges " + 
+						" WITH u, allChallenges + COLLECT(c) AS allChallenges " + 
 						" MATCH (c:Challenge)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(u) " +
-						" WITH likedChallenges + commentedChallenges + COLLECT(c) AS allChallenges " +
+						" WITH u, allChallenges + COLLECT(c) AS allChallenges " +
 						" UNWIND allChallenges as c " +
 						" WITH DISTINCT c " +
 						" MATCH (c)-[:POSTED_BY]->(poster:User) " +
@@ -326,9 +347,9 @@ var routes = function(db) {
 						" WITH c, poster, liked, likers, COUNT(comment) as comment_count " + 
 						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " + 
 						" WITH c, poster, liked, likers, comment_count, COUNT(entry) as entry_count " + 
-						" RETURN c, poster, size(liked) as like_count, comment_count, entry_count, liked[0], likers[0] ORDER BY liked[0] DESC;";
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, size(liked) as like_count, comment_count, entry_count, liked[0], likers[0], COUNT(like) ORDER BY liked[0] DESC;";
 
-						console.log("running query -- " + cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {	
 							callback(err, 0);
@@ -336,7 +357,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyLiked", null, null, result.data[i][5], result.data[i][6]);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][7], "recentlyLiked", null, null, result.data[i][5], result.data[i][6]);
 							output.push(data);
 		    			}
 
@@ -345,15 +366,17 @@ var routes = function(db) {
 					});
 				});
 
-				// Someone commented on a challenge that I've liked, commented or posted in
+				// Someone commented on a challenge that I've posted, liked, commented or posted in (refined)
 				runQueryFunctions.push(function(callback){
 					var cypherQuery = "" +
-						" MATCH (u:User {id: '" + req.user.id + "'})-[:LIKES]->(c:Challenge) " +
-						" WITH COLLECT(c) AS likedChallenges " + 
+						" MATCH (u:User {id: '" + req.user.id + "'})<-[:POSTED_BY]-(c:Challenge) " +
+						" WITH u, COLLECT(c) AS allChallenges " +
+						" MATCH (u)-[:LIKES]->(c:Challenge) " +
+						" WITH u, allChallenges + COLLECT(c) AS allChallenges " + 
 						" MATCH (c:Challenge)<-[:POSTED_IN]-(comment:Comment)-[:POSTED_BY]->(u) " +
-						" WITH likedChallenges, COLLECT(c) AS commentedChallenges " + 
+						" WITH u, allChallenges + COLLECT(c) AS allChallenges " + 
 						" MATCH (c:Challenge)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(u) " +
-						" WITH likedChallenges + commentedChallenges + COLLECT(c) AS allChallenges " +
+						" WITH allChallenges + COLLECT(c) AS allChallenges " +
 						" UNWIND allChallenges as c " +
 						" WITH DISTINCT c " +
 						" MATCH (c)-[:POSTED_BY]->(poster:User) " +
@@ -366,8 +389,9 @@ var routes = function(db) {
 						" WITH c, poster, commenters, comments, COUNT(liker) AS like_count " +
 						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " + 
 						" WITH c, poster, like_count, commenters, comments, COUNT(entry) as entry_count " + 
-						" RETURN c, poster, like_count, size(comments) AS comment_count, entry_count, comments[0], commenters[0] ORDER BY comments[0].created DESC;";
-						console.log("running query @@@ " + cypherQuery);
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, like_count, size(comments) AS comment_count, entry_count, comments[0], commenters[0], COUNT(like) ORDER BY comments[0].created DESC;";
+					
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {	
 							callback(err, 0);
@@ -375,7 +399,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyCommented", result.data[i][5], result.data[i][6], null, null);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][7] > 0, "recentlyCommented", result.data[i][5], result.data[i][6], null, null);
 							output.push(data);
 		    			}
 
@@ -384,13 +408,15 @@ var routes = function(db) {
 					});
 				});
 
-				// Someone likes an Entry that I've liked, or commented in
+				// Someone likes an Entry that I've posted, liked, or commented in (refined)
 				runQueryFunctions.push(function(callback){
 					var cypherQuery = "" +
-						" MATCH (u:User {id: '" + req.user.id + "'})-[:LIKES]->(e:Entry) " +
-						" WITH COLLECT(e) AS likedEntries " + 
+						" MATCH (u:User {id: '" + req.user.id + "'})<-[:POSTED_BY]-(e:Entry) " +
+						" WITH u, COLLECT(e) AS allEntries " +
+						" MATCH (u)-[:LIKES]->(e:Entry) " +
+						" WITH u, allEntries + COLLECT(e) AS allEntries " + 
 						" MATCH (e:Entry)<-[:POSTED_IN]-(comment:Comment)-[:POSTED_BY]->(u) " +
-						" WITH likedEntries + COLLECT(e) AS allEntries " + 
+						" WITH allEntries + COLLECT(e) AS allEntries " + 
 						" UNWIND allEntries as e " +
 						" WITH DISTINCT e " +
 						" MATCH (e)-[:POSTED_BY]->(poster:User) " +
@@ -401,9 +427,9 @@ var routes = function(db) {
 						" WITH e, poster, collect(created) AS liked, collect(liker) as likers " + 
 						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
 						" WITH e, poster, liked, likers, COUNT(comment) as comment_count " + 
-						" RETURN e, poster, size(liked) as like_count, comment_count, liked[0], likers[0] ORDER BY liked[0] DESC;";
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(e) " +
+						" RETURN e, poster, size(liked) as like_count, comment_count, liked[0], likers[0], COUNT(like) ORDER BY liked[0] DESC;";
 
-						console.log("running query -- " + cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {	
 							callback(err, 0);
@@ -411,7 +437,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4], result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyLiked", null, null, result.data[i][4], result.data[i][5]);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4], result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][6] > 0, "recentlyLiked", null, null, result.data[i][4], result.data[i][5]);
 							
 							output.push(data);
 		    			}
@@ -421,13 +447,15 @@ var routes = function(db) {
 					});
 				});
 
-				// Someone Comments on an Entry that I've liked, or commented in
+				// Someone Comments on an Entry that I've posted, liked, or commented in (refined)
 				runQueryFunctions.push(function(callback){
 					var cypherQuery = "" +
-						" MATCH (u:User {id: '" + req.user.id + "'})-[:LIKES]->(e:Entry) " +
-						" WITH COLLECT(e) AS likedEntries " + 
+						" MATCH (u:User {id: '" + req.user.id + "'})<-[:POSTED_BY]-(e:Entry) " +
+						" WITH u, COLLECT(e) AS allEntries " +
+						" MATCH (u)-[:LIKES]->(e:Entry) " +
+						" WITH u, allEntries + COLLECT(e) AS allEntries " + 
 						" MATCH (e:Entry)<-[:POSTED_IN]-(comment:Comment)-[:POSTED_BY]->(u) " +
-						" WITH likedEntries + COLLECT(e) AS allEntries " + 
+						" WITH allEntries + COLLECT(e) AS allEntries " + 
 						" UNWIND allEntries as e " +
 						" WITH DISTINCT e " +
 						" MATCH (e)-[:POSTED_BY]->(poster:User) " +
@@ -438,10 +466,10 @@ var routes = function(db) {
 						" WITH e, poster, COLLECT(comment) AS comments, COLLECT(commenter) AS commenters " +
 						" OPTIONAL MATCH (e)<-[like:LIKES]-(liker:User) " +
 						" WITH e, poster, comments, commenters, COUNT(like) AS like_count " +
-						" RETURN e, poster, like_count, size(comments) AS comment_count, comments[0], commenters[0] " +
+						" OPTIONAL MATCH (me:User {id: '" + req.user.id + "'})-[like:LIKES]->(e) " +
+						" RETURN e, poster, like_count, size(comments) AS comment_count, comments[0], commenters[0], COUNT(like) " +
 						" ORDER BY comments[0].created DESC; ";
 						
-						console.log("running query -- " + cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {	
 							callback(err, 0);
@@ -449,7 +477,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyCommented", result.data[i][4], result.data[i][5], null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][4].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][6] > 0, "recentlyCommented", result.data[i][4], result.data[i][5], null, null);
 							
 							output.push(data);
 		    			}
@@ -460,8 +488,6 @@ var routes = function(db) {
 				});
 
 
-
-			
 			/**************** DEFAULT FEED WHEN USER IS NOT LOGGED IN *****************/	
 			} else { 
 				// Challenges Posted Recently
@@ -483,7 +509,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, false, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -502,7 +528,6 @@ var routes = function(db) {
 						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
 						" RETURN e, poster, like_count, comment_count ORDER BY e.created DESC;";
 
-					console.log("running query: " + cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							callback(err, 0);
@@ -510,7 +535,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "recentlyPosted", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, false, "recentlyPosted", null, null, null, null);
 							output.push(data);
 		    			}
 
@@ -527,6 +552,8 @@ var routes = function(db) {
 			//Challenge or entry with > 20 likes
 			//Challenge or entry with > 20 comments
 
+			var meId = (req.user) ? (req.user.id) : (0);
+
 			// Challenges posted recently with > 20 likes
 			runQueryFunctions.push(function(callback){
 
@@ -538,7 +565,9 @@ var routes = function(db) {
 					" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
 					" WITH c, poster, like_count, COUNT(comment) as comment_count " + 
 					" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-					" RETURN c, poster, like_count, comment_count, COUNT(entry) AS entry_count ORDER BY c.created DESC;";
+					" WITH c, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
+					" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
+					" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like) ORDER BY c.created DESC;";
 
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
@@ -547,7 +576,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "highLikeCount", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][5] > 0, "highLikeCount", null, null, null, null);
 						output.push(data);
 	    			}
 
@@ -567,9 +596,10 @@ var routes = function(db) {
 					" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
 					" WITH c, poster, comment_count, COUNT(u2) AS like_count " + 
 					" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-					" RETURN c, poster, like_count, comment_count, COUNT(entry) AS entry_count ORDER BY c.created DESC;";
+					" WITH c, poster, comment_count, like_count, COUNT(entry) AS entry_count " +
+					" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
+					" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like) ORDER BY c.created DESC;";
 
-				console.log("running cquery: " + cypherQuery);
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
 						callback(err, 0);
@@ -577,7 +607,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, "highCommentCount", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][5] > 0, "highCommentCount", null, null, null, null);
 						output.push(data);
 	    			}
 
@@ -596,7 +626,8 @@ var routes = function(db) {
 					" WHERE like_count >= " + config.businessLogic.minLikesForPopularity + " " +
 					" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
 					" WITH e, poster, like_count, COUNT(comment) as comment_count " + 
-					" RETURN e, poster, like_count, comment_count ORDER BY e.created DESC;";
+					" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(e) " +
+					" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
 
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
@@ -605,7 +636,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "highLikeCount", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "highLikeCount", null, null, null, null);
 						output.push(data);
 	    			}
 
@@ -623,8 +654,9 @@ var routes = function(db) {
 					" WITH e, poster, COUNT(comment) AS comment_count " + 
 					" WHERE comment_count >= " + config.businessLogic.minCommentsForPopularity + " " +
 					" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
-					" WITH e, poster, comment_count, COUNT(u2) AS like_count " + 					
-					" RETURN e, poster, like_count, comment_count ORDER BY e.created DESC;";
+					" WITH e, poster, comment_count, COUNT(u2) AS like_count " + 	
+					" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(e) " +				
+					" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
 
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
@@ -633,7 +665,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "highCommentCount", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "highCommentCount", null, null, null, null);
 						output.push(data);
 	    			}
 
@@ -669,7 +701,7 @@ function objectLessThan(data1, data2) {
 }
 
 function alreadyExists(element) {
-	console.log("alreadyExists: element.id = " + element.id + ", this.id = " + this.id);	
+	//console.log("alreadyExists: element.id = " + element.id + ", this.id = " + this.id);	
 	return (element.id == this.id);
 }
 
@@ -705,19 +737,21 @@ function mergeFeeds(feedsArray, mergedFeed) {
 	var indices = [];
 	for (var i = 0; i < feedsArray.length; i++) {
 		indices.push(-1);
-		console.log("feedsArray " + i + ":");
+		//console.log("feedsArray " + i + ":");
 		var feed = feedsArray[i];
 		if (feed.length > 0) {
 			indices[i] = 0;
 		}
+		/*
 		for (var j = 0; j < feed.length; j++) {
 			console.log("j = " + j + ", id = " + feed[j].id + ", created = " + feed[j].compareDate);
 		}
+		*/
 	}
 
 	while (true) {
 		var found = indices.find(checkIndexRemaining)
-		console.log("found is " + found);
+		//console.log("found is " + found);
 		if (found == undefined) {
 			break;
 		}

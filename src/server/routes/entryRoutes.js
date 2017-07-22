@@ -28,73 +28,40 @@ var routes = function(db) {
 				Note: all query options can be cascaded on top of each other and the overall
 				effect will be an intersection.
 			**/
+			var meId = (req.user) ? (req.user.id) : (0);
 
 			var cypherQuery;
 
 			//console.log("/api/entries, query is " + JSON.stringify(req.query));
 			// In case a challenge is mentioned, extract all entries linked to that challenge
 			if (req.query.challengeId && req.query.user) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}) "
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}) "
 			} else if (req.query.challengeId && req.query.excludeUser) {
-				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) WHERE NOT ('" + req.query.excludeUser + "' IN u.id) "
+				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(poster:User) WHERE NOT ('" + req.query.excludeUser + "' IN poster.id) "
 			} else if (req.query.challengeId) {
-				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(u:User) "
+				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(poster:User) "
 			} else if (req.query.user) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) ";
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + req.query.user + "'}) ";
 			} else {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(u:User) ";
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User) ";
 			}
 			
-			// add social count check
-			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(e) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) RETURN e, u, COUNT(u2), COUNT(comment)";
-			
-			if (req.query.sortBy) {
-				if (req.query.sortBy == "popularity") {
-					cypherQuery += " ";
-				} else if (req.query.sortBy == "date") {
-					cypherQuery += " ORDER BY e.created DESC";
-				}
-			}
+			cypherQuery += 
+						" WITH e, poster " + 
+						" OPTIONAL MATCH (liker:User)-[:LIKES]->(e) " + 
+						" WITH e, poster, COUNT(liker) AS like_count " + 
+						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
+						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
+						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(e) " +	
+						" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
 
-			if (req.query.count) {
-				cypherQuery += " LIMIT " + req.query.count;
-			}
-
-			cypherQuery += " ;";
-		
-			//console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			//console.log("result is " + JSON.stringify(result.data)); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
-
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
-    				var e = result.data[i][0];
-    				var u = result.data[i][1];
-    				var numLikes = result.data[i][2];
-    				var numComments = result.data[i][3];
 
-    				var data = {};
-    				data.type = "entry";
-    				data.id = e.id;
-    				data.image = config.url.entryImages + e.id;
-					data.postedDate = e.created;
-					data.postedByUser = {};
-					data.postedByUser.id = u.id;
-					data.postedByUser.displayName = u.displayName;
-					data.postedByUser.image = u.image;
-
-					data.socialStatus = {};
-					data.socialStatus.numLikes = numLikes;
-					data.socialStatus.numShares = 23;
-					data.socialStatus.numComments = numComments;
-
-					data.caption = e.caption;
-
-					data.link = config.url.entry + e.id;
-
+    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "recentlyPosted", null, null, null, null);
 					output.push(data);
     			}
 
@@ -234,39 +201,25 @@ var routes = function(db) {
 				GET the specific entry node data.  
 				Returns a single JSON object of type entry
 			**/
+			var meId = (req.user) ? (req.user.id) : (0);
 
-			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'})-[:POSTED_BY]->(u:User) ";
+			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'})-[:POSTED_BY]->(poster:User) " +
+						" WITH e, poster " + 
+						" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
+						" WITH e, poster, COUNT(u2) AS like_count " + 
+						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
+						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
+						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(e) " +	
+						" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
 
 			// add social count check
-			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(e) RETURN e, u, COUNT(u2)";
+			//cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(e) RETURN e, u, COUNT(u2)";
 			
-			//console.log("GET Received, Running cypherQuery: " + cypherQuery);
+			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-				var e = result.data[0][0];
-				var u = result.data[0][1];
-				var numLikes = result.data[0][2];
-
-				var data = {};
-				data.type = "entry";
-				data.id = e.id;
-				data.image = config.url.entryImages + e.id;
-				data.postedDate = e.created;
-				data.postedByUser = {};
-				data.postedByUser.id = u.id;
-				data.postedByUser.displayName = u.displayName;
-				data.postedByUser.image = u.image;
-
-				data.socialStatus = {};
-				data.socialStatus.numLikes = numLikes;
-				data.socialStatus.numShares = 23;
-				data.socialStatus.numComments = 45;
-
-				data.caption = e.caption;
-
-				data.link = config.url.entry + e.id;
-    			
+    			var data = dataUtils.constructEntityData("entry", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], null, 0, null, null, null, result.data[0][4] > 0, "recentlyPosted", null, null, null, null);
     			res.json(data);
 			});
 		})

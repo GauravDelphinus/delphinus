@@ -21,6 +21,8 @@ var routes = function(db) {
                         cypherQuery = "MATCH (u:User) ";
                   }
 
+                  var meId = (req.user) ? (req.user.id) : (0);
+                  
                   cypherQuery += " WITH u " +
                   		" OPTIONAL MATCH (u)<-[:FOLLOWING]-(follower:User) " +
                   		" WITH u, COUNT(follower) AS numFollowers " +
@@ -28,7 +30,8 @@ var routes = function(db) {
                   		" WITH u, numFollowers, COLLECT(c) AS challengesPosted " +
                   		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(e:Entry) " +
                   		" WITH u, numFollowers, challengesPosted, COLLECT(e) AS entriesPosted " +
-                  		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts; ";
+                  		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
+                  		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following); ";
 
                   console.log("Running user cypherQuery: " + cypherQuery);
                   db.cypherQuery(cypherQuery, function(err, result){
@@ -37,7 +40,7 @@ var routes = function(db) {
                         var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
 		    				//var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "highLikeCount", null, null, null, null);
-		    				var data = dataUtils.constructEntityData("user", result.data[i][0], null, result.data[i][0].lastSeen, null, null, null, null, result.data[i][1], result.data[i][2], "none", null, null, null, null);
+		    				var data = dataUtils.constructEntityData("user", result.data[i][0], null, result.data[i][0].lastSeen, null, null, null, null, result.data[i][1], result.data[i][3] > 0, result.data[i][2], "none", null, null, null, null);
 				
 							output.push(data);
 		    			}
