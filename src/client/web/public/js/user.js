@@ -211,7 +211,7 @@ function setupFollowSection(profileType) {
 	} else if (profileType == "member") {
 		//find out if you're already following this user or not
 
-		$.getJSON("/api/users/follow/" + userInfo.id, function(result) {
+		$.getJSON("/api/users/" + userInfo.id + "/follow", function(result) {
 			if (result.followStatus == "following") {
 				$("#followButton").prop("value", "FOLLOWING");
           		$("#followButton").data("followStatus", "following");
@@ -243,7 +243,7 @@ function setupFollowSection(profileType) {
 
 			$.ajax({
 				type: "PUT",
-				url: "/api/users/follow/" + userInfo.id,
+				url: "/api/users/" + userInfo.id + "/follow",
 	          dataType: "json", // return data type
 	          contentType: "application/json; charset=UTF-8",
 	          data: JSON.stringify(jsonObj)

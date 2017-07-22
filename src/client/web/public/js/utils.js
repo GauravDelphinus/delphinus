@@ -426,7 +426,7 @@ function createMainElement(data, setupTimelapseView) {
 	var bottomBar = $("<div>", {id: data.id + "BottomBar", class: "bottomBar"});
 	bottomBar.append(createSocialStatusSectionElement(data));
 	bottomBar.append(createSocialActionsSectionElement(data));
-	
+
 	if (setupTimelapseView) {
 		bottomBar.append(createTimelapseView(data));
 	}
@@ -491,7 +491,8 @@ function createSocialStatusSectionElement(data) {
 	// For Challenges and Entries
 	if (data.socialStatus.likes) {
 		var likeButton = $("<button>", {id: data.id + "LikesButton", type: "button", class: "socialStatusButton"});
-		likeButton.append($("<span>", {id: data.id + "NumLikes", text: data.socialStatus.likes.numLikes + " Likes"}));
+		likeButton.append($("<span>", {id: data.id + "NumLikes", text: data.socialStatus.likes.numLikes}));
+		likeButton.append($("<span>", {text: " Likes"}));
 		if (data.socialStatus.likes.numLikes <= 0) {
 			likeButton.hide();
 		}
@@ -500,7 +501,8 @@ function createSocialStatusSectionElement(data) {
 	
 	if (data.socialStatus.shares) {
 		var shareButton = $("<button>", {id: data.id + "SharesButton", type: "button", class: "socialStatusButton"});
-		shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.shares.numShares + " Shares"}));
+		shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.shares.numShares}));
+		shareButton.append($("<span>", {text: " Shares"}));
 		if (data.socialStatus.shares.numShares <= 0) {
 			shareButton.hide();
 		}
@@ -509,7 +511,8 @@ function createSocialStatusSectionElement(data) {
 	
 	if (data.socialStatus.comments) {
 		var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "socialStatusButton"});
-		commentButton.append($("<span>", {id: data.id + "NumComments", text: data.socialStatus.comments.numComments + " Comments"}));
+		shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.shares.numShares}));
+		shareButton.append($("<span>", {text: " Shares"}));
 		if (data.socialStatus.comments.numComments <= 0) {
 			commentButton.hide();
 		}
@@ -519,7 +522,8 @@ function createSocialStatusSectionElement(data) {
 	// For challenges only
 	if (data.socialStatus.entries) {
 		var entriesButton = $("<button>", {id: data.id + "EntriesButton", type: "button", class: "socialStatusButton"});
-		entriesButton.append($("<span>", {id: data.id + "NumEntries", text: data.socialStatus.entries.numEntries + " Entries"}));
+		entriesButton.append($("<span>", {id: data.id + "NumEntries", text: data.socialStatus.entries.numEntries}));
+		entriesButton.append($("<span>", {text: " Entries"}));
 		if (data.socialStatus.entries.numEntries <= 0) {
 			entriesButton.hide();
 		}
@@ -532,9 +536,10 @@ function createSocialStatusSectionElement(data) {
 	}
 
 	// For Users
-	if (data.socialStatus.follows && data.socialStatus.follows.numFollowers) {
+	if (data.socialStatus.follows) {
 		var followersButton = $("<button>", {id: data.id + "FollowersButton", type: "button", class: "socialStatusButton"});
-		followersButton.append($("<span>", {id: data.id + "NumFollowers", text: data.socialStatus.follows.numFollowers + " Followers"}));
+		followersButton.append($("<span>", {id: data.id + "NumFollowers", text: data.socialStatus.follows.numFollowers}));
+		followersButton.append($("<span>", {text: " Followers"}));
 		if (data.socialStatus.follows.numFollowers <= 0) {
 			followersButton.hide();
 		}
@@ -543,7 +548,8 @@ function createSocialStatusSectionElement(data) {
 
 	if (data.socialStatus.posts) {
 		var postsButton = $("<button>", {id: data.id + "PostsButton", type: "button", class: "socialStatusButton"});
-		postsButton.append($("<span>", {id: data.id + "NumPosts", text: data.socialStatus.posts.numPosts + " Posts"}));
+		postsButton.append($("<span>", {id: data.id + "NumPosts", text: data.socialStatus.posts.numPosts}));
+		postsButton.append($("<span>", {text: " Posts"}));
 		if (data.socialStatus.posts.numPosts <= 0) {
 			postsButton.hide();
 		}
@@ -593,12 +599,12 @@ function createSocialActionsSectionElement(data) {
 						if (likeStatus) {
 							numLikes ++;
 							$("#" + data.id + "LikeButton").addClass("active");
-							$("#" + data.id + "NumLikes").text(numLikes + " Likes");
+							$("#" + data.id + "NumLikes").text(numLikes);
 							$("#" + data.id + "LikesButton").show();
 						} else {
 							numLikes --;
 							$("#" + data.id + "LikeButton").removeClass("active");
-							$("#" + data.id + "NumLikes").text(numLikes + " Likes");
+							$("#" + data.id + "NumLikes").text(numLikes);
 							if (numLikes == 0) {
 								$("#" + data.id + "LikesButton").hide();
 							}
@@ -652,7 +658,49 @@ function createSocialActionsSectionElement(data) {
 			followButton.addClass("active");
 		}
 
-		//TBD - add click handler for oflllwo g button
+		var dataId = data.id;
+		followButton.click(function(e) {
+			if (user) {
+				var jsonObj = {};
+				if ($(this).hasClass("active")) {
+					jsonObj.followAction = "unfollow";
+				} else {
+					jsonObj.followAction = "follow";
+				}
+
+				$.ajax({
+					type: "PUT",
+					url: "/api/users/" + dataId + "/follow",
+		          dataType: "json", // return data type
+		          contentType: "application/json; charset=UTF-8",
+		          data: JSON.stringify(jsonObj)
+		      	})
+				.done(function(data, textStatus, jqXHR) {
+					console.log("text is [" + $("#" + dataId + "NumFollowers").text() + "]");
+					var numFollowers = parseInt($("#" + dataId + "NumFollowers").text());
+		          	if (data.followStatus == "following") {
+		          		numFollowers ++;
+		          		console.log("numFollowers is now " + numFollowers);
+		          		$("#" + dataId + "NumFollowers").text(numFollowers);
+		          		$("#" + dataId + "FollowButton").addClass("active");
+		          		$("#" + dataId + "FollowersButton").show();
+		          	} else {
+		          		numFollowers --;
+		          		console.log("numFollowers is now " + numFollowers);
+		          		$("#" + dataId + "NumFollowers").text(numFollowers);
+		          		$("#" + dataId + "FollowButton").removeClass("active");
+		          		if (numFollowers <= 0) {
+		          			$("#" + dataId + "FollowersButton").hide();
+		          		}
+		          	}
+		      	})
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					alert("some error was found, " + errorThrown);
+				});
+			} else {
+				window.open("/auth", "_self");
+			}
+		});
 	}
 
 	return socialActionsSection;

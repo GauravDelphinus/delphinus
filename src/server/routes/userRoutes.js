@@ -33,7 +33,6 @@ var routes = function(db) {
                   		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
                   		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following); ";
 
-                  console.log("Running user cypherQuery: " + cypherQuery);
                   db.cypherQuery(cypherQuery, function(err, result){
                         if(err) throw err;
 
@@ -91,20 +90,15 @@ var routes = function(db) {
             }
       });
 
-      userRouter.route("/follow/:followedId") //api/users/follow
+      userRouter.route("/:followedId/follow") //api/users/follow
       .get(function(req, res) {
       	//console.log("GET on /api/users/follow, req.user is " + JSON.stringify(req.user));
       	if (req.user && req.user.id && req.params.followedId) {
       		var cypherQuery = "MATCH (u1:User {id: '" + req.user.id + 
       			"'})-[:FOLLOWING]->(u2:User {id: '" + req.params.followedId + "'}) RETURN u1;";
-      		//console.log("running cypherQuery: " + cypherQuery);
       		db.cypherQuery(cypherQuery, function(err, result){
                 if(err) throw err;
 
-                //console.log(JSON.stringify(result.data)); // delivers an array of query results
-                //console.log(result.columns); // delivers an array of names of objects getting returned
-
-                //console.log(result.data);
                 var output = {};
                 if (result.data.length == 1) {
                 	output = {followStatus : "following"};
@@ -116,7 +110,7 @@ var routes = function(db) {
       	}
       })
       .put(function(req, res) {
-      	//console.log("PUT on /api/users/follow, req.user is " + JSON.stringify(req.user));
+      	console.log("PUT on /api/users/:followerId/follow, req.user is " + JSON.stringify(req.user) + ", followedId is " + req.params.followedId);
       	if (req.user && req.user.id && req.params.followedId) {
 
       		if (req.body.followAction == "follow") {
@@ -125,12 +119,8 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-	                //console.log(result.data); // delivers an array of query results
-	                //console.log(result.columns); // delivers an array of names of objects getting returned
-
 	                var output = {};
 
-	                //console.log(result.data);
 	                if (result.data.length == 1) {
 
 	                	output.followStatus = "following";
@@ -146,7 +136,6 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-					//console.log("result of deletion: " + JSON.stringify(result));
 					var output = {};
 
 					if (result.data.length == 1) {
@@ -169,8 +158,6 @@ var routes = function(db) {
 			db.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 
-				//console.log("result of query = " + JSON.stringify(result));
-
 				var output = {};
 
 				output.numFollowers = parseInt(result.data[0]);
@@ -186,7 +173,6 @@ function updateUserInDB(res, user) {
       dataUtils.saveUser(user, function(err) {
             if (err) throw err;
 
-            //console.log("sending JSON back: " + JSON.stringify(user));
             res.json(user);
       });
 }
