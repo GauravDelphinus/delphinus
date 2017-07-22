@@ -423,16 +423,15 @@ function createMainElement(data, setupTimelapseView) {
 		element.append(createCaptionSectionElement(data));
 	}
 
-	var bottomBar = $("<div>", {id: data.id + "BottomBar", class: "bottomBar"});
-	bottomBar.append(createSocialStatusSectionElement(data));
-	bottomBar.append(createSocialActionsSectionElement(data));
+	//var bottomBar = $("<div>", {id: data.id + "BottomBar", class: "bottomBar"});
+	
+	element.append(createSocialStatusSectionElement(data));
+	element.append(createSocialActionsSectionElement(data));
 
 	if (setupTimelapseView) {
-		bottomBar.append(createTimelapseView(data));
+		element.append(createTimelapseView(data));
 	}
 	
-	element.append(bottomBar);
-
 	return element;
 }
 
@@ -449,7 +448,6 @@ function createScrollableElement(data) {
 	}
 
 	element.append(createSocialStatusSectionElement(data));
-
 	element.append(createSocialActionsSectionElement(data));
 
 	return element;

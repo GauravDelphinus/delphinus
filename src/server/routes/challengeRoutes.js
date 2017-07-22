@@ -142,7 +142,6 @@ var routes = function(db) {
 						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
 						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like) ORDER BY c.created DESC;";
 
-			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 

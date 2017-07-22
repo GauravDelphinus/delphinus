@@ -168,8 +168,11 @@
 .clear { clear:  both; }
 
 .mainElement {
-	width: 70%;
-	margin: 0 auto;
+	border-right: 2px;
+	border-style: solid;
+	border-width: 0.1px;
+	border-color: gray;
+	margin: 20px 5px;
 }
 
 .feedElement {
@@ -245,8 +248,7 @@ postedByName:hover{
 }
 
 .mainImage {
-	max-width: 90%;
-	max-height: 600px;
+	width: 100%;
 	display: block;
 	margin: 0 auto;
 }
