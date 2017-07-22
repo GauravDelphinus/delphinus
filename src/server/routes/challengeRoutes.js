@@ -129,6 +129,8 @@ var routes = function(db) {
 
 			//var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[:POSTED_BY]->(u:User) OPTIONAL MATCH (u2:User)-[:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry);";
 
+			var meId = (req.user) ? (req.user.id) : (0);
+
 			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[r:POSTED_BY]->(poster:User) " +
 						" WITH c, poster " +
 						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
@@ -136,13 +138,15 @@ var routes = function(db) {
 						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
 						" WITH c, poster, like_count, COUNT(comment) as comment_count " + 
 						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-						" RETURN c, poster, like_count, comment_count, COUNT(entry) AS entry_count ORDER BY c.created DESC;";
+						" WITH c, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
+						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like) ORDER BY c.created DESC;";
 
 			console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
-    			var data = dataUtils.constructEntityData("challenge", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], result.data[0][4], 0, null, null, null, "none", null, null, null, null);
+    			var data = dataUtils.constructEntityData("challenge", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], result.data[0][4], 0, null, null, null, result.data[0][5] > 0, "none", null, null, null, null);
     			res.json(data);
 			});
 		})

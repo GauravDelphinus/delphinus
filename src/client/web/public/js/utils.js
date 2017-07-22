@@ -425,6 +425,8 @@ function createMainElement(data, setupTimelapseView) {
 
 	var bottomBar = $("<div>", {id: data.id + "BottomBar", class: "bottomBar"});
 	bottomBar.append(createSocialStatusSectionElement(data));
+	bottomBar.append(createSocialActionsSectionElement(data));
+	
 	if (setupTimelapseView) {
 		bottomBar.append(createTimelapseView(data));
 	}
