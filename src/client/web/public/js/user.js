@@ -322,6 +322,8 @@ function setupTabs(profileType) {
 	//entries are shown irrespective of who is viewing, as long as there are entries
 	setupEntriesTab();
 
+	setupFollowersTab();
+
 	setupTabRedirection();
 }
 
@@ -399,6 +401,11 @@ function setupChallengesTab() {
 function setupEntriesTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
 	createAndAppendContentContainer(tabDiv, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/entries/?user=" + userInfo.id + "&sortBy=popularity"}]);
+}
+
+function setupFollowersTab() {
+	var tabDiv = appendNewTab("mainTabGroup", "followers", "Followers");
+	createAndAppendContentContainer(tabDiv, "followers", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followedId=" + userInfo.id}]);
 }
 
 /*

@@ -17,6 +17,8 @@ var routes = function(db) {
                         cypherQuery = "MATCH (e:Entry) WHERE (id(e) = " + req.query.entryId + ") MATCH (e)-[POSTED_BY]->(u:User) ";
                   } else if (req.user) { //return all users excluding this user
                   		cypherQuery = "MATCH (u:User) WHERE u.id <> '" + req.user.id + "' ";
+                  } else if (req.query.followedId) {
+                  		cypherQuery = "MATCH (followed:User {id: '" + req.query.followedId + "'})<-[:FOLLOWING]-(u:User)"
                   } else { // return all users
                         cypherQuery = "MATCH (u:User) ";
                   }
