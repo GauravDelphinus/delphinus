@@ -300,6 +300,7 @@ var routes = function(db) {
 						" WITH DISTINCT c " +
 						" MATCH (e:Entry)-[:PART_OF]->(c) " +
 						" MATCH (e)-[:POSTED_BY]->(poster:User) " +
+						" WHERE poster.id <> '" + req.user.id + "' " +
 						" WITH e, poster " + 
 						" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
 						" WITH e, poster, COUNT(u2) AS like_count " + 
