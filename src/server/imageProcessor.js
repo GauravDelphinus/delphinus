@@ -532,6 +532,7 @@ module.exports = {
 function writeImage(image, imagePath, next) {
 
 	image.write(imagePath, function(err) {
+		console.log("write, err = " + err + ", image is [" + imagePath + "]");
 		if (err) throw err;
 
 		next(0, imagePath);
@@ -576,23 +577,63 @@ function applySteps(sourceImage, targetImage, steps, next) {
 	image.size(function (err, size) {
 		if (err) throw err;
 
+		console.log("applying steps to image [" + targetImage + "]: " + JSON.stringify(steps));
 		if (steps.layouts) {
+			/**
+				After applying the layouts, if any, the image size coudl have changed.
+				The only way to know the new size is to write out the image after applying the layouts
+				to a temp file and then going on with other steps on the new image.
+			**/
 			applyLayouts(image, size, steps.layouts);
-		}
+			tmp.tmpName(function _tempNameGenerated(err, path) {
+    			if (err) throw err;
 
-		if (steps.filters) {
-			applyFilters(image, size, steps.filters);
-		}
+    			writeImage(image, path, function(err, outpath) {
+    				if (err) throw err;
 
-		if (steps.artifacts) {
-			applyArtifacts(image, size, steps.artifacts);
-		}
+					image = gm(outpath);
+	    			image.size(function(err, newSize) {
+	    				if (err) throw err;
 
-		if (steps.decorations) {
-			applyDecorations(image, size, steps.decorations);
-		}
+						if (steps.filters) {
+							applyFilters(image, newSize, steps.filters);
+						}
 
-		writeImage(image, targetImage, next);
+						if (steps.artifacts) {
+							applyArtifacts(image, newSize, steps.artifacts);
+						}
+
+						if (steps.decorations) {
+							applyDecorations(image, newSize, steps.decorations);
+						}
+
+						writeImage(image, targetImage, function(err, finalPath) {
+							if (err) throw err;
+
+							fs.unlink(outpath, function(err) {
+								if (err) throw err;
+							});
+
+							next(0, finalPath);
+						});
+    				});
+    			});
+    		});
+		} else {
+			if (steps.filters) {
+				applyFilters(image, newSize, steps.filters);
+			}
+
+			if (steps.artifacts) {
+				applyArtifacts(image, newSize, steps.artifacts);
+			}
+
+			if (steps.decorations) {
+				applyDecorations(image, newSize, steps.decorations);
+			}
+
+			writeImage(image, targetImage, next);
+		}
 	});
 }
 	
@@ -633,6 +674,7 @@ function applyLayouts (image, size, layouts) {
 		if (layout.type == "preset") {
 			applyPresetLayout(image, size, layout.preset);
 		} else if (layout.type == "custom") {
+			/*
 			if (layout.size) {
 				if (layout.size == "auto") {
 					// determine the best size for the image
@@ -646,6 +688,7 @@ function applyLayouts (image, size, layouts) {
 					}
 				}
 			}
+			*/
 
 			if (layout.crop) {
 				image.crop(layout.crop.width, layout.crop.height, layout.crop.x, layout.crop.y);
