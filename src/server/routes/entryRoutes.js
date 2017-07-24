@@ -81,9 +81,11 @@ var routes = function(db) {
 			var cypherQuery = "MATCH (c:Challenge {id: '" + req.body.challengeId + "'}) " + 
 							" MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
 							"id: '" + id + "', " + 
+							"caption: '" + dataUtils.escapeSingleQuotes(req.body.caption) + "', " + 
 							"created : '" + req.body.created + "'" + 
 							"})-[:PART_OF]->(c), (u)<-[r:POSTED_BY]-(e) RETURN e;";
 			
+			console.log("POST called on /api/entries, req.body.steps is " + JSON.stringify(req.body.steps));
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) throw err;
 
@@ -102,9 +104,7 @@ var routes = function(db) {
 						for (var i = 0; i < req.body.steps.layouts.length; i++) {
 							var layout = req.body.steps.layouts[i];
 
-							if (layout.type == "none") {
-								// No layout, do nothing
-							} else {
+							if (layout.type == "preset" || layout.type == "custom") {
 								createFilterNodesFunctions.push(async.apply(dataUtils.createLayoutNode, db, layout));
 							}
 						}
@@ -114,9 +114,7 @@ var routes = function(db) {
 						for (var i = 0; i < req.body.steps.filters.length; i++) {
 							var filter = req.body.steps.filters[i];
 
-							if (filter.type == "none") {
-								// No filter added - do nothing
-							} else {
+							if (filter.type == "preset" || filter.type == "custom") {
 								createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter));
 							}
 						}
@@ -126,9 +124,7 @@ var routes = function(db) {
 						for (var i = 0; i < req.body.steps.artifacts.length; i++) {
 							var artifact = req.body.steps.artifacts[i];
 
-							if (artifact.type == "none") {
-								// No Artifact, do nothing
-							} else {
+							if (artifact.type == "preset" || artifact.type == "custom") {
 								createFilterNodesFunctions.push(async.apply(dataUtils.createArtifactNode, db, artifact));
 							}
 						}
@@ -138,9 +134,7 @@ var routes = function(db) {
 						for (var i = 0; i < req.body.steps.decorations.length; i++) {
 							var decoration = req.body.steps.decorations[i];
 
-							if (decoration.type == "none") {
-								// No Decoration, do nothing
-							} else {
+							if (decoration.type == "preset" || decoration.type == "custom") {
 								createFilterNodesFunctions.push(async.apply(dataUtils.createDecorationNode, db, decoration));
 							}
 						}
@@ -151,6 +145,9 @@ var routes = function(db) {
 				// LAYOUTS
 
 				async.series(createFilterNodesFunctions, function(err, filterNodes) {
+					if (err) {
+						throw err;
+					}
 
 					var cypherQuery = "MATCH (e:Entry {id: '" + newEntryId + "'}) ";
 					for (var i = 0; i < filterNodes.length; i++) {
@@ -159,8 +156,10 @@ var routes = function(db) {
 						cypherQuery += " MATCH (s" + i + " {id: '" + filterNodes[i] + "'}) ";
 					}
 
-					cypherQuery += " CREATE ";
-
+					if (filterNodes.length > 0) {
+						cypherQuery += " CREATE ";
+					}
+					
 					for (var i = 0; i < filterNodes.length; i++) {
 						if (i > 0) {
 							cypherQuery += " , ";
@@ -170,10 +169,13 @@ var routes = function(db) {
 
 					cypherQuery += " return e;";
 
+					console.log("calling cypherQuery: " + cypherQuery);
+
 					db.cypherQuery(cypherQuery, function(err, result){
 						if(err) throw err;
 
 						if (result.data.length > 0) {
+							console.log("sending back to client: " + JSON.stringify(result.data[0]));
 							res.json(result.data[0]);
 						}
 					});

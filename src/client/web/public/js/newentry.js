@@ -100,60 +100,68 @@ function changeCallback(event) {
 
 function showLayoutStep() {
 	$("#stepTitle").text("Tweak the layout of your entry")
+
+	if ($("#presetLayoutSection").is(":visible")) {
+		$.getJSON('/api/filters?type=layout' + "&layoutType=preset", function(result) {
+			if (result.length > 0) {
+				var list = [];
+				for (var i = 0; i < result.length; i++) {
+					var l = result[i][0];
+					//var u = result[i][1];
+
+					var data = {};
+					data.id = l.id;
+					data.caption = l.name;
+					data.image = "/images/static/progress.gif";
+		
+					data.socialStatus = {};
+					data.socialStatus.numLikes = 121;
+					data.socialStatus.numShares = 23;
+					data.socialStatus.numComments = 45;
+
+					data.link = "/layout/" + l.id;
+
+					var jsonObj = {};
+					constructJSONObject(jsonObj);
+					jsonObj.steps.layouts[0].type = "preset";
+					jsonObj.steps.layouts[0].preset = l.id;
+					generateChanges(l.id, jsonObj, function(id, imgPath) {
+						$("#" + id + " img").prop("src", imgPath);
+					});
+
+					list.push(data);
+				}
+
+				$("#presetLayouts").remove();
+				var grid = createGrid("presetLayouts", list, 3, true, true, function(id) {
+					$("#presetLayoutSection").data("selectedLayoutID", id);
+					applyChanges();
+					$(window).scrollTop(0);
+				});
+				$("#presetLayoutSection").append(grid);
+			}
+		});
+	}
 }
 
 function setupLayoutStep() {
-	//show hide logic
-	$("#layoutTypeSelection").on("change", function() {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneLayoutSection"}, 
-			{value: "preset", id: "#presetLayoutSection"}, 
-			{value: "user_defined", id: "#userDefinedLayoutSection"}, 
-			{value: "custom", id: "#customLayoutSection"}]);
-
+	//default is preset
+	$("#layoutOptionsButton").data("state", "preset");
+	$("#layoutOptionsButton").click(function() {
 		if ($("#presetLayoutSection").is(":visible")) {
-			$.getJSON('/api/filters?type=layout' + "&layoutType=preset", function(result) {
-				if (result.length > 0) {
-					var list = [];
-					for (var i = 0; i < result.length; i++) {
-						var l = result[i][0];
-						//var u = result[i][1];
+			//presets already show, toggle
+			$("#presetLayoutSection").hide();
+			$("#customLayoutSection").show();
 
-						var data = {};
-						data.id = l.id;
-						data.caption = l.name;
-						data.image = "/images/static/progress.gif";
-			
-						data.socialStatus = {};
-						data.socialStatus.numLikes = 121;
-						data.socialStatus.numShares = 23;
-						data.socialStatus.numComments = 45;
+			$(this).text("Hide custom options");
+			$(this).data("state", "custom");
+		} else if ($("#customLayoutSection").is(":visible")) {
+			$("#presetLayoutSection").show();
+			$("#customLayoutSection").hide();
 
-						data.link = "/layout/" + l.id;
-
-						var jsonObj = {};
-						constructJSONObject(jsonObj);
-						jsonObj.steps.layouts[0].type = "preset";
-						jsonObj.steps.layouts[0].preset = l.id;
-						generateChanges(l.id, jsonObj, function(id, imgPath) {
-							$("#" + id + " img").prop("src", imgPath);
-						});
-
-						list.push(data);
-					}
-
-					$("#presetLayouts").remove();
-					var grid = createGrid("presetLayouts", list, 3, true, true, function(id) {
-						$("#presetLayoutSection").data("selectedLayoutID", id);
-						applyChanges();
-						$(window).scrollTop(0);
-					});
-					$("#presetLayoutSection").append(grid);
-				}
-			});
+			$(this).text("Show custom options");
+			$(this).data("state", "preset");
 		}
-
-		applyChanges();
 	});
 
 	/*** CROP Handling ****/
@@ -341,92 +349,69 @@ function endCrop() {
 
 function showFilterStep() {
 	$("#stepTitle").text("Apply a really cool filter to your entry!")
+
+	if ($("#presetFilterSection").is(":visible")) {
+		$.getJSON('/api/filters?type=filter' + "&filterType=preset", function(result) {
+			if (result.length > 0) {
+				var list = [];
+				for (var i = 0; i < result.length; i++) {
+					var f = result[i][0];
+					//var u = result[i][1];
+
+					var data = {};
+					data.id = f.id;
+					data.caption = f.name;
+					data.image = "/images/static/progress.gif";
+		
+					data.socialStatus = {};
+					data.socialStatus.numLikes = 121;
+					data.socialStatus.numShares = 23;
+					data.socialStatus.numComments = 45;
+
+					data.link = "/filter/" + f.id;
+
+					var jsonObj = {};
+					constructJSONObject(jsonObj);
+					jsonObj.steps.filters[0].type = "preset";
+					jsonObj.steps.filters[0].preset = f.id;
+					generateChanges(f.id, jsonObj, function(id, imgPath) {
+						$("#" + id + " img").prop("src", imgPath);
+					});
+
+					list.push(data);
+				}
+
+				$("#presetFilters").remove();
+				var grid = createGrid("presetFilters", list, 3, true, true, function(id) {
+					$("#presetFilterSection").data("selectedFilterID", id);
+					applyChanges();
+					$(window).scrollTop(0);
+				});
+				$("#presetFilterSection").append(grid);
+			}
+		});
+	}
 }
 
 function setupFilterStep() {
-
-	//show hide logic
-	$("#filterTypeSelection").on("change", function() {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneFilterSection"}, 
-			{value: "preset", id: "#presetFilterSection"}, 
-			{value: "user_defined", id: "#userDefinedFilterSection"}, 
-			{value: "custom", id: "#customFilterSection"}]);
-
+	//default is preset
+	$("#filterOptionsButton").data("state", "preset");
+	$("#filterOptionsButton").click(function() {
 		if ($("#presetFilterSection").is(":visible")) {
-			$.getJSON('/api/filters?type=filter' + "&filterType=preset", function(result) {
-				if (result.length > 0) {
-					var list = [];
-					for (var i = 0; i < result.length; i++) {
-						var f = result[i][0];
-						//var u = result[i][1];
-
-						var data = {};
-						data.id = f.id;
-						data.caption = f.name;
-						data.image = "/images/static/progress.gif";
-			
-						data.socialStatus = {};
-						data.socialStatus.numLikes = 121;
-						data.socialStatus.numShares = 23;
-						data.socialStatus.numComments = 45;
-
-						data.link = "/filter/" + f.id;
-
-						var jsonObj = {};
-						constructJSONObject(jsonObj);
-						jsonObj.steps.filters[0].type = "preset";
-						jsonObj.steps.filters[0].preset = f.id;
-						generateChanges(f.id, jsonObj, function(id, imgPath) {
-							$("#" + id + " img").prop("src", imgPath);
-						});
-
-						list.push(data);
-					}
-
-					$("#presetFilters").remove();
-					var grid = createGrid("presetFilters", list, 3, true, true, function(id) {
-						$("#presetFilterSection").data("selectedFilterID", id);
-						applyChanges();
-						$(window).scrollTop(0);
-					});
-					$("#presetFilterSection").append(grid);
-				}
-			});
-		}
-
-		applyChanges();
-	});
-
-	/*
-	$("#filterTypeSelection").on("change", function() {
-		console.log("selectino triggered, selected option = " + this.value);
-
-		if (this.value == "none") {
-			$("#noneFilterSection").show();
+			//presets already show, toggle
 			$("#presetFilterSection").hide();
-			$("#userDefinedFilterSection").hide();
-			$("#customFilterSection").hide();
-		} else if (this.value == "preset") {
-			$("#noneFilterSection").hide();
-			$("#presetFilterSection").show();
-			$("#userDefinedFilterSection").hide();
-			$("#customFilterSection").hide();
-
-			
-		} else if (this.value == "userDefined") {
-			$("#noneFilterSection").hide();
-			$("#presetFilterSection").hide();
-			$("#userDefinedFilterSection").show();
-			$("#customFilterSection").hide();
-		} else if (this.value == "custom") {
-			$("#noneFilterSection").hide();
-			$("#presetFilterSection").hide();
-			$("#userDefinedFilterSection").hide();
 			$("#customFilterSection").show();
+
+			$(this).text("Hide custom options");
+			$(this).data("state", "custom");
+		} else if ($("#customFilterSection").is(":visible")) {
+			$("#presetFilterSection").show();
+			$("#customFilterSection").hide();
+
+			$(this).text("Show custom options");
+			$(this).data("state", "preset");
 		}
 	});
-	*/
 
 	// FILTERS SECTION ----------------------
 
@@ -593,19 +578,22 @@ function showArtifactStep() {
 }
 
 function setupArtifactStep() {
-		//show hide logic
+	//default is preset
+	$("#artifactOptionsButton").data("state", "preset");
 	$("#artifactOptionsButton").click(function() {
 		if ($("#presetArtifactSection").is(":visible")) {
 			//presets already show, toggle
 			$("#presetArtifactSection").hide();
 			$("#customArtifactSection").show();
 
-			$(this).text("Show custom options");
+			$(this).text("Hide custom options");
+			$(this).data("state", "custom");
 		} else if ($("#customArtifactSection").is(":visible")) {
 			$("#presetArtifactSection").show();
 			$("#customArtifactSection").hide();
 
-			$(this).text("Hide custom options");
+			$(this).text("Show custom options");
+			$(this).data("state", "preset");
 		}
 	});
 
@@ -645,62 +633,71 @@ function setupArtifactStep() {
 
 function showDecorationStep() {
 	$("#stepTitle").text("Apply some final touches to your entry with a border!")
+
+	if ($("#presetDecorationSection").is(":visible")) {
+		$.getJSON('/api/filters?type=decoration' + "&decorationType=preset", function(result) {
+			if (result.length > 0) {
+				var list = [];
+				for (var i = 0; i < result.length; i++) {
+					var d = result[i][0];
+					//var u = result[i][1];
+
+					var data = {};
+					data.id = d.id;
+					data.caption = d.name;
+					data.image = "/images/static/progress.gif";
+		
+					data.socialStatus = {};
+					data.socialStatus.numLikes = 121;
+					data.socialStatus.numShares = 23;
+					data.socialStatus.numComments = 45;
+
+					data.link = "/decoration/" + d.id;
+
+					var jsonObj = {};
+					constructJSONObject(jsonObj);
+					jsonObj.steps.decorations[0].type = "preset";
+					jsonObj.steps.decorations[0].preset = d.id;
+					generateChanges(d.id, jsonObj, function(id, imgPath) {
+						$("#" + id + " img").prop("src", imgPath);
+					});
+
+					list.push(data);
+				}
+
+				$("#presetDecorations").remove();
+				var grid = createGrid("presetDecorations", list, 3, true, true, function(id) {
+					$("#presetDecorationSection").data("selectedDecorationID", id);
+					applyChanges();
+					$(window).scrollTop(0);
+				});
+				$("#presetDecorationSection").append(grid);
+			}
+		});
+	}
 }
 
 function setupDecorationStep() {
-	// DECORATIONS SECTION ------------------------
-	$("#decorationTypeSelection").on("change", function() {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneDecorationSection"}, 
-			{value: "preset", id: "#presetDecorationSection"}, 
-			{value: "userDefined", id: "#userDefinedDecorationSection"}, 
-			{value: "custom", id: "#customDecorationSection"}]);
-
+	//default is preset
+	$("#decorationOptionsButton").data("state", "preset");
+	$("#decorationOptionsButton").click(function() {
 		if ($("#presetDecorationSection").is(":visible")) {
-			$.getJSON('/api/filters?type=decoration' + "&decorationType=preset", function(result) {
-				if (result.length > 0) {
-					var list = [];
-					for (var i = 0; i < result.length; i++) {
-						var d = result[i][0];
-						//var u = result[i][1];
+			//presets already show, toggle
+			$("#presetDecorationSection").hide();
+			$("#customDecorationSection").show();
 
-						var data = {};
-						data.id = d.id;
-						data.caption = d.name;
-						data.image = "/images/static/progress.gif";
-			
-						data.socialStatus = {};
-						data.socialStatus.numLikes = 121;
-						data.socialStatus.numShares = 23;
-						data.socialStatus.numComments = 45;
+			$(this).text("Hide custom options");
+			$(this).data("state", "custom");
+		} else if ($("#customDecorationSection").is(":visible")) {
+			$("#presetDecorationSection").show();
+			$("#customDecorationSection").hide();
 
-						data.link = "/decoration/" + d.id;
-
-						var jsonObj = {};
-						constructJSONObject(jsonObj);
-						jsonObj.steps.decorations[0].type = "preset";
-						jsonObj.steps.decorations[0].preset = d.id;
-						generateChanges(d.id, jsonObj, function(id, imgPath) {
-							$("#" + id + " img").prop("src", imgPath);
-						});
-
-						list.push(data);
-					}
-
-					$("#presetDecorations").remove();
-					var grid = createGrid("presetDecorations", list, 3, true, true, function(id) {
-						$("#presetDecorationSection").data("selectedDecorationID", id);
-						applyChanges();
-						$(window).scrollTop(0);
-					});
-					$("#presetDecorationSection").append(grid);
-				}
-			});
+			$(this).text("Show custom options");
+			$(this).data("state", "preset");
 		}
-
-		applyChanges();
 	});
 
+	// DECORATIONS SECTION ------------------------
 	enableDisableOnCheck("#checkboxBorder", ["#borderWidth", "#borderColor"]);
 	setChangeCallback(changeCallback, [
 		"#checkboxBorder", 
@@ -756,6 +753,7 @@ function constructJSONObject(jsonObj) {
 	jsonObj.imageData = challengeId;
 	jsonObj.challengeId = challengeId;
 	jsonObj.created = (new Date()).getTime();
+	jsonObj.caption = $("#bannerText").prop("value");
 
 	jsonObj.steps = {}; // the main object that encapsulates filters, layouts, etc.
 
@@ -763,15 +761,13 @@ function constructJSONObject(jsonObj) {
 	jsonObj.steps.layouts = [];
 
 	var layout = {};
-
-	if ($("#layoutTypeSelection").val() == "none") {
-		layout.type = "none";
-	} else if ($("#layoutTypeSelection").val() == "preset") {
-		layout.type = "preset";
-		layout.preset = $("#presetLayoutSection").data("selectedLayoutID");
-	} else if ($("#layoutTypeSelection").val() == "userDefined") {
-		layout.type = "user_defined";
-	} else if ($("#layoutTypeSelection").val() == "custom") {
+	if ($("#layoutOptionsButton").data("state") == "preset") {
+		var presetValue = $("#presetLayoutSection").data("selectedLayoutID");
+		if (presetValue != undefined) {
+			layout.type = "preset";
+			layout.preset = presetValue;
+		}
+	} else if ($("#layoutOptionsButton").data("state") == "custom") {
 		layout.type = "custom";
 		
 		//crop
@@ -822,15 +818,13 @@ function constructJSONObject(jsonObj) {
 
 	var filter = {};
 
-	if ($("#filterTypeSelection").val() == "none") { // NO FILTER
-		filter.type = "none";
-	} else if ($("#filterTypeSelection").val() == "preset") { // PRESET FILTER
-		filter.type = "preset";
-		filter.preset = $("#presetFilterSection").data("selectedFilterID");
-	} else if ($("#filterTypeSelection").val() == "userDefined") { // USER DEFINED FILTER
-		filter.type = "user_defined";
-		filter.user_defined = "some_unique_name";
-	} else if ($("#filterTypeSelection").val() == "custom") { // CUSTOM FILTER
+	if ($("#filterOptionsButton").data("state") == "preset") { // PRESET FILTER
+		var presetValue = $("#presetFilterSection").data("selectedFilterID");
+		if (presetValue != undefined) {
+			filter.type = "preset";
+			filter.preset = presetValue;
+		}
+	} else if ($("#filterOptionsButton").data("state") == "custom") { // CUSTOM FILTER
 		filter.type = "custom";
 
 		// ADD EFFECTS
@@ -908,16 +902,13 @@ function constructJSONObject(jsonObj) {
 
 	artifact.banner = {};
 	artifact.banner.text = $("#bannerText").prop("value");
-	if ($("#artifactTypeSelection").val() == "none") {
-		artifact.type = "none";
-	} else if ($("#artifactTypeSelection").val() == "preset") {
-		artifact.type = "preset";
-		artifact.preset = $("#presetArtifactSection").data("selectedArtifactID");
-
-		
-	} else if ($("#artifactTypeSelection").val() == "userDefined") {
-		artifact.type = "user_defined";
-	} else if ($("#artifactTypeSelection").val() == "custom") {
+	if ($("#artifactOptionsButton").data("state") == "preset") {
+		var presetValue = $("#presetArtifactSection").data("selectedArtifactID");
+		if (presetValue != undefined) {
+			artifact.type = "preset";
+			artifact.preset = presetValue;
+		}
+	} else if ($("#artifactOptionsButton").data("state") == "custom") {
 		artifact.type = "custom";
 
 			if ($("#topBannerButton").hasClass("active")) {
@@ -952,14 +943,13 @@ function constructJSONObject(jsonObj) {
 
 	var decoration = {};
 
-	if ($("#decorationTypeSelection").val() == "none") {
-		decoration.type = "none";
-	} else if ($("#decorationTypeSelection").val() == "preset") {
-		decoration.type = "preset";
-		decoration.preset = $("#presetDecorationSection").data("selectedDecorationID");
-	} else if ($("#decorationTypeSelection").val() == "userDefined") {
-		decoration.type = "user_defined";
-	} else if ($("#decorationTypeSelection").val() == "custom") {
+	if ($("#decorationOptionsButton").data("state") == "preset") {
+		var presetValue = $("#presetDecorationSection").data("selectedDecorationID");
+		if (presetValue != undefined) {
+			decoration.type = "preset";
+			decoration.preset = presetValue;
+		}
+	} else if ($("#decorationOptionsButton").data("state") == "custom") {
 		decoration.type = "custom";
 
 		if ($("#checkboxBorder").prop("checked")) {
@@ -1024,11 +1014,13 @@ console.log(JSON.stringify(jsonObj));
 }
 
 function postEntry() {
+
 	var jsonObj = {};
 
 	//alert("contrast default value is " + $("#contrast").prop("defaultValue") + ", actual selected value is " + $("#contrast").val());
 	
 	constructJSONObject(jsonObj);
+	console.log("postEntry called, jsonObj is " + JSON.stringify(jsonObj));
 
 	$.ajax({
 		type: "POST",

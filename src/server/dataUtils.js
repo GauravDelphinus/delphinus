@@ -447,8 +447,6 @@ module.exports = {
 			}
 	**/
 	createFilterNode : function(db, filter, callback) {
-		
-
 		if (filter.type == "none") {
 			// There's no need to create a filter node in this case.
 			// This shouldn't be called, and should get handled by caller
@@ -459,96 +457,94 @@ module.exports = {
 		} else if (filter.type == "preset") {
 			callback(null, filter.preset);
 			return;
+		} else if (filter.type == "custom") {
+			var cypherQuery = "CREATE (f:Filter {";
+			var id = shortid.generate();
+
+			if (filter.type == "custom") {
+				cypherQuery += " id : '" + id + "' ";
+				cypherQuery += ", filter_type : 'custom'";
+
+				if (filter.effects) {
+					if (filter.effects.paint) {
+						cypherQuery += ", effects_paint : 'on' ";
+						cypherQuery += ", effects_paint_radius : " + filter.effects.paint.radius;
+					}
+					if (filter.effects.grayscale && filter.effects.grayscale == "on") {
+						cypherQuery += ", effects_grayscale : 'on' ";
+					}
+					if (filter.effects.charcoal) {
+						cypherQuery += ", effects_charcoal : 'on' ";
+						cypherQuery += ", effects_charcoal_factor : " + filter.effects.charcoal.factor;
+					}
+					if (filter.effects.mosaic && filter.effects.mosaic == "on") {
+						cypherQuery += ", effects_mosaic : 'on' ";
+					}
+					if (filter.effects.negative && filter.effects.negative == "on") {
+						cypherQuery += ", effects_negative : 'on' ";
+					}
+					if (filter.effects.solarize) {
+						cypherQuery += ", effects_solarize : 'on' ";
+						cypherQuery += ", effects_solarize_threshold : " + filter.effects.solarize.threshold;
+					}
+					if (filter.effects.monochrome && filter.effects.monochrome == "on") {
+						cypherQuery += ", effects_monochrome : 'on' ";
+					}
+					if (filter.effects.swirl) {
+						cypherQuery += ", effects_swirl : 'on' ";
+						cypherQuery += ", effects_swirl_degrees : " + filter.effects.swirl.degrees;
+					}
+					if (filter.effects.wave) {
+						cypherQuery += ", effects_wave : 'on' ";
+						cypherQuery += ", effects_wave_amplitude : " + filter.effects.wave.amplitude;
+						cypherQuery += ", effects_wave_wavelength : " + filter.effects.wave.wavelength;
+					}
+					if (filter.effects.spread) {
+						cypherQuery += ", effects_spread : 'on' ";
+						cypherQuery += ", effects_spread_amount : " + filter.effects.spread.amount;
+					}
+				}
+
+				if (filter.settings) {
+					if (filter.settings.brightness) {
+						cypherQuery += ", settings_brightness : 'on' ";
+						cypherQuery += ", settings_brightness_value : " + filter.settings.brightness.value;
+					}
+					if (filter.settings.contrast) {
+						cypherQuery += ", settings_contrast : 'on' ";
+						cypherQuery += ", settings_contrast_value : " + filter.settings.contrast.value;
+					}
+					if (filter.settings.hue) {
+						cypherQuery += ", settings_hue : 'on' ";
+						cypherQuery += ", settings_hue_value : " + filter.settings.hue.value;
+					}
+					if (filter.settings.saturation) {
+						cypherQuery += ", settings_saturation : 'on' ";
+						cypherQuery += ", settings_saturation_value : " + filter.settings.saturation.value;
+					}
+				}
+			} // TODO - careful about this case.  Can else every happen?  Maybe throw in that case?
+
+			
+			/// ADD MORE
+
+			cypherQuery += "}) RETURN f;";
+
+			//console.log("Running cypherQuery: " + cypherQuery);
+					
+			db.cypherQuery(cypherQuery, function(err, result){
+	    		if(err) throw err;
+
+	    		//console.log(result.data[0]); // delivers an array of query results
+
+				callback(null, id);
+			});
+		} else {
+			callback(new Error("Invalid filter.type value passed to createFilterNode: " + filter.type), 0);
 		}
-
-		var cypherQuery = "CREATE (f:Filter {";
-		var id = shortid.generate();
-
-		if (filter.type == "custom") {
-			cypherQuery += " id : '" + id + "' ";
-			cypherQuery += ", filter_type : 'custom'";
-
-			if (filter.effects) {
-				if (filter.effects.paint) {
-					cypherQuery += ", effects_paint : 'on' ";
-					cypherQuery += ", effects_paint_radius : " + filter.effects.paint.radius;
-				}
-				if (filter.effects.grayscale && filter.effects.grayscale == "on") {
-					cypherQuery += ", effects_grayscale : 'on' ";
-				}
-				if (filter.effects.charcoal) {
-					cypherQuery += ", effects_charcoal : 'on' ";
-					cypherQuery += ", effects_charcoal_factor : " + filter.effects.charcoal.factor;
-				}
-				if (filter.effects.mosaic && filter.effects.mosaic == "on") {
-					cypherQuery += ", effects_mosaic : 'on' ";
-				}
-				if (filter.effects.negative && filter.effects.negative == "on") {
-					cypherQuery += ", effects_negative : 'on' ";
-				}
-				if (filter.effects.solarize) {
-					cypherQuery += ", effects_solarize : 'on' ";
-					cypherQuery += ", effects_solarize_threshold : " + filter.effects.solarize.threshold;
-				}
-				if (filter.effects.monochrome && filter.effects.monochrome == "on") {
-					cypherQuery += ", effects_monochrome : 'on' ";
-				}
-				if (filter.effects.swirl) {
-					cypherQuery += ", effects_swirl : 'on' ";
-					cypherQuery += ", effects_swirl_degrees : " + filter.effects.swirl.degrees;
-				}
-				if (filter.effects.wave) {
-					cypherQuery += ", effects_wave : 'on' ";
-					cypherQuery += ", effects_wave_amplitude : " + filter.effects.wave.amplitude;
-					cypherQuery += ", effects_wave_wavelength : " + filter.effects.wave.wavelength;
-				}
-				if (filter.effects.spread) {
-					cypherQuery += ", effects_spread : 'on' ";
-					cypherQuery += ", effects_spread_amount : " + filter.effects.spread.amount;
-				}
-			}
-
-			if (filter.settings) {
-				if (filter.settings.brightness) {
-					cypherQuery += ", settings_brightness : 'on' ";
-					cypherQuery += ", settings_brightness_value : " + filter.settings.brightness.value;
-				}
-				if (filter.settings.contrast) {
-					cypherQuery += ", settings_contrast : 'on' ";
-					cypherQuery += ", settings_contrast_value : " + filter.settings.contrast.value;
-				}
-				if (filter.settings.hue) {
-					cypherQuery += ", settings_hue : 'on' ";
-					cypherQuery += ", settings_hue_value : " + filter.settings.hue.value;
-				}
-				if (filter.settings.saturation) {
-					cypherQuery += ", settings_saturation : 'on' ";
-					cypherQuery += ", settings_saturation_value : " + filter.settings.saturation.value;
-				}
-			}
-		} // TODO - careful about this case.  Can else every happen?  Maybe throw in that case?
-
-		
-		/// ADD MORE
-
-		cypherQuery += "}) RETURN f;";
-
-		//console.log("Running cypherQuery: " + cypherQuery);
-				
-		db.cypherQuery(cypherQuery, function(err, result){
-    		if(err) throw err;
-
-    		//console.log(result.data[0]); // delivers an array of query results
-
-			callback(null, id);
-		});
 	},
 
 	createDecorationNode : function(db, decoration, callback) {
-		//console.log("createDecorationNode: decoration = " + JSON.stringify(decoration));
-
-		
-
 		if (decoration.type == "none") {
 			throw err; // shouldn't happen
 		} else if (decoration.type == "user_defined") {
@@ -557,33 +553,37 @@ module.exports = {
 		} else if (decoration.type == "preset") {
 			callback(null, decoration.preset);
 			return;
-		}
+		} else if (decoration.type == "custom") {
+			var cypherQuery = "CREATE (d:Decoration {";
+			var id = shortid.generate();
 
-		var cypherQuery = "CREATE (d:Decoration {";
-		var id = shortid.generate();
+			if (decoration.type == "custom") {
+				cypherQuery += " id : '" + id + "' ";
+				cypherQuery += ", decoration_type : 'custom' ";
 
-		if (decoration.type == "custom") {
-			cypherQuery += " id : '" + id + "' ";
-			cypherQuery += ", decoration_type : 'custom' ";
-
-			if (decoration.border) {
-				cypherQuery += ", border : 'on'";
-				cypherQuery += ", border_width : '" + decoration.border.width + "'";
-				cypherQuery += ", border_color : '" + decoration.border.color + "'";
+				if (decoration.border) {
+					cypherQuery += ", border : 'on'";
+					cypherQuery += ", border_width : '" + decoration.border.width + "'";
+					cypherQuery += ", border_color : '" + decoration.border.color + "'";
+				}
 			}
+
+			cypherQuery += " }) RETURN d;";
+
+			//console.log("Running cypherQuery: " + cypherQuery);
+
+			db.cypherQuery(cypherQuery, function(err, result) {
+				if (err) throw err;
+
+				//console.log(result.data[0]);
+
+				callback(null, id);
+			});
+
+			return;
+		} else {
+			callback(new Error("Invalid decoration.type value passed to createDecorationNode: " + decoration.type), 0);
 		}
-
-		cypherQuery += " }) RETURN d;";
-
-		//console.log("Running cypherQuery: " + cypherQuery);
-
-		db.cypherQuery(cypherQuery, function(err, result) {
-			if (err) throw err;
-
-			//console.log(result.data[0]);
-
-			callback(null, id);
-		});
 	},
 
 	escapeSingleQuotes : function(str) {
@@ -607,48 +607,51 @@ module.exports = {
 		} else if (artifact.type == "preset") {
 			callback(null, artifact.preset);
 			return;
-		}
+		} else if (artifact.type == "custom") {
+			var cypherQuery = "CREATE (a:Artifact {";
 
-		var cypherQuery = "CREATE (a:Artifact {";
+			var id = shortid.generate();
 
-		var id = shortid.generate();
+			if (artifact.type == "custom") {
+				cypherQuery += " id : '" + id + "' ";
+				cypherQuery += ", artifact_type : 'custom' ";
 
-		if (artifact.type == "custom") {
-			cypherQuery += " id : '" + id + "' ";
-			cypherQuery += ", artifact_type : 'custom' ";
+				var bannerText = artifact.banner.text;
+				bannerText = bannerText.replace(/'/g, "\\'");
 
-			var bannerText = artifact.banner.text;
-			bannerText = bannerText.replace(/'/g, "\\'");
+				if (artifact.banner) {
+					cypherQuery += ", banner : 'on'";
+					cypherQuery += ", banner_text : '" + bannerText + "'";
 
-			if (artifact.banner) {
-				cypherQuery += ", banner : 'on'";
-				cypherQuery += ", banner_text : '" + bannerText + "'";
-
-				cypherQuery += ", banner_location : '" + artifact.banner.location + "'";
-				cypherQuery += ", banner_fontSize : '" + artifact.banner.fontSize + "'";
-				cypherQuery += ", banner_fontName : '" + artifact.banner.fontName + "'";
-				cypherQuery += ", banner_backgroundColor : '" + artifact.banner.backgroundColor + "'";
-				cypherQuery += ", banner_textColor : '" + artifact.banner.textColor + "'";
+					cypherQuery += ", banner_location : '" + artifact.banner.location + "'";
+					cypherQuery += ", banner_fontSize : '" + artifact.banner.fontSize + "'";
+					cypherQuery += ", banner_fontName : '" + artifact.banner.fontName + "'";
+					cypherQuery += ", banner_backgroundColor : '" + artifact.banner.backgroundColor + "'";
+					cypherQuery += ", banner_textColor : '" + artifact.banner.textColor + "'";
+				}
 			}
+
+			cypherQuery += "}) RETURN a;";
+
+			//console.log("Running cypherQuery: " + cypherQuery);
+
+			db.cypherQuery(cypherQuery, function(err, result) {
+				if (err) throw err;
+
+				//console.log(result.data[0]);
+
+				callback(null, id);
+			});
+
+			return;
+		} else {
+			callback(new Error("Invalid artifact.type value passed to createArtifactNode: " + artifact.type), 0);
 		}
 
-		cypherQuery += "}) RETURN a;";
-
-		//console.log("Running cypherQuery: " + cypherQuery);
-
-		db.cypherQuery(cypherQuery, function(err, result) {
-			if (err) throw err;
-
-			//console.log(result.data[0]);
-
-			callback(null, id);
-		});
+		
 	},
 
 	createLayoutNode : function(db, layout, callback) {
-		
-
-		
 		if (layout.type == "none") {
 			// There's no need to create a layout node in this case.
 			// This shouldn't be called, and should get handled by caller
@@ -659,56 +662,60 @@ module.exports = {
 		} else if (layout.type == "preset") {
 			callback(null, layout.preset);
 			return;
-		}
+		} else if (layout.type == "custom") {
+			var id = shortid.generate();
 
-		var id = shortid.generate();
+			var cypherQuery = "CREATE (l:Layout {";
 
-		var cypherQuery = "CREATE (l:Layout {";
+			if (layout.type == "custom") {
+				cypherQuery += " id : '" + id + "' ";
+				cypherQuery += ", layout_type : 'custom' ";
 
-		if (layout.type == "custom") {
-			cypherQuery += " id : '" + id + "' ";
-			cypherQuery += ", layout_type : 'custom' ";
+				if (layout.mirror) {
+					if (layout.mirror == "flip") {
+						cypherQuery += ", mirror_flip : 'on'";
+					} else if (layout.mirror == "flop") {
+						cypherQuery += ", mirror_flop : 'on'";
+					}
+				}
 
-			if (layout.mirror) {
-				if (layout.mirror == "flip") {
-					cypherQuery += ", mirror_flip : 'on'";
-				} else if (layout.mirror == "flop") {
-					cypherQuery += ", mirror_flop : 'on'";
+				if (layout.crop) {
+					cypherQuery += ", crop : 'on'";
+					cypherQuery += ", crop_x : '" + layout.crop.x + "'";
+					cypherQuery += ", crop_y : '" + layout.crop.y + "'";
+					cypherQuery += ", crop_width : '" + layout.crop.width + "'";
+					cypherQuery += ", crop_height : '" + layout.crop.height + "'";
+				}
+
+				if (layout.rotation) {
+					cypherQuery += ", rotation : 'on'";
+					cypherQuery += ", rotation_degrees : '" + layout.rotation.degrees + "'";
+					cypherQuery += ", rotation_color : '" + layout.rotation.color + "'";
+				}
+
+				if (layout.shear) {
+					cypherQuery += ", shear : 'on'";
+					cypherQuery += ", shear_xDegrees : '" + layout.shear.xDegrees + "'";
+					cypherQuery += ", shear_yDegrees : '" + layout.shear.yDegrees + "'";
 				}
 			}
 
-			if (layout.crop) {
-				cypherQuery += ", crop : 'on'";
-				cypherQuery += ", crop_x : '" + layout.crop.x + "'";
-				cypherQuery += ", crop_y : '" + layout.crop.y + "'";
-				cypherQuery += ", crop_width : '" + layout.crop.width + "'";
-				cypherQuery += ", crop_height : '" + layout.crop.height + "'";
-			}
+			cypherQuery += "}) RETURN l;";
 
-			if (layout.rotation) {
-				cypherQuery += ", rotation : 'on'";
-				cypherQuery += ", rotation_degrees : '" + layout.rotation.degrees + "'";
-				cypherQuery += ", rotation_color : '" + layout.rotation.color + "'";
-			}
+			//console.log("Running cypherQuery: " + cypherQuery);
+					
+			db.cypherQuery(cypherQuery, function(err, result){
+	    		if(err) throw err;
 
-			if (layout.shear) {
-				cypherQuery += ", shear : 'on'";
-				cypherQuery += ", shear_xDegrees : '" + layout.shear.xDegrees + "'";
-				cypherQuery += ", shear_yDegrees : '" + layout.shear.yDegrees + "'";
-			}
+	    		//console.log(result.data[0]); // delivers an array of query results
+
+				callback(null, id);
+			});
+
+			return;
+		} else {
+			callback(new Error("Invalid layout.type property passed to createLayoutNode: " + layout.type), 0);
 		}
-
-		cypherQuery += "}) RETURN l;";
-
-		//console.log("Running cypherQuery: " + cypherQuery);
-				
-		db.cypherQuery(cypherQuery, function(err, result){
-    		if(err) throw err;
-
-    		//console.log(result.data[0]); // delivers an array of query results
-
-			callback(null, id);
-		});
 	},
 
 	findUser : function (query, callback) {
