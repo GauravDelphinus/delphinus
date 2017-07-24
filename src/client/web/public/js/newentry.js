@@ -3,6 +3,8 @@ $(document).ready(function(){
 
 	setupSteps();
 
+	setupNavigation();
+
 	$("#apply").click(postEntry);
 
 	createLoginHeader();
@@ -16,95 +18,88 @@ function setupMainItem() {
 }
 
 function setupNavigation() {
-	moveToStep("layout");
+	var navListItems = $('div.stepwizard-header div a'),
+          allWells = $('.setup-content'),
+          allNextBtn = $('.nextBtn');
+
+	allWells.hide();
+
+	navListItems.click(function (e) {
+		console.log("navlist item clicked");
+		e.preventDefault();
+		var $target = $($(this).attr('href')),
+			$item = $(this);
+
+		if (!$item.hasClass('disabled')) {
+	          navListItems.removeClass('btn-primary').addClass('btn-default');
+	          $item.addClass('btn-primary');
+	          allWells.hide();
+	          $target.show();
+	          showStep($target.prop("id"));
+	          $target.find('input:eq(0)').focus();
+		}
+	});
+
+	//show the first step
+	$('div.stepwizard-header div a.btn-primary').trigger('click');
 
 	$("#prevButton").click(function() {
 		var currentStep = getCurrentStep();
-		if (currentStep == "filter") {
-			moveToStep("layout");
-		} else if (currentStep == "artifact") {
-			moveToStep("filter");
-		} else if (currentStep == "decoration") {
-			moveToStep("artifact");
-		} else if (currentStep == "post") {
-			moveToStep("decoration");
-		}
+		var previousStepLink = $('div.stepwizard-header div a[href="#' + currentStep + 'Section"]').parent().prev();
+		previousStepLink.children("a").removeAttr('disabled').trigger('click');
 	});
 
 	$("#nextButton").click(function() {
 		var currentStep = getCurrentStep();
-
-		if (currentStep == "layout") {
-			moveToStep("filter");
-		} else if (currentStep == "filter") {
-			moveToStep("artifact");
-		} else if (currentStep == "artifact") {
-			moveToStep("decoration");
-		} else if (currentStep == "decoration") {
-			moveToStep("post");
-		}
+		var nextStepLink = $('div.stepwizard-header div a[href="#' + currentStep + 'Section"]').parent().next();
+		nextStepLink.children("a").removeAttr('disabled').trigger('click');
 	});
 }
 
-function moveToStep(stepName) {
-	if (stepName == "layout") {
-		$("#layoutSection").show();
-		$("#filterSection").hide();
-		$("#artifactSection").hide();
-		$("#decorationSection").hide();
-		$("#postSection").hide();
-		$("#nextButton").show();
-		$("#prevButton").hide();
-	} else if (stepName == "filter") {
-		$("#layoutSection").hide();
-		$("#filterSection").show();
-		$("#artifactSection").hide();
-		$("#decorationSection").hide();
-		$("#postSection").hide();
-		$("#nextButton").show();
-		$("#prevButton").show();
-	} else if (stepName == "artifact") {
-		$("#layoutSection").hide();
-		$("#filterSection").hide();
-		$("#artifactSection").show();
-		$("#decorationSection").hide();
-		$("#postSection").hide();
-		$("#nextButton").show();
-		$("#prevButton").show();
-	} else if (stepName == "decoration") {
-		$("#layoutSection").hide();
-		$("#filterSection").hide();
-		$("#artifactSection").hide();
-		$("#decorationSection").show();
-		$("#postSection").hide();
-		$("#nextButton").show();
-		$("#prevButton").show();
-	} else if (stepName == "post") {
-		$("#layoutSection").hide();
-		$("#filterSection").hide();
-		$("#artifactSection").hide();
-		$("#decorationSection").hide();
-		$("#postSection").show();
-		$("#nextButton").hide();
-		$("#prevButton").show();
-	}
-}
-
-
 function setupSteps() {
+	setupArtifactStep();
+
 	setupLayoutStep();
 
 	setupFilterStep();
 
-	setupArtifactStep();
-
 	setupDecorationStep();
+}
 
-	setupNavigation();
+function showStep(stepId) {
+	if (stepId == "captionSection") {
+		showCaptionStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "hidden");
+	} else if (stepId == "artifactSection") {
+		showArtifactStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "visible");
+	} else if (stepId == "layoutSection") {
+		showLayoutStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "visible");
+	} else if (stepId == "filterSection") {
+		showFilterStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "visible");
+	} else if (stepId == "decorationSection") {
+		showDecorationStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "visible");
+	} else if (stepId == "postSection") {
+		showPostStep();
+		$("#nextButton").css("visibility", "hidden");
+		$("#prevButton").css("visibility", "visible");
+	}
 }
 
 function changeCallback(event) {
 	applyChanges(null);
+}
+
+function showLayoutStep() {
+	$("#stepTitle").text("Tweak the layout of your entry")
 }
 
 function setupLayoutStep() {
@@ -344,6 +339,10 @@ function endCrop() {
 	$("#steps").show();
 }
 
+function showFilterStep() {
+	$("#stepTitle").text("Apply a really cool filter to your entry!")
+}
+
 function setupFilterStep() {
 
 	//show hide logic
@@ -538,59 +537,76 @@ function createRangeSection(valueTextID, rangeInputID, min, max, value, step) {
 	return paintRangeSection;
 }
 
+function showCaptionStep() {
+	$("#stepTitle").text("Enter a really awesome caption for your entry!")
+}
+
+function setupCaptionStep() {
+
+}
+
+function showArtifactStep() {
+	$("#stepTitle").text("Place your caption in the entry image")
+
+	if ($("#presetArtifactSection").is(":visible")) {
+		$.getJSON('/api/filters?type=artifact' + "&artifactType=preset", function(result) {
+			if (result.length > 0) {
+				var list = [];
+				for (var i = 0; i < result.length; i++) {
+					var a = result[i][0];
+					//var u = result[i][1];
+
+					var data = {};
+					data.id = a.id;
+					data.caption = a.name;
+					data.image = "/images/static/progress.gif";
+		
+					data.socialStatus = {};
+					data.socialStatus.numLikes = 121;
+					data.socialStatus.numShares = 23;
+					data.socialStatus.numComments = 45;
+
+					data.link = "/artifact/" + a.id;
+
+					var jsonObj = {};
+					constructJSONObject(jsonObj);
+					jsonObj.steps.artifacts[0].type = "preset";
+					jsonObj.steps.artifacts[0].preset = a.id;
+					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
+					generateChanges(a.id, jsonObj, function(id, imgPath) {
+						$("#" + id + " img").prop("src", imgPath);
+					});
+
+					list.push(data);
+				}
+
+				$("#presetArtifacts").remove();
+				var grid = createGrid("presetArtifacts", list, 3, true, true, function(id) {
+					$("#presetArtifactSection").data("selectedArtifactID", id);
+					applyChanges();
+					$(window).scrollTop(0);
+				});
+				$("#presetArtifactSection").append(grid);
+			}
+		});
+	}
+}
+
 function setupArtifactStep() {
 		//show hide logic
-	$("#artifactTypeSelection").on("change", function() {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneArtifactSection"}, 
-			{value: "preset", id: "#presetArtifactSection"}, 
-			{value: "userDefined", id: "#userDefinedArtifactSection"}, 
-			{value: "custom", id: "#customArtifactSection"}]);
-
+	$("#artifactOptionsButton").click(function() {
 		if ($("#presetArtifactSection").is(":visible")) {
-			$.getJSON('/api/filters?type=artifact' + "&artifactType=preset", function(result) {
-				if (result.length > 0) {
-					var list = [];
-					for (var i = 0; i < result.length; i++) {
-						var a = result[i][0];
-						//var u = result[i][1];
+			//presets already show, toggle
+			$("#presetArtifactSection").hide();
+			$("#customArtifactSection").show();
 
-						var data = {};
-						data.id = a.id;
-						data.caption = a.name;
-						data.image = "/images/static/progress.gif";
-			
-						data.socialStatus = {};
-						data.socialStatus.numLikes = 121;
-						data.socialStatus.numShares = 23;
-						data.socialStatus.numComments = 45;
+			$(this).text("Show custom options");
+		} else if ($("#customArtifactSection").is(":visible")) {
+			$("#presetArtifactSection").show();
+			$("#customArtifactSection").hide();
 
-						data.link = "/artifact/" + a.id;
-
-						var jsonObj = {};
-						constructJSONObject(jsonObj);
-						jsonObj.steps.artifacts[0].type = "preset";
-						jsonObj.steps.artifacts[0].preset = a.id;
-						jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
-						generateChanges(a.id, jsonObj, function(id, imgPath) {
-							$("#" + id + " img").prop("src", imgPath);
-						});
-
-						list.push(data);
-					}
-
-					$("#presetArtifacts").remove();
-					var grid = createGrid("presetArtifacts", list, 3, true, true, function(id) {
-						$("#presetArtifactSection").data("selectedArtifactID", id);
-						applyChanges();
-						$(window).scrollTop(0);
-					});
-					$("#presetArtifactSection").append(grid);
-				}
-			});
+			$(this).text("Hide custom options");
 		}
-
-		applyChanges();
 	});
 
 	$("#topBannerButton, #bottomBannerButton, #aboveBannerButton, #belowBannerButton").click(function() {
@@ -625,6 +641,10 @@ function setupArtifactStep() {
 		"#bannerTextFontName",
 		"#bannerTextColorButton"
 		]);
+}
+
+function showDecorationStep() {
+	$("#stepTitle").text("Apply some final touches to your entry with a border!")
 }
 
 function setupDecorationStep() {
@@ -689,6 +709,9 @@ function setupDecorationStep() {
 		]);
 }
 
+function showPostStep() {
+	$("#stepTitle").text("You're now ready to post!")
+}
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 	for (var i = 0; i < listOfValuesAndSectionIds.length; i++) {
 		if (valueToMatch == listOfValuesAndSectionIds[i].value) {
@@ -1031,7 +1054,9 @@ function postEntry() {
 }
 
 function getCurrentStep() {
-	if ($("#layoutSection").is(":visible")) {
+	if ($("#captionSection").is(":visible")) {
+		return "caption";
+	} else if ($("#layoutSection").is(":visible")) {
 		return "layout";
 	} else if ($("#filterSection").is(":visible")) {
 		return "filter";

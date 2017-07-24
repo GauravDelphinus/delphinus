@@ -18,20 +18,94 @@
 	</div>
 </div>
 
-<div id="steps">
-	<!-- LAYOUT SECTION -->
-	<div id="stepSection" class="stepSection">
+<div id="steps" class="stepwizard">
+
+		<div class="stepwizard-header">
+	      <div class="stepwizard-step">
+	        <a href="#captionSection" type="button" class="btn btn-primary btn-circle">1</a>
+	        <p>Step 1</p>
+	      </div>
+	      <div class="stepwizard-step">
+	        <a href="#artifactSection" type="button" class="btn btn-default btn-circle" disabled="disabled">2</a>
+	        <p>Step 2</p>
+	      </div>
+	      <div class="stepwizard-step">
+	        <a href="#layoutSection" type="button" class="btn btn-default btn-circle" disabled="disabled">3</a>
+	        <p>Step 3</p>
+	      </div>
+	      <div class="stepwizard-step">
+	        <a href="#filterSection" type="button" class="btn btn-default btn-circle" disabled="disabled">4</a>
+	        <p>Step 4</p>
+	      </div>
+	      <div class="stepwizard-step">
+	        <a href="#decorationSection" type="button" class="btn btn-default btn-circle" disabled="disabled">5</a>
+	        <p>Step 5</p>
+	      </div>
+	      <div class="stepwizard-step">
+	        <a href="#postSection" type="button" class="btn btn-default btn-circle" disabled="disabled">6</a>
+	        <p>Step 6</p>
+	      </div>
+	    </div>
+	  
+	
 		<div id="stepHeader" class="stepHeader">
+			<button id="prevButton" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left"></span> Previous</button>
 			<span id="stepTitle" class="stepTitle"></span>
-			<div id="stepNavigation" class="stepNavigation">
-				<button id="prevButton" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-prev"></span> Previous</button>
-				<button id="nextButton" type="button" class="btn btn-primary">Next <span class="glyphicon glyphicon-next"></span></button>
-			</div>
+			<button id="nextButton" type="button" class="btn btn-primary">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
 		</div>
+
 		<div id="stepContent" class="stepContent">
-			<div id="layoutSection">
+
+			<!-- CAPTION SECTION -->
+			<div id="captionSection" class="setup-content">
+				<div class="settingsSubBlock">
+					<input type="text" id="bannerText" class="form-control" placeholder="My Awesome Caption!" required>
+				</div>
+			</div>
+
+			<!-- ARTIFACT SECION -->
+			<div id="artifactSection" class="setup-content" style="display: none;">
+				<button type="button" class="btn btn-link" id="artifactOptionsButton">Show custom options</button>
+
+				<!-- PRESET ARTIFACT SUBSECTION -->
+				<div id="presetArtifactSection" class="settingsSubBlock">
+				</div>
+
+				<!-- CUSTOM ARTIFACT SUBSECTION -->
+				<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
+					<div id="bannerSection">
+						<span class="settingsSubBlockTitle">Banner</span>
+						<div class="settingsSubBlock">
+							<b>Location:</b>
+							<button type="button" class="btn btn-default" id="topBannerButton">Top</button>
+							<button type="button" class="btn btn-default active" id="bottomBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Bottom</button>
+							<button type="button" class="btn btn-default" id="aboveBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Above</button>
+							<button type="button" class="btn btn-default" id="belowBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Below</button><br><br>
+							<b>Background Color:</b>
+							<button type="button" class="btn btn-default active" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
+							<input type="color" class="btn btn-default" id="bannerColorButton" value="#000000">
+						</div>
+						<span class="settingsSubBlockTitle">Text</span>
+						<div class="settingsSubBlock">
+							<b>Font:</b>
+							<select id="bannerTextFontName" class="fontDropDown">
+								<option value="arial">Arial</option>
+								<option value="times">Times</option>
+								<option value="courier">Courier</option>
+							</select>
+							<input type="number" id="bannerTextFontSize" value="30">
+							<b>Text Color:</b>
+							<input type="color" class="btn btn-default" id="bannerTextColorButton" value="#000000">
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<br>
+
+			<!-- LAYOUT SECTION -->
+			<div id="layoutSection" class="setup-content" style="display: none;">
 				
-				<span class="title">Step 1: Adjust Layout</span><br>
 				<select id="layoutTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
 					<option value="preset">Preset</option>
@@ -120,8 +194,7 @@
 			</div>
 
 			<!-- FILTER SECTION -->
-			<div id="filterSection" style="display: none;">
-				<span class="title">Step 2: Apply Filter</span><br>
+			<div id="filterSection" class="setup-content" style="display: none;">
 
 				<select id="filterTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
@@ -225,70 +298,9 @@
 			</div>
 			<br>
 
-			<!-- ARTIFACT SECION -->
-			<div id="artifactSection" style="display: none;">
-				<span class="title">Step 3: Add Artifacts</span><br>
-				<span class="settingsSubBlockTitle">Caption</span>
-				<div class="settingsSubBlock">
-					<input type="text" id="bannerText" class="form-control" placeholder="Enter your caption here!" required>
-				</div>
-
-				<select id="artifactTypeSelection" class="form-control">
-					<option value="none" selected="selected">None</option>
-					<option value="preset">Preset</option>
-					<option value="custom">Custom</option>
-				</select>
-
-				<!-- NONE ARTIFACT SUBSECTION -->
-				<div id="noneArtifactSection" class="settingsSubBlock">
-				<p>No Artifact Selected</p>
-				</div>
-
-				<!-- PRESET ARTIFACT SUBSECTION -->
-				<div id="presetArtifactSection" class="settingsSubBlock">
-				<p>Preset Artifacts</p>
-				</div>
-
-				<!-- USER DEFINED ARTIFACT SUBSECTION -->
-				<div id="userDefinedArtifactSection" class="settingsSubBlock" style="display: none;">
-					<span class="subTitle">User Defined Artifacts</span><br>
-				</div>
-
-				<!-- CUSTOM ARTIFACT SUBSECTION -->
-				<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
-					<div id="bannerSection">
-						<span class="settingsSubBlockTitle">Banner</span>
-						<div class="settingsSubBlock">
-							<b>Location:</b>
-							<button type="button" class="btn btn-default" id="topBannerButton">Top</button>
-							<button type="button" class="btn btn-default active" id="bottomBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Bottom</button>
-							<button type="button" class="btn btn-default" id="aboveBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Above</button>
-							<button type="button" class="btn btn-default" id="belowBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Below</button><br><br>
-							<b>Background Color:</b>
-							<button type="button" class="btn btn-default active" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
-							<input type="color" class="btn btn-default" id="bannerColorButton" value="#000000">
-						</div>
-						<span class="settingsSubBlockTitle">Text</span>
-						<div class="settingsSubBlock">
-							<b>Font:</b>
-							<select id="bannerTextFontName" class="fontDropDown">
-								<option value="arial">Arial</option>
-								<option value="times">Times</option>
-								<option value="courier">Courier</option>
-							</select>
-							<input type="number" id="bannerTextFontSize" value="30">
-							<b>Text Color:</b>
-							<input type="color" class="btn btn-default" id="bannerTextColorButton" value="#000000">
-						</div>
-
-					</div>
-				</div>
-			</div>
-			<br>
-
+			
 			<!-- DECORATION SECTION -->
-			<div id="decorationSection" style="display: none;">
-				<span class="title">Step 4: Add Decorations</span><br>
+			<div id="decorationSection" class="setup-content" style="display: none;">
 
 				<select id="decorationTypeSelection" class="form-control">
 					<option value="none" selected="selected">None</option>
@@ -320,7 +332,9 @@
 					</div>
 				</div>
 			</div>
-			<div id="postSection" class="settingsBlock" style="display: none;">
+
+			<!-- POST SECTION -->
+			<div id="postSection" class="settingsBlock setup-content" style="display: none;">
 			<input type="button" value="Post Entry!" class="btn btn-primary" id="apply">
 			</div>
 		</div>
