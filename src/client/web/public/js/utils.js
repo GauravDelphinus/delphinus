@@ -509,8 +509,8 @@ function createSocialStatusSectionElement(data) {
 	
 	if (data.socialStatus.comments) {
 		var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "socialStatusButton"});
-		shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.shares.numShares}));
-		shareButton.append($("<span>", {text: " Shares"}));
+		commentButton.append($("<span>", {id: data.id + "NumComments", text: data.socialStatus.comments.numComments}));
+		commentButton.append($("<span>", {text: " Comments"}));
 		if (data.socialStatus.comments.numComments <= 0) {
 			commentButton.hide();
 		}
