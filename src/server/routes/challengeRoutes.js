@@ -98,12 +98,12 @@ var routes = function(db) {
     			
     			var id = shortid.generate();
 
-				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) CREATE (n:Challenge {" +
+				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) MATCH (category:Category {id: '" + req.body.category + "'}) CREATE (n:Challenge {" +
 							"id: '" + id + "'," +
 							"image : '" + name + "'," +
 							"created : '" + req.body.created + "'," + 
 							"title : '" + dataUtils.escapeSingleQuotes(req.body.caption) + "'" +
-							"})-[r:POSTED_BY]->(u) RETURN n;";
+							"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
 
 				//console.log("Running cypherQuery: " + cypherQuery);
 				

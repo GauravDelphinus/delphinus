@@ -621,15 +621,15 @@ function applySteps(sourceImage, targetImage, steps, next) {
     		});
 		} else {
 			if (steps.filters) {
-				applyFilters(image, newSize, steps.filters);
+				applyFilters(image, size, steps.filters);
 			}
 
 			if (steps.artifacts) {
-				applyArtifacts(image, newSize, steps.artifacts);
+				applyArtifacts(image, size, steps.artifacts);
 			}
 
 			if (steps.decorations) {
-				applyDecorations(image, newSize, steps.decorations);
+				applyDecorations(image, size, steps.decorations);
 			}
 
 			writeImage(image, targetImage, next);

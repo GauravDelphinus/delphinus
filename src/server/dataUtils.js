@@ -1,5 +1,6 @@
 var config = require('./config');
 var presets = require("./presets");
+var categories = require("./categories");
 var shortid = require("shortid");
 var fs = require("fs");
 
@@ -91,6 +92,14 @@ module.exports = {
 				//console.log(result.data); // delivers an array of query results
 
 			});
+		}
+
+		//enumerate and create nodes for the categories and subcategories
+		for (var key in categories) {
+			var id = key;
+			var categoryValue = categories[key];
+
+			createNodesForCategory(db, null, key, categories[key]);
 		}
 	},
 
@@ -1196,7 +1205,31 @@ module.exports = {
 		//console.log("constructEntityData returning data = " + JSON.stringify(data));
 		return data;
 	}
-
 	
+}
+
+function createNodesForCategory(db, parentCategoryId, categoryId, categoryObj) {
+	console.log("createNodesForCategory, id = " + categoryId + ", obj = " + JSON.stringify(categoryObj));
+	if (categoryObj && categoryObj.displayName) {
+		var cypherQuery = "";
+		if (parentCategoryId != null) {
+			cypherQuery += " MATCH (parent:Category {id: '" + parentCategoryId + "'}) MERGE (parent)<-[:BELONGS_TO]-(c:Category {id: '" + categoryId + "'}) ";
+		} else {
+			cypherQuery += " MERGE (c:Category {id: '" + categoryId + "'}) ";
+		}
+
+		cypherQuery += " ON CREATE SET c.name = '" + categoryObj.displayName + "' RETURN c;";
+			
+		db.cypherQuery(cypherQuery, function(err, result){
+			if(err) throw err;
+
+			//now, look for any subcategories
+			if (categoryObj.subCategories) {
+				for (var key in categoryObj.subCategories) {
+					createNodesForCategory(db, categoryId, key, categoryObj.subCategories[key]);
+				}
+			}
+		});
+	}
 }
 

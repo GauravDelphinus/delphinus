@@ -12,7 +12,38 @@ $(document).ready(function(){
   });
 
   createLoginHeader();
+
+  setupCategories();
 });
+
+function setupCategories() {
+	$.getJSON('/api/categories/', function(data) {
+		console.log("data received is " + JSON.stringify(data));
+		for (var i = 0; i < data.length; i++) {
+			var option = $("<option>", {"value": data[i].id});
+			option.text(data[i].name);
+			$("#categoryList").append(option);
+		}
+
+		setupSubCategories($("#categoryList option:selected").val());
+	});
+
+	$("#categoryList").on("change", function() {
+		setupSubCategories(this.value);
+	});
+}
+
+function setupSubCategories(categoryId) {
+	$("#subCategoryList").empty();
+	$.getJSON('/api/categories?category=' + categoryId, function(data) {
+		for (var i = 0; i < data.length; i++) {
+			var option = $("<option>", {"value": data[i].id});
+			option.text(data[i].name);
+
+			$("#subCategoryList").append(option);
+		}
+	});
+}
 
 function handleFileDropped(evt) {
 	evt.stopPropagation();
@@ -45,6 +76,7 @@ function postChallenge() {
 	jsonObj.imageDataURI = $("#challengeImage").attr("src");
 	jsonObj.caption = $("#caption").val();
 	jsonObj.created = (new Date()).getTime();
+	jsonObj.category = $("#subCategoryList option:selected").val();
 
 	$.ajax({
 		type: "POST",

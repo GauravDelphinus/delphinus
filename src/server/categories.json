@@ -1,0 +1,32 @@
+{
+	"arts" : {
+		"displayName" : "Arts",
+		"subCategories" : {
+				"fineArt" : {
+					"displayName" : "Fine Arts"
+				},
+				"modernArt" : {
+					"displayName" : "Modern Art"
+				}
+			}
+	},
+	"family" : {
+		"displayName" : "Family",
+		"subCategories" : {
+			"friends" : {
+				"displayName" : "Friends"
+			},
+			"relatives" : {
+				"displayName" : "Relatives",
+				"subCategories" : {
+					"closeRelatives" : {
+						"displayName" : "Close Relatives"
+					},
+					"distantRelatives" : {
+						"displayName" : "Distant Relatives"
+					}
+				}
+			}
+		}
+	}
+}

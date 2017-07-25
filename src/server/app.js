@@ -70,6 +70,9 @@ module.exports = function() {
 	var feedRouter = require("./routes/feedRoutes")(db);
 	app.use("/api/feeds", feedRouter);
 	
+	var categoryRouter = require("./routes/categoryRoutes")(db);
+	app.use("/api/categories", categoryRouter);
+	
 	/**
 		FILE ROUTERS
 		This is the list of file routers that allow for serving of file
