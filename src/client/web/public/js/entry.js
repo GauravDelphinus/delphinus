@@ -38,7 +38,7 @@ function setupChallengeTab() {
 
 function setupCommentsTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "comments", "Comments");
-	createAndAppendContentContainer(tabDiv, "comments", [{type: "comments"}], [{type: "date", url: "/api/comments/?entityId=" + entryId + "&sortBy=reverseDate"}]);
+	createAndAppendContentContainer(tabDiv, entryId, "comments", [{type: "comments"}], [{type: "date", url: "/api/comments/?entityId=" + entryId + "&sortBy=reverseDate"}]);
 }
 
 /*

@@ -32,8 +32,6 @@ var routes = function(db) {
 
 			var cypherQuery;
 
-			//console.log("/api/comments, query is " + JSON.stringify(req.query));
-
 			if (req.query.entityId && req.query.user) {
 				cypherQuery = "MATCH (c:Comment)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (c)-[:POSTED_IN]->({id: '" + req.query.entityId + "'}) "
 			} else if (req.query.entityId) {
@@ -63,12 +61,8 @@ var routes = function(db) {
 
 			cypherQuery += " ;";
 		
-			//console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
-
-    			//console.log("result is " + JSON.stringify(result.data)); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
@@ -117,15 +111,12 @@ var routes = function(db) {
 							"text : '" + req.body.text + "'" + 
 							"})-[:POSTED_IN]->(e), (u)<-[r:POSTED_BY]-(c) RETURN c;";
 
-			//console.log("Running cypherQuery: " + cypherQuery);
 			
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) throw err;
 
-				//console.log(result.data); // delivers an array of query results
 				var newEntryId = result.data[0].id;
 
-				//res.json(result.data[0]);
 				var c = result.data[0];
 
 				var data = {};
@@ -160,7 +151,6 @@ var routes = function(db) {
 			// add social count check
 			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(c) RETURN c, u, COUNT(u2)";
 			
-			//console.log("GET Received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
@@ -204,12 +194,8 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN c;";
 
-			//console.log("PUT received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
-
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data[0]);
 			});
@@ -248,12 +234,8 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN c;";
 
-			//console.log("PATCH received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
-
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data[0]);
 			});
@@ -267,12 +249,9 @@ var routes = function(db) {
 			**/
 
 			var cypherQuery = "MATCH (c: Comment {id: '" + req.params.commentId + "'}) DELETE c;";
-			//console.log("DELETE received, Running cypherQuery: " + cypherQuery);
+
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
-
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			res.json(result.data);
 			});
@@ -284,14 +263,10 @@ var routes = function(db) {
 			if (req.user && req.user.id) {
 	      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
 	      			"'})-[:LIKES]->(c:Comment {id: '" + req.params.commentId + "'}) RETURN c;";
-	      		//console.log("running cypherQuery: " + cypherQuery);
+
 	      		db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-	                //console.log("result of get likes is " + JSON.stringify(result.data)); // delivers an array of query results
-	                //console.log(result.columns); // delivers an array of names of objects getting returned
-
-	                //console.log(result.data);
 	                var output = {};
 	                if (result.data.length == 1) {
 	                	output = {likeStatus : "on"};
@@ -299,7 +274,6 @@ var routes = function(db) {
 	                	output = {likeStatus : "off"};
 	                }
 
-	                //console.log("sending back to client: " + JSON.stringify(output));
 	                res.json(output);
 				});
       		} else {
@@ -313,12 +287,8 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-	                //console.log(result.data); // delivers an array of query results
-	                //console.log(result.columns); // delivers an array of names of objects getting returned
-
 	                var output = {};
 
-	                //console.log(result.data);
 	                if (result.data.length == 1) {
 
 	                	output.likeStatus = "on";
@@ -334,7 +304,6 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) throw err;
 
-					//console.log("result of deletion: " + JSON.stringify(result));
 					var output = {};
 
 					if (result.data.length == 1) {

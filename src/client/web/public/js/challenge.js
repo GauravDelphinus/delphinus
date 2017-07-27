@@ -42,16 +42,16 @@ function setupMyEntriesTab() {
 	});
 
 	if (user) {
-		createAndAppendContentContainer(tabDiv, "myEntries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?user=" + user.id + "&challengeId=" + challengeId + "&sortBy=date"}, {type: "popularity", url: "/api/entries/?user=" + user.id + "&challengeId=" + challengeId + "&sortBy=popularity"}]);
+		createAndAppendContentContainer(tabDiv, challengeId, "myEntries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?user=" + user.id + "&challengeId=" + challengeId + "&sortBy=date"}, {type: "popularity", url: "/api/entries/?user=" + user.id + "&challengeId=" + challengeId + "&sortBy=popularity"}]);
 	}
 }
 
 function setupEntriesTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
-	createAndAppendContentContainer(tabDiv, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=date" + (user? "&excludeUser=" + user.id : "")}, {type: "popularity", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=popularity" + (user? "&excludeUser=" + user.id : "")}]);
+	createAndAppendContentContainer(tabDiv, challengeId, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=date" + (user? "&excludeUser=" + user.id : "")}, {type: "popularity", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=popularity" + (user? "&excludeUser=" + user.id : "")}]);
 }
 
 function setupCommentsTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "comments", "Comments");
-	createAndAppendContentContainer(tabDiv, "comments", [{type: "comments"}], [{type: "date", url: "/api/comments/?entityId=" + challengeId + "&sortBy=reverseDate"}]);
+	createAndAppendContentContainer(tabDiv, challengeId, "comments", [{type: "comments"}], [{type: "date", url: "/api/comments/?entityId=" + challengeId + "&sortBy=reverseDate"}]);
 }

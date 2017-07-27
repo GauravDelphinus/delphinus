@@ -219,6 +219,7 @@ function createSocialStatusSectionSimple(data, parentId, isReply) {
 		//for reply of reply, the parent is still the top comment
 		var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id));
 		appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), null, true);
+
 	});
 
 	return socialStatusSection;
@@ -449,6 +450,8 @@ function createScrollableElement(data) {
 
 	element.append(createSocialStatusSectionElement(data));
 	element.append(createSocialActionsSectionElement(data));
+		//container for comments, if any
+	element.append(createCommentsContainer(data));
 
 	return element;
 }
@@ -515,6 +518,14 @@ function createSocialStatusSectionElement(data) {
 			commentButton.hide();
 		}
 		socialStatus.append(commentButton);
+
+		commentButton.click(function() {
+			$.getJSON("/api/comments/?entityId=" + data.id + "&sortBy=reverseDate", function(list) {
+				var commentsList = createCommentsList(data.id, list);
+				$("#" + data.id + "CommentsContainer").empty().append(commentsList);
+				$("#" + data.id + "NewCommentText").focus(); // set focus in the input field
+			});
+		});
 	}
 	
 	// For challenges only
@@ -558,7 +569,6 @@ function createSocialStatusSectionElement(data) {
 }
 
 function createSocialActionsSectionElement(data) {
-	console.log("createSocialActionsSectionElement - data.socialInfo is " + JSON.stringify(data.socialStatus));
 	var socialActionsSection = $("<div>", {id: data.id + "SocialActionsSection", class: "socialActionsSection"});
 
 	// LIKE BUTTON ---------------------------------
@@ -623,7 +633,11 @@ function createSocialActionsSectionElement(data) {
 		socialActionsSection.append(commentButton);
 		
 		commentButton.click(function(e) {
-			window.open(data.link + "#comments", "_self");
+			$.getJSON("/api/comments/?entityId=" + data.id + "&sortBy=reverseDate", function(list) {
+				var commentsList = createCommentsList(data.id, list);
+				$("#" + data.id + "CommentsContainer").empty().append(commentsList);
+				$("#" + data.id + "NewCommentText").focus(); // set focus in the input field
+			});		
 		});
 	}
 	
@@ -674,17 +688,14 @@ function createSocialActionsSectionElement(data) {
 		          data: JSON.stringify(jsonObj)
 		      	})
 				.done(function(data, textStatus, jqXHR) {
-					console.log("text is [" + $("#" + dataId + "NumFollowers").text() + "]");
 					var numFollowers = parseInt($("#" + dataId + "NumFollowers").text());
 		          	if (data.followStatus == "following") {
 		          		numFollowers ++;
-		          		console.log("numFollowers is now " + numFollowers);
 		          		$("#" + dataId + "NumFollowers").text(numFollowers);
 		          		$("#" + dataId + "FollowButton").addClass("active");
 		          		$("#" + dataId + "FollowersButton").show();
 		          	} else {
 		          		numFollowers --;
-		          		console.log("numFollowers is now " + numFollowers);
 		          		$("#" + dataId + "NumFollowers").text(numFollowers);
 		          		$("#" + dataId + "FollowButton").removeClass("active");
 		          		if (numFollowers <= 0) {
@@ -734,16 +745,24 @@ function createFeedElement(data) {
 
 	element.append(createSocialActionsSectionElement(data));
 
-	if (data.activity && data.activity.comment) {
-		//data.activity.comment.postedByUser = data.activity.user;
-		element.append(createCommentElement(data.activity.comment, data.id, false));
-	}
+	//container for comments, if any
+	element.append(createCommentsContainer(data));
 
 	return element;
 }
 
+function createCommentsContainer(data) {
+	var container = $("<div>", {id: data.id + "CommentsContainer"}).empty();
+
+	if (data.activity && data.activity.comment) {
+		//data.activity.comment.postedByUser = data.activity.user;
+		container.append(createCommentElement(data.activity.comment, data.id, false));
+	}
+
+	return container;
+}
+
 function createCommentElement(data, parentId, isReply) {
-	console.log("createCommentElement: data is " + JSON.stringify(data));
 	var element = $("<div>", {id: data.id + "CommentElement", class: "commentElement"});
 	if (isReply) {
 		element.addClass("replyElement");
@@ -792,7 +811,6 @@ function createCommentElement(data, parentId, isReply) {
 }
 
 function createNewCommentElement(isReply, parentId) {
-	console.log("createNewCommentElement, parentId = " + parentId + ", user is " + JSON.stringify(user));
 	var element = $("<div>", {id: parentId + "NewCommentElement", class: "commentElement"});
 	if (isReply) {
 		element.addClass("replyElement");
@@ -811,6 +829,7 @@ function createNewCommentElement(isReply, parentId) {
 	var tdRight = $("<td>", {class: "commentsRightColumn"});
 
 	var input = $("<input>", {type: "text", id: parentId + "NewCommentText", class:"form-control", placeholder: "Add your comment here"});
+
 
 	tdRight.append(input);
 
@@ -835,14 +854,12 @@ function createNewCommentElement(isReply, parentId) {
 		    	//appendCommentElement("comments", data);
 		    	var commentElement = createCommentElement(data, parentId, isReply);
 		    	var atEnd = (!isReply);
-		    	appendCommentElement(commentElement, parentId, atEnd);
+		    	appendCommentElement(commentElement, parentId, isReply);
 		    	if (isReply) {
 		    		$("#" + parentId + "NewCommentElement").remove();
 		    	} else {
 		    		$("#" + parentId + "NewCommentText").prop("value", "");
 		    		$("#" + parentId + "NewCommentText").blur();
-		    		//$("#" + parentId + "NewCommentText").prop("placeholder", "Add your comment here");
-		    		console.log("latet version");
 		    	}
 			})
 			.fail(function(jqXHR, textStatus, errorThrown) {
@@ -889,12 +906,15 @@ function appendNewCommentElement(newCommentElement, parentId, container, isReply
 			next.before(newCommentElement);
 		}
 	}
+
+	$("#" + parentId + "NewCommentText").focus(); // set focus in the input field
 }
 
-function appendCommentElement(commentElement, parentId, atEnd) {
+function appendCommentElement(commentElement, parentId, isReply) {
 	//var commentElement = createCommentElement(data);
-	if (atEnd) {
-		$("#" + entityId + "NewCommentElement").before(commentElement);
+	if (!isReply) {
+		$("#" + parentId + "NewCommentElement").before(commentElement);
+		//$("#" + parentId + "CommentsList").append(commentElement);
 	} else {
 		//reply
 		var parentElement = $("#" + parentId + "CommentElement");
@@ -912,17 +932,13 @@ function appendCommentElement(commentElement, parentId, atEnd) {
 			current = next;
 		}
 		
-		//var nextSibling = parentElement.next(":not(.replyElement)");
-		//console.log("nextSibling found by api is " + nextSibling.attr("id"));
 		if (next.length == 0) {
 			//append at end
 			parentElement.parent().append(commentElement);
 		} else {
 			next.before(commentElement);
 		}
-	}
-	
-	//$("#" + contentTag + "CommentsList").append(commentElement);
+	}	
 }
 
 function createThumbnailElement(data, createLink) {
@@ -1016,13 +1032,13 @@ function createFeedList(id, list) {
 	return container;
 }
 
-function createCommentsList(id, list) {
-	var container = $("<div>", {id: id, class: "commentsList"});
+function createCommentsList(id, list) { //id is the entity id
+	var container = $("<div>", {id: id + "CommentsList", class: "commentsList"});
 
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
 
-		var commentElement = createCommentElement(data, entityId, false);
+		var commentElement = createCommentElement(data, id, false);
 		container.append(commentElement);
 
 		//passing the right array element to the callback by using the technique desribed at https://stackoverflow.com/questions/27364891/passing-additional-arguments-into-a-callback-function
@@ -1033,7 +1049,7 @@ function createCommentsList(id, list) {
 						var replyData = replyList[j];
 
 						var replyElement = createCommentElement(replyData, id, true);
-						appendCommentElement(replyElement, id);
+						appendCommentElement(replyElement, id, true);
 					}
 				}
 			});
@@ -1042,8 +1058,8 @@ function createCommentsList(id, list) {
 
 	if (user) {
 		//show new comment box if already logged in
-		var newCommentElement = createNewCommentElement(false, entityId);
-		appendNewCommentElement(newCommentElement, entityId, container, false);
+		var newCommentElement = createNewCommentElement(false, id);
+		appendNewCommentElement(newCommentElement, id, container, false);
 	} else {
 		var newCommentLink = $("<a>", {href: "/auth/", class: "btn btn-primary center", text: "Add new comment"});
 		container.append(newCommentLink);
@@ -1057,6 +1073,7 @@ function createCommentsList(id, list) {
 	Create and append a content container with the content.
 	appendTo: parent element to which to append this container.  The reason we pass this is so we can append
 	the content in the parent early and allow for jquery lookups for child elements (such as buttons when setting up click event handlers)
+	entityId: Entity ID
 	contentTag: a page-unique string identifier to identify this particular content.  This is prepended to relevant id names
 	viewData: the data that is used to determine the viewing order, and the defaults
 	{
@@ -1071,8 +1088,7 @@ function createCommentsList(id, list) {
 		getURLPopularitySort: "get url for sorting by popularity"
 	}
 **/
-function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sortOptions) {
-
+function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOptions, sortOptions) {
 	/** 
 		both viewOptions and sortOptions must contain at least one item each.
 	**/
@@ -1114,7 +1130,7 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 
 	var getURL = sortOptions[0].url;
 
-	refreshListAndUpdateContent(getURL, contentTag, viewOptions[0].type);
+	refreshListAndUpdateContent(getURL, entityId, contentTag, viewOptions[0].type);
 
 	$("#" + contentTag + "ViewGroup button").click(function() {
 		$("#" + contentTag + "ScrollableList").remove();
@@ -1131,8 +1147,10 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 			var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
 			container.append(scrollableList);
 		} else if (buttonID == "commentsViewButton") {
-			var commentsList = createCommentsList(contentTag + "CommentsList", list);
-			container.append(commentsList);
+			var commentsList = createCommentsList(entityId, list);
+			var commentsContainer = $("<div>", {id: entityId + "CommentsContainer"}).empty();
+			commentsContainer.append(commentsList);
+			container.append(commentsContainer);
 		}
 
 		//toggle state, and reset all other buttons to not active
@@ -1155,7 +1173,7 @@ function createAndAppendContentContainer(appendTo, contentTag, viewOptions, sort
 	});
 }
 
-function refreshListAndUpdateContent(getURL, contentTag, defaultViewType) {
+function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewType) {
 	$.getJSON(getURL, function(list) {
 
 		jQuery.data(document.body, contentTag + "List", list);
@@ -1182,8 +1200,10 @@ function refreshListAndUpdateContent(getURL, contentTag, defaultViewType) {
 				var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
 				$("#" + contentTag + "Container").append(scrollableList);
 			} else if (defaultViewType == "comments") {
-				var commentsList = createCommentsList(contentTag + "CommentsList", list);
-				$("#" + contentTag + "Container").append(commentsList);
+				var commentsList = createCommentsList(entityId, list);
+				var commentsContainer = $("<div>", {id: entityId + "CommentsContainer"}).empty();
+				commentsContainer.append(commentsList);
+				$("#" + contentTag + "Container").append(commentsContainer);
 			} else if (defaultViewType == "feed") {
 				var feedList = createFeedList(contentTag + "FeedList", list);
 				$("#" + contentTag + "Container").append(feedList);
