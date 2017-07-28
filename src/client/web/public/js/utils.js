@@ -117,9 +117,10 @@ function appendNewTab(tabGroupId, id, title) {
 	return div;
 }
 
-function createPostedBySectionElement(data) {
+function createPostHeaderElement(data) {
+	var postHeaderElement = $("<div>", {id: data.id + "PostHeader", class: "postHeaderSection"});
+
 	// Posted By Section
-	var postedBySection = $("<div>", {id: data.id + "PostedBySection", class: "postedBySection"});
 	var postedByDate = $("<span>", {id: "postedByDate", class: "postedByDate", text: "Posted " + formatDate(data.postedDate)});
 	var postedBy = $("<div>", {class: "postedBy"});
 	var postedByName = $("<span>", {id: "postedByName", class: "postedByName"});
@@ -151,9 +152,29 @@ function createPostedBySectionElement(data) {
 
 	table.append(tr2);
 
-	postedBySection.append(table);
+	postHeaderElement.append(table);
 
-	return postedBySection;
+	// Menu section
+
+	//if I'm the one who posted this item, show the menu option
+	if (user && user.id == data.postedByUser.id) {
+		var menu = $("<div>", {id: data.id + "ItemMenu", class: "dropdown itemDropdownMenu"});
+		var menuIcon = $("<span>", {class: "glyphicon glyphicon-chevron-down"});
+		var menuButton = $("<button>", {id: data.id + "ItemMenuButton", class: "dropdown-toggle itemDropdownButton", "data-toggle": "dropdown"}).append(menuIcon);
+		//var menuButton = $("<a>", {href: "#", id: data.id + "ItemMenuButton", class: "dropdown-toggle", "data-toggle" : data.id + "ItemMenu", text: user.displayName});
+		var menuList = $("<ul>", {id: data.id + "ItemMenuList", class: "dropdown-menu itemDropdownMenuList", role: "menu", "aria-labelledby" : data.id + "ItemMenuButton"});
+
+		var deleteIcon = $("<span>", {class: "glyphicon glyphicon-remove"});
+		var deleteButton = $("<button>", {id: data.id + "DeleteButton", class: "btn itemDropdownButton", type: "button"}).append(deleteIcon).append(" Delete Post");
+		menuList.append($("<li>").append(deleteButton));
+
+		menu.append(menuButton);
+		menu.append(menuList);
+
+		postHeaderElement.append(menu);
+	}
+
+	return postHeaderElement;
 }
 
 
@@ -417,7 +438,7 @@ function createTextElement(data) {
 function createMainElement(data, setupTimelapseView) {
 	var element = $("<div>", {id: data.id + "MainElement", class: "mainElement"});
 
-	element.append(createPostedBySectionElement(data));
+	element.append(createPostHeaderElement(data));
 	element.append(createMainImageElement(data));
 
 	if (data.caption) {
@@ -441,7 +462,7 @@ function createMainElement(data, setupTimelapseView) {
 function createScrollableElement(data) {
 	var element = $("<div>", {class: "scrollableElement"});
 
-	element.append(createPostedBySectionElement(data));
+	element.append(createPostHeaderElement(data));
 
 	var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data));
 	element.append(imageLink);
@@ -748,7 +769,7 @@ function createFeedElement(data) {
 		element.append(createActivitySectionElement(data));
 	}
 
-	element.append(createPostedBySectionElement(data));
+	element.append(createPostHeaderElement(data));
 
 	if (data.text) {
 		element.append(createTextSection(data));
@@ -823,16 +844,6 @@ function createCommentElement(data, parentId, isReply) {
 
 	table.append(tr);
 	element.append(table);
-
-	//handle reply button
-
-	/*	
-	element.append(createPostedBySectionElement(data));
-
-	element.append(createTextElement(data));
-
-	element.append(createSocialStatusSectionElement(data));
-	*/
 
 	return element;
 }
@@ -977,7 +988,7 @@ function createThumbnailElement(data, createLink) {
 	var element = $("<div>", {class: "thumbnailElement"});
 
 	if (data.postedDate) {
-		element.append(createPostedBySectionElement(data));
+		element.append(createPostHeaderElement(data));
 	}
 
 

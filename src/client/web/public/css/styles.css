@@ -195,10 +195,11 @@
 	font-size: 1.1em;
 }
 
-.postedBySection {
-	width: 100%;
+.postHeaderSection {
 	margin: 5px 20px;
 	padding: 10px 0px;
+	/* overflow: hidden; */
+	position: relative;
 }
 
 .postedBySectionOldRemove {
@@ -1025,3 +1026,25 @@ img {
     background-color: #5cb85c;
     color: white;
 }
+
+/************************** Item / Post **************************/
+
+.itemDropdownMenu {
+	
+	position: absolute;
+	top: 5px;
+	right: 5px;
+	
+	/* float: right; */
+}
+
+.itemDropdownMenuList2 {
+	position: relative;
+	z-index: 1;
+}
+
+.itemDropdownButton {
+	background: transparent;
+	border: 0px;
+}
+
