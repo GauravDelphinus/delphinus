@@ -805,8 +805,9 @@ img {
 /*********************** COMMENTS LIST ************************/
 
 .commentsList {
-	width: 70%;
+	width: 80%;
 	margin: 0 auto;
+	background-color: #e6f9ff;
 }
 
 .commentsTable {

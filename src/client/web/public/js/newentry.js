@@ -545,13 +545,6 @@ function showArtifactStep() {
 					data.id = a.id;
 					data.caption = a.name;
 					data.image = "/images/static/progress.gif";
-		
-					data.socialStatus = {};
-					data.socialStatus.numLikes = 121;
-					data.socialStatus.numShares = 23;
-					data.socialStatus.numComments = 45;
-
-					data.link = "/artifact/" + a.id;
 
 					var jsonObj = {};
 					constructJSONObject(jsonObj);

@@ -426,8 +426,10 @@ function createMainElement(data, setupTimelapseView) {
 
 	//var bottomBar = $("<div>", {id: data.id + "BottomBar", class: "bottomBar"});
 	
-	element.append(createSocialStatusSectionElement(data));
-	element.append(createSocialActionsSectionElement(data));
+	if (data.socialStatus) {
+		element.append(createSocialStatusSectionElement(data));
+		element.append(createSocialActionsSectionElement(data));
+	}
 
 	if (setupTimelapseView) {
 		element.append(createTimelapseView(data));
@@ -448,9 +450,12 @@ function createScrollableElement(data) {
 		element.append(createCaptionSectionElement(data));
 	}
 
-	element.append(createSocialStatusSectionElement(data));
-	element.append(createSocialActionsSectionElement(data));
-		//container for comments, if any
+	if (data.socialStatus) {
+		element.append(createSocialStatusSectionElement(data));
+		element.append(createSocialActionsSectionElement(data));
+	}
+	
+	//container for comments, if any
 	element.append(createCommentsContainer(data));
 
 	return element;
@@ -762,9 +767,10 @@ function createFeedElement(data) {
 		element.append(createCaptionSectionElement(data));
 	}
 
-	element.append(createSocialStatusSectionElement(data));
-
-	element.append(createSocialActionsSectionElement(data));
+	if (data.socialStatus) {
+		element.append(createSocialStatusSectionElement(data));
+		element.append(createSocialActionsSectionElement(data));
+	}
 
 	//container for comments, if any
 	element.append(createCommentsContainer(data));
@@ -987,9 +993,10 @@ function createThumbnailElement(data, createLink) {
 		element.append(link);
 	}
 
-	element.append(createSocialStatusSectionElement(data));
-
-	element.append(createSocialActionsSectionElement(data));
+	if (data.socialStatus) {
+		element.append(createSocialStatusSectionElement(data));
+		element.append(createSocialActionsSectionElement(data));
+	}
 
 	//container for comments, if any
 	var commentPopupHeader = $("<h2>").append("Comments");
