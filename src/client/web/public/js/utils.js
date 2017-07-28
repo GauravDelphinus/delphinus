@@ -520,11 +520,7 @@ function createSocialStatusSectionElement(data) {
 		socialStatus.append(commentButton);
 
 		commentButton.click(function() {
-			$.getJSON("/api/comments/?entityId=" + data.id + "&sortBy=reverseDate", function(list) {
-				var commentsList = createCommentsList(data.id, list);
-				$("#" + data.id + "CommentsContainer").empty().append(commentsList);
-				$("#" + data.id + "NewCommentText").focus(); // set focus in the input field
-			});
+			showHideCommentsList(data.id);
 		});
 	}
 	
@@ -568,6 +564,17 @@ function createSocialStatusSectionElement(data) {
 	return socialStatus;
 }
 
+function showHideCommentsList(parentId) {
+	if ($("#" + parentId + "CommentsContainer").is(":empty")) {
+		$.getJSON("/api/comments/?entityId=" + parentId + "&sortBy=reverseDate", function(list) {
+			var commentsList = createCommentsList(parentId, list);
+			$("#" + parentId + "CommentsContainer").empty().append(commentsList);
+			$("#" + parentId + "NewCommentText").focus(); // set focus in the input field
+		});
+	} else {
+		$("#" + parentId + "CommentsContainer").empty();
+	}
+}
 function createSocialActionsSectionElement(data) {
 	var socialActionsSection = $("<div>", {id: data.id + "SocialActionsSection", class: "socialActionsSection"});
 
@@ -633,11 +640,7 @@ function createSocialActionsSectionElement(data) {
 		socialActionsSection.append(commentButton);
 		
 		commentButton.click(function(e) {
-			$.getJSON("/api/comments/?entityId=" + data.id + "&sortBy=reverseDate", function(list) {
-				var commentsList = createCommentsList(data.id, list);
-				$("#" + data.id + "CommentsContainer").empty().append(commentsList);
-				$("#" + data.id + "NewCommentText").focus(); // set focus in the input field
-			});		
+			showHideCommentsList(data.id);	
 		});
 	}
 	
@@ -858,8 +861,13 @@ function createNewCommentElement(isReply, parentId) {
 		    	if (isReply) {
 		    		$("#" + parentId + "NewCommentElement").remove();
 		    	} else {
-		    		$("#" + parentId + "NewCommentText").prop("value", "");
-		    		$("#" + parentId + "NewCommentText").blur();
+		    		$("#" + parentId + "NewCommentText").prop("value", "").blur().focus();
+		    		
+		    		//update the numComments in the Social Status section
+		    		var numComments = parseInt($("#" + parentId + "NumComments").text());
+		    		numComments++;
+		    		$("#" + parentId + "NumComments").text(numComments);
+		    		$("#" + parentId + "CommentsButton").show();
 		    	}
 			})
 			.fail(function(jqXHR, textStatus, errorThrown) {
