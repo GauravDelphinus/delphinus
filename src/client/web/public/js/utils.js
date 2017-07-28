@@ -564,17 +564,35 @@ function createSocialStatusSectionElement(data) {
 	return socialStatus;
 }
 
+/**
+	Show or Hide the Comments List associated with the given Entity.
+	parentId - Entity id to which the list is attached (eg. Challenge, Entry, etc.)
+**/
 function showHideCommentsList(parentId) {
-	if ($("#" + parentId + "CommentsContainer").is(":empty")) {
+	//comments list is currently hidden, so fetch comments and show the list
+	if ($("#" + parentId + "CommentsContainer").is(":empty")) { 
 		$.getJSON("/api/comments/?entityId=" + parentId + "&sortBy=reverseDate", function(list) {
 			var commentsList = createCommentsList(parentId, list);
 			$("#" + parentId + "CommentsContainer").empty().append(commentsList);
 			$("#" + parentId + "NewCommentText").focus(); // set focus in the input field
 		});
+
+		//if we're showing the comments list on a popup, then show the popup
+		if ($("#" + parentId + "CommentsPopup").length) {
+			$("#" + parentId + "CommentsPopup").show();
+		}
+
+	//comments list is already show, so empty the container and hide it
 	} else {
 		$("#" + parentId + "CommentsContainer").empty();
+
+		//if we're showing the comments list on a popup, then hide the popup
+		if ($("#" + parentId + "CommentsPopup").length) {
+			$("#" + parentId + "CommentsPopup").hide();
+		}
 	}
 }
+
 function createSocialActionsSectionElement(data) {
 	var socialActionsSection = $("<div>", {id: data.id + "SocialActionsSection", class: "socialActionsSection"});
 
@@ -972,6 +990,46 @@ function createThumbnailElement(data, createLink) {
 	element.append(createSocialStatusSectionElement(data));
 
 	element.append(createSocialActionsSectionElement(data));
+
+	//container for comments, if any
+	var commentPopupHeader = $("<h2>").append("Comments");
+	var commentPopupBody = createCommentsContainer(data);
+	element.append(createPopupElement(data.id + "CommentsPopup", commentPopupHeader, null, commentPopupBody, function() {
+		showHideCommentsList(data.id);
+	}));
+
+	return element;
+}
+
+function createPopupElement(id, headerContent, footerContent, bodyContent, closeCallback) {
+	var element = $("<div>", {id: id, class: "modal"});
+	
+	var closeButton = $("<span>", {id: id + "PopupClose", class: "close"}).append("&times;");
+	closeButton.click(function() {
+		closeCallback();
+	});
+
+	var header = $("<div>", {class: "modal-header"}).append(closeButton);
+	if (headerContent) {
+		header.append(headerContent);
+	}
+
+	var body = $("<div>", {class: "modal-body"});
+	if (bodyContent) {
+		body.append(bodyContent);
+	}
+
+	var footer = $("<div>", {class: "modal-footer"});
+	if (footerContent) {
+		footer.append(footerContent);
+	}
+
+	var content = $("<div>", {class: "modal-content"});
+	content.append(header);
+	content.append(body);
+	content.append(footer);
+
+	element.append(content);
 
 	return element;
 }
