@@ -1048,3 +1048,10 @@ img {
 	border: 0px;
 }
 
+/************************* Likers Popup *************************/
+
+.likerImage {
+	height: 50px;
+	margin-right: 10px;
+	border-radius: 10%;
+}

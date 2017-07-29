@@ -21,6 +21,8 @@ var routes = function(db) {
                   		cypherQuery = "MATCH (followed:User {id: '" + req.query.followedId + "'})<-[:FOLLOWING]-(u:User)"
                   } else if (req.query.followingId) {
                   		cypherQuery = "MATCH (following:User {id: '" + req.query.followingId + "'})-[:FOLLOWING]->(u:User)"
+                  } else if (req.query.likedEntityId) {
+                  		cypherQuery = "MATCH ({id: '" + req.query.likedEntityId + "'})<-[:LIKES]-(u:User)";
                   } else { // return all users
                         cypherQuery = "MATCH (u:User) ";
                   }
@@ -37,6 +39,7 @@ var routes = function(db) {
                   		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
                   		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following); ";
 
+                  console.log("running cypherQuery: " + cypherQuery);
                   db.cypherQuery(cypherQuery, function(err, result){
                         if(err) throw err;
 

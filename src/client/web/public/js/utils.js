@@ -627,6 +627,13 @@ function createScrollableElement(data) {
 	//container for comments, if any
 	element.append(createCommentsContainer(data));
 
+	//container for likers list, if any
+	var likersPopupHeader = $("<h2>").append("Likers");
+	var likersPopupBody = createLikersContainer(data);
+	element.append(createPopupElement(data.id + "LikersPopup", likersPopupHeader, null, likersPopupBody, function() {
+		showHideLikersList(data.id);
+	}));
+
 	return element;
 }
 
@@ -672,6 +679,10 @@ function createSocialStatusSectionElement(data) {
 			likeButton.hide();
 		}
 		socialStatus.append(likeButton);
+
+		likeButton.click(function() {
+			showHideLikersList(data.id);
+		});
 	}
 	
 	if (data.socialStatus.shares) {
@@ -736,6 +747,29 @@ function createSocialStatusSectionElement(data) {
 	}
 
 	return socialStatus;
+}
+
+/**
+	Show the list of likes for this parentId, along with names of users and their 'Follow' status
+	w.r.t. to currently logged-in user
+**/
+function showHideLikersList(parentId) {
+	if ($("#" + parentId + "LikersContainer").is(":empty")) {
+		$.getJSON("/api/users/?likedEntityId=" + parentId + "&sortBy=reverseDate", function(list) {
+			var likersList = createLikersList(parentId, list);
+			$("#" + parentId + "LikersContainer").empty().append(likersList);
+		});
+
+		if ($("#" + parentId + "LikersPopup").length) {
+			$("#" + parentId + "LikersPopup").show();
+		}
+	} else {
+		$("#" + parentId + "LikersContainer").empty();
+
+		if ($("#" + parentId + "LikersPopup").length) {
+			$("#" + parentId + "LikersPopup").hide();
+		}
+	}
 }
 
 /**
@@ -883,38 +917,30 @@ function createSocialActionsSectionElement(data) {
 		var dataId = data.id;
 		followButton.click(function(e) {
 			if (user) {
-				var jsonObj = {};
-				if ($(this).hasClass("active")) {
-					jsonObj.followAction = "unfollow";
-				} else {
-					jsonObj.followAction = "follow";
+				var follow = false;
+				if (!$(this).hasClass("active")) {
+					follow = true;
 				}
 
-				$.ajax({
-					type: "PUT",
-					url: "/api/users/" + dataId + "/follow",
-		          dataType: "json", // return data type
-		          contentType: "application/json; charset=UTF-8",
-		          data: JSON.stringify(jsonObj)
-		      	})
-				.done(function(data, textStatus, jqXHR) {
-					var numFollowers = parseInt($("#" + dataId + "NumFollowers").text());
-		          	if (data.followStatus == "following") {
-		          		numFollowers ++;
-		          		$("#" + dataId + "NumFollowers").text(numFollowers);
-		          		$("#" + dataId + "FollowButton").addClass("active");
-		          		$("#" + dataId + "FollowersButton").show();
-		          	} else {
-		          		numFollowers --;
-		          		$("#" + dataId + "NumFollowers").text(numFollowers);
-		          		$("#" + dataId + "FollowButton").removeClass("active");
-		          		if (numFollowers <= 0) {
-		          			$("#" + dataId + "FollowersButton").hide();
-		          		}
-		          	}
-		      	})
-				.fail(function(jqXHR, textStatus, errorThrown) {
-					alert("some error was found, " + errorThrown);
+				sendFollow(dataId, follow, function (err, followResult) {
+					if (err) {
+						alert("some error was found " + err);
+					} else {
+						var numFollowers = parseInt($("#" + dataId + "NumFollowers").text());
+			          	if (followResult) {
+			          		numFollowers ++;
+			          		$("#" + dataId + "NumFollowers").text(numFollowers);
+			          		$("#" + dataId + "FollowButton").addClass("active");
+			          		$("#" + dataId + "FollowersButton").show();
+			          	} else {
+			          		numFollowers --;
+			          		$("#" + dataId + "NumFollowers").text(numFollowers);
+			          		$("#" + dataId + "FollowButton").removeClass("active");
+			          		if (numFollowers <= 0) {
+			          			$("#" + dataId + "FollowersButton").hide();
+			          		}
+			          	}
+					}
 				});
 			} else {
 				window.open("/auth", "_self");
@@ -923,6 +949,33 @@ function createSocialActionsSectionElement(data) {
 	}
 
 	return socialActionsSection;
+}
+
+function sendFollow(userId, follow, callback) {
+	var jsonObj = {};
+	if (follow) {
+		jsonObj.followAction = "follow";
+	} else {
+		jsonObj.followAction = "unfollow";
+	}
+
+	$.ajax({
+		type: "PUT",
+		url: "/api/users/" + userId + "/follow",
+      	dataType: "json", // return data type
+      	contentType: "application/json; charset=UTF-8",
+      	data: JSON.stringify(jsonObj)
+  	})
+	.done(function(data, textStatus, jqXHR) {
+      	if (data.followStatus == "following") {
+      		callback(0, true);
+      	} else {
+      		callback(0, false);
+      	}
+  	})
+	.fail(function(jqXHR, textStatus, errorThrown) {
+		callback(errorThrown);
+	});
 }
 
 function createFeedElement(data) {
@@ -959,7 +1012,20 @@ function createFeedElement(data) {
 	//container for comments, if any
 	element.append(createCommentsContainer(data));
 
+		//container for likers list, if any
+	var likersPopupHeader = $("<h2>").append("Likers");
+	var likersPopupBody = createLikersContainer(data);
+	element.append(createPopupElement(data.id + "LikersPopup", likersPopupHeader, null, likersPopupBody, function() {
+		showHideLikersList(data.id);
+	}));
+
 	return element;
+}
+
+function createLikersContainer(data) {
+	var container = $("<div>", {id: data.id + "LikersContainer"}).empty();
+
+	return container;
 }
 
 function createCommentsContainer(data) {
@@ -1179,6 +1245,13 @@ function createThumbnailElement(data, createLink) {
 		showHideCommentsList(data.id);
 	}));
 
+	//container for likers list, if any
+	var likersPopupHeader = $("<h2>").append("Likers");
+	var likersPopupBody = createLikersContainer(data);
+	element.append(createPopupElement(data.id + "LikersPopup", likersPopupHeader, null, likersPopupBody, function() {
+		showHideLikersList(data.id);
+	}));
+
 	return element;
 }
 
@@ -1275,6 +1348,58 @@ function createFeedList(id, list) {
 		var feedElement = createFeedElement(data);
 		container.append(feedElement);
 	}
+
+	return container;
+}
+
+function createLikersList(id, list) {
+	var container = $("<div>", {id: id + "LikersList", class: "likersList", "data-id": id});
+
+	var table = $("<table>");
+
+	for (var i = 0; i < list.length; i++) {
+		var data = list[i];
+		console.log("likers list, data is " + JSON.stringify(data));
+
+		var row = $("<tr>");
+		var userImage = $("<img>", {src: data.image, class: "likerImage"});
+
+		var userName = $("<span>", {class: "userName"}).append(data.caption);
+		var followButton = $("<button>", {type: "button", id: data.id + "FollowButton"});
+		if (data.socialStatus.follows.amFollowing) {
+			//already following
+			followButton.append($("<span>", {class: "glyphicon glyphicon-ok"}).append(" Following"));
+			followButton.attr("disabled", "disabled"); // no need to be clickable as already following
+		} else {
+			followButton.append($("<span>", {class: "glyphicon glyphicon-plus"}).append(" Follow"));
+			followButton.click((function(id) {
+				return function(e) {
+
+				sendFollow(id, true, function(err, followResult) {
+					if (err) {
+						alert("some error occured " + err);
+					} else {
+						if (followResult) {
+							//now following
+							var button = $("#" + id + "FollowButton");
+							button.empty();
+							button.append($("<span>", {class: "glyphicon glyphicon-ok"}).append(" Following"));
+							button.attr("disabled", "disabled"); // no need to be clickable as already following
+						}
+					}
+				});
+			}
+		})(data.id));
+		}
+
+		row.append($("<td>").append(userImage));
+		row.append($("<td>").append(userName));
+		row.append($("<td>").append(followButton));
+
+		table.append(row);
+	}
+
+	container.append(table);
 
 	return container;
 }
