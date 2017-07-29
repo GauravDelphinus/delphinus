@@ -324,6 +324,8 @@ function setupTabs(profileType) {
 
 	setupFollowersTab();
 
+	setupFollowingTab();
+
 	setupTabRedirection();
 }
 
@@ -395,17 +397,22 @@ function setupProfileTab(profileType) {
 
 function setupChallengesTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
-	createAndAppendContentContainer(tabDiv, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/challenges/?user=" + userInfo.id + "&sortBy=popularity"}]);
+	createAndAppendContentContainer(tabDiv, 0, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/challenges/?user=" + userInfo.id + "&sortBy=popularity"}]);
 }
 
 function setupEntriesTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
-	createAndAppendContentContainer(tabDiv, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/entries/?user=" + userInfo.id + "&sortBy=popularity"}]);
+	createAndAppendContentContainer(tabDiv, 0, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/entries/?user=" + userInfo.id + "&sortBy=popularity"}]);
 }
 
 function setupFollowersTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "followers", "Followers");
-	createAndAppendContentContainer(tabDiv, "followers", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followedId=" + userInfo.id}]);
+	createAndAppendContentContainer(tabDiv, 0, "followers", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followedId=" + userInfo.id}]);
+}
+
+function setupFollowingTab() {
+	var tabDiv = appendNewTab("mainTabGroup", "following", "Following");
+	createAndAppendContentContainer(tabDiv, 0, "following", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followingId=" + userInfo.id}]);
 }
 
 /*
