@@ -52,7 +52,15 @@ var routes = function(db) {
 						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
 						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
 						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(e) " +	
-						" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
+						" RETURN e, poster, like_count, comment_count, COUNT(like), (like_count + comment_count) AS popularity_count ";
+
+			if (req.query.sortBy) {
+				if (req.query.sortBy == "dateCreated") {
+					cypherQuery += " ORDER BY e.created DESC;";
+				} else if (req.query.sortBy == "popularity") {
+					cypherQuery += " ORDER BY popularity_count DESC;";
+				}
+			}
 
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;

@@ -7,7 +7,7 @@ $(document).ready(function(){
 });
 
 function setupMainItem() {
-	createAndAppendContentContainer($("#entries"), 0, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries?sortBy=date"}, {type: "popularity", url: "/api/entries?sortBy=popularity"}]);
+	createAndAppendContentContainer($("#entries"), 0, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries?sortBy=dateCreated"}, {type: "popularity", url: "/api/entries?sortBy=popularity"}]);
 
 }
 

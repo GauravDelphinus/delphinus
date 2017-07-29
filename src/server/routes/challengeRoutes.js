@@ -39,15 +39,18 @@ var routes = function(db) {
 						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
 						" WITH c, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
 						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
-						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like) ORDER BY c.created DESC;";
+						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), (like_count + comment_count + entry_count) AS popularity_count ";
 
+			if (req.query.sortBy) {
+				if (req.query.sortBy == "dateCreated") {
+					cypherQuery += " ORDER BY c.created DESC;";
+				} else if (req.query.sortBy == "popularity") {
+					cypherQuery += " ORDER BY popularity_count DESC;";
+				}
+			}
 
-			//console.log("Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
-
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {

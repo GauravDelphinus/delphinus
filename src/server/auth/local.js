@@ -56,6 +56,9 @@ module.exports = function () {
                         user.local.displayName = req.body.displayName;
                         user.displayName = req.body.displayName;
                         user.image = config.url.staticImages + config.name.defaultProfileImageName;
+
+                        // set last seen
+                    	user.lastSeen = (new Date()).getTime();
                         
                         //console.log("calling saveUser with user = " + JSON.stringify(user));
                         dataUtils.saveUser(user, function(err, user) {
@@ -126,6 +129,9 @@ module.exports = function () {
                         if (!user.image) {
                         	user.image = config.url.staticImages + config.name.defaultProfileImageName;
                         }
+
+                        // set last seen
+                    	user.lastSeen = (new Date()).getTime();
 
                         //console.log("calling saveUser with user = " + JSON.stringify(user));
                         dataUtils.saveUser(user, function(err) {

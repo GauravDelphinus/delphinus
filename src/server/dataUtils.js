@@ -906,6 +906,10 @@ module.exports = {
 					setValues.push(" u.location = '" + user.location + "'");
 				}
 
+				if (user.lastSeen) {
+					setValues.push(" u.last_seen = '" + user.lastSeen + "'");
+				}
+
 				if (user.google) {
 					if (user.google.id) {
 						setValues.push(" u.google_id = '" + user.google.id + "'");
@@ -1023,6 +1027,10 @@ module.exports = {
 
 				if (user.location) {
 					cypherQuery += ", location: '" + user.location + "'";
+				}
+
+				if (user.lastSeen) {
+					cypherQuery += ", last_seen: '" + user.lastSeen + "'";
 				}
 
 				if (user.google) {

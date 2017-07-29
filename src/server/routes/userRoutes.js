@@ -37,9 +37,15 @@ var routes = function(db) {
                   		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(e:Entry) " +
                   		" WITH u, numFollowers, challengesPosted, COLLECT(e) AS entriesPosted " +
                   		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
-                  		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following); ";
+                  		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following), (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
 
-                  console.log("running cypherQuery: " + cypherQuery);
+				if (req.query.sortBy) {
+					if (req.query.sortBy == "lastSeen") {
+						cypherQuery += " ORDER BY u.last_seen DESC;";
+					} else if (req.query.sortBy == "popularity") {
+						cypherQuery += " ORDER BY popularity_count DESC;";
+					}
+				}
                   db.cypherQuery(cypherQuery, function(err, result){
                         if(err) throw err;
 

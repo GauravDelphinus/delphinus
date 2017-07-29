@@ -1289,6 +1289,7 @@ function createPopupElement(id, headerContent, footerContent, bodyContent, close
 }
 
 function createGrid(id, list, numCols, allowHover, allowSelection, selectionCallback) {
+	console.log("createGrid called");
 	var table = $("<table>", {id: id, class: "gridTable"});
 
 	var tdWidth = 100 / numCols;
@@ -1559,11 +1560,12 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 			}
 		}
 
-		refreshListAndUpdateContent(getURL, contentTag);
+		refreshListAndUpdateContent(getURL, entityId, contentTag, viewOptions[0].type);
 	});
 }
 
 function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewType) {
+	console.log("refreshListAndUpdateContent, getURL is " + getURL + ", defaultViewType is " + defaultViewType);
 	$.getJSON(getURL, function(list) {
 
 		jQuery.data(document.body, contentTag + "List", list);
@@ -1572,7 +1574,8 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 		$("#" + contentTag + "GridTable").remove();
 
 		//var  = $("#" + contentTag + "ViewGroup button.active");
-
+		console.log("list is " + JSON.stringify(list));
+		console.log("#" + contentTag + "ViewGroup button.active - length is " + $("#" + contentTag + "ViewGroup button.active").length);
 		if ($("#" + contentTag + "ViewGroup button.active").length) {
 			var viewOptionsButtonID = $("#" + contentTag + "ViewGroup button.active").attr("id");
 			if (viewOptionsButtonID == "thumbnailViewButton") {

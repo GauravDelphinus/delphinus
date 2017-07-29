@@ -73,6 +73,9 @@ module.exports = function () {
                     	user.image = config.url.staticImages + config.name.defaultProfileImageName;
                     }
 
+                    // set last seen
+                    user.lastSeen = (new Date()).getTime();
+
                     dataUtils.saveUser(user, function(err, user) {
                         if (err) throw err;
 
