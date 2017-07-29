@@ -234,7 +234,8 @@ var routes = function(db) {
 				DELETE will permantently delete the specified node.  Call with Caution!
 			**/
 
-			var cypherQuery = "MATCH (c: Challenge {id : '" + req.params.challengeId + "'}) DELETE c;";
+			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'}) OPTIONAL MATCH (c)<-[:POSTED_IN*1..2]-(challengeComment:Comment) OPTIONAL MATCH (c)<-[:PART_OF]-(e:Entry) OPTIONAL MATCH(e)<-[:POSTED_IN*1..2]-(entryComment:Comment) DETACH DELETE challengeComment, entryComment, c, e;";
+
 			//console.log("DELETE received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;

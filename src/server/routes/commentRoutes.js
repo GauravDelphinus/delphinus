@@ -245,10 +245,10 @@ var routes = function(db) {
 		.delete(function(req, res){
 			
 			/**
-				DELETE will permantently delete the specified node.  Call with Caution!
+				DELETE will permantently delete the specified comment, along with all child comments.  Call with Caution!
 			**/
 
-			var cypherQuery = "MATCH (c: Comment {id: '" + req.params.commentId + "'}) DELETE c;";
+			var cypherQuery = "MATCH (c:Comment {id: '" + req.params.commentId + "'}) OPTIONAL MATCH (c)<-[:POSTED_IN*1..2]-(comment:Comment) detach delete comment, c;";
 
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;

@@ -167,6 +167,12 @@ function createPostHeaderElement(data) {
 		var deleteIcon = $("<span>", {class: "glyphicon glyphicon-remove"});
 		var deleteButton = $("<button>", {id: data.id + "DeleteButton", class: "btn itemDropdownButton", type: "button"}).append(deleteIcon).append(" Delete Post");
 		menuList.append($("<li>").append(deleteButton));
+		deleteButton.click(function() {
+			var result = confirm("Are you sure you want to delete this post permanently?");
+			if (result) {
+			    deleteItem(data);
+			}
+		});
 
 		menu.append(menuButton);
 		menu.append(menuList);
@@ -177,7 +183,136 @@ function createPostHeaderElement(data) {
 	return postHeaderElement;
 }
 
+/*
+	Delete the item from the server permanently.
+	Also, refresh client as required.
+*/
+function deleteItem(data) {
+	console.log("deleteItem, data is " + JSON.stringify(data));
+	var deleteURL;
+	if (data.type == "challenge") {
+		deleteURL = "/api/challenges/" + data.id;
+	} else if (data.type == "entry") {
+		deleteURL = "/api/entries/" + data.id;
+	} else if (data.type == "comment") {
+		deleteURL = "/api/comments/" + data.id;
+	} else {
+		// not supported
+		return;
+	}
 
+	var jsonObj = {};
+
+	$.ajax({
+		type: "DELETE",
+		url: deleteURL,
+		dataType: "json", // return data type
+		contentType: "application/json; charset=UTF-8",
+		data: JSON.stringify(jsonObj)
+	})
+	.done(function(retdata, textStatus, jqXHR) {
+		console.log("successfully deleted!");
+		refreshAfterDelete(data.id, data.type);
+	})
+	.fail(function(jqXHR, textStatus, errorThrown) {
+		alert("some error was found, " + errorThrown);
+	});
+}
+
+function alreadyExists(element) {
+	console.log("alreadyExists: element.id = " + element.id + ", this = " + this);	
+	return (element.id == this);
+}
+
+/**
+	Refresh the client after the specific item has been deleted from the server.
+	Figure out the best way to refresh. 
+**/
+function refreshAfterDelete(id, type) {
+	//figure out which page we're on
+	if (type == "comment") {
+		// Find the parent Id, and then refresh the list in place - Tested!
+		var parentId = $("#" + id + "CommentElement").closest(".commentsList").data("id");
+		refreshCommentsList(parentId);
+		return;
+	}
+
+	var currentPath = window.location.pathname;
+	
+	if (currentPath == "/") {
+		// Home page feed view
+		//find the parent feed element and delete, if found
+		var feedElement = $("#" + id + "FeedElement");
+		if (feedElement.length) {
+			feedElement.remove();
+		} else {
+			//last resort - reload page
+			location.reload();
+		}
+	} else if (currentPath == "/entries") {
+		// Entries page
+		refreshContainerViewAfterDelete(id, "entries");
+	} else if (currentPath == "/challenges") {
+		// Challenges page
+		refreshContainerViewAfterDelete(id, "challenges");
+	} else if (currentPath == "/users") {
+		// Users page
+		location.reload();
+	} else if (currentPath.startsWith("/challenge/")) {
+		// Specific Challenge Page
+		if (currentPath.startsWith("/challenge/" + id)) {
+			// Trying to delete the current challenge itself, so redirect to the challenges page
+			window.open("/challenges", "_self");
+		} else if (type == "entry") {
+			// Trying to delete an entry within a challenge
+			refreshContainerViewAfterDelete(id, "entries");
+		} else {
+			location.reload();
+		}
+	} else if (currentPath.startsWith("/entry/")) {
+		// Specific Entry Page
+		if (currentPath.startsWith("/entry/" + id)) {
+			// Trying to delete the current entry itself, so redirect to the entries page
+			window.open("/entries", "_self");
+		} else {
+			location.reload();
+		}
+	} else if (currentPath.startsWith("/user/")) {
+		// Specific User Page
+		location.reload();
+	} else {
+		// Default to home page
+		window.open("/", "_self");
+	}
+}
+
+/*
+	Refresh the container view after an element with id is deleted
+	contentTag is the tag identifying the container
+	The actual view inside the container coudl be thumbnail or filmstrip view
+*/
+function refreshContainerViewAfterDelete(id, contentTag) {
+	var list = jQuery.data(document.body, contentTag + "List");
+
+	//now remove the deleted item from the list and update it
+	var index = list.findIndex(alreadyExists, id);
+	if (index != -1) {
+		list.splice(index, 1);
+	}
+	jQuery.data(document.body, contentTag + "List", list);
+
+	//check if we're in thumbnail (grid) view or filmstrip (scrollable) view
+	if ($("#" + id + "ThumbnailElement").length) {
+		//we're in grid view
+		refreshThumbnailView(contentTag);
+	} else if ($("#" + id + "ScrollableElement").length) {
+		//we're in scrolalble/filmstrip view
+		//simply remove the element from the list :)
+		$("#" + id + "ScrollableElement").remove();
+	} else {
+		location.reload();
+	}
+}
 
 function createCaptionSectionElement(data) {
 	// Caption (if available)
@@ -188,22 +323,10 @@ function createCaptionSectionElement(data) {
 	return captionSection;
 }
 
-function createSocialStatusSectionSimple(data, parentId, isReply) {
+function createSocialStatusSectionComment(data, parentId, isReply) {
 	var socialStatusSection = $("<div>", {class: "socialStatusSectionSimple"});
 	var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "likeButtonSimple"}).append("Like");
-	var replyButton = $("<button>", {id: data.id + "ReplyButton", type: "button", class: "likeButtonSimple"}).append("Reply");
-	var likeIcon = $("<span>", {id: data.id + "LikeIcon", class: "glyphicon glyphicon-thumbs-up"});
-	var numLikes = $("<span>", {id: data.id + "NumLikes"}).append(" " + data.socialStatus.numLikes);
-
-	var postedDate = $("<span>", {class: "commentPostedDate", text: "" + formatDate(data.postedDate)});
-
 	socialStatusSection.append(likeButton);
-	socialStatusSection.append(replyButton);
-	socialStatusSection.append(likeIcon);
-	socialStatusSection.append(numLikes);
-	socialStatusSection.append("     ");
-	socialStatusSection.append(postedDate);
-
 	var restURL = "/api/comments/" + data.id + "/like";
 	if (user) {
 		$.getJSON(restURL, function(result) {
@@ -236,12 +359,37 @@ function createSocialStatusSectionSimple(data, parentId, isReply) {
 	
 	});
 
+	var replyButton = $("<button>", {id: data.id + "ReplyButton", type: "button", class: "likeButtonSimple"}).append("Reply");
+	socialStatusSection.append(replyButton);
 	replyButton.click(function(e) {
 		//for reply of reply, the parent is still the top comment
 		var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id));
 		appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), null, true);
 
 	});
+
+	// Allow delete for comments posted by currently logged-in user
+	console.log("user is " + JSON.stringify(user) + ", data is " + JSON.stringify(data));
+	if (user && user.id == data.postedByUser.id) {
+		var deleteButton = $("<button>", {id: data.id + "DeleteButton", type: "button", class: "likeButtonSimple"}).append("Delete");
+		socialStatusSection.append(deleteButton);
+		deleteButton.click(function(e) {
+			var result = confirm("Are you sure you want to delete this comment permanently?");
+			if (result) {
+			    deleteItem(data);
+			}
+		});
+	}
+
+	var likeIcon = $("<span>", {id: data.id + "LikeIcon", class: "glyphicon glyphicon-thumbs-up"});
+	socialStatusSection.append(likeIcon);
+
+	var numLikes = $("<span>", {id: data.id + "NumLikes"}).append(" " + data.socialStatus.numLikes);
+	socialStatusSection.append(numLikes);
+
+	var postedDate = $("<span>", {class: "commentPostedDate", text: "" + formatDate(data.postedDate)});
+	socialStatusSection.append("     ");
+	socialStatusSection.append(postedDate);
 
 	return socialStatusSection;
 }
@@ -460,7 +608,7 @@ function createMainElement(data, setupTimelapseView) {
 }
 
 function createScrollableElement(data) {
-	var element = $("<div>", {class: "scrollableElement"});
+	var element = $("<div>", {id: data.id + "ScrollableElement", class: "scrollableElement"});
 
 	element.append(createPostHeaderElement(data));
 
@@ -619,6 +767,21 @@ function showHideCommentsList(parentId) {
 	}
 }
 
+/**
+	Refresh the comments list attached to the given entity (parentId)
+	This assumes that the comments list is already showing to the user
+**/
+function refreshCommentsList(parentId) {
+	$.getJSON("/api/comments/?entityId=" + parentId + "&sortBy=reverseDate", function(list) {
+		var commentsList = createCommentsList(parentId, list);
+		$("#" + parentId + "CommentsContainer").empty().append(commentsList);
+		$("#" + parentId + "NewCommentText").focus(); // set focus in the input field
+
+		//also, update the counter
+		$("#" + parentId + "NumComments").text(list.length);
+	});
+}
+
 function createSocialActionsSectionElement(data) {
 	var socialActionsSection = $("<div>", {id: data.id + "SocialActionsSection", class: "socialActionsSection"});
 
@@ -763,7 +926,7 @@ function createSocialActionsSectionElement(data) {
 }
 
 function createFeedElement(data) {
-	var element = $("<div>", {class: "feedElement"});
+	var element = $("<div>", {id: data.id + "FeedElement", class: "feedElement"});
 
 	if (data.activity && data.activity.type != "recentlyPosted") {
 		element.append(createActivitySectionElement(data));
@@ -838,7 +1001,7 @@ function createCommentElement(data, parentId, isReply) {
 
 	tdRight.append("<br>");
 
-	tdRight.append(createSocialStatusSectionSimple(data, parentId, isReply));
+	tdRight.append(createSocialStatusSectionComment(data, parentId, isReply));
 
 	tr.append(tdRight);
 
@@ -1063,7 +1226,7 @@ function createGrid(id, list, numCols, allowHover, allowSelection, selectionCall
 
 		var data = list[i];
 
-		var td = $("<td>", {id: data.id, width: tdWidth + "%"});
+		var td = $("<td>", {id: data.id + "ThumbnailElement", width: tdWidth + "%"});
 		var element = createThumbnailElement(data, !allowSelection);
 
 		if (allowHover) {
@@ -1117,7 +1280,7 @@ function createFeedList(id, list) {
 }
 
 function createCommentsList(id, list) { //id is the entity id
-	var container = $("<div>", {id: id + "CommentsList", class: "commentsList"});
+	var container = $("<div>", {id: id + "CommentsList", class: "commentsList", "data-id" : id});
 
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
@@ -1151,6 +1314,24 @@ function createCommentsList(id, list) { //id is the entity id
 	
 
 	return container;
+}
+
+function refreshThumbnailView(contentTag) {
+	$("#" + contentTag + "GridTable").remove();
+
+	var list = jQuery.data(document.body, contentTag + "List");
+
+	var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+	$("#" + contentTag + "Container").append(grid);
+}
+
+function refreshFilmstripView(contentTag) {
+	$("#" + contentTag + "ScrollableList").remove();
+
+	var list = jQuery.data(document.body, contentTag + "List");
+
+	var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+	$("#" + contentTag + "Container").append(scrollableList);
 }
 
 /**

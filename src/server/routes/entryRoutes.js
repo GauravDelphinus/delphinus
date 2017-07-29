@@ -286,10 +286,12 @@ var routes = function(db) {
 			
 			/**
 				DELETE will permantently delete the specified node.  Call with Caution!
+				Deletes the comments linked to this Entry up to level 2 (we currently only support comments till level 2)
 			**/
 
-			var cypherQuery = "MATCH (e: Entry {id: '" + req.params.entryId + "'}) DELETE e;";
+			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'}) OPTIONAL MATCH (e)<-[:POSTED_IN*1..2]-(comment:Comment) detach delete comment, e;";
 
+			console.log("DELETE called on /api/entries, calling cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result) {
     			if(err) throw err;
 
