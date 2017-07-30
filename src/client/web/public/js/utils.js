@@ -1293,35 +1293,37 @@ function createGrid(id, list, numCols, allowHover, allowSelection, selectionCall
 	var table = $("<table>", {id: id, class: "gridTable"});
 
 	var tdWidth = 100 / numCols;
-	for (var i = 0; i < list.length; i++) {
-		var col = i % numCols;
-		var tr;
-		//var row = i / numCols;
+	if (numCols < 2) {
+		numCols = 2;
+	}
 
-		var data = list[i];
+	var i = 0;
+	var numRows = (list.length / numCols) + (((list.length % numCols) > 0) ? 1 : 0);
+	for (var row = 0; row < numRows; row ++) {
+		var tr = $("<tr>");
+		for (var col = 0; col < numCols; col ++) {
+			var td = $("<td>", {class: "gridCell", width: tdWidth + "%"});
+			if (i < list.length) {
+				var data = list[i++];
+				var element = createThumbnailElement(data, !allowSelection);
 
-		var td = $("<td>", {id: data.id + "ThumbnailElement", width: tdWidth + "%"});
-		var element = createThumbnailElement(data, !allowSelection);
+				if (allowHover) {
+					element.addClass("elementHover");
+				}
 
-		if (allowHover) {
-			element.addClass("elementHover");
+				if (allowSelection) {
+					element.click({id: data.id, element: element}, function(e) {
+						$("#" + id + " .thumbnailElement").removeClass("elementSelected"); //unselect all first
+						e.data.element.addClass("elementSelected"); //now make the selection
+						selectionCallback(e.data.id);
+					});
+				}
+
+				td.append(element);
+			}
+			tr.append(td);
 		}
-
-		if (allowSelection) {
-			element.click({id: data.id, element: element}, function(e) {
-				$("#" + id + " .thumbnailElement").removeClass("elementSelected"); //unselect all first
-				e.data.element.addClass("elementSelected"); //now make the selection
-				selectionCallback(e.data.id);
-			});
-		}
-
-		td.append(element);
-		
-		if (col == 0) {
-			tr = $("<tr>");
-			table.append(tr);
-		}
-		tr.append(td);
+		table.append(tr);
 	}
 
 	return table;
