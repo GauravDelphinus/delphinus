@@ -1,3 +1,62 @@
+/********************* GENERAL ***************/
+
+.button-full {
+	background-color: #9E1F63;
+	color: white;
+	font-size: 16px;
+}
+
+.button-full:hover {
+	background-color: #6B1044;
+	color: white;
+	font-size: 16px;
+}
+
+.button-line {
+	color: #9E1F63;
+	border: 1px;
+	border-color: #9E1F63;
+	background: transparent;
+	font-size: 15px;
+}
+
+.button-line:hover {
+	color: #6B1044;
+	border: 1px;
+	border-color: #6B1044;
+	background: transparent;
+	font-size: 15px;
+}
+
+.button-line.active {
+	color: #6B1044;
+	border: 1px;
+	border-color: #6B1044;
+	background: transparent;
+	font-size: 15px;
+}
+
+.button-empty {
+	color: black;
+	font-size: 15px;
+	background: transparent;
+	border: 0px;
+}
+
+.button-empty: hover {
+	color: #9E1F63;
+	background-color: #E2A1C7;
+	font-size: 15px;
+}
+
+.button-empty.active {
+	color: #9E1F63;
+}
+
+.text-script {
+	font-style: italic;
+}
+
 .body {
 	font-family: Source Sans Pro,Helvetica,Arial,sans-serif
 }
@@ -798,10 +857,12 @@ img {
 	height: 50px;
 }
 
+/*
 .btn {
 	font-size: 1.4em;
 	height: 50px;
 }
+*/
 
 /*********************** COMMENTS LIST ************************/
 
@@ -1054,4 +1115,10 @@ img {
 	height: 50px;
 	margin-right: 10px;
 	border-radius: 10%;
+}
+
+/************************ Social ***************************/
+
+.socialIcon {
+	height: 50px;
 }

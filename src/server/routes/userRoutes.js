@@ -15,8 +15,6 @@ var routes = function(db) {
                         cypherQuery = "MATCH (c:Challenge) WHERE (id(c) = " + req.query.challengeId + ") MATCH (c)-[POSTED_BY]->(u:User) ";
                   } else if (req.query.entryId) { // filter by user who posted the entry
                         cypherQuery = "MATCH (e:Entry) WHERE (id(e) = " + req.query.entryId + ") MATCH (e)-[POSTED_BY]->(u:User) ";
-                  } else if (req.user) { //return all users excluding this user
-                  		cypherQuery = "MATCH (u:User) WHERE u.id <> '" + req.user.id + "' ";
                   } else if (req.query.followedId) {
                   		cypherQuery = "MATCH (followed:User {id: '" + req.query.followedId + "'})<-[:FOLLOWING]-(u:User)"
                   } else if (req.query.followingId) {
@@ -46,6 +44,8 @@ var routes = function(db) {
 						cypherQuery += " ORDER BY popularity_count DESC;";
 					}
 				}
+
+				console.log("cypherQuery is " + cypherQuery);
                   db.cypherQuery(cypherQuery, function(err, result){
                         if(err) throw err;
 

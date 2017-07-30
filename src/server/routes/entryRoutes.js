@@ -39,8 +39,8 @@ var routes = function(db) {
 				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(poster:User) WHERE NOT ('" + req.query.excludeUser + "' IN poster.id) "
 			} else if (req.query.challengeId) {
 				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(poster:User) "
-			} else if (req.query.user) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + req.query.user + "'}) ";
+			} else if (req.query.postedBy) {
+				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + req.query.postedBy + "'}) ";
 			} else {
 				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User) ";
 			}

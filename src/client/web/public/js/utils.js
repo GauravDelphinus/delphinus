@@ -603,6 +603,20 @@ function createMainElement(data, setupTimelapseView) {
 	if (setupTimelapseView) {
 		element.append(createTimelapseView(data));
 	}
+
+	//container for likers list, if any
+	var likersPopupHeader = $("<h2>").append("Likers");
+	var likersPopupBody = createLikersContainer(data);
+	element.append(createPopupElement(data.id + "LikersPopup", likersPopupHeader, null, likersPopupBody, function() {
+		showHideLikersList(data.id);
+	}));
+
+	//container for Share Popup
+	var sharePopupHeader = $("<h2>").append("Share");
+	var sharePopupBody = createShareContainer(data);
+	element.append(createPopupElement(data.id + "SharePopup", sharePopupHeader, null, sharePopupBody, function() {
+		showHideSharePopup(data.id);
+	}));
 	
 	return element;
 }
@@ -632,6 +646,13 @@ function createScrollableElement(data) {
 	var likersPopupBody = createLikersContainer(data);
 	element.append(createPopupElement(data.id + "LikersPopup", likersPopupHeader, null, likersPopupBody, function() {
 		showHideLikersList(data.id);
+	}));
+
+	//container for Share Popup
+	var sharePopupHeader = $("<h2>").append("Share");
+	var sharePopupBody = createShareContainer(data);
+	element.append(createPopupElement(data.id + "SharePopup", sharePopupHeader, null, sharePopupBody, function() {
+		showHideSharePopup(data.id);
 	}));
 
 	return element;
@@ -747,6 +768,17 @@ function createSocialStatusSectionElement(data) {
 	}
 
 	return socialStatus;
+}
+
+function showHideSharePopup(parentId) {
+	var sharePopup = $("#" + parentId + "SharePopup");
+	if (sharePopup.length) {
+		if (sharePopup.is(":visible")) {
+			sharePopup.hide();
+		} else {
+			sharePopup.show();
+		}
+	}
 }
 
 /**
@@ -891,12 +923,19 @@ function createSocialActionsSectionElement(data) {
 		var shareButton = $("<button>", {id: data.id + "ShareButton", type: "button", class: "socialActionButton"});
 		shareButton.append($("<span>", {class: "glyphicon glyphicon-share-alt glyphiconAlign"})).append(" Share");
 		socialActionsSection.append(shareButton);
+
+		shareButton.click(function(e) {
+
+			showHideSharePopup(data.id);
+			
+			
+		});
 	}
 	
 	// ADD ENTRY BUTTON ---------------------------------
 	if (data.socialStatus.entries) {
-		var addEntryButton = $("<button>", {id: data.id + "AddEntryButton", type: "button", class: "socialActionButton"});
-		addEntryButton.append($("<span>", {class: "glyphicon glyphicon-flag glyphiconAlign"})).append(" Add Entry");
+		var addEntryButton = $("<button>", {id: data.id + "AddEntryButton", type: "button", class: "socialActionButton text-script"});
+		addEntryButton.append($("<span>", {class: "glyphicon glyphicon-flag glyphiconAlign"})).append(" Captionify");
 		socialActionsSection.append(addEntryButton);
 
 		addEntryButton.click(function(e) {
@@ -1019,7 +1058,61 @@ function createFeedElement(data) {
 		showHideLikersList(data.id);
 	}));
 
+	//container for Share Popup
+	var sharePopupHeader = $("<h2>").append("Share");
+	var sharePopupBody = createShareContainer(data);
+	element.append(createPopupElement(data.id + "SharePopup", sharePopupHeader, null, sharePopupBody, function() {
+		showHideSharePopup(data.id);
+	}));
+
 	return element;
+}
+
+function createShareContainer(data) {
+	var container = $("<div>", {id: data.id + "ShareContainer", class: "ShareContainer"});
+	var facebookCheck = $("<input>", {id: data.id + "FacebookCheckbox", type: "checkbox", value: "facebook"});
+	var twitterCheck = $("<input>", {id: data.id + "TwitterCheckbox", type: "checkbox", value: "twitter"});
+
+	var shareButton = $("<button>", {type: "button", class: "btn button-full"}).append("Share");
+	shareButton.click(function(e) {
+			if (facebookCheck.is(":checked")) {
+				console.log("facebook selected");
+				var jsonObj = {};
+				/* For Picture upload to Facebook
+				jsonObj.caption = data.caption;
+				jsonObj.url = "https://i.ytimg.com/vi/ObJgJizBFh8/maxresdefault.jpg";
+				*/
+
+				jsonObj.message = data.caption;
+				jsonObj.link = "http://timesofindia.indiatimes.com/india/congress-parades-gujarat-mlas-says-we-are-fighting-to-protect-democracy/articleshow/59832674.cms";
+				jsonObj.access_token = user.facebook.token;
+				console.log("jsonObj is " + JSON.stringify(jsonObj));
+
+
+				$.ajax({
+					type: "POST",
+					//url: "https://graph.facebook.com/v2.8/me/photos",
+					url: "https://graph.facebook.com/v2.8/me/feed",
+			      	dataType: "json", // return data type
+			      	contentType: "application/json; charset=UTF-8",
+			      	data: JSON.stringify(jsonObj)
+			  	})
+				.done(function(data, textStatus, jqXHR) {
+			      	alert("success!  data is " + JSON.stringify(data));
+			  	})
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					alert("failure! error is " + errorThrown);
+				});	
+			} else if (twitterCheck.is(":checked")) {
+				console.log("twitter selected");
+			}
+	});
+
+	container.append(facebookCheck).append($("<img>", {src: "/images/social/facebook_blue.png", class: "socialIcon"})).append($("<br>"));
+	container.append(twitterCheck).append($("<img>", {src: "/images/social/twitter_blue.png", class: "socialIcon"})).append($("<br>"));
+	container.append(shareButton);
+
+	return container;
 }
 
 function createLikersContainer(data) {
@@ -1250,6 +1343,13 @@ function createThumbnailElement(data, createLink) {
 	var likersPopupBody = createLikersContainer(data);
 	element.append(createPopupElement(data.id + "LikersPopup", likersPopupHeader, null, likersPopupBody, function() {
 		showHideLikersList(data.id);
+	}));
+
+	//container for Share Popup
+	var sharePopupHeader = $("<h2>").append("Share");
+	var sharePopupBody = createShareContainer(data);
+	element.append(createPopupElement(data.id + "SharePopup", sharePopupHeader, null, sharePopupBody, function() {
+		showHideSharePopup(data.id);
 	}));
 
 	return element;

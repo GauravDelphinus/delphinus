@@ -397,12 +397,12 @@ function setupProfileTab(profileType) {
 
 function setupChallengesTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
-	createAndAppendContentContainer(tabDiv, 0, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/challenges/?user=" + userInfo.id + "&sortBy=popularity"}]);
+	createAndAppendContentContainer(tabDiv, 0, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges/?postedBy=" + userInfo.id + "&sortBy=dateCreated"}, {type: "popularity", url: "/api/challenges/?postedBy=" + userInfo.id + "&sortBy=popularity"}]);
 }
 
 function setupEntriesTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
-	createAndAppendContentContainer(tabDiv, 0, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?user=" + userInfo.id + "&sortBy=date"}, {type: "popularity", url: "/api/entries/?user=" + userInfo.id + "&sortBy=popularity"}]);
+	createAndAppendContentContainer(tabDiv, 0, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?postedBy=" + userInfo.id + "&sortBy=dateCreated"}, {type: "popularity", url: "/api/entries/?postedBy=" + userInfo.id + "&sortBy=popularity"}]);
 }
 
 function setupFollowersTab() {

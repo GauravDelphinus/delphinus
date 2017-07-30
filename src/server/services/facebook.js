@@ -13,7 +13,7 @@ var Facebook = function (facebookKey, facebookSecret) {
     );
     var getImage = function(userKey, done) {
         oauth.get(
-      'https://graph.facebook.com/v2.3/me/picture?redirect=false&type=large',
+      'https://graph.facebook.com/v2.8/me/picture?redirect=false&type=large',
       userKey, //test user token
       function (e, results, res){
           //console.log('hi');
@@ -25,7 +25,7 @@ var Facebook = function (facebookKey, facebookSecret) {
     }
     var getFriends = function(userKey, done) {
         oauth.get(
-      'https://graph.facebook.com/v2.3/me/friends?redirect=false',
+      'https://graph.facebook.com/v2.8/me/friends?redirect=false',
       userKey, //test user token
       function (e, results, res){
           //console.log('hi');

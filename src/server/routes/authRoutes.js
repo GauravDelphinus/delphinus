@@ -151,7 +151,7 @@ var routes = function(db) {
             next();
         })
         .get(passport.authenticate('facebook', {
-            scope: ['email', 'user_friends']
+            scope: ['email', 'user_friends', 'publish_actions']
         }), function(req, res) {
         });
 

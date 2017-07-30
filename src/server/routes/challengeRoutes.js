@@ -28,9 +28,17 @@ var routes = function(db) {
 				effect will be an intersection.
 			**/
 
+			var cypherQuery = "";
+
 			var meId = (req.user) ? (req.user.id) : (0);
 
-			var cypherQuery = "MATCH (c:Challenge)-[r:POSTED_BY]->(poster:User) " +
+			if (req.query.postedBy) {
+				cypherQuery += "MATCH (c:Challenge)-[r:POSTED_BY]->(poster:User {id: '" + req.query.postedBy + "'}) ";
+			} else {
+				cypherQuery += "MATCH (c:Challenge)-[r:POSTED_BY]->(poster:User) ";
+			}
+
+			cypherQuery +=
 						" WITH c, poster " +
 						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
 						" WITH c, poster, COUNT(u2) AS like_count " + 
