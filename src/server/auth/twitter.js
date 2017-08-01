@@ -13,6 +13,7 @@ module.exports = function () {
         },
         function(req, token, tokenSecret, profile, done){
             //console.log("Twitter Profile is " + JSON.stringify(profile));
+            console.log("********* Twitter profile, token = " + token + ", tokenSecret = " + tokenSecret);
             var query = {};
             
             if (req.user) {

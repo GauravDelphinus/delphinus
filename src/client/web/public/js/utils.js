@@ -1075,13 +1075,21 @@ function createShareContainer(data) {
 
 	var shareButton = $("<button>", {type: "button", class: "btn button-full"}).append("Share");
 	shareButton.click(function(e) {
+				var jsonObj = {};
+				jsonObj.message = data.caption;
+				jsonObj.link = "localhost:8080" + data.link;
+
+				var postURL = "/api/social";
 			if (facebookCheck.is(":checked")) {
 				console.log("facebook selected");
+				postURL += "?target=facebook";
+				
+				/*
 				var jsonObj = {};
-				/* For Picture upload to Facebook
-				jsonObj.caption = data.caption;
-				jsonObj.url = "https://i.ytimg.com/vi/ObJgJizBFh8/maxresdefault.jpg";
-				*/
+				// For Picture upload to Facebook
+				//jsonObj.caption = data.caption;
+				//jsonObj.url = "https://i.ytimg.com/vi/ObJgJizBFh8/maxresdefault.jpg";
+				
 
 				jsonObj.message = data.caption;
 				jsonObj.link = "http://timesofindia.indiatimes.com/india/congress-parades-gujarat-mlas-says-we-are-fighting-to-protect-democracy/articleshow/59832674.cms";
@@ -1103,9 +1111,49 @@ function createShareContainer(data) {
 				.fail(function(jqXHR, textStatus, errorThrown) {
 					alert("failure! error is " + errorThrown);
 				});	
+				*/
 			} else if (twitterCheck.is(":checked")) {
 				console.log("twitter selected");
+				postURL += "?target=twitter";
+				/*
+				var jsonObj = {};
+				
+
+				jsonObj.status = "test";
+				jsonObj.access_token = user.twitter.token;
+				console.log("jsonObj is " + JSON.stringify(jsonObj));
+
+
+				$.ajax({
+					type: "POST",
+					//url: "https://graph.facebook.com/v2.8/me/photos",
+					url: "https://api.twitter.com/1.1/statuses/update.json",
+			      	dataType: "json", // return data type
+			      	contentType: "application/json; charset=UTF-8",
+			      	data: JSON.stringify(jsonObj)
+			  	})
+				.done(function(data, textStatus, jqXHR) {
+			      	alert("success!  data is " + JSON.stringify(data));
+			  	})
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					alert("failure! error is " + errorThrown);
+				});	
+				*/
 			}
+
+			$.ajax({
+					type: "POST",
+					url: postURL,
+			      	dataType: "json", // return data type
+			      	contentType: "application/json; charset=UTF-8",
+			      	data: JSON.stringify(jsonObj)
+			  	})
+				.done(function(data, textStatus, jqXHR) {
+			      	alert("success!  data is " + JSON.stringify(data));
+			  	})
+				.fail(function(jqXHR, textStatus, errorThrown) {
+					alert("failure! error is " + errorThrown);
+				});	
 	});
 
 	container.append(facebookCheck).append($("<img>", {src: "/images/social/facebook_blue.png", class: "socialIcon"})).append($("<br>"));
