@@ -158,6 +158,7 @@ function createPostHeaderElement(data) {
 
 	//if I'm the one who posted this item, show the menu option
 	if (user && user.id == data.postedByUser.id) {
+		/*
 		var menu = $("<div>", {id: data.id + "ItemMenu", class: "dropdown itemDropdownMenu"});
 		var menuIcon = $("<span>", {class: "glyphicon glyphicon-chevron-down"});
 		var menuButton = $("<button>", {id: data.id + "ItemMenuButton", class: "dropdown-toggle itemDropdownButton", "data-toggle": "dropdown"}).append(menuIcon);
@@ -176,11 +177,45 @@ function createPostHeaderElement(data) {
 
 		menu.append(menuButton);
 		menu.append(menuList);
+		*/
+		var menuIcon = $("<span>", {class: "glyphicon glyphicon-chevron-down"});
+		var menuButton = $("<button>", {id: data.id + "ItemMenuButton", class: "itemDropdownButton"}).append(menuIcon);
+		var menu = createMenu(menuButton);
+		var deleteIcon = $("<span>", {class: "glyphicon glyphicon-remove"});
+		var deleteButton = $("<button>", {id: data.id + "DeleteButton", class: "btn itemDropdownButton", type: "button"}).append(deleteIcon).append(" Delete Post");
+		
+		appendMenuItemButton(menu, deleteButton);
+
+		deleteButton.click(function() {
+			var result = confirm("Are you sure you want to delete this post permanently?");
+			if (result) {
+			    deleteItem(data);
+			}
+		});
 
 		postHeaderElement.append(menu);
 	}
 
 	return postHeaderElement;
+}
+
+function createMenu(menuButton) {
+	var menu = $("<div>", {class: "dropdown DropDown"});
+	$(menuButton).addClass("class", "dropdown-toggle");
+	$(menuButton).attr("data-toggle", "dropdown");
+	var menuList = $("<ul>", {class: "dropdown-menu", role: "menu", "aria-labelledby" : $(menuButton).attr("id")});
+
+	menu.append(menuButton);
+	menu.append(menuList);
+
+	return menu;
+}
+
+function appendMenuItemButton(menu, menuItemButton) {
+	var menuList = menu.find(".dropdown-menu");
+
+	//var button = $("<button>", {id: prefix + menuItemTag, class: "btn itemDropdownButton", type: "button"}).append(menuItemIcon).append(menuItemLabel);
+	menuList.append($("<li>").append(menuItemButton));
 }
 
 /*
@@ -611,13 +646,6 @@ function createMainElement(data, setupTimelapseView) {
 		showHideLikersList(data.id);
 	}));
 
-	//container for Share Popup
-	var sharePopupHeader = $("<h2>").append("Share");
-	var sharePopupBody = createShareContainer(data);
-	element.append(createPopupElement(data.id + "SharePopup", sharePopupHeader, null, sharePopupBody, function() {
-		showHideSharePopup(data.id);
-	}));
-	
 	return element;
 }
 
@@ -646,13 +674,6 @@ function createScrollableElement(data) {
 	var likersPopupBody = createLikersContainer(data);
 	element.append(createPopupElement(data.id + "LikersPopup", likersPopupHeader, null, likersPopupBody, function() {
 		showHideLikersList(data.id);
-	}));
-
-	//container for Share Popup
-	var sharePopupHeader = $("<h2>").append("Share");
-	var sharePopupBody = createShareContainer(data);
-	element.append(createPopupElement(data.id + "SharePopup", sharePopupHeader, null, sharePopupBody, function() {
-		showHideSharePopup(data.id);
 	}));
 
 	return element;
@@ -768,17 +789,6 @@ function createSocialStatusSectionElement(data) {
 	}
 
 	return socialStatus;
-}
-
-function showHideSharePopup(parentId) {
-	var sharePopup = $("#" + parentId + "SharePopup");
-	if (sharePopup.length) {
-		if (sharePopup.is(":visible")) {
-			sharePopup.hide();
-		} else {
-			sharePopup.show();
-		}
-	}
 }
 
 /**
@@ -922,14 +932,29 @@ function createSocialActionsSectionElement(data) {
 	if (data.socialStatus.shares) {
 		var shareButton = $("<button>", {id: data.id + "ShareButton", type: "button", class: "socialActionButton"});
 		shareButton.append($("<span>", {class: "glyphicon glyphicon-share-alt glyphiconAlign"})).append(" Share");
-		socialActionsSection.append(shareButton);
+		
+		if (user.facebook || user.twitter || user.google) {
+			var menu = createMenu(shareButton);
+			var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Facebook");
+			appendMenuItemButton(menu, facebookButton);
+			facebookButton.click(function() {
+				sendShare("facebook", data);
+			});
 
-		shareButton.click(function(e) {
-
-			showHideSharePopup(data.id);
+			var twitterButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Twitter");
+			appendMenuItemButton(menu, twitterButton);
+			twitterButton.click(function() {
+				sendShare("twitter", data);
+			});
 			
-			
-		});
+			socialActionsSection.append(menu);
+		} else {
+			// no social provider, so redirect to auth page
+			socialActionsSection.append(shareButton);
+			shareButton.click(function(e) {
+				window.open("/auth", "_self");
+			});
+		}
 	}
 	
 	// ADD ENTRY BUTTON ---------------------------------
@@ -988,6 +1013,40 @@ function createSocialActionsSectionElement(data) {
 	}
 
 	return socialActionsSection;
+}
+
+function sendShare(provider, data) {
+	var jsonObj = {};
+	jsonObj.message = data.caption;
+	jsonObj.link = "localhost:8080" + data.link;
+
+	var postURL = "/api/social";
+	if (provider == "facebook") {
+		postURL += "?target=facebook";
+	} else if (provider == "twitter") {
+		postURL += "?target=twitter";
+	}
+
+	$.ajax({
+		type: "POST",
+		url: postURL,
+      	dataType: "json", // return data type
+      	contentType: "application/json; charset=UTF-8",
+      	data: JSON.stringify(jsonObj)
+  	})
+	.done(function(data, textStatus, jqXHR) {
+      	showAlert("Posted successfully!", 2);
+  	})
+	.fail(function(jqXHR, textStatus, errorThrown) {
+		showAlert("There appears to be a problem.  Please try again later.", 2);
+	});	
+}
+
+/*
+	Good looking alert box that fades away after a certain number of seconds
+*/
+function showAlert(message, secondsToFade) {
+	alert(message);
 }
 
 function sendFollow(userId, follow, callback) {
@@ -1058,16 +1117,10 @@ function createFeedElement(data) {
 		showHideLikersList(data.id);
 	}));
 
-	//container for Share Popup
-	var sharePopupHeader = $("<h2>").append("Share");
-	var sharePopupBody = createShareContainer(data);
-	element.append(createPopupElement(data.id + "SharePopup", sharePopupHeader, null, sharePopupBody, function() {
-		showHideSharePopup(data.id);
-	}));
-
 	return element;
 }
 
+/*
 function createShareContainer(data) {
 	var container = $("<div>", {id: data.id + "ShareContainer", class: "ShareContainer"});
 	var facebookCheck = $("<input>", {id: data.id + "FacebookCheckbox", type: "checkbox", value: "facebook"});
@@ -1101,12 +1154,19 @@ function createShareContainer(data) {
 		});	
 	});
 
-	container.append(facebookCheck).append($("<img>", {src: "/images/social/facebook_blue.png", class: "socialIcon"})).append($("<br>"));
-	container.append(twitterCheck).append($("<img>", {src: "/images/social/twitter_blue.png", class: "socialIcon"})).append($("<br>"));
+	if (user.facebook) {
+		container.append(facebookCheck).append($("<img>", {src: "/images/social/facebook_blue.png", class: "socialIcon"})).append($("<br>"));
+	}
+	
+	if (user.twitter) {
+		container.append(twitterCheck).append($("<img>", {src: "/images/social/twitter_blue.png", class: "socialIcon"})).append($("<br>"));
+	}
+	
 	container.append(shareButton);
 
 	return container;
 }
+*/
 
 function createLikersContainer(data) {
 	var container = $("<div>", {id: data.id + "LikersContainer"}).empty();
@@ -1336,13 +1396,6 @@ function createThumbnailElement(data, createLink) {
 	var likersPopupBody = createLikersContainer(data);
 	element.append(createPopupElement(data.id + "LikersPopup", likersPopupHeader, null, likersPopupBody, function() {
 		showHideLikersList(data.id);
-	}));
-
-	//container for Share Popup
-	var sharePopupHeader = $("<h2>").append("Share");
-	var sharePopupBody = createShareContainer(data);
-	element.append(createPopupElement(data.id + "SharePopup", sharePopupHeader, null, sharePopupBody, function() {
-		showHideSharePopup(data.id);
 	}));
 
 	return element;

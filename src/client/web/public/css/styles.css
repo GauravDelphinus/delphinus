@@ -1090,6 +1090,9 @@ img {
 
 /************************** Item / Post **************************/
 
+.DropDown {
+	display: inline-block;
+}
 .itemDropdownMenu {
 	
 	position: absolute;
