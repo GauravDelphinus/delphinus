@@ -935,7 +935,7 @@ function createSocialActionsSectionElement(data) {
 		
 		if (user.facebook || user.twitter || user.google) {
 			var menu = createMenu(shareButton);
-			var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Facebook");
+			var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append($("<i>", {class: "fa fa-facebook", "aria-hidden" : "true"})).append("Share on Facebook");
 			appendMenuItemButton(menu, facebookButton);
 			facebookButton.click(function() {
 				sendShare("facebook", data);
