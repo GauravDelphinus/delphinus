@@ -1217,7 +1217,6 @@ module.exports = {
 }
 
 function createNodesForCategory(db, parentCategoryId, categoryId, categoryObj) {
-	console.log("createNodesForCategory, id = " + categoryId + ", obj = " + JSON.stringify(categoryObj));
 	if (categoryObj && categoryObj.displayName) {
 		var cypherQuery = "";
 		if (parentCategoryId != null) {
