@@ -1,5 +1,19 @@
 /********************* GENERAL ***************/
 
+.centerDisplay {
+	width: 60%;
+	margin: 100px auto 0;
+	border: 2px dotted gray;
+	border-radius: 20px;
+	text-align: center;
+	padding: 20px;
+}
+
+.centerDisplayTitle {
+	font-size: 1.4em;
+	font-weight: bold;
+}
+
 .button-full {
 	background-color: #9E1F63;
 	color: white;
