@@ -32,7 +32,7 @@ function extractImage(files, callback) {
             /*
             $("#challengeImage").prop("src", data);
             */
-            callback(data, e.target.result, escape(theFile.name));
+            callback(data, e.target.result, escape(theFile.name), theFile.type);
           }
           /// resizing code
 
@@ -1018,7 +1018,7 @@ function createSocialActionsSectionElement(data) {
 function sendShare(provider, data) {
 	var jsonObj = {};
 	jsonObj.message = data.caption;
-	jsonObj.link = "localhost:8080" + data.link;
+	jsonObj.link = data.link;
 
 	var postURL = "/api/social";
 	if (provider == "facebook") {

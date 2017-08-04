@@ -5,6 +5,7 @@ module.exports = function() {
 	var neo4j = require("node-neo4j");
 	var async = require('async');
 	var fs = require("fs");
+	var mime = require("mime");
 
 	var dataUtils = require("./dataUtils");
 	var imageProcessor = require("./imageProcessor");
@@ -124,7 +125,24 @@ module.exports = function() {
 
 	// 1 - Challenge Page
 	app.get("/challenge/:challengeId", function(req, res) {
-		res.render("challenge", {challengeId: req.params.challengeId, user: normalizeUser(req.user)});
+		// extract information for meta tags on the page
+		dataUtils.getMetaDataForChallenge(db, req.params.challengeId, function(err, data) {
+			var jsonObj = {
+				fbAppId : config.social.facebook.clientID,
+				challengeId : req.params.challengeId,
+				user: normalizeUser(req.user),
+				pageURL: data.pageURL,
+				pageTitle: data.pageTitle,
+				pageDescription: data.pageDescription,
+				imageURL: data.imageURL,
+				imageType: data.imageType,
+				imageWidth: data.imageWidth,
+				imageHeight: data.imageHeight,
+				authorName: data.authorName,
+				publisherName: data.publisherName
+			};
+			res.render("challenge", jsonObj);
+		});
 	});
 
 	// 2 - Challenge Image
@@ -147,42 +165,66 @@ module.exports = function() {
 			});
 		});
 		*/
-		res.sendFile(global.appRoot + config.path.challengeImages + req.params.imageName, function(err) {
+		var targetImage = global.appRoot + config.path.challengeImages + req.params.imageName;
+		res.setHeader("Content-Type", mime.lookup(targetImage));
+		res.sendFile(targetImage, function(err) {
 			if (err && err.code !== "ECONNABORTED") throw err;
 		});
 	});
 
 	// 3 - Entry Page
 	app.get("/entry/:entryId", function(req, res) {
-		//console.log("/entry/entryId, entry ID is " + req.params.entryId);
-		dataUtils.getChallengeForEntry(db, req.params.entryId, function (err, challengeId) {
-			if (err) throw err;
+		// extract information for meta tags on the page
+		dataUtils.getMetaDataForEntry(db, req.params.entryId, function(err, data) {
+			var jsonObj = {
+				fbAppId : config.social.facebook.clientID,
+				entryId : req.params.entryId,
+				challengeId: data.challengeId,
+				user: normalizeUser(req.user),
+				pageURL: data.pageURL,
+				pageTitle: data.pageTitle,
+				pageDescription: data.pageDescription,
+				imageURL: data.imageURL,
+				imageType: data.imageType,
+				imageWidth: data.imageWidth,
+				imageHeight: data.imageHeight,
+				authorName: data.authorName,
+				publisherName: data.publisherName
+			};
 
-			res.render("entry", {entryId: req.params.entryId, challengeId: challengeId, user: normalizeUser(req.user)});
+			res.render("entry", jsonObj);
 		});
-		
 	});
 
 	// 4 - Entry Image
-	app.get("/entries/images/:entryId", function(req, res) {
+	app.get("/entries/images/:imageName", function(req, res) {
 		// TODO - this would ultimately process the image before sending it.  For entries, it will probably
 		// not need to story the image itself, but the steps that need to be performed on the challenge image
 		//res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
 
-		dataUtils.checkCachedFile(global.appRoot + config.path.entryImages + req.params.entryId, function(err) {
+		
+		var targetImage = global.appRoot + config.path.entryImages + req.params.imageName;
+		dataUtils.checkCachedFile(targetImage, function(err) {
 			if (!err) {
 				//cache found, so just send that back
-				res.sendFile(global.appRoot + config.path.entryImages + req.params.entryId);
+				res.setHeader("Content-Type", mime.lookup(targetImage));
+				res.sendFile(targetImage);
 			} else {
 				//cache not found, do the whole loop and make sure to save to cache
-				dataUtils.getImageDataForEntry(db, req.params.entryId, function(err, imageData){
+
+				//imageName is supposed to be of the form "entryId.imageextension"
+				//extract the entryId
+				var entryId = req.params.imageName.replace(/\.[^/.]+$/, "");
+
+				dataUtils.getImageDataForEntry(db, entryId, function(err, imageData){
 					if (err) throw err;
 
-					var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image;
-					imageProcessor.applyStepsToImage(sourceImagePath, global.appRoot + config.path.entryImages + req.params.entryId, imageData.steps, function(err, image){
+					var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image; //path to challenge image
+					imageProcessor.applyStepsToImage(sourceImagePath, targetImage, imageData.steps, function(err, image){
 						if (err) throw err;
 
 						//console.log("calling res.sendFile with " + image);
+						res.setHeader("Content-Type", mime.lookup(image));
 						res.sendFile(image, function(err) {
 							if (err) {
 								if (err.code == "ECONNABORTED") {

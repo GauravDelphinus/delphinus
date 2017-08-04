@@ -6,9 +6,9 @@ var config = require('../config');
 module.exports = function () {
 
     passport.use(new GoogleStrategy({
-            clientID: '834949392857-spbcn54g31c0cdd764s092m1hd6va9hf.apps.googleusercontent.com',
-            clientSecret: '-FDBs0AqFgNR_zmdMbdlhVu2',
-            callbackURL: 'http://localhost:8080/auth/google/callback',
+            clientID: config.social.google.clientID,
+            clientSecret: config.social.google.clientSecret,
+            callbackURL: config.hostname + ":" + config.port + config.social.google.oauthCallback,
             passReqToCallback: true
         },
         function(req, accessToken, refreshToken, profile, done){
@@ -70,10 +70,13 @@ module.exports = function () {
                     user.displayName = user.google.displayName;
                 }
 
-                if (!user.image && user.google.images.length > 0) {
-                    user.image = user.google.images[0];
-                } else {
-					user.image = config.url.staticImages + config.name.defaultProfileImageName;
+                // if user.image is not already set, set it to the one coming from Google
+                if (!user.image) {
+                	if (user.google.images.length > 0) {
+	                    user.image = user.google.images[0];
+	                } else {
+						user.image = config.url.staticImages + config.name.defaultProfileImageName;
+					}
 				}
 
 				// set last seen

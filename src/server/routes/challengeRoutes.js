@@ -4,6 +4,8 @@ var path = require("path");
 var config = require("../config");
 var shortid = require("shortid");
 var dataUtils = require("../dataUtils");
+var gm = require("gm");
+var mime = require("mime");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -82,6 +84,7 @@ var routes = function(db) {
 			var fs = require('fs');
 			var imageDataURI = req.body.imageDataURI;
 			//var regex = /^data:.+\/(.+);base64,(.*)$/;
+			var imageType = req.body.imageType;
 
 			//var matches = imageDataURI.match(regex);
 			//var ext = matches[1].toLowerCase();
@@ -97,36 +100,31 @@ var routes = function(db) {
 			var buffer = new Buffer(data, 'base64');
 			var baseDir = global.appRoot + config.path.challengeImages;
 
-			//Create random name for new image file
-			tmp.tmpName({ dir: baseDir }, function _tempNameGenerated(err, fullpath) {
-    			if (err) throw err;
- 
- 				var name = path.parse(fullpath).base;
+			var id = shortid.generate();
+			var name = id + "." + mime.extension(imageType);
 
-    			fs.writeFileSync(fullpath, buffer);
-
-    			//console.log(JSON.stringify(req.user));
-    			
-    			var id = shortid.generate();
-
+			var fullpath = baseDir + name;
+			fs.writeFileSync(fullpath, buffer);
+			gm(fullpath).size(function(err, size) {
 				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) MATCH (category:Category {id: '" + req.body.category + "'}) CREATE (n:Challenge {" +
-							"id: '" + id + "'," +
-							"image : '" + name + "'," +
-							"created : '" + req.body.created + "'," + 
-							"title : '" + dataUtils.escapeSingleQuotes(req.body.caption) + "'" +
-							"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
-
-				//console.log("Running cypherQuery: " + cypherQuery);
-				
+					"id: '" + id + "'," +
+					"image : '" + name + "'," +
+					"image_type : '" + imageType + "'," + 
+					"image_width : '" + size.width + "'," +
+					"image_height : '" + size.height + "'," +
+					"created : '" + req.body.created + "'," + 
+					"title : '" + dataUtils.escapeSingleQuotes(req.body.caption) + "'" +
+					"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
+			
 				db.cypherQuery(cypherQuery, function(err, result){
-    				if(err) throw err;
+					if(err) throw err;
 
-    				//console.log(result.data); // delivers an array of query results
-
-    				res.json(result.data[0]);
+					res.json(result.data[0]);
 				});
-				
 			});
+
+
+		
 		});
 
 	challengeRouter.route("/:challengeId") // ROUTER FOR /api/challenges/<id>
@@ -333,3 +331,4 @@ var routes = function(db) {
 }
 
 module.exports = routes;
+

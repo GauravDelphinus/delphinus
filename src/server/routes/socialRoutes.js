@@ -1,6 +1,6 @@
 var express = require("express");
 var dataUtils = require("../dataUtils");
-
+var config = require("../config");
 
 var routes = function(db) {
 	var socialRouter = express.Router();
@@ -9,7 +9,7 @@ var routes = function(db) {
 	.post(function(req, res) {
 		if (req.query.target == "facebook") {
 			var facebook = require('../services/facebook')('1286014801445639', '81732e3d807f86c9099589f632897dce');
-			facebook.postUpdate(req.body.message, req.body.link, req.user.facebook.token, function(error, data) {
+			facebook.postUpdate(req.body.message, config.hostname + ":" + config.port + req.body.link, req.user.facebook.token, function(error, data) {
 				if (error) {
 	        		res.sendStatus(401);
 	        	} else {

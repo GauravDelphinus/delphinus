@@ -18,7 +18,6 @@ $(document).ready(function(){
 
 function setupCategories() {
 	$.getJSON('/api/categories/', function(data) {
-		console.log("data received is " + JSON.stringify(data));
 		for (var i = 0; i < data.length; i++) {
 			var option = $("<option>", {"value": data[i].id});
 			option.text(data[i].name);
@@ -52,11 +51,10 @@ function handleFileDropped(evt) {
     extractImage(evt.dataTransfer.files, handleFileSelected);
 }
 
-function handleFileSelected(data, path, title) {
-  $("#challengeImage").prop("src", data);
-
+function handleFileSelected(data, path, title, type) {
   $("#challengeImage").prop("src", path);
   $("#challengeImage").prop("title", title);
+  $("#challengeImage").data("imageType", type);
   $("#selectImage").hide();
 }
 
@@ -74,6 +72,7 @@ function handleFileSelect(evt) {
 function postChallenge() {
 	var jsonObj = {};
 	jsonObj.imageDataURI = $("#challengeImage").attr("src");
+	jsonObj.imageType = $("#challengeImage").data("imageType");
 	jsonObj.caption = $("#caption").val();
 	jsonObj.created = (new Date()).getTime();
 	jsonObj.category = $("#subCategoryList option:selected").val();

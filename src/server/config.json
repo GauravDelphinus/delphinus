@@ -1,5 +1,6 @@
 {
 	"port": "8080",
+	"hostname" : "http://localhost",
 	"request_token_url": "https://api.twitter.com/oauth/request_token",
 	"access_token_url": "https://api.twitter.com/oauth/access_token",
 	"authorize_url": "https://twitter.com/oauth/authorize",
@@ -13,6 +14,24 @@
 		"userImages" : "/data/users/images/",
 		"staticImages" : "../client/web/public/images/static/",
 		"entryImages" : "/data/entries/images/"
+	},
+	"social" : {
+
+		"facebook" : {
+			"clientID" : "1286014801445639",
+			"clientSecret" : "81732e3d807f86c9099589f632897dce",
+			"oauthCallback" : "/auth/facebook/callback"
+		},
+		"google" : {
+			"clientID" : "834949392857-spbcn54g31c0cdd764s092m1hd6va9hf.apps.googleusercontent.com",
+			"clientSecret" : "-FDBs0AqFgNR_zmdMbdlhVu2",
+			"oauthCallback" : "/auth/google/callback"
+		},
+		"twitter" : {
+			"clientID" : "7Y9T7UneSfQnZ3EvuhErbEpdP",
+			"clientSecret" : "n7lQJiOJFrTCpNzrsq1Vt6JI18hkEwfTB0r1iTRgozYi8w793f",
+			"oauthCallback" : "/auth/twitter/callback"
+		}
 	},
 	"url" : {
 		"challenge" : "/challenge/",
@@ -33,5 +52,8 @@
 	"businessLogic" : {
 		"minLikesForPopularity" : 2,
 		"minCommentsForPopularity" : 2
+	},
+	"branding" : {
+		"siteName" : "Captionify.com"
 	}
 }

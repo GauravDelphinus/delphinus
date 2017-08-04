@@ -6,9 +6,9 @@ var config = require('../config');
 module.exports = function () {
 
     passport.use(new TwitterStrategy({
-            consumerKey: '7Y9T7UneSfQnZ3EvuhErbEpdP',
-            consumerSecret: 'n7lQJiOJFrTCpNzrsq1Vt6JI18hkEwfTB0r1iTRgozYi8w793f',
-            callbackURL: 'http://localhost:8080/auth/twitter/callback',
+            consumerKey: config.social.twitter.clientID,
+            consumerSecret: config.social.twitter.clientSecret,
+            callbackURL: config.hostname + ":" + config.port + config.social.twitter.oauthCallback,
             passReqToCallback: true
         },
         function(req, token, tokenSecret, profile, done){
@@ -71,10 +71,13 @@ module.exports = function () {
                     user.displayName = user.twitter.displayName;
                 }
 
-                if (!user.image && user.twitter.images.length > 0) {
-                    user.image = user.twitter.images[0];
-                } else {
-					user.image = config.url.staticImages + config.name.defaultProfileImageName;
+                // if user.image is not already set, set it to the one coming from Twitter
+                if (!user.image) {
+                	if (user.twitter.images.length > 0) {
+	                    user.image = user.twitter.images[0];
+	                } else {
+						user.image = config.url.staticImages + config.name.defaultProfileImageName;
+					}
 				}
 
 				// set last seen

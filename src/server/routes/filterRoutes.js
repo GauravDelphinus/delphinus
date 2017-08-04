@@ -3,6 +3,7 @@ var dataUtils = require("../dataUtils");
 var fs = require("fs");
 var config = require("../config");
 var async = require("async");
+var mime = require("mime");
 
 var routes = function(db) {
 
@@ -40,7 +41,7 @@ var routes = function(db) {
 
 	filterRouter.route("/apply") // /api/filters/apply ROUTE
 	.post(function(req, res){
-		//console.log("/api/filters/apply received post, body is = " + JSON.stringify(req.body));
+		console.log("/api/filters/apply received post, body is = " + JSON.stringify(req.body));
 
 		var sourceImagePath;
 		var purgeImageAfterUse = false;
@@ -50,11 +51,12 @@ var routes = function(db) {
 			// find local path to the challenge's source image
 			purgeImageAfterUse = false;
 
-			dataUtils.getImageDataForChallenge(db, req.body.imageData, function(err, image){
-				//console.log("/api/filters/apply - Received req.body = ~~" + JSON.stringify(req.body) + "~~");
+			
+			dataUtils.getImageDataForChallenge(db, req.body.imageData, function(err, imageData){
 				if (err) throw err;
 
-				sourceImagePath = global.appRoot + config.path.challengeImages + image;
+				var image = req.body.imageData; //challengeId
+				sourceImagePath = global.appRoot + config.path.challengeImages + image + "." + mime.extension(imageData.imageType);
 
 	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
 	    			imageProcessor.applyStepsToImage(sourceImagePath, null, steps, function(err, imagePath){
@@ -72,7 +74,7 @@ var routes = function(db) {
 						fs.unlink(imagePath);
 					});
 	    		});
-			});
+    		});
 		} else if (req.body.imageSource == "url") {
 			// download the external web image into a local temp path, also set the "delete" flag to true
 			purgeImageAfterUse = true;

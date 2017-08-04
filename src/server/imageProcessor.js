@@ -577,7 +577,6 @@ function applySteps(sourceImage, targetImage, steps, next) {
 	image.size(function (err, size) {
 		if (err) throw err;
 
-		console.log("applying steps to image [" + targetImage + "]: " + JSON.stringify(steps));
 		if (steps.layouts) {
 			/**
 				After applying the layouts, if any, the image size coudl have changed.

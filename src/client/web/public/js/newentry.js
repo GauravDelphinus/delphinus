@@ -14,6 +14,12 @@ $(document).ready(function(){
 function setupMainItem() {
 	$.getJSON('/api/challenges/' + challengeId, function(result) {
 		$("#newentryimage").prop("src", result.image);
+		$("#newentryimage").data("imageType", result.imageType);
+	});
+
+	$("#newentryimage").on("load", function() {
+		$("#newentryimage").data("naturalWidth", this.naturalWidth);
+		$("#newentryimage").data("naturalHeight", this.naturalHeight);
 	});
 }
 
@@ -25,7 +31,6 @@ function setupNavigation() {
 	allWells.hide();
 
 	navListItems.click(function (e) {
-		console.log("navlist item clicked");
 		e.preventDefault();
 		var $target = $($(this).attr('href')),
 			$item = $(this);
@@ -748,6 +753,11 @@ function constructJSONObject(jsonObj) {
 	jsonObj.created = (new Date()).getTime();
 	jsonObj.caption = $("#bannerText").prop("value");
 
+	//extract image height and width, will be used to save in server for use for meta tags
+	jsonObj.imageHeight = $("#newentryimage").data("naturalHeight");
+	jsonObj.imageWidth = $("#newentryimage").data("naturalWidth");
+	jsonObj.imageType = $("#newentryimage").data("imageType");
+
 	jsonObj.steps = {}; // the main object that encapsulates filters, layouts, etc.
 
 	/// LAYOUT
@@ -974,12 +984,11 @@ function generateChanges(id, jsonObj, done) {
 }
 
 function applyChanges(done) {
-	//alert("applyChanges called");
 	var jsonObj = {};
 	
 
 	constructJSONObject(jsonObj);
-console.log(JSON.stringify(jsonObj));
+	console.log(JSON.stringify(jsonObj));
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -987,20 +996,12 @@ console.log(JSON.stringify(jsonObj));
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			//alert("success, data is " + jsonData);
-			//var jsonData = $.parseJSON(data);
-			//alert("image received: " + jsonData.image);
-
-			//$("#newentryimage").attr("src", jsonData.image);
 			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
-			//console.log("done is " + JSON.stringify(done));
 			if (done) {
 				done();
 			}
 		},
 		error: function(jsonData) {
-			//alert("error, data is " + jsonData);
-			//var jsonData = $.parseJSON(data);
 			alert("some error was found, " + jsonData.error);
 		}
 	});
@@ -1009,11 +1010,8 @@ console.log(JSON.stringify(jsonObj));
 function postEntry() {
 
 	var jsonObj = {};
-
-	//alert("contrast default value is " + $("#contrast").prop("defaultValue") + ", actual selected value is " + $("#contrast").val());
 	
 	constructJSONObject(jsonObj);
-	console.log("postEntry called, jsonObj is " + JSON.stringify(jsonObj));
 
 	$.ajax({
 		type: "POST",
@@ -1022,16 +1020,9 @@ function postEntry() {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-
-			//var jsonObj = JSON.parse(jsonData);
-
 			window.open("/entry/" + jsonData.id, "_self");
-
-			//$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
 		},
 		error: function(jsonData) {
-			//alert("error, data is " + jsonData);
-			//var jsonData = $.parseJSON(data);
 			alert("some error was found, " + jsonData.error);
 		}
 	});

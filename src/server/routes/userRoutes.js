@@ -45,7 +45,6 @@ var routes = function(db) {
 					}
 				}
 
-				console.log("cypherQuery is " + cypherQuery);
                   db.cypherQuery(cypherQuery, function(err, result){
                         if(err) throw err;
 
@@ -64,7 +63,6 @@ var routes = function(db) {
       userRouter.route("/")
       .put(function(req, res) {
             
-            //console.log("PUT on /api/users, body is " + JSON.stringify(req.body));
             var user = req.body.user;
 
             var index = -1;
@@ -105,7 +103,6 @@ var routes = function(db) {
 
       userRouter.route("/:followedId/follow") //api/users/follow
       .get(function(req, res) {
-      	//console.log("GET on /api/users/follow, req.user is " + JSON.stringify(req.user));
       	if (req.user && req.user.id && req.params.followedId) {
       		var cypherQuery = "MATCH (u1:User {id: '" + req.user.id + 
       			"'})-[:FOLLOWING]->(u2:User {id: '" + req.params.followedId + "'}) RETURN u1;";
@@ -123,7 +120,6 @@ var routes = function(db) {
       	}
       })
       .put(function(req, res) {
-      	console.log("PUT on /api/users/:followerId/follow, req.user is " + JSON.stringify(req.user) + ", followedId is " + req.params.followedId);
       	if (req.user && req.user.id && req.params.followedId) {
 
       		if (req.body.followAction == "follow") {

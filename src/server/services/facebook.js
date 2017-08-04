@@ -39,13 +39,15 @@ var Facebook = function (facebookKey, facebookSecret) {
     var postUpdate = function(message, link, userKey, done) {
     	var jsonObj = {
     		message: message,
-    		link: "http://www.google.com", //link,
+    		link: link,
     		access_token: userKey
     	};
+    	console.log("request.post to facebook, jsonObj = " + JSON.stringify(jsonObj));
     	request.post(
 		    "https://graph.facebook.com/v2.8/me/feed",
 		    { json: jsonObj },
 		    function (error, response, body) {
+		    	console.log("callback, error = " + error + ", response = " + JSON.stringify(response) + ", body = " + JSON.stringify(body));
 		        done(error, body);
 		    }
 		);

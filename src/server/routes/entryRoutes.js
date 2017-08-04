@@ -90,10 +90,12 @@ var routes = function(db) {
 							" MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
 							"id: '" + id + "', " + 
 							"caption: '" + dataUtils.escapeSingleQuotes(req.body.caption) + "', " + 
+							"image_height: '" + req.body.imageHeight + "', " +
+							"image_width: '" + req.body.imageWidth + "', " +
+							"image_type: '" + req.body.imageType + "', " +
 							"created : '" + req.body.created + "'" + 
 							"})-[:PART_OF]->(c), (u)<-[r:POSTED_BY]-(e) RETURN e;";
 			
-			console.log("POST called on /api/entries, req.body.steps is " + JSON.stringify(req.body.steps));
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) throw err;
 
@@ -177,13 +179,10 @@ var routes = function(db) {
 
 					cypherQuery += " return e;";
 
-					console.log("calling cypherQuery: " + cypherQuery);
-
 					db.cypherQuery(cypherQuery, function(err, result){
 						if(err) throw err;
 
 						if (result.data.length > 0) {
-							console.log("sending back to client: " + JSON.stringify(result.data[0]));
 							res.json(result.data[0]);
 						}
 					});
@@ -281,7 +280,6 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN e;";
 
-			//console.log("PATCH received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) throw err;
 
@@ -299,7 +297,6 @@ var routes = function(db) {
 
 			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'}) OPTIONAL MATCH (e)<-[:POSTED_IN*1..2]-(comment:Comment) detach delete comment, e;";
 
-			console.log("DELETE called on /api/entries, calling cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result) {
     			if(err) throw err;
 

@@ -5,9 +5,6 @@ $(document).ready(function(){
 	// userInfo - whose page we're looking at
 	// user - currently logged in user
 
-	console.log("user is " + JSON.stringify(user));
-	console.log("userInfo is " + JSON.stringify(userInfo));
-
 	var profileType = "public";
 	if (!user) {
 		profileType = "public"; // public profile, not logged in
@@ -122,7 +119,6 @@ function setupImageHandlers(profileType) {
           data: JSON.stringify(jsonObj)
       	})
 		.done(function(data, textStatus, jqXHR) {
-          //alert("successful, image is " + data.image);
           userInfo.image = data.image;
 
           cleanupAndHideCarousel();
@@ -269,16 +265,10 @@ function setupFollowSection(profileType) {
 
 	//calculate the number of followers
 	$.getJSON("/api/users/" + userInfo.id + "?numFollowers=true", function(result) {
-		console.log("result is " + JSON.stringify(result));
 		userInfo.numFollowers = result.numFollowers;
 
 		$("#numFollowers").text(userInfo.numFollowers);
 	});
-
-	
-
-	//$("#followLink").text("FOLLOW " + userInfo.displayName).attr("href", "/user/" + userInfo.id + "/follow");
-
 }
 
 function setupSocialSection(profileType) {
@@ -414,83 +404,6 @@ function setupFollowingTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "following", "Following");
 	createAndAppendContentContainer(tabDiv, 0, "following", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followingId=" + userInfo.id}]);
 }
-
-/*
-function setupChallengesTab(active) {
-	//get challenges posted by this user
-	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
-	var h3 = $("<h3>").text("Challenges posted by " + userInfo.displayName);
-	tabDiv.append(h3);
-
-	$.getJSON('/api/challenges/?user=' + userInfo.id, function(result) {
-					console.log("result is " + JSON.stringify(result));
-		for (var i = 0; i < result.length; i++) {
-			//console.log("result " + i + " is " + JSON.stringify(result[i]));
-			var c = result[i][0];
-			var u = result[i][1];
-
-
-			console.log("c is " + JSON.stringify(c));
-			console.log("u is " + JSON.stringify(u));
-			var data = {};
-			data.image = c.image;
-			data.postedDate = new Date(parseInt(c.created));
-			data.postedByUser = {};
-			data.postedByUser.id = u.id;
-			data.postedByUser.displayName = u.displayName;
-			data.postedByUser.image = u.image;
-
-			data.socialStatus = {};
-			data.socialStatus.numLikes = 121;
-			data.socialStatus.numShares = 23;
-			data.socialStatus.numComments = 45;
-
-			data.link = "/challenge/" + c.id;
-
-			var scrollableElement = createScrollableElement(data);
-			tabDiv.append(scrollableElement);
-		}
-	});
-}
-
-function setupEntriesTab() {
-	//get entries posted by this user
-	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
-	var h3 = $("<h3>").text("Entries posted by " + userInfo.displayName);
-	tabDiv.append(h3);
-
-	$.getJSON('/api/entries/?user=' + userInfo.id, function(result) {
-
-		for (var i = 0; i < result.length; i++) {
-			//console.log("result " + i + " is " + JSON.stringify(result[i]));
-			var e = result[i][0];
-			var u = result[i][1];
-			//console.log("e = " + JSON.stringify(e));
-			//console.log("u = " + JSON.stringify(u));
-			var data = {};
-			data.image = "/entries/images/" + e.id;
-			data.postedDate = new Date(parseInt(e.created));
-			data.postedByUser = {};
-			data.postedByUser.id = u.id;
-			data.postedByUser.displayName = u.displayName;
-			data.postedByUser.image = u.image;
-			data.link = "/entry/" + e.id;
-
-			data.socialStatus = {};
-			data.socialStatus.numLikes = 121;
-			data.socialStatus.numShares = 23;
-			data.socialStatus.numComments = 45;
-
-			if (e.caption) {
-				data.caption = e.caption;
-			}
-
-			var scrollableElement = createScrollableElement(data);
-			tabDiv.append(scrollableElement);
-		}
-	});
-}
-*/
 
 function setupAndShowCarousel() {
 	var alreadyAddedImages = [];

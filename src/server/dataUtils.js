@@ -3,6 +3,7 @@ var presets = require("./presets");
 var categories = require("./categories");
 var shortid = require("shortid");
 var fs = require("fs");
+var mime = require("mime");
 
 module.exports = {
 
@@ -128,30 +129,52 @@ module.exports = {
 	    });
 	},
 
-		/**
-		Given an Challenge ID, fetch the details of the image
-		that was posted for that challenge.  This includes:
-		- Name of the image (random name stored under /data/challenges/images/<name>)
-		- Image Type (as originally posted - eg. jpeg, gif, png, etc.)
-
-		Calls the function in the last argument with 3 parameters - err, imageName and imageType.
+	/**
+		Given an Challenge ID, fetch the meta data related to the challenge.
 	**/
-	getImageDataForChallenge : function(db, challengeId, next) {
-		var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) RETURN c.imageType, c.image;";
+	getMetaDataForChallenge : function(db, challengeId, next) {
+		var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'})-[:POSTED_BY]->(poster:User) RETURN c, poster;";
 
 		//console.log("cypherQuery is " + cypherQuery);
 		db.cypherQuery(cypherQuery, function(err, result){
-	    	if(err) throw err;
+	    	if(err || result.data.length <= 0) throw err;
 
-	    	//console.log("result is " + JSON.stringify(result));
-	    	var row = result.data[0].toString();
-	    	var dataArray = row.split(",");
-	    	var imageType = dataArray[0];
-	    	var image = dataArray[1];
+	    	var data = constructMetaData("challenge", result.data[0][0], result.data[0][1]);
 
-	    	next(0, image, imageType);
+		    next(0, data);
 		});
 
+	},
+
+	/**
+		Given an Entry ID, fetch the meta data related to the Entry.
+	**/
+	getMetaDataForEntry : function(db, entryId, next) {
+		var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) MATCH (c:Challenge)<-[:PART_OF]-(e)-[:POSTED_BY]->(poster:User) RETURN e, poster, c;";
+
+		db.cypherQuery(cypherQuery, function(err, result){
+	    	if(err || result.data.length <= 0) throw err;
+
+	    	var data = constructMetaData("entry", result.data[0][0], result.data[0][1], result.data[0][2]);
+
+		    next(0, data);
+		});
+
+	},
+
+	getImageDataForChallenge : function(db, challengeId, next) {
+		var fetchChallengeQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) RETURN c;"
+		db.cypherQuery(fetchChallengeQuery, function(err, output){
+	    	if (err) throw err;
+
+	    	var c = output.data[0];
+	    	var imageData = {};
+	    	imageData.imageType = c.image_type;
+	    	imageData.imageWidth = c.image_width;
+	    	imageData.imageHeight = c.image_height;
+
+	    	next(0, imageData);
+	    });
 	},
 
 	/**
@@ -169,13 +192,16 @@ module.exports = {
 	getImageDataForEntry : function(db, entryId, next) {
 
 		// First get the original image from the challenge
-		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.image;"
+		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id, c.image_type;"
+		console.log("query is " + fetchChallengeQuery);
 		db.cypherQuery(fetchChallengeQuery, function(err, output){
 	    		if (err) throw err;
 
-	    		//console.log(output.data);
-	    		var image = output.data[0];
-	    		var imagePath = global.appRoot + config.path.challengeImages + image;
+	    		console.log("output is " + JSON.stringify(output.data));
+	    		var imageType = output.data[0][1];
+	    		var image = output.data[0][0] + "." + mime.extension(imageType);
+	    		console.log("imageType is " + imageType);
+	    		//var imagePath = global.appRoot + config.path.challengeImages + image + "." + extractExtension(imageType);
 
 	    		//console.log("Image is " + imagePath);
 
@@ -854,7 +880,7 @@ module.exports = {
 	},
 
 	saveUser : function (user, next) {
-		//console.log("saveUser, user = " + JSON.stringify(user));
+		console.log("saveUser, user = " + JSON.stringify(user));
 		var query = {
 		};
 
@@ -891,6 +917,7 @@ module.exports = {
 					setValues.push(" u.displayName = '" + user.displayName + "'");
 				}
 				if (user.image) {
+					console.log("setting u.image in DB to user.image = " + user.image);
 					setValues.push(" u.image = '" + user.image + "'");
 				}
 
@@ -1171,11 +1198,13 @@ module.exports = {
 		}
 
 		if (entityType == "challenge") {
-			data.image = config.url.challengeImages + entity.image;
+			data.image = config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
+			data.imageType = entity.image_type;
 			data.caption = entity.title;
 			data.link = config.url.challenge + entity.id;
 		} else if (entityType == "entry") {
-			data.image = config.url.entryImages + entity.id
+			data.image = config.url.entryImages + entity.id + "." + mime.extension(entity.image_type);
+			data.imageType = entity.image_type;
 			data.caption = entity.caption;
 			data.link = config.url.entry + entity.id;
 		} else if (entityType == "user") {
@@ -1212,7 +1241,9 @@ module.exports = {
 		
 		//console.log("constructEntityData returning data = " + JSON.stringify(data));
 		return data;
-	}
+	},
+
+	
 	
 }
 
@@ -1239,4 +1270,33 @@ function createNodesForCategory(db, parentCategoryId, categoryId, categoryObj) {
 		});
 	}
 }
+
+function constructMetaData(entityType, entity, poster, challenge) {
+		var data = {
+			id : entity.id,
+		};
+
+		if (entityType == "challenge") {
+			data.imageURL = config.hostname + ":" + config.port + config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
+			data.pageTitle = entity.title;
+			data.pageURL = config.hostname + ":" + config.port + config.url.challenge + entity.id;
+			data.pageDescription = "Challenge posted at Captionify.com";
+			data.imageType = entity.image_type;
+		} else if (entityType == "entry") {
+			data.imageURL = config.hostname + ":" + config.port + config.url.entryImages + entity.id  + "." + mime.extension(entity.image_type);
+			data.pageTitle = entity.caption;
+			data.pageURL = config.hostname + ":" + config.port + config.url.entry + entity.id;
+			data.pageDescription = "Entry posted at Captionify.com";
+			data.challengeId = challenge.id;
+			data.imageType = challenge.image_type; //entry retains format of the challenge
+		}
+
+		
+		data.imageWidth = entity.image_width;
+		data.imageHeight = entity.image_height;
+		data.authorName = poster.displayName;
+		data.publisherName = config.branding.siteName;
+
+		return data;
+	}
 
