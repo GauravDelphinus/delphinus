@@ -1108,13 +1108,14 @@ img {
 .DropDown {
 	display: inline-block;
 }
+
 .itemDropdownMenu {
-	
+	/*
 	position: absolute;
 	top: 5px;
 	right: 5px;
-	
-	/* float: right; */
+	*/
+	float: right; 
 }
 
 .itemDropdownMenuList2 {

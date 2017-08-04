@@ -120,6 +120,33 @@ function appendNewTab(tabGroupId, id, title) {
 function createPostHeaderElement(data) {
 	var postHeaderElement = $("<div>", {id: data.id + "PostHeader", class: "postHeaderSection"});
 
+	// IMPORTANT: Menu should be the FIRST Child, because it needs to be displayed at top right
+	// using float: right (see https://stackoverflow.com/a/33503177/7657145)
+	
+	// Menu section
+
+	//if I'm the one who posted this item, show the menu option
+	if (user && user.id == data.postedByUser.id) {
+		var menuIcon = $("<span>", {class: "glyphicon glyphicon-chevron-down"});
+		var menuButton = $("<button>", {id: data.id + "ItemMenuButton", class: "itemDropdownButton"}).append(menuIcon);
+		var menu = createMenu(menuButton);
+		menu.addClass("itemDropdownMenu");
+		var deleteIcon = $("<span>", {class: "glyphicon glyphicon-remove"});
+		var deleteButton = $("<button>", {id: data.id + "DeleteButton", class: "btn itemDropdownButton", type: "button"}).append(deleteIcon).append(" Delete Post");
+		
+		appendMenuItemButton(menu, deleteButton);
+
+		deleteButton.click(function() {
+			var result = confirm("Are you sure you want to delete this post permanently?");
+			if (result) {
+			    deleteItem(data);
+			}
+		});
+
+		postHeaderElement.append(menu);
+	}
+
+ 	
 	// Posted By Section
 	var postedByDate = $("<span>", {id: "postedByDate", class: "postedByDate", text: "Posted " + formatDate(data.postedDate)});
 	var postedBy = $("<div>", {class: "postedBy"});
@@ -129,9 +156,6 @@ function createPostHeaderElement(data) {
 	postedByImage.prop("src", data.postedByUser.image);
 	postedBy.append(postedByName);
 	postedBy.append(postedByImage);
-
-	//postedBySection.append(postedByDate);
-	//postedBySection.append(postedBy);
 
 	var table = $("<table>");
 	var tr1 = $("<tr>");
@@ -154,47 +178,6 @@ function createPostHeaderElement(data) {
 
 	postHeaderElement.append(table);
 
-	// Menu section
-
-	//if I'm the one who posted this item, show the menu option
-	if (user && user.id == data.postedByUser.id) {
-		/*
-		var menu = $("<div>", {id: data.id + "ItemMenu", class: "dropdown itemDropdownMenu"});
-		var menuIcon = $("<span>", {class: "glyphicon glyphicon-chevron-down"});
-		var menuButton = $("<button>", {id: data.id + "ItemMenuButton", class: "dropdown-toggle itemDropdownButton", "data-toggle": "dropdown"}).append(menuIcon);
-		//var menuButton = $("<a>", {href: "#", id: data.id + "ItemMenuButton", class: "dropdown-toggle", "data-toggle" : data.id + "ItemMenu", text: user.displayName});
-		var menuList = $("<ul>", {id: data.id + "ItemMenuList", class: "dropdown-menu itemDropdownMenuList", role: "menu", "aria-labelledby" : data.id + "ItemMenuButton"});
-
-		var deleteIcon = $("<span>", {class: "glyphicon glyphicon-remove"});
-		var deleteButton = $("<button>", {id: data.id + "DeleteButton", class: "btn itemDropdownButton", type: "button"}).append(deleteIcon).append(" Delete Post");
-		menuList.append($("<li>").append(deleteButton));
-		deleteButton.click(function() {
-			var result = confirm("Are you sure you want to delete this post permanently?");
-			if (result) {
-			    deleteItem(data);
-			}
-		});
-
-		menu.append(menuButton);
-		menu.append(menuList);
-		*/
-		var menuIcon = $("<span>", {class: "glyphicon glyphicon-chevron-down"});
-		var menuButton = $("<button>", {id: data.id + "ItemMenuButton", class: "itemDropdownButton"}).append(menuIcon);
-		var menu = createMenu(menuButton);
-		var deleteIcon = $("<span>", {class: "glyphicon glyphicon-remove"});
-		var deleteButton = $("<button>", {id: data.id + "DeleteButton", class: "btn itemDropdownButton", type: "button"}).append(deleteIcon).append(" Delete Post");
-		
-		appendMenuItemButton(menu, deleteButton);
-
-		deleteButton.click(function() {
-			var result = confirm("Are you sure you want to delete this post permanently?");
-			if (result) {
-			    deleteItem(data);
-			}
-		});
-
-		postHeaderElement.append(menu);
-	}
 
 	return postHeaderElement;
 }
@@ -1435,7 +1418,6 @@ function createPopupElement(id, headerContent, footerContent, bodyContent, close
 }
 
 function createGrid(id, list, numCols, allowHover, allowSelection, selectionCallback) {
-	console.log("createGrid called");
 	var table = $("<table>", {id: id, class: "gridTable"});
 
 	var tdWidth = 100 / numCols;
@@ -1508,7 +1490,6 @@ function createLikersList(id, list) {
 
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
-		console.log("likers list, data is " + JSON.stringify(data));
 
 		var row = $("<tr>");
 		var userImage = $("<img>", {src: data.image, class: "likerImage"});
@@ -1713,7 +1694,6 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 }
 
 function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewType) {
-	console.log("refreshListAndUpdateContent, getURL is " + getURL + ", defaultViewType is " + defaultViewType);
 	$.getJSON(getURL, function(list) {
 
 		jQuery.data(document.body, contentTag + "List", list);
@@ -1721,9 +1701,6 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 		$("#" + contentTag + "ScrollableList").remove();
 		$("#" + contentTag + "GridTable").remove();
 
-		//var  = $("#" + contentTag + "ViewGroup button.active");
-		console.log("list is " + JSON.stringify(list));
-		console.log("#" + contentTag + "ViewGroup button.active - length is " + $("#" + contentTag + "ViewGroup button.active").length);
 		if ($("#" + contentTag + "ViewGroup button.active").length) {
 			var viewOptionsButtonID = $("#" + contentTag + "ViewGroup button.active").attr("id");
 			if (viewOptionsButtonID == "thumbnailViewButton") {
