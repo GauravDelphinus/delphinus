@@ -7,7 +7,11 @@ $(document).ready(function(){
 });
 
 function setupMainItem() {
-	createAndAppendContentContainer($("#challenges"), 0, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges?sortBy=dateCreated"}, {type: "popularity", url: "/api/challenges?sortBy=popularity"}]);
+	var appendCategory = "";
+	if (query && query.category) {
+		appendCategory = "&category=" + query.category;
+	}
+	createAndAppendContentContainer($("#challenges"), 0, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges?sortBy=dateCreated" + appendCategory}, {type: "popularity", url: "/api/challenges?sortBy=popularity" + appendCategory}]);
 
 }
 

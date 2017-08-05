@@ -148,7 +148,6 @@ function createPostHeaderElement(data) {
 
  	
 	// Posted By Section
-	var postedByDate = $("<span>", {id: "postedByDate", class: "postedByDate", text: "Posted " + formatDate(data.postedDate)});
 	var postedBy = $("<div>", {class: "postedBy"});
 	var postedByName = $("<span>", {id: "postedByName", class: "postedByName"});
 	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName}));
@@ -171,6 +170,14 @@ function createPostHeaderElement(data) {
 
 	var tr2 = $("<tr>");
 	var postedDateTd = $("<td>");
+	var postedByDate = $("<span>", {id: "postedByDate", class: "postedByDate", text: "Posted " + formatDate(data.postedDate)});
+	postedByDate.append(postedByDate);
+
+	if (data.categoryID && data.categoryName) {
+		var postedCategory = $("<a>", {href: "/challenges?category=" + data.categoryID}).append(data.categoryName);
+		postedByDate.append(" under ").append(postedCategory);
+	}
+	
 	postedDateTd.append(postedByDate);
 	tr2.append(postedDateTd);
 
@@ -1745,4 +1752,26 @@ function setupTabRedirection() {
 	//var element = $(".nav-tabs").get(0);
 	var element = document.getElementById("mainTabGroup");
 	element.scrollIntoView(true);
+}
+
+/**
+	Update the given sidebar with the given list of items
+	Each item in the list is an object of form {type: "link or button or separator", name: "Name", link: "some link"}
+**/
+function updateSidebar(id, heading, list) {
+	console.log("updateSidebar, received list = " + JSON.stringify(list));
+	var sidebar = $("#" + id);
+	$(sidebar).empty();
+
+	//set the title
+	$(sidebar).append($("<span>", {class: "sidebarHeading"}).append(heading));
+
+	//now insert items
+	for (var i = 0; i < list.length; i++) {
+		var item = list[i];
+		console.log("item is " + JSON.stringify(item));
+		if (item.type && item.type == "link") {
+			$(sidebar).append($("<a>", {class: "sidebarLink", href: item.link}).append(item.name));
+		}
+	}
 }

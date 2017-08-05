@@ -112,7 +112,7 @@ module.exports = function() {
 	});
 
 	app.get("/challenges", function(req, res) {
-		res.render("challenges", {user: normalizeUser(req.user)});
+		res.render("challenges", {user: normalizeUser(req.user), query: req.query});
 	});
 
 	app.get("/entries", function(req, res) {
@@ -327,7 +327,7 @@ module.exports = function() {
 		Serve static files in public directory
 	**/
 	app.use(express.static(__dirname + '/public'));
-
+	
 	// Finally, start listening for requests
 	app.listen(config.port, function() {
 		console.log("Listening on port " + config.port);

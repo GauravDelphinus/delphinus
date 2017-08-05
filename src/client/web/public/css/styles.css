@@ -1141,3 +1141,28 @@ img {
 .socialIcon {
 	height: 50px;
 }
+
+
+/************************** Side bar ***************************/
+
+.sidebar {
+	width: 100%;
+	border: 1px dotted gray;
+	border-radius: 5px;
+	padding: 5px;
+}
+
+.sidebarHeading {
+	font-size: 1.6em;
+	font-weight: bold;
+	color: #9E1F63;
+}
+
+.sidebarLink {
+	font-size: 1.4em;
+	display: block;
+}
+
+.sidebarSeparator {
+	
+}

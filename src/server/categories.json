@@ -1,32 +1,26 @@
 {
 	"arts" : {
-		"displayName" : "Arts",
-		"subCategories" : {
-				"fineArt" : {
-					"displayName" : "Fine Arts"
-				},
-				"modernArt" : {
-					"displayName" : "Modern Art"
-				}
-			}
+		"displayName" : "Arts"
 	},
 	"family" : {
-		"displayName" : "Family",
-		"subCategories" : {
-			"friends" : {
-				"displayName" : "Friends"
-			},
-			"relatives" : {
-				"displayName" : "Relatives",
-				"subCategories" : {
-					"closeRelatives" : {
-						"displayName" : "Close Relatives"
-					},
-					"distantRelatives" : {
-						"displayName" : "Distant Relatives"
-					}
-				}
-			}
-		}
+		"displayName" : "Family"
+	},
+	"nature" : {
+		"displayName" : "Nature"
+	},
+	"motivation" : {
+		"displayName" : "Motivation"
+	},
+	"sports" : {
+		"displayName" : "Sports"
+	},
+	"politics" : {
+		"displayName" : "Politics"
+	},
+	"science" : {
+		"displayName" : "Science"
+	},
+	"misc" : {
+		"displayName": "Miscelleneous"
 	}
 }

@@ -1162,7 +1162,7 @@ module.exports = {
 		});
 	},
 
-	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, numFollowers, amFollowing, numPosts, amLiking, activityType, lastComment, lastCommenter, likeTime, liker) {
+	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, numFollowers, amFollowing, numPosts, amLiking, activityType, lastComment, lastCommenter, likeTime, liker, category) {
 
 		var data = {
 			type : entityType,
@@ -1202,6 +1202,8 @@ module.exports = {
 			data.imageType = entity.image_type;
 			data.caption = entity.title;
 			data.link = config.url.challenge + entity.id;
+			data.categoryName = category.name;
+			data.categoryID = category.id;
 		} else if (entityType == "entry") {
 			data.image = config.url.entryImages + entity.id + "." + mime.extension(entity.image_type);
 			data.imageType = entity.image_type;

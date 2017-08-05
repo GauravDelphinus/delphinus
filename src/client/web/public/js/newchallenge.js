@@ -23,24 +23,6 @@ function setupCategories() {
 			option.text(data[i].name);
 			$("#categoryList").append(option);
 		}
-
-		setupSubCategories($("#categoryList option:selected").val());
-	});
-
-	$("#categoryList").on("change", function() {
-		setupSubCategories(this.value);
-	});
-}
-
-function setupSubCategories(categoryId) {
-	$("#subCategoryList").empty();
-	$.getJSON('/api/categories?category=' + categoryId, function(data) {
-		for (var i = 0; i < data.length; i++) {
-			var option = $("<option>", {"value": data[i].id});
-			option.text(data[i].name);
-
-			$("#subCategoryList").append(option);
-		}
 	});
 }
 
@@ -75,7 +57,7 @@ function postChallenge() {
 	jsonObj.imageType = $("#challengeImage").data("imageType");
 	jsonObj.caption = $("#caption").val();
 	jsonObj.created = (new Date()).getTime();
-	jsonObj.category = $("#subCategoryList option:selected").val();
+	jsonObj.category = $("#categoryList option:selected").val();
 
 	$.ajax({
 		type: "POST",

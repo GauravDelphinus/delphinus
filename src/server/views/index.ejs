@@ -9,11 +9,36 @@
 <% include ./header %>
 <br><br>
 
-<div id="feed" class="section">
-
+<div class="container-fluid">
+	<div class="row">
+	<div class="col-md-3">
+		<div class="sidebar">
+			<span class="sidebarHeading">Shortcuts</span>
+			<a class="sidebarLink" href="/">Home Feed</a>
+			<a class="sidebarLink" href="/auth">Sign In</a>
+			<span class="sidebarSeparator"></span>
+			<a class="sidebarLink" href="/challenges">Browse Challenges</a>
+			<a class="sidebarLink" href="/entries">Browse Entries</a>
+			<a class="sidebarLink" href="/users">Browse Users</a>
+		</div>
+		<div class="sidebar" id="categoriesSidebar">
+		</div>
+	</div>
+	<div id="feed" class="col-md-6">
+	</div>
+	<div class="col-md-3">
+		<div class="sidebar">
+			<span class="sidebarHeading">Shortcuts</span>
+			<a class="sidebarLink" href="/">Home Feed</a>
+			<a class="sidebarLink" href="/auth">Sign In</a>
+			<span class="sidebarSeparator"></span>
+			<a class="sidebarLink" href="/challenges">Browse Challenges</a>
+			<a class="sidebarLink" href="/entries">Browse Entries</a>
+			<a class="sidebarLink" href="/users">Browse Users</a>
+		</div>
+	</div>
 </div>
-
-</div>
+	
 <script>
 	var user = <%- JSON.stringify(user) %>;
 </script>
