@@ -41,7 +41,6 @@ var routes = function(db) {
 
 	filterRouter.route("/apply") // /api/filters/apply ROUTE
 	.post(function(req, res){
-		console.log("/api/filters/apply received post, body is = " + JSON.stringify(req.body));
 
 		var sourceImagePath;
 		var purgeImageAfterUse = false;

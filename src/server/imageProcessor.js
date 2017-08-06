@@ -532,7 +532,6 @@ module.exports = {
 function writeImage(image, imagePath, next) {
 
 	image.write(imagePath, function(err) {
-		console.log("write, err = " + err + ", image is [" + imagePath + "]");
 		if (err) throw err;
 
 		next(0, imagePath);

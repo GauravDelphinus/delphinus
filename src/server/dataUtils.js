@@ -193,14 +193,11 @@ module.exports = {
 
 		// First get the original image from the challenge
 		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id, c.image_type;"
-		console.log("query is " + fetchChallengeQuery);
 		db.cypherQuery(fetchChallengeQuery, function(err, output){
 	    		if (err) throw err;
 
-	    		console.log("output is " + JSON.stringify(output.data));
 	    		var imageType = output.data[0][1];
 	    		var image = output.data[0][0] + "." + mime.extension(imageType);
-	    		console.log("imageType is " + imageType);
 	    		//var imagePath = global.appRoot + config.path.challengeImages + image + "." + extractExtension(imageType);
 
 	    		//console.log("Image is " + imagePath);

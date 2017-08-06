@@ -1884,7 +1884,7 @@ function createPopularUsersSidebar() {
 			if (data.socialStatus.follows && data.socialStatus.follows.numFollowers > 0) {
 				description += data.socialStatus.follows.numFollowers + " Followers";
 			}
-			if (data.socialStatus.posts && data.socialStatus.posts.numPosts > 0) {
+			if (data.socialStatus.posts 	 && data.socialStatus.posts.numPosts > 0) {
 				description += (description.length > 0) ? (", ") : ("");
 				description += data.socialStatus.posts.numPosts + " Posts";
 			}

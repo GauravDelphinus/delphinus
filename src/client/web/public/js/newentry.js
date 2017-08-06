@@ -131,7 +131,7 @@ function showLayoutStep() {
 					jsonObj.steps.layouts[0].type = "preset";
 					jsonObj.steps.layouts[0].preset = l.id;
 					generateChanges(l.id, jsonObj, function(id, imgPath) {
-						$("#" + id + " img").prop("src", imgPath);
+						$("#" + id + "EntityImage").prop("src", imgPath);
 					});
 
 					list.push(data);
@@ -380,7 +380,7 @@ function showFilterStep() {
 					jsonObj.steps.filters[0].type = "preset";
 					jsonObj.steps.filters[0].preset = f.id;
 					generateChanges(f.id, jsonObj, function(id, imgPath) {
-						$("#" + id + " img").prop("src", imgPath);
+						$("#" + id + "EntityImage").prop("src", imgPath);
 					});
 
 					list.push(data);
@@ -557,7 +557,7 @@ function showArtifactStep() {
 					jsonObj.steps.artifacts[0].preset = a.id;
 					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
 					generateChanges(a.id, jsonObj, function(id, imgPath) {
-						$("#" + id + " img").prop("src", imgPath);
+						$("#" + id + "EntityImage").prop("src", imgPath);
 					});
 
 					list.push(data);
@@ -657,7 +657,7 @@ function showDecorationStep() {
 					jsonObj.steps.decorations[0].type = "preset";
 					jsonObj.steps.decorations[0].preset = d.id;
 					generateChanges(d.id, jsonObj, function(id, imgPath) {
-						$("#" + id + " img").prop("src", imgPath);
+						$("#" + id + "EntityImage").prop("src", imgPath);
 					});
 
 					list.push(data);
@@ -996,6 +996,7 @@ function applyChanges(done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
+			console.log("success with apply, data is " + JSON.stringify(jsonData));
 			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
 			if (done) {
 				done();
