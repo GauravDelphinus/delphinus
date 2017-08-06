@@ -271,7 +271,7 @@ body {
 }
 
 .postHeaderSection {
-	margin: 5px 20px;
+	margin: 5px 5px 5px 10px; /* Right margin is less to allow the Drop Down menu (caret) to be as right as possible */
 	padding: 10px 0px;
 	/* overflow: hidden; */
 	position: relative;
@@ -318,7 +318,7 @@ postedByName:hover{
 }
 
 .postedByImage {
-	height: 50px;
+	max-height: 50px;
 	margin-right: 10px;
 	border-radius: 50%;
 }
@@ -390,7 +390,6 @@ postedByName:hover{
 }
 
 .socialActionsSection {
-	width: 100%;
 	margin: 5px 20px;
 }
 
@@ -471,21 +470,19 @@ postedByName:hover{
 }
 
 .scrollableElement {
-	border-radius: 5px;
-	border-color: black;
-	border-style: dotted;
-	border-width: 0.5px;
-	margin: 20px;
-	padding: 10px;
+	border-right: 2px;
+	border-style: solid;
+	border-width: 0.1px;
+	border-color: gray;
+	margin: 20px 5px;
 }
 
 .thumbnailElement {
-	border-radius: 5px;
-	border-color: black;
-	border-style: dotted;
-	border-width: 0.5px;
-	margin: 10px;
-	padding: 5px;
+	border-right: 2px;
+	border-style: solid;
+	border-width: 0.1px;
+	border-color: gray;
+	margin: 20px 5px;
 }
 
 .elementHover:hover {
