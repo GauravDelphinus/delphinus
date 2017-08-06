@@ -1,16 +1,21 @@
+/*
+	Create the 'Sign in' button in the nav bar depending on whether the user is currently
+	signed in or not
+*/
 function createLoginHeader() {
-	
+	var navbarItem = $("#userNavbarItem");
 	if (user) {
-		$("<div>", {id: "dropdown", class : "dropdown pull-right"}).appendTo("#navbar");
-		$("<a>", {href: "#", id: "dropdownmenu", class: "dropdown-toggle", "data-toggle" : "dropdown", text: user.displayName}).appendTo("#dropdown");
-		$("<b>", {class: "caret"}).appendTo("#dropdownmenu");
-
-		$("<ul>", {id: "dropdownlist", class: "dropdown-menu", role: "menu", "aria-labelledby" : "dropdownmenu"}).appendTo("#dropdown");
-
-		$("<li>").append($("<a>", {text: "Profile", href: "/user"})).appendTo("#dropdownlist");
-		$("<li>").append($("<a>", {text: "Sign Out", href: "/auth/logout"})).appendTo("#dropdownlist");
+		$(navbarItem).empty().addClass("dropdown");
+		$(navbarItem).append($("<a>", {class: "dropdown-toggle", "data-toggle" : "dropdown", href: "#"}).append($("<img>", {src: user.image, class: "userImage"})).append(user.displayName).append($("<span>", {class: "caret"})));
+		var items = $("<ul>", {class: "dropdown-menu"});
+		$(items).append($("<li>").append($("<a>", {href: "/user"}).append("Profile")));
+		$(items).append($("<li>").append($("<a>", {href: "/auth/logout"}).append("Sign out")));
+		$(navbarItem).append($(items));
 
 	} else {
-		$("<a>", {text: "Sign in", href : "/auth"}).attr("class", "pull-right").appendTo("#navbar");
+		$(navbarItem).empty().removeClass("dropdown");
+		$(navbarItem).append($("<a>", {href: "/auth"}).append("Sign in"));
 	}
+
+	updateShortcutsSidebar();
 }

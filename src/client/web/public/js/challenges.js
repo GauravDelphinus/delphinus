@@ -1,6 +1,8 @@
 $(document).ready(function(){
 	createLoginHeader();
 
+	createCategorySidebar();
+
 	setupMainItem();
 
 	setupButtons();

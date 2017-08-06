@@ -11,31 +11,19 @@
 
 <div class="container-fluid">
 	<div class="row">
-	<div class="col-md-3">
-		<div class="sidebar">
-			<span class="sidebarHeading">Shortcuts</span>
-			<a class="sidebarLink" href="/">Home Feed</a>
-			<a class="sidebarLink" href="/auth">Sign In</a>
-			<span class="sidebarSeparator"></span>
-			<a class="sidebarLink" href="/challenges">Browse Challenges</a>
-			<a class="sidebarLink" href="/entries">Browse Entries</a>
-			<a class="sidebarLink" href="/users">Browse Users</a>
-		</div>
+	<div class="col-md-2">
+		<% include ./shortcutsSidebar %>
 		<div class="sidebar" id="categoriesSidebar">
 		</div>
+		
 	</div>
 	<div id="feed" class="col-md-6">
 	</div>
-	<div class="col-md-3">
-		<div class="sidebar">
-			<span class="sidebarHeading">Shortcuts</span>
-			<a class="sidebarLink" href="/">Home Feed</a>
-			<a class="sidebarLink" href="/auth">Sign In</a>
-			<span class="sidebarSeparator"></span>
-			<a class="sidebarLink" href="/challenges">Browse Challenges</a>
-			<a class="sidebarLink" href="/entries">Browse Entries</a>
-			<a class="sidebarLink" href="/users">Browse Users</a>
+	<div class="col-md-2">
+		<div class="sidebar" id="popularChallengesSidebar">
 		</div>
+	</div>
+	<div class="col-md-2">
 	</div>
 </div>
 	

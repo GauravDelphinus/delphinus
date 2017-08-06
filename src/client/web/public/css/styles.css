@@ -71,9 +71,11 @@
 	font-style: italic;
 }
 
-.body {
-	font-family: Source Sans Pro,Helvetica,Arial,sans-serif
+body {
+	font-family: Source Sans Pro,Helvetica,Arial,sans-serif;
+	padding-top: 40px;
 }
+
 .title {
 	text-align: center;
 	font-family: arial;	
@@ -721,9 +723,17 @@ input[type="file"] {
 }
 
 /* Tab Titles */
+/*
 .nav li {
 	font-size: 2em;
 	background-color: transparent;
+}
+*/
+
+.navbarItem {
+	font-size: 1.6em;
+	padding-top: 15px;
+	padding-bottom: 15px;
 }
 
 .social a {
@@ -1149,7 +1159,8 @@ img {
 	width: 100%;
 	border: 1px dotted gray;
 	border-radius: 5px;
-	padding: 5px;
+	padding: 10px;
+	margin: 10px 0px;
 }
 
 .sidebarHeading {
@@ -1166,3 +1177,76 @@ img {
 .sidebarSeparator {
 	
 }
+
+.sidebarItem {
+	background: #F8F8F8;
+	margin-top: 5px;
+	margin-bottom: 5px;
+}
+
+.sidebarItemImage {
+	width: 40%;
+	padding: 5px;
+}
+
+.sidebarItemTitle {
+	padding: 5px;
+}
+
+.sidebarItemDescription {
+	padding: 5px;
+}
+
+/************************** Nav Bar (Top) ***************************/
+
+/* Override bootstrap nav bar */
+.navbar-fixed-top {
+	background: #9E1F63;
+}
+
+/* Override bootstrap color.  Custom color for all links in navbar */
+.navbar-nav a {
+	color: white;
+	font-size: 1.4em;
+}
+
+/* Override bootstrap value of padding.  The brand image on navbar should start at top as the height
+already matches the navbar height */
+.navbar-brand {
+	padding-top: 0px;
+}
+
+ul.nav > li > a:hover {
+	background: black;
+}
+
+ul.nav li.dropdown.open > a {
+	background: black;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
+.userImage {
+	height: 30px;
+	margin-right: 10px;
+	border-radius: 50%;
+	vertical-align: middle;
+}
+
+/****
+	IMPORTANT: Below two rules are important and must not be changed.
+	They are to vertically center the nav bar items.
+	The height of the navbar is fixed to 50px.  Please don't change
+	unless you change both instances to a new value.
+***/
+
+.navbar-nav li {
+	height: 50px;
+}
+
+.navbar-nav > li > a {
+	line-height: 50px;
+	padding-top: 0px;
+	padding-bottom: 0px;
+}
+
