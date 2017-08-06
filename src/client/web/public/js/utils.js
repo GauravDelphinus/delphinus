@@ -1850,6 +1850,52 @@ function createPopularChallengesSidebar() {
 	});
 }
 
+function createPopularEntriesSidebar() {
+	var list = [];
+	$.getJSON("/api/entries?sortBy=popularity", function(result) {
+		for (var i = 0; i < result.length; i++) {
+			var data = result[i];
+			var description = "";
+			if (data.socialStatus.likes && data.socialStatus.likes.numLikes > 0) {
+				description += data.socialStatus.likes.numLikes + " Likes";
+			}
+			if (data.socialStatus.shares && data.socialStatus.shares.numShares > 0) {
+				description += (description.length > 0) ? (", ") : ("");
+				description += data.socialStatus.shares.numShares + " Shares";
+			}
+			if (data.socialStatus.comments && data.socialStatus.comments.numComments > 0) {
+				description += (description.length > 0) ? (", ") : ("");
+				description += data.socialStatus.comments.numComments + " Comments";
+			}
+
+			list.push({image: data.image, name: data.caption, link: data.link, description: description});
+		}
+
+		updateRichSidebar("popularEntriesSidebar", "Popular Entries", list, true);
+	});
+}
+
+function createPopularUsersSidebar() {
+	var list = [];
+	$.getJSON("/api/users?sortBy=popularity", function(result) {
+		for (var i = 0; i < result.length; i++) {
+			var data = result[i];
+			var description = "";
+			if (data.socialStatus.follows && data.socialStatus.follows.numFollowers > 0) {
+				description += data.socialStatus.follows.numFollowers + " Followers";
+			}
+			if (data.socialStatus.posts && data.socialStatus.posts.numPosts > 0) {
+				description += (description.length > 0) ? (", ") : ("");
+				description += data.socialStatus.posts.numPosts + " Posts";
+			}
+
+			list.push({image: data.image, name: data.caption, link: data.link, description: description});
+		}
+
+		updateRichSidebar("popularUsersSidebar", "Popular Users", list, true);
+	});
+}
+
 /*
 	Update the Shortcuts sidebar with the User Profile link, incase the user is signed in
 */

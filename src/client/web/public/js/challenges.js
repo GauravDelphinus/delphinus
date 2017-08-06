@@ -3,6 +3,8 @@ $(document).ready(function(){
 
 	createCategorySidebar();
 
+	createPopularChallengesSidebar();
+
 	setupMainItem();
 
 	setupButtons();

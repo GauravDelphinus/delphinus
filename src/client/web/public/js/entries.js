@@ -1,6 +1,10 @@
 $(document).ready(function(){
 	createLoginHeader();
 
+	createCategorySidebar();
+
+	createPopularEntriesSidebar();
+
 	setupMainItem();
 
 	setupButtons();
