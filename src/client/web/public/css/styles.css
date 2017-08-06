@@ -1250,3 +1250,11 @@ ul.nav li.dropdown.open > a {
 	padding-bottom: 0px;
 }
 
+
+/************************* SPECIFIC FIXES **********************/
+
+/* Fix for keeping the the first bootstrap column fixed - refer https://stackoverflow.com/a/30038714/7657145 */
+.fixed {
+	position: fixed;
+}
+
