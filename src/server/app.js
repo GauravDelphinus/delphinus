@@ -112,7 +112,13 @@ module.exports = function() {
 	});
 
 	app.get("/challenges", function(req, res) {
-		res.render("challenges", {user: normalizeUser(req.user), query: req.query});
+		dataUtils.getMetaDataForCategory(db, req.query.category, function(err, data) {
+			var jsonObj = data;
+			jsonObj.user = normalizeUser(req.user);
+			jsonObj.categoryId = (req.query.category) ? req.query.category : "all";
+
+			res.render("challenges", jsonObj);
+		});
 	});
 
 	app.get("/entries", function(req, res) {
@@ -127,20 +133,10 @@ module.exports = function() {
 	app.get("/challenge/:challengeId", function(req, res) {
 		// extract information for meta tags on the page
 		dataUtils.getMetaDataForChallenge(db, req.params.challengeId, function(err, data) {
-			var jsonObj = {
-				fbAppId : config.social.facebook.clientID,
-				challengeId : req.params.challengeId,
-				user: normalizeUser(req.user),
-				pageURL: data.pageURL,
-				pageTitle: data.pageTitle,
-				pageDescription: data.pageDescription,
-				imageURL: data.imageURL,
-				imageType: data.imageType,
-				imageWidth: data.imageWidth,
-				imageHeight: data.imageHeight,
-				authorName: data.authorName,
-				publisherName: data.publisherName
-			};
+			var jsonObj = data;
+			jsonObj.challengeId = req.params.challengeId;
+			jsonObj.user = normalizeUser(req.user);
+
 			res.render("challenge", jsonObj);
 		});
 	});
@@ -176,21 +172,9 @@ module.exports = function() {
 	app.get("/entry/:entryId", function(req, res) {
 		// extract information for meta tags on the page
 		dataUtils.getMetaDataForEntry(db, req.params.entryId, function(err, data) {
-			var jsonObj = {
-				fbAppId : config.social.facebook.clientID,
-				entryId : req.params.entryId,
-				challengeId: data.challengeId,
-				user: normalizeUser(req.user),
-				pageURL: data.pageURL,
-				pageTitle: data.pageTitle,
-				pageDescription: data.pageDescription,
-				imageURL: data.imageURL,
-				imageType: data.imageType,
-				imageWidth: data.imageWidth,
-				imageHeight: data.imageHeight,
-				authorName: data.authorName,
-				publisherName: data.publisherName
-			};
+			var jsonObj = data;
+			jsonObj.entryId = req.params.entryId;
+			jsonObj.user = normalizeUser(req.user);
 
 			res.render("entry", jsonObj);
 		});

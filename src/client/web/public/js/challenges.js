@@ -12,8 +12,8 @@ $(document).ready(function(){
 
 function setupMainItem() {
 	var appendCategory = "";
-	if (query && query.category) {
-		appendCategory = "&category=" + query.category;
+	if (categoryId != "all") {
+		appendCategory = "&category=" + categoryId;
 	}
 	createAndAppendContentContainer($("#challenges"), 0, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges?sortBy=dateCreated" + appendCategory}, {type: "popularity", url: "/api/challenges?sortBy=popularity" + appendCategory}]);
 

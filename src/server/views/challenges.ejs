@@ -1,6 +1,18 @@
 <html>
 <head>
-<title>Challenges</title>
+<meta property="fb:app_id"              content="<%=fbAppId%>" />
+<meta property="og:url"                content="<%=pageURL%>" />
+<meta property="og:type"               content="website" />
+<meta property="og:title"              content="<%=pageTitle%>" />
+<meta property="og:description"        content="<%=pageDescription%>" />
+<meta property="og:image"              content="<%=imageURL%>" />
+<meta property="og:image:type"              content="<%=imageType%>" />
+<meta property="og:image:width"              content="<%=imageWidth%>" />
+<meta property="og:image:height"              content="<%=imageHeight%>" />
+<meta property="article:author"              content="<%=authorName%>" />
+<meta property="article:publisher"              content="<%=publisherName%>" />
+
+<title><%=pageTitle%></title>
 <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css">
 <link ref="stylesheet" href="/css/font-awesome/css/font-awesome.css">
 <link rel="stylesheet" type="text/css" href="/css/styles.css"
@@ -21,7 +33,7 @@
 	</div>
 	<div id="challenges" class="col-md-6 col-md-offset-2">
 		<div class="sectionHeader">
-			<span class="sectionTitle">Challenges</span>
+			<span class="sectionTitle"><%=pageTitle%></span>
 			<button id="postChallenge" type="button" class="btn button-full pull-right"><span class="glyphicon glyphicon-plus"></span> Post New Challenge</button>
 		</div>
 		<hr/>
@@ -39,7 +51,7 @@
 
 <script>
 	var user = <%- JSON.stringify(user) %>;
-	var query = <%- JSON.stringify(query) %>;
+	var categoryId = "<%=categoryId%>";
 </script>
 <script src="/js/jquery-3.1.1.min.js"></script>
 <script src="/js/bootstrap.js"></script>
