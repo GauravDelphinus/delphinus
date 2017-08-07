@@ -139,7 +139,7 @@ module.exports = {
 		myDB.cypherQuery(cypherQuery, function(err, result){
 	    	if(err || result.data.length <= 0) throw err;
 
-	    	var data = constructMetaData("challenge", result.data[0][0], result.data[0][1]);
+	    	var data = this.constructMetaData("challenge", result.data[0][0], result.data[0][1]);
 
 		    next(0, data);
 		});
@@ -150,6 +150,7 @@ module.exports = {
 		Given an Category ID, fetch the meta data related to the category.
 	**/
 	getMetaDataForCategory : function(categoryId, next) {
+		var constructMetaData = this.constructMetaData;
 		if (categoryId != undefined) {
 			var cypherQuery = "MATCH (c:Category {id: '" + categoryId + "'}) RETURN c;";
 
@@ -161,7 +162,7 @@ module.exports = {
 			    next(0, data);
 			});
 		} else {
-			var data = constructMetaData("category", null, null);
+			var data = this.constructMetaData("category", null, null);
 			next (0, data);
 		}
 	},
@@ -175,11 +176,72 @@ module.exports = {
 		myDB.cypherQuery(cypherQuery, function(err, result){
 	    	if(err || result.data.length <= 0) throw err;
 
-	    	var data = constructMetaData("entry", result.data[0][0], result.data[0][1], result.data[0][2]);
+	    	var data = this.constructMetaData("entry", result.data[0][0], result.data[0][1], result.data[0][2]);
 
 		    next(0, data);
 		});
 
+	},
+
+	constructMetaData: function(entityType, entity, poster, challenge) {
+
+		var data = {
+			fbAppId: config.social.facebook.clientID,
+			publisherName : config.branding.siteName
+		};
+
+		if (entityType == "challenge") {
+			data.id = entity.id;
+			data.imageURL = config.hostname + config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
+			data.pageTitle = entity.title + " - " + config.branding.siteName;
+			data.pageURL = config.hostname + config.url.challenge + entity.id;
+			data.pageDescription = "Challenge posted";
+			data.imageType = entity.image_type;
+			data.imageWidth = entity.image_width;
+			data.imageHeight = entity.image_height;
+			data.authorName = poster.displayName;
+		} else if (entityType == "entry") {
+			data.id = entity.id;
+			data.imageURL = config.hostname + config.url.entryImages + entity.id  + "." + mime.extension(entity.image_type);
+			data.pageTitle = entity.caption + " - " + config.branding.siteName;
+			data.pageURL = config.hostname + config.url.entry + entity.id;
+			data.pageDescription = "Entry posted";
+			data.challengeId = challenge.id;
+			data.imageType = challenge.image_type; //entry retains format of the challenge
+			data.imageWidth = entity.image_width;
+			data.imageHeight = entity.image_height;
+			data.authorName = poster.displayName;
+		} else if (entityType == "category") {
+			data.imageURL = config.hostname + config.url.brandImages + config.branding.shareImage.imageName;
+			data.imageType = config.branding.shareImage.imageType;
+			data.imageWidth = config.branding.shareImage.imageWidth;
+			data.imageHeight = config.branding.shareImage.imageHeight;
+
+			if (entity) {
+				data.id = entity.id;
+				data.pageTitle = "Challenges under " + entity.name + " - " + config.branding.siteName;
+				data.pageURL = config.hostname + config.url.challenges + "?category=" + entity.id;
+				data.pageDescription = "Challenge posted under " + entity.name;
+			} else {
+				data.pageTitle = "All Challenges" + " - " + config.branding.siteName;
+				data.pageURL = config.hostname + config.url.challenges;
+				data.pageDescription = "All Challenges Posted";
+			}
+			
+			data.authorName = config.branding.siteName;
+		} else if (entityType == "home") { //home page or other generic pages
+			data.pageURL = config.hostname;
+			data.pageTitle = config.branding.siteTitle + " - " + config.branding.siteName;
+			data.pageDescription = config.branding.siteDescription;
+			data.imageURL = config.hostname + config.url.brandImages + config.branding.shareImage.imageName;
+			data.imageType = config.branding.shareImage.imageType;
+			data.imageWidth = config.branding.shareImage.imageWidth;
+			data.imageHeight = config.branding.shareImage.imageHeight;
+
+			data.authorName = config.branding.siteName;
+		}
+		
+		return data;
 	},
 
 	getImageDataForChallenge : function(challengeId, next) {
@@ -1287,58 +1349,4 @@ function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {
 		});
 	}
 }
-
-function constructMetaData(entityType, entity, poster, challenge) {
-
-	var data = {
-		fbAppId: config.social.facebook.clientID,
-		publisherName : config.branding.siteName
-	};
-
-	if (entityType == "challenge") {
-		data.id = entity.id;
-		data.imageURL = config.hostname + config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
-		data.pageTitle = entity.title;
-		data.pageURL = config.hostname + config.url.challenge + entity.id;
-		data.pageDescription = "Challenge posted";
-		data.imageType = entity.image_type;
-		data.imageWidth = entity.image_width;
-		data.imageHeight = entity.image_height;
-		data.authorName = poster.displayName;
-	} else if (entityType == "entry") {
-		data.id = entity.id;
-		data.imageURL = config.hostname + config.url.entryImages + entity.id  + "." + mime.extension(entity.image_type);
-		data.pageTitle = entity.caption;
-		data.pageURL = config.hostname + config.url.entry + entity.id;
-		data.pageDescription = "Entry posted";
-		data.challengeId = challenge.id;
-		data.imageType = challenge.image_type; //entry retains format of the challenge
-		data.imageWidth = entity.image_width;
-		data.imageHeight = entity.image_height;
-		data.authorName = poster.displayName;
-	} else if (entityType == "category") {
-		data.imageURL = config.hostname + config.url.brandImages + config.branding.shareImage.imageName;
-		data.imageType = config.branding.shareImage.imageType;
-		data.imageWidth = config.branding.shareImage.imageWidth;
-		data.imageHeight = config.branding.shareImage.imageHeight;
-
-		if (entity) {
-			data.id = entity.id;
-			data.pageTitle = "Challenges under " + entity.name;
-			data.pageURL = config.hostname + config.url.challenges + "?category=" + entity.id;
-			data.pageDescription = "Challenge posted under " + entity.name;
-		} else {
-			data.pageTitle = "All Challenges";
-			data.pageURL = config.hostname + config.url.challenges;
-			data.pageDescription = "All Challenges Posted";
-		}
-		
-		data.authorName = config.branding.siteName;
-	}
-	
-	return data;
-}
-
-
-
 

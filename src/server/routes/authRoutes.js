@@ -1,5 +1,6 @@
 var express = require("express");
 var passport = require("passport");
+var config = require("../config");
 
 var routes = function(db) {
 	var authRouter = express.Router();
@@ -17,7 +18,8 @@ var routes = function(db) {
                 req.session.redirectTo = req.get('Referrer');
             }
 
-            res.render("auth");
+			res.render("auth", {pageTitle: "Sign In - " + config.branding.siteName});
+
         });
 
     authRouter.route("/login")

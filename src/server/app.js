@@ -36,28 +36,6 @@ module.exports = function() {
 	app.use(bodyParser.json({limit: "50mb"})); //make sure we can handle large messages that include images.  The actual value may require fine tuning later
 	app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 
-	/*
-	// Add headers - to fix Twitter issues
-	app.use(function (req, res, next) {
-
-	    // Website you wish to allow to connect
-	    res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-
-	    // Request methods you wish to allow
-	    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-
-	    // Request headers you wish to allow
-	    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-
-	    // Set to true if you need the website to include cookies in the requests sent
-	    // to the API (e.g. in case you use sessions)
-	    res.setHeader('Access-Control-Allow-Credentials', true);
-
-	    // Pass to next layer of middleware
-	    next();
-	});
-	*/
-
 	/**
 		API ROUTERS
 		This is the list of API Routers that help route the various
@@ -108,7 +86,9 @@ module.exports = function() {
 
 	// 0 - Home Page
 	app.get("/", function(req, res) {
-		res.render("index", {user: normalizeUser(req.user)});
+		var metaData = dataUtils.constructMetaData("home");
+		metaData.user = normalizeUser(req.user);
+		res.render("index", metaData);
 	});
 
 	app.get("/challenges", function(req, res) {
