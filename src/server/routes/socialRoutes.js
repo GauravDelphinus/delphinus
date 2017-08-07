@@ -1,5 +1,4 @@
 var express = require("express");
-var dataUtils = require("../dataUtils");
 var config = require("../config");
 
 var routes = function(db) {

@@ -51,7 +51,7 @@ var routes = function(db) {
 			purgeImageAfterUse = false;
 
 			
-			dataUtils.getImageDataForChallenge(db, req.body.imageData, function(err, imageData){
+			dataUtils.getImageDataForChallenge(req.body.imageData, function(err, imageData){
 				if (err) throw err;
 
 				var image = req.body.imageData; //challengeId
@@ -96,7 +96,7 @@ var routes = function(db) {
 			// find local path to the challenge's source image
 			purgeImageAfterUse = false;
 
-			dataUtils.getImageDataForEntry(db, req.params.entryId, function(err, imageData){
+			dataUtils.getImageDataForEntry(req.params.entryId, function(err, imageData){
 				if (err) throw err;
 
 				sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image;

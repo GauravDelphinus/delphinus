@@ -1,7 +1,6 @@
 var tmp = require("tmp");
 var fs = require("fs");
 var gm = require("gm") //.subClass({imageMagick: true});
-var dataUtils = require("./dataUtils");
 var config = require('./config');
 
 /**

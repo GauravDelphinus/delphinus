@@ -115,9 +115,9 @@ module.exports = {
 		Challenge ID that this entry belongs to.
 		calls the function next with an err and the challengeId
 	**/
-	getChallengeForEntry : function(db, entryId, next) {
+	getChallengeForEntry : function(entryId, next) {
 		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id;"
-		db.cypherQuery(fetchChallengeQuery, function(err, result){
+		myDB.cypherQuery(fetchChallengeQuery, function(err, result){
 	    		if (err) {
 	    			next(err, -1);
 	    			return;
@@ -132,11 +132,11 @@ module.exports = {
 	/**
 		Given an Challenge ID, fetch the meta data related to the challenge.
 	**/
-	getMetaDataForChallenge : function(db, challengeId, next) {
+	getMetaDataForChallenge : function(challengeId, next) {
 		var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'})-[:POSTED_BY]->(poster:User) RETURN c, poster;";
 
 		//console.log("cypherQuery is " + cypherQuery);
-		db.cypherQuery(cypherQuery, function(err, result){
+		myDB.cypherQuery(cypherQuery, function(err, result){
 	    	if(err || result.data.length <= 0) throw err;
 
 	    	var data = constructMetaData("challenge", result.data[0][0], result.data[0][1]);
@@ -149,11 +149,11 @@ module.exports = {
 	/**
 		Given an Category ID, fetch the meta data related to the category.
 	**/
-	getMetaDataForCategory : function(db, categoryId, next) {
+	getMetaDataForCategory : function(categoryId, next) {
 		if (categoryId != undefined) {
 			var cypherQuery = "MATCH (c:Category {id: '" + categoryId + "'}) RETURN c;";
 
-			db.cypherQuery(cypherQuery, function(err, result){
+			myDB.cypherQuery(cypherQuery, function(err, result){
 		    	if(err || result.data.length <= 0) throw err;
 
 		    	var data = constructMetaData("category", result.data[0], null);
@@ -169,10 +169,10 @@ module.exports = {
 	/**
 		Given an Entry ID, fetch the meta data related to the Entry.
 	**/
-	getMetaDataForEntry : function(db, entryId, next) {
+	getMetaDataForEntry : function(entryId, next) {
 		var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) MATCH (c:Challenge)<-[:PART_OF]-(e)-[:POSTED_BY]->(poster:User) RETURN e, poster, c;";
 
-		db.cypherQuery(cypherQuery, function(err, result){
+		myDB.cypherQuery(cypherQuery, function(err, result){
 	    	if(err || result.data.length <= 0) throw err;
 
 	    	var data = constructMetaData("entry", result.data[0][0], result.data[0][1], result.data[0][2]);
@@ -182,9 +182,9 @@ module.exports = {
 
 	},
 
-	getImageDataForChallenge : function(db, challengeId, next) {
+	getImageDataForChallenge : function(challengeId, next) {
 		var fetchChallengeQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) RETURN c;"
-		db.cypherQuery(fetchChallengeQuery, function(err, output){
+		myDB.cypherQuery(fetchChallengeQuery, function(err, output){
 	    	if (err) throw err;
 
 	    	var c = output.data[0];
@@ -209,11 +209,11 @@ module.exports = {
 			steps : "steps to perform"
 		}
 	**/
-	getImageDataForEntry : function(db, entryId, next) {
+	getImageDataForEntry : function(entryId, next) {
 
 		// First get the original image from the challenge
 		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id, c.image_type;"
-		db.cypherQuery(fetchChallengeQuery, function(err, output){
+		myDB.cypherQuery(fetchChallengeQuery, function(err, output){
 	    		if (err) throw err;
 
 	    		var imageType = output.data[0][1];
@@ -226,7 +226,7 @@ module.exports = {
 
 				var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[u:USES]->(s) RETURN LABELS(s),s ORDER BY u.order;";
 
-				db.cypherQuery(cypherQuery, function(err, result){
+				myDB.cypherQuery(cypherQuery, function(err, result){
 	    			if(err) throw err;
 
 	    			//console.log(result.data); // delivers an array of query results
@@ -498,7 +498,7 @@ module.exports = {
 				}
 			}
 	**/
-	createFilterNode : function(db, filter, callback) {
+	createFilterNode : function(filter, callback) {
 		if (filter.type == "none") {
 			// There's no need to create a filter node in this case.
 			// This shouldn't be called, and should get handled by caller
@@ -584,7 +584,7 @@ module.exports = {
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 					
-			db.cypherQuery(cypherQuery, function(err, result){
+			myDB.cypherQuery(cypherQuery, function(err, result){
 	    		if(err) throw err;
 
 	    		//console.log(result.data[0]); // delivers an array of query results
@@ -596,7 +596,7 @@ module.exports = {
 		}
 	},
 
-	createDecorationNode : function(db, decoration, callback) {
+	createDecorationNode : function(decoration, callback) {
 		if (decoration.type == "none") {
 			throw err; // shouldn't happen
 		} else if (decoration.type == "user_defined") {
@@ -624,7 +624,7 @@ module.exports = {
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 
-			db.cypherQuery(cypherQuery, function(err, result) {
+			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 
 				//console.log(result.data[0]);
@@ -647,7 +647,7 @@ module.exports = {
 		return str;
 	},
 
-	createArtifactNode : function(db, artifact, callback) {
+	createArtifactNode : function(artifact, callback) {
 		//console.log("createArtifactNode: artifact = " + JSON.stringify(artifact));
 		
 
@@ -687,7 +687,7 @@ module.exports = {
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 
-			db.cypherQuery(cypherQuery, function(err, result) {
+			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 
 				//console.log(result.data[0]);
@@ -703,7 +703,7 @@ module.exports = {
 		
 	},
 
-	createLayoutNode : function(db, layout, callback) {
+	createLayoutNode : function(layout, callback) {
 		if (layout.type == "none") {
 			// There's no need to create a layout node in this case.
 			// This shouldn't be called, and should get handled by caller
@@ -756,7 +756,7 @@ module.exports = {
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 					
-			db.cypherQuery(cypherQuery, function(err, result){
+			myDB.cypherQuery(cypherQuery, function(err, result){
 	    		if(err) throw err;
 
 	    		//console.log(result.data[0]); // delivers an array of query results
@@ -897,7 +897,6 @@ module.exports = {
 	},
 
 	saveUser : function (user, next) {
-		console.log("saveUser, user = " + JSON.stringify(user));
 		var query = {
 		};
 
@@ -934,7 +933,6 @@ module.exports = {
 					setValues.push(" u.displayName = '" + user.displayName + "'");
 				}
 				if (user.image) {
-					console.log("setting u.image in DB to user.image = " + user.image);
 					setValues.push(" u.image = '" + user.image + "'");
 				}
 
@@ -1266,7 +1264,7 @@ module.exports = {
 	
 }
 
-function createNodesForCategory(db, parentCategoryId, categoryId, categoryObj) {
+function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {
 	if (categoryObj && categoryObj.displayName) {
 		var cypherQuery = "";
 		if (parentCategoryId != null) {
@@ -1277,7 +1275,7 @@ function createNodesForCategory(db, parentCategoryId, categoryId, categoryObj) {
 
 		cypherQuery += " ON CREATE SET c.name = '" + categoryObj.displayName + "' RETURN c;";
 			
-		db.cypherQuery(cypherQuery, function(err, result){
+		myDB.cypherQuery(cypherQuery, function(err, result){
 			if(err) throw err;
 
 			//now, look for any subcategories

@@ -112,7 +112,7 @@ module.exports = function() {
 	});
 
 	app.get("/challenges", function(req, res) {
-		dataUtils.getMetaDataForCategory(db, req.query.category, function(err, data) {
+		dataUtils.getMetaDataForCategory(req.query.category, function(err, data) {
 			var jsonObj = data;
 			jsonObj.user = normalizeUser(req.user);
 			jsonObj.categoryId = (req.query.category) ? req.query.category : "all";
@@ -132,7 +132,7 @@ module.exports = function() {
 	// 1 - Challenge Page
 	app.get("/challenge/:challengeId", function(req, res) {
 		// extract information for meta tags on the page
-		dataUtils.getMetaDataForChallenge(db, req.params.challengeId, function(err, data) {
+		dataUtils.getMetaDataForChallenge(req.params.challengeId, function(err, data) {
 			var jsonObj = data;
 			jsonObj.challengeId = req.params.challengeId;
 			jsonObj.user = normalizeUser(req.user);
@@ -149,18 +149,6 @@ module.exports = function() {
 			the challenge Image.  The actual image is stored under /data/challenges/images/<random name>
 			path, and the random name is stored in the neo4j db entry for that challenge node.
 		**/
-		/*
-		dataUtils.getImageDataForChallenge(db, req.params.challengeId, function(err, image, imageType){
-			if (err) throw err;
-
-			var challengeImagesDir = __dirname + "/data/challenges/images/";
-			//console.log("calling res.sendFile with " + image);
-			res.set('Content-Type', 'image/' + imageType);
-			res.sendFile(challengeImagesDir + image, function(err) {
-				if (err && err.code !== "ECONNABORTED") throw err;
-			});
-		});
-		*/
 		var targetImage = global.appRoot + config.path.challengeImages + req.params.imageName;
 		res.setHeader("Content-Type", mime.lookup(targetImage));
 		res.sendFile(targetImage, function(err) {
@@ -171,7 +159,7 @@ module.exports = function() {
 	// 3 - Entry Page
 	app.get("/entry/:entryId", function(req, res) {
 		// extract information for meta tags on the page
-		dataUtils.getMetaDataForEntry(db, req.params.entryId, function(err, data) {
+		dataUtils.getMetaDataForEntry(req.params.entryId, function(err, data) {
 			var jsonObj = data;
 			jsonObj.entryId = req.params.entryId;
 			jsonObj.user = normalizeUser(req.user);
@@ -200,7 +188,7 @@ module.exports = function() {
 				//extract the entryId
 				var entryId = req.params.imageName.replace(/\.[^/.]+$/, "");
 
-				dataUtils.getImageDataForEntry(db, entryId, function(err, imageData){
+				dataUtils.getImageDataForEntry(entryId, function(err, imageData){
 					if (err) throw err;
 
 					var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image; //path to challenge image

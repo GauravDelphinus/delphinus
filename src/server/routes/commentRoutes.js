@@ -1,6 +1,5 @@
 var express = require("express");
 var async = require("async");
-var dataUtils = require("../dataUtils");
 var shortid = require("shortid");
 var config = require("../config");
 

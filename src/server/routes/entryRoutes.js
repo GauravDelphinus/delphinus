@@ -115,7 +115,7 @@ var routes = function(db) {
 							var layout = req.body.steps.layouts[i];
 
 							if (layout.type == "preset" || layout.type == "custom") {
-								createFilterNodesFunctions.push(async.apply(dataUtils.createLayoutNode, db, layout));
+								createFilterNodesFunctions.push(async.apply(dataUtils.createLayoutNode, layout));
 							}
 						}
 					}
@@ -125,7 +125,7 @@ var routes = function(db) {
 							var filter = req.body.steps.filters[i];
 
 							if (filter.type == "preset" || filter.type == "custom") {
-								createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, db, filter));
+								createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, filter));
 							}
 						}
 					}
@@ -135,7 +135,7 @@ var routes = function(db) {
 							var artifact = req.body.steps.artifacts[i];
 
 							if (artifact.type == "preset" || artifact.type == "custom") {
-								createFilterNodesFunctions.push(async.apply(dataUtils.createArtifactNode, db, artifact));
+								createFilterNodesFunctions.push(async.apply(dataUtils.createArtifactNode, artifact));
 							}
 						}
 					}
@@ -145,7 +145,7 @@ var routes = function(db) {
 							var decoration = req.body.steps.decorations[i];
 
 							if (decoration.type == "preset" || decoration.type == "custom") {
-								createFilterNodesFunctions.push(async.apply(dataUtils.createDecorationNode, db, decoration));
+								createFilterNodesFunctions.push(async.apply(dataUtils.createDecorationNode, decoration));
 							}
 						}
 					}

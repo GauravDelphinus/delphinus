@@ -50,7 +50,6 @@ var routes = function(db) {
 
                         var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				//var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], 0, 0, null, null, "highLikeCount", null, null, null, null);
 		    				var data = dataUtils.constructEntityData("user", result.data[i][0], null, result.data[i][0].lastSeen, null, null, null, null, result.data[i][1], result.data[i][3] > 0, result.data[i][2], "none", null, null, null, null);
 				
 							output.push(data);
