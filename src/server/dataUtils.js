@@ -1276,15 +1276,15 @@ function constructMetaData(entityType, entity, poster, challenge) {
 		};
 
 		if (entityType == "challenge") {
-			data.imageURL = config.hostname + ":" + config.port + config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
+			data.imageURL = config.hostname + config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
 			data.pageTitle = entity.title;
-			data.pageURL = config.hostname + ":" + config.port + config.url.challenge + entity.id;
+			data.pageURL = config.hostname + config.url.challenge + entity.id;
 			data.pageDescription = "Challenge posted at Captionify.com";
 			data.imageType = entity.image_type;
 		} else if (entityType == "entry") {
-			data.imageURL = config.hostname + ":" + config.port + config.url.entryImages + entity.id  + "." + mime.extension(entity.image_type);
+			data.imageURL = config.hostname + config.url.entryImages + entity.id  + "." + mime.extension(entity.image_type);
 			data.pageTitle = entity.caption;
-			data.pageURL = config.hostname + ":" + config.port + config.url.entry + entity.id;
+			data.pageURL = config.hostname + config.url.entry + entity.id;
 			data.pageDescription = "Entry posted at Captionify.com";
 			data.challengeId = challenge.id;
 			data.imageType = challenge.image_type; //entry retains format of the challenge

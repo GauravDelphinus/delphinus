@@ -8,7 +8,7 @@ module.exports = function () {
     passport.use(new FacebookStrategy({
             clientID: config.social.facebook.clientID,
             clientSecret: config.social.facebook.clientSecret,
-            callbackURL: config.hostname + ":" + config.port + config.social.facebook.oauthCallback,
+            callbackURL: config.hostname + config.social.facebook.oauthCallback,
             profileFields: ['id', 'email', 'name'],
             passReqToCallback: true
         },

@@ -8,7 +8,7 @@ module.exports = function () {
     passport.use(new TwitterStrategy({
             consumerKey: config.social.twitter.clientID,
             consumerSecret: config.social.twitter.clientSecret,
-            callbackURL: config.hostname + ":" + config.port + config.social.twitter.oauthCallback,
+            callbackURL: config.hostname + config.social.twitter.oauthCallback,
             passReqToCallback: true
         },
         function(req, token, tokenSecret, profile, done){

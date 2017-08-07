@@ -8,7 +8,7 @@ module.exports = function () {
     passport.use(new GoogleStrategy({
             clientID: config.social.google.clientID,
             clientSecret: config.social.google.clientSecret,
-            callbackURL: config.hostname + ":" + config.port + config.social.google.oauthCallback,
+            callbackURL: config.hostname + config.social.google.oauthCallback,
             passReqToCallback: true
         },
         function(req, accessToken, refreshToken, profile, done){
