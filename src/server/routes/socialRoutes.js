@@ -7,7 +7,7 @@ var routes = function(db) {
 	socialRouter.route("/")
 	.post(function(req, res) {
 		if (req.query.target == "facebook") {
-			var facebook = require('../services/facebook')('1286014801445639', '81732e3d807f86c9099589f632897dce');
+			var facebook = require('../services/facebook')();
 			facebook.postUpdate(req.body.message, config.hostname + req.body.link, req.user.facebook.token, function(error, data) {
 				if (error) {
 	        		res.sendStatus(401);
@@ -16,7 +16,7 @@ var routes = function(db) {
 	        	}
 			});
 		} else if (req.query.target == "twitter") {
-			var twitter = require('../services/twitter')('7Y9T7UneSfQnZ3EvuhErbEpdP', 'n7lQJiOJFrTCpNzrsq1Vt6JI18hkEwfTB0r1iTRgozYi8w793f');
+			var twitter = require('../services/twitter')();
 	        twitter.postUpdate(req.body.message, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
 	        	if (error) {
 	        		res.sendStatus(401);

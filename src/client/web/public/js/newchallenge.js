@@ -1,21 +1,58 @@
 $(document).ready(function(){
-	 document.getElementById('files').addEventListener('change', handleFileSelect, false);
+	//set up all event handlers
+	setupHandlers();
 
-	   // Setup the dnd listeners.
-  var dropZone = document.getElementById('dropzone');
-  dropZone.addEventListener('dragover', handleDragOver, false);
-  dropZone.addEventListener('drop', handleFileDropped, false);
-
-  $("#postChallenge").click(postChallenge);
-  $("#goToHomePage").click(function() {
-      window.open("/", "_self");
-  });
-
-  createLoginHeader();
-
-  setupCategories();
+	//set up categories
+	setupCategories();
 });
 
+/**
+	Set up event handlers
+**/
+function setupHandlers() {
+	// Setup the dnd listeners.
+	var dropZone = document.getElementById('dropzone');
+	dropZone.addEventListener('dragover', handleDragOver, false);
+	dropZone.addEventListener('drop', handleFileDropped, false);
+
+	//handler for file Browse button
+	document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+	// Post challenge button
+	$("#postChallenge").click(postChallenge);
+
+	// Challenge Message text box
+	$("textarea").keypress(function(e) {
+		var code = e.keyCode ? e.keyCode : e.which;
+		if (code == 13) {  // Enter keycode
+			$("#categorySection").show();
+			return false;
+		}
+	});
+
+	// Category List handler
+	$("#categoryList").on("change", function() {
+	  	if (user.facebook || user.twitter) {
+	  		$("#shareSection").show();
+	  		if (user.facebook) {
+	  			$("#shareFacebookSection").show();
+	  		}
+	  		if (user.twitter) {
+	  			$("#shareTwitterSection").show();
+	  		}	
+	  	} else {
+	  		$("#shareSection").hide();
+	  	}
+
+	  	$("#postSection").show();
+	  	$("#titleMessage").hide();
+	  	$("#challengeCategory").text("Category: " + $("#categoryList option:selected").text())
+	});
+}
+
+/**
+	Fetch available categories and populate the categories drop down
+**/
 function setupCategories() {
 	$.getJSON('/api/categories/', function(data) {
 		for (var i = 0; i < data.length; i++) {
@@ -26,6 +63,8 @@ function setupCategories() {
 	});
 }
 
+/****** Drag / Drop Handlers ********/
+
 function handleFileDropped(evt) {
 	evt.stopPropagation();
     evt.preventDefault();
@@ -33,32 +72,56 @@ function handleFileDropped(evt) {
     extractImage(evt.dataTransfer.files, handleFileSelected);
 }
 
-function handleFileSelected(data, path, title, type) {
-  $("#challengeImage").prop("src", path);
-  $("#challengeImage").prop("title", title);
-  $("#challengeImage").data("imageType", type);
-  $("#selectImage").hide();
-}
-
 function handleFileSelect(evt) {
   	extractImage(evt.target.files, handleFileSelected); // FileList object
-  }
+}
 
 
-  function handleDragOver(evt) {
+function handleDragOver(evt) {
     evt.stopPropagation();
     evt.preventDefault();
     evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
-  }
+}
 
+/**
+	An image was selected, whether by drag/drop or by Browse button
+	Show the image and switch to next step 
+**/
+function handleFileSelected(data, path, title, type) {
+	//show the image, and hide the drag/drop view
+	$("#challengeImage").prop("src", path);
+	$("#challengeImage").prop("title", title);
+	$("#challengeImage").data("imageType", type);
+	$("#selectImage").hide();
+
+	//move to next step, which is the Challenge Message
+	$("#descriptionSection").show();
+	$("#caption").blur().focus(); //make sure to set focus into the challenge message text area
+}
+
+/**
+	Post the challenge to the server
+**/
 function postChallenge() {
+	//construct the json object to be posted
 	var jsonObj = {};
-	jsonObj.imageDataURI = $("#challengeImage").attr("src");
-	jsonObj.imageType = $("#challengeImage").data("imageType");
-	jsonObj.caption = $("#caption").val();
-	jsonObj.created = (new Date()).getTime();
-	jsonObj.category = $("#categoryList option:selected").val();
+	jsonObj.imageDataURI = $("#challengeImage").attr("src"); //image data
+	jsonObj.imageType = $("#challengeImage").data("imageType"); //image type (used to store in server, for later use)
+	jsonObj.caption = $("#caption").val(); //challenge message
+	jsonObj.created = (new Date()).getTime(); //created time
+	jsonObj.category = $("#categoryList option:selected").val(); //category id
 
+	//if social share checkboxes were checked, make sure to include that in the post message
+	// note that the server will do the actual posting to the networks
+	jsonObj.socialShare = {};
+	if ($("#checkboxFacebook").prop("checked")) {
+		jsonObj.socialShare.facebook = true;
+	}
+	if ($("#checkboxTwitter").prop("checked")) {
+		jsonObj.socialShare.twitter = true;
+	}
+
+	//finally, make the call to the server
 	$.ajax({
 		type: "POST",
 		url: "/api/challenges",
@@ -67,18 +130,18 @@ function postChallenge() {
 		data: JSON.stringify(jsonObj)
 	})
 	.done(function(data, textStatus, jqXHR) {
-		//alert("Challenge posted successfully, challenge id = " + data._id);
-    window.open("/challenge/" + data.id, "_self");
+		//if the challenge was posted successfully, redirect to the newly created challenge page
+    	window.open("/challenge/" + data.id, "_self");
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
-		alert("some error was found, " + errorThrown);
-    $("#postChallenge").prop("value", "Post");
-    $("#postChallenge").prop("disabled", false);
+		//in case of some failure, allow the user another chance at posting by clicking the Post Challenge button again
+		alert("Something prevented us from posting your Challenge.  Please try again.");
+	    $("#postChallenge").prop("value", "Post");
+	    $("#postChallenge").prop("disabled", false);
 	});
 
-  //change button to 'posting ...'
-  console.log("changing button state... ");
-  $("#postChallenge").prop("value", "Posting...");
-  $("#postChallenge").prop("disabled", true);
-  console.log("after changing button state");
+	//as soon as the user clicks Post Challenge button, disable the button to prevent multiple clicks
+	//change button to 'posting ...'
+	$("#postChallenge").prop("value", "Posting...");
+	$("#postChallenge").prop("disabled", true);
 }

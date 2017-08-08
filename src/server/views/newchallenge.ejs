@@ -6,46 +6,53 @@
 <link rel="stylesheet" type="text/css" href="/css/styles.css"
 </head>
 <body>
-<% include ./header %>
-<div id="newchallenge" class="section100">
-	<div class="section">
-		<h1 id="mainTitle" class="title">New Challenge</h1>
-	
+
+<div class="centerDisplay">
+	<!-- HEADER -->
+	<div class="centerDisplayHeader">
+		<img src="/images/branding/captionify_logo_small.png">
+		<p id="titleMessage">Let's get ready to post an exciting new challenge!</p>
+	</div>
+	<hr>
+
+	<!-- CONTENT -->
+	<div class="centerDisplayContent">
 		<div class="selectImageSection" id="selectImage">
 			<div id="dropzone" class="dropZone">
-				<p>Drop Image here</p>
-				<p>OR</p>
-				<label for="files" class="btn btn-default">
-    				<i class="fa fa-cloud-upload"></i> Browse
-				</label>
-				<!-- <input type="file" id="files" name="files[]"> -->
-
+				<div class="dropZoneContent">
+					<p>Drop Image here</p><br>
+					<p>OR</p><br>
+					<label for="files" class="btn button-line">
+	    				<i class="fa fa-cloud-upload"></i> Browse
+					</label>
+				</div>
 				<input id="files" type="file"/>
-			</div>
-			
+			</div>	
 		</div>
-
-		<span>
-			<img id="challengeImage" class="centerImage">
-		</span>
-	</div>
-
-	<div class="section40">
-		<div class="form-group">
-			<label class="formCaption" for="caption">Caption:</label>
-			<textarea rows="2" class="form-control" id="caption" placeholder="Enter an exciting challenge caption here"></textarea>
-
-			<label class="formCaption" for="category">Category:</label>
+		<img id="challengeImage" class="centerDisplayImage">
+		<br>
+		<div id="descriptionSection" style="display:none;">
+			<p class="centerDisplayCaption">Challenge message:</p>
+			<textarea rows="2" class="form-control" id="caption" placeholder="Enter your challenge message here.  Press ENTER/RETURN after you're done."></textarea>
+		</div>
+		<br>
+		<div id="categorySection" style="display:none;">
+			<p class="centerDisplayCaption">Category:</p>
 			<select class="form-control" id="categoryList">
+				<option selected disabled>Choose category</option>
   			</select>
-
-		</div>
-
-		
-		<div class="center">
-			<button type="button" class="btn btn-primary btn-lg" value="Post Challenge!" id="postChallenge">Post Challenge!</button>
 		</div>
 	</div>
+
+	<!-- FOOTER -->
+	<div id="postSection" class="centerDisplayFooter" style="display:none;">
+		<hr>
+		<button type="button" class="btn btn-lg button-full" value="Post Challenge!" id="postChallenge">Post Challenge!</button>
+		<div id="shareSection">
+			<span>Also share on: </span>
+			<span id="shareFacebookSection"><input type="checkbox" id="checkboxFacebook" checked>Facebook</span>
+			<span id="shareTwitterSection"><input type="checkbox" id="checkboxTwitter" checked>Twitter</span>
+		</div>
 	</div>
 </div>
 

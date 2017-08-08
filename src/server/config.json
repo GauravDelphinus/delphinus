@@ -1,6 +1,6 @@
 {
-	"port": "8080",
 	"hostname" : "http://localhost:8080",
+	"port" : "8080",
 	"request_token_url": "https://api.twitter.com/oauth/request_token",
 	"access_token_url": "https://api.twitter.com/oauth/access_token",
 	"authorize_url": "https://twitter.com/oauth/authorize",
@@ -17,7 +17,6 @@
 		"brandImages" : "../client/web/public/images/static/branding/"
 	},
 	"social" : {
-
 		"facebook" : {
 			"clientID" : "1286014801445639",
 			"clientSecret" : "81732e3d807f86c9099589f632897dce",
@@ -32,6 +31,9 @@
 			"clientID" : "7Y9T7UneSfQnZ3EvuhErbEpdP",
 			"clientSecret" : "n7lQJiOJFrTCpNzrsq1Vt6JI18hkEwfTB0r1iTRgozYi8w793f",
 			"oauthCallback" : "/auth/twitter/callback"
+		},
+		"share" : {
+			"newChallengeMessage" : "Check out this new challenge that I just posted on Captionify.com!"
 		}
 	},
 	"url" : {

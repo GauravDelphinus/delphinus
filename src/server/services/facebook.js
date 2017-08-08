@@ -1,9 +1,11 @@
 var OAuth = require('OAuth').OAuth2;
 var request = require("request");
-var Facebook = function (facebookKey, facebookSecret) {
+var config = require("../config");
 
-    var key = facebookKey;
-    var secret = facebookSecret;
+var Facebook = function () {
+
+    var key = config.social.facebook.clientID;
+    var secret = config.social.facebook.clientSecret;
 
     var oauth = new OAuth(
         key, secret, 'https://graph.facebook.com',

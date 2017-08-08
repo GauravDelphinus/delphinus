@@ -81,16 +81,10 @@ var routes = function(db) {
 				POST a new challenge node.
 			**/
 
-			//console.log("received POST on /api/challenges");
 			// Store the incoming base64 encoded image into a local image file first
 			var fs = require('fs');
 			var imageDataURI = req.body.imageDataURI;
-			//var regex = /^data:.+\/(.+);base64,(.*)$/;
 			var imageType = req.body.imageType;
-
-			//var matches = imageDataURI.match(regex);
-			//var ext = matches[1].toLowerCase();
-			//var data = matches[2];
 			var index = imageDataURI.indexOf("base64,");
 			var data;
 			if (index != -1) {
@@ -99,13 +93,14 @@ var routes = function(db) {
 				data = imageDataURI;
 			}
 
-			var buffer = new Buffer(data, 'base64');
+			//generate path name for challenge image
 			var baseDir = global.appRoot + config.path.challengeImages;
-
-			var id = shortid.generate();
-			var name = id + "." + mime.extension(imageType);
-
+			var id = shortid.generate(); //new id for challenge
+			var name = id + "." + mime.extension(imageType); //generate name of image file
 			var fullpath = baseDir + name;
+			
+			//write the data to a file
+			var buffer = new Buffer(data, 'base64');
 			fs.writeFileSync(fullpath, buffer);
 			gm(fullpath).size(function(err, size) {
 				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) MATCH (category:Category {id: '" + req.body.category + "'}) CREATE (n:Challenge {" +
@@ -121,12 +116,24 @@ var routes = function(db) {
 				db.cypherQuery(cypherQuery, function(err, result){
 					if(err) throw err;
 
+					//now, check if the user selected to share to social networks
+					if (req.body.socialShare) {
+						if (req.body.socialShare.facebook) {
+							var facebook = require('../services/facebook')();
+							facebook.postUpdate(config.social.share.newChallengeMessage, config.hostname + config.url.challenges + id, req.user.facebook.token, function(error, data) {
+								//do nothing
+							});
+						}
+						if (req.body.socialShare.twitter) {
+							var twitter = require('../services/twitter')();
+					        twitter.postUpdate(config.social.share.newChallengeMessage + " " + config.hostname + config.url.challenges + id, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
+					        	//do nothing
+					        });
+						}
+					}
 					res.json(result.data[0]);
 				});
 			});
-
-
-		
 		});
 
 	challengeRouter.route("/:challengeId") // ROUTER FOR /api/challenges/<id>
