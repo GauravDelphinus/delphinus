@@ -95,7 +95,7 @@ function numDaysBetween (d1, d2) {
 };
 
 function createNewTabGroup(id) {
-	var tabGroup = $("<div>", {id: id, class: "container"});
+	var tabGroup = $("<div>", {id: id});
 	tabGroup.append($("<ul>", {class: "nav nav-tabs"}));
 	tabGroup.append($("<div>", {class: "tab-content"}));
 

@@ -173,12 +173,13 @@ module.exports = {
 		Given an Entry ID, fetch the meta data related to the Entry.
 	**/
 	getMetaDataForEntry : function(entryId, next) {
+		var constructMetaData = this.constructMetaData;
 		var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) MATCH (c:Challenge)<-[:PART_OF]-(e)-[:POSTED_BY]->(poster:User) RETURN e, poster, c;";
 
 		myDB.cypherQuery(cypherQuery, function(err, result){
 	    	if(err || result.data.length <= 0) throw err;
 
-	    	var data = this.constructMetaData("entry", result.data[0][0], result.data[0][1], result.data[0][2]);
+	    	var data = constructMetaData("entry", result.data[0][0], result.data[0][1], result.data[0][2]);
 
 		    next(0, data);
 		});

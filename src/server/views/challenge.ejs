@@ -2,28 +2,44 @@
 <head>
 <% include ./metadata %>
 
-<title>When Great Minds Don’t Think Alike</title>
+<title><%=pageTitle%></title>
 <link rel="stylesheet" href="http://netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css">
 <link ref="stylesheet" href="/css/font-awesome/css/font-awesome.css">
 <link rel="stylesheet" type="text/css" href="/css/styles.css">
-
-
-
 </head>
+
 <body>
 <% include ./header %>
-
-<div id="meta">
-</div>
-
-
-
-<div id="main" class="section">
-	<h1 id="mainTitle" class="title"></h1>
-</div>
-
 <br><br>
-
+<div class="container-fluid">
+	<div class="row">
+	<div class="col-md-2 fixed">
+		<% include ./shortcutsSidebar %>
+		<div class="sidebar" id="categoriesSidebar">
+		</div>
+		<div class="sidebar">
+			<span class="sidebarHeading">Ad Space</span>
+		</div>
+	</div>
+	<div class="col-md-6 col-md-offset-2">
+		<div id="main">
+			<span class="sectionTitle"><%=pageTitle%></span>
+		</div>
+		<hr/>
+		<div id="tabs">
+		</div>
+	</div>
+	<div class="col-md-2">
+		<% include ./createEntrySidebar %>
+		<div class="sidebar" id="popularChallengesSidebar">
+		</div>
+	</div>
+	<div class="col-md-2">
+		<div class="sidebar">
+			<span class="sidebarHeading">Ad Space</span>
+		</div>
+	</div>
+</div>
 
 <script>
 	var challengeId = '<%=challengeId%>';

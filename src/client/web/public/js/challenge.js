@@ -1,6 +1,10 @@
 $(document).ready(function(){
 	createLoginHeader();
 
+	createCategorySidebar();
+
+	createPopularChallengesSidebar();
+
 	setupMainItem();
 
 	setupTabs();
@@ -18,7 +22,7 @@ function setupMainItem() {
 
 function setupTabs() {
 	var tabGroup = createNewTabGroup("mainTabGroup");
-	$("body").append(tabGroup);
+	$("#tabs").append(tabGroup);
 
 	setupEntriesTab();
 
