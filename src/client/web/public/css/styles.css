@@ -199,9 +199,8 @@ body {
 }
 
 .settingsSubBlock {
-	margin: auto;
-	width: 90%;
-	margin-left: 20px;
+	margin: 0 auto;
+	width: 100%;
 }
 
 .settingsSubBlockTitle {
@@ -864,7 +863,7 @@ input[type=range] {
 
 .stepContent {
 	padding: 10px;
-	width: 90%;
+	width: 100%;
 	margin: 0 auto;
 }
 
@@ -997,7 +996,7 @@ img {
 .stepwizard-header {
     display: flex;
   	justify-content: space-between;
-  	margin: 10px 10px;
+  	margin: 10px 0px;
 }
 .stepwizard-header:before {
     top: 24px;
@@ -1011,9 +1010,9 @@ img {
 }
 .stepwizard {
     display: table;
-    width: 80%;
+    width: 100%;
     position: relative;
-    margin: 0 auto;
+    margin: 10px auto;
 }
 .stepwizard-step button[disabled] {
     opacity: 1 !important;
@@ -1075,8 +1074,8 @@ img {
 
 .stepTitle {
 	display: inline-block;
-	font-family: serif;
-	font-size: 2em;
+	/* font-family: serif; */
+	font-size: 1.4em;
 	font-weight: bold;
 	width: 80%;
 	display: table-cell;

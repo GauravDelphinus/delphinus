@@ -14,7 +14,6 @@ var routes = function(db) {
 
 	filterRouter.route("/")
 	.get(function(req, res) {
-		console.log("GET on /api/filters");
 		var cypherQuery;
 
 		if (req.query.type == "filter" && req.query.filterType == "preset") {
@@ -44,7 +43,6 @@ var routes = function(db) {
 
 	filterRouter.route("/apply") // /api/filters/apply ROUTE
 	.post(function(req, res){
-		console.log("POST on /api/filters/apply, req.body is " + JSON.stringify(req.body));
 		var sourceImagePath;
 		var purgeImageAfterUse = false;
 		// Normalize the image
@@ -59,9 +57,7 @@ var routes = function(db) {
 
 				var image = req.body.imageData; //challengeId
 				sourceImagePath = global.appRoot + config.path.challengeImages + image + "." + mime.extension(imageData.imageType);
-				console.log("1- req.body.steps = " + JSON.stringify(req.body.steps));
 	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
-	    			console.log("2- steps = " + JSON.stringify(steps));
 	    			imageProcessor.applyStepsToImage(sourceImagePath, null, steps, req.body.caption, function(err, imagePath){
 						if (err) throw err;
 
@@ -331,52 +327,12 @@ function extractSingleStepList(steps) {
 		}
 	}
 
-	/*
-	if (steps.filters) {
-		var step = {filters: steps.filters};
-
-		if (steps.layouts) {
-			step.layouts = steps.layouts;
-		}
-		singleStepList.push(step);
-	}
-
-	if (steps.artifacts) {
-		var step = {artifacts: steps.artifacts};
-
-		if (steps.layouts) {
-			step.layouts = steps.layouts;
-		}
-		if (steps.filters) {
-			step.filters = steps.filters;
-		}
-		singleStepList.push(step);
-	}
-
-	if (steps.decorations) {
-		var step = {decorations: steps.decorations};
-
-		if (steps.layouts) {
-			step.layouts = steps.layouts;
-		}
-		if (steps.filters) {
-			step.filters = steps.filters;
-		}
-		if (steps.artifacts) {
-			step.artifacts = steps.artifacts;
-		}
-		singleStepList.push(step);
-	}
-	*/
-
-	//console.log("output stepList: " + singleStepList);
 	return singleStepList;
 }
 
 function sendImage(err, imagePath, purge) {
 	if (err) throw err;
 
-	//console.log("calling res.send with " + imagePath);
 	var json = "{ image : '" + imagePath + "' }";
 	res.send(json); //, function(err) {
 			

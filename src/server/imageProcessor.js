@@ -402,7 +402,7 @@ function applyFilters (image, filters, imArgs) {
 				if (filter.effects.spread) {
 					//image.spread(filter.effects.spread.amount);
 					imArgs.push("-spread");
-					imArgs.push(filter.effecxts.spread.amount);
+					imArgs.push(filter.effects.spread.amount);
 				}
 				if (filter.effects.charcoal) {
 					//image.charcoal(filter.effects.charcoal.factor);
@@ -494,7 +494,6 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 	for (var i = 0; i < numArtifacts; i++) {
 
 		var artifact = artifacts[i];
-		console.log("artifact is " + JSON.stringify(artifact));
 
 		if (artifact.type == "preset") {
 			applyPresetArtifact(size, artifact.preset, caption, imArgs);

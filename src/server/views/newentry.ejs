@@ -10,6 +10,18 @@
 </head>
 <body>
 <% include ./header %>
+
+<div class="centerDisplay">
+	<!-- HEADER -->
+	<div class="centerDisplayHeader">
+		<img src="/images/branding/captionify_logo_small.png">
+		<p id="titleMessage">Let's get ready to post an awesome Caption entry!</p>
+	</div>
+	<hr>
+
+	<!-- CONTENT -->
+	<div class="centerDisplayContent">
+
 <div id="newentry" class="fullWidth" style="text-align: center;">
 	<div class="imageSection">
 		<img id="newentryimage" class="centerImage"/>
@@ -23,35 +35,35 @@
 		<div class="stepwizard-header">
 	      <div class="stepwizard-step">
 	        <a href="#captionSection" type="button" class="btn btn-primary btn-circle">1</a>
-	        <p>Step 1</p>
+	        <p>Caption</p>
 	      </div>
 	      <div class="stepwizard-step">
 	        <a href="#artifactSection" type="button" class="btn btn-default btn-circle" disabled="disabled">2</a>
-	        <p>Step 2</p>
+	        <p>Place Caption</p>
 	      </div>
 	      <div class="stepwizard-step">
 	        <a href="#layoutSection" type="button" class="btn btn-default btn-circle" disabled="disabled">3</a>
-	        <p>Step 3</p>
+	        <p>Adjust Layout</p>
 	      </div>
 	      <div class="stepwizard-step">
 	        <a href="#filterSection" type="button" class="btn btn-default btn-circle" disabled="disabled">4</a>
-	        <p>Step 4</p>
+	        <p>Apply Filters</p>
 	      </div>
 	      <div class="stepwizard-step">
 	        <a href="#decorationSection" type="button" class="btn btn-default btn-circle" disabled="disabled">5</a>
-	        <p>Step 5</p>
+	        <p>Add Border</p>
 	      </div>
 	      <div class="stepwizard-step">
 	        <a href="#postSection" type="button" class="btn btn-default btn-circle" disabled="disabled">6</a>
-	        <p>Step 6</p>
+	        <p>Post!</p>
 	      </div>
 	    </div>
 	  
 	
 		<div id="stepHeader" class="stepHeader">
-			<button id="prevButton" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left"></span> Previous</button>
+			<button id="prevButton" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left"></span></button>
 			<span id="stepTitle" class="stepTitle"></span>
-			<button id="nextButton" type="button" class="btn btn-primary">Next <span class="glyphicon glyphicon-arrow-right"></span></button>
+			<button id="nextButton" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-right"></span></button>
 		</div>
 
 		<div id="stepContent" class="stepContent">
@@ -101,7 +113,6 @@
 					</div>
 				</div>
 			</div>
-			<br>
 
 			<!-- LAYOUT SECTION -->
 			<div id="layoutSection" class="setup-content" style="display: none;">
@@ -269,7 +280,6 @@
 				</div>
 
 			</div>
-			<br>
 			
 			<!-- DECORATION SECTION -->
 			<div id="decorationSection" class="setup-content" style="display: none;">
@@ -290,11 +300,28 @@
 					</div>
 				</div>
 			</div>
-
+			
 			<!-- POST SECTION -->
+			<!--
 			<div id="postSection" class="settingsBlock setup-content" style="display: none;">
 			<input type="button" value="Post Entry!" class="btn btn-primary" id="apply">
 			</div>
+			-->
+		</div>
+
+
+</div>
+
+	</div>
+
+	<!-- FOOTER -->
+	<div id="postSection" class="centerDisplayFooter" style="display:none;">
+		<hr>
+		<button type="button" class="btn btn-lg button-full" value="postCaption" id="apply">Post Caption!</button>
+		<div id="shareSection">
+			<span>Also share on: </span>
+			<span id="shareFacebookSection"><input type="checkbox" id="checkboxFacebook" checked>Facebook</span>
+			<span id="shareTwitterSection"><input type="checkbox" id="checkboxTwitter" checked>Twitter</span>
 		</div>
 	</div>
 </div>
@@ -305,9 +332,7 @@
 
 <br><br>
 
-</div>
-	
-</div>
+
 <script>
 	var challengeId = '<%=challengeId%>';
 	var user = <%- JSON.stringify(user) %>;
