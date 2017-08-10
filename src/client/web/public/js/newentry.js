@@ -106,7 +106,10 @@ function changeCallback(event) {
 function showLayoutStep() {
 	$("#stepTitle").text("Tweak the layout of your entry")
 
+
 	if ($("#presetLayoutSection").is(":visible")) {
+		//default selection
+		var defaultSelectionID = $("#presetLayoutSection").data("selectedLayoutID");
 		$.getJSON('/api/filters?type=layout' + "&layoutType=preset", function(result) {
 			if (result.length > 0) {
 				var list = [];
@@ -141,12 +144,14 @@ function showLayoutStep() {
 				}
 
 				$("#presetLayouts").remove();
-				var grid = createGrid("presetLayouts", list, 3, true, true, function(id) {
+				var grid = createGrid("presetLayouts", list, 3, true, true, defaultSelectionID, function(id) {
 					$("#presetLayoutSection").data("selectedLayoutID", id);
 					applyChanges();
 					$(window).scrollTop(0);
 				});
 				$("#presetLayoutSection").append(grid);
+
+				applyChanges(); //for default selection
 			}
 		});
 	}
@@ -359,6 +364,9 @@ function showFilterStep() {
 	$("#stepTitle").text("Apply a really cool filter to your entry!")
 
 	if ($("#presetFilterSection").is(":visible")) {
+		//default selection
+		var defaultSelectionID = $("#presetFilterSection").data("selectedFilterID");
+
 		$.getJSON('/api/filters?type=filter' + "&filterType=preset", function(result) {
 			if (result.length > 0) {
 				var list = [];
@@ -393,13 +401,15 @@ function showFilterStep() {
 				}
 
 				$("#presetFilters").remove();
-				var grid = createGrid("presetFilters", list, 3, true, true, function(id) {
+				var grid = createGrid("presetFilters", list, 3, true, true, defaultSelectionID, function(id) {
 					console.log("selection callbac for id = " + id);
 					$("#presetFilterSection").data("selectedFilterID", id);
 					applyChanges();
 					$(window).scrollTop(0);
 				});
 				$("#presetFilterSection").append(grid);
+
+				applyChanges(); //for default selection
 			}
 		});
 	}
@@ -546,6 +556,13 @@ function showArtifactStep() {
 	$("#stepTitle").text("Place your caption in the entry image")
 
 	if ($("#presetArtifactSection").is(":visible")) {
+		//default selection
+		var defaultSelectionID = $("#presetArtifactSection").data("selectedArtifactID");
+		if (defaultSelectionID == undefined) {
+			defaultSelectionID = "bannerBottomBlack";
+			$("#presetArtifactSection").data("selectedArtifactID", defaultSelectionID);
+		}
+
 		$.getJSON('/api/filters?type=artifact' + "&artifactType=preset", function(result) {
 			if (result.length > 0) {
 				var list = [];
@@ -574,12 +591,15 @@ function showArtifactStep() {
 				}
 
 				$("#presetArtifacts").remove();
-				var grid = createGrid("presetArtifacts", list, 3, true, true, function(id) {
+				var grid = createGrid("presetArtifacts", list, 3, true, true, defaultSelectionID, function(id) {
 					$("#presetArtifactSection").data("selectedArtifactID", id);
 					applyChanges();
 					$(window).scrollTop(0);
 				});
 				$("#presetArtifactSection").append(grid);
+
+				//apply changes to reflect default selection
+				applyChanges();
 			}
 		});
 	}
@@ -643,6 +663,9 @@ function showDecorationStep() {
 	$("#stepTitle").text("Apply some final touches to your entry with a border!")
 
 	if ($("#presetDecorationSection").is(":visible")) {
+		//default selection
+		var defaultSelectionID = $("#presetDecorationSection").data("selectedDecorationID");
+
 		$.getJSON('/api/filters?type=decoration' + "&decorationType=preset", function(result) {
 			if (result.length > 0) {
 				var list = [];
@@ -677,12 +700,14 @@ function showDecorationStep() {
 				}
 
 				$("#presetDecorations").remove();
-				var grid = createGrid("presetDecorations", list, 3, true, true, function(id) {
+				var grid = createGrid("presetDecorations", list, 3, true, true, defaultSelectionID, function(id) {
 					$("#presetDecorationSection").data("selectedDecorationID", id);
 					applyChanges();
 					$(window).scrollTop(0);
 				});
 				$("#presetDecorationSection").append(grid);
+
+				applyChanges(); //for default selection
 			}
 		});
 	}
@@ -914,9 +939,10 @@ function constructJSONObject(jsonObj) {
 
 	// ARTIFACTS
 	var artifact = {};
-	
+	console.log("artifact state = " + $("#artifactOptionsButton").data("state"));
 	if ($("#artifactOptionsButton").data("state") == "preset") {
 		var presetValue = $("#presetArtifactSection").data("selectedArtifactID");
+		console.log("presetValue = " + presetValue);
 		if (presetValue != undefined) {
 			artifact.type = "preset";
 			artifact.preset = presetValue;

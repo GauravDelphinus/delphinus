@@ -1424,7 +1424,8 @@ function createPopupElement(id, headerContent, footerContent, bodyContent, close
 	return element;
 }
 
-function createGrid(id, list, numCols, allowHover, allowSelection, selectionCallback) {
+function createGrid(id, list, numCols, allowHover, allowSelection, defaultSelectedID, selectionCallback) {
+	console.log("createGrid, defaultSelectedID is " + defaultSelectedID);
 	var table = $("<table>", {id: id, class: "gridTable"});
 
 	var tdWidth = 100 / numCols;
@@ -1452,6 +1453,11 @@ function createGrid(id, list, numCols, allowHover, allowSelection, selectionCall
 						e.data.element.addClass("elementSelected"); //now make the selection
 						selectionCallback(e.data.id);
 					});
+				}
+
+				//if there's a default selection, make the selection
+				if (defaultSelectedID != null && defaultSelectedID != undefined && defaultSelectedID == data.id) {
+					element.addClass("elementSelected");
 				}
 
 				td.append(element);
@@ -1583,7 +1589,7 @@ function refreshThumbnailView(contentTag) {
 
 	var list = jQuery.data(document.body, contentTag + "List");
 
-	var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+	var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null, null);
 	$("#" + contentTag + "Container").append(grid);
 }
 
@@ -1668,7 +1674,7 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 		var list = jQuery.data(document.body, contentTag + "List");
 		
 		if (buttonID == "thumbnailViewButton") {
-			var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+			var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null, null);
 			container.append(grid);
 		} else if (buttonID == "scrollableViewButton") {
 			var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
@@ -1711,7 +1717,7 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 		if ($("#" + contentTag + "ViewGroup button.active").length) {
 			var viewOptionsButtonID = $("#" + contentTag + "ViewGroup button.active").attr("id");
 			if (viewOptionsButtonID == "thumbnailViewButton") {
-				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null, null);
 				$("#" + contentTag + "Container").append(grid);
 			} else if (viewOptionsButtonID == "scrollableViewButton") {
 				var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
@@ -1719,7 +1725,7 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 			}
 		} else {
 			if (defaultViewType == "thumbnail") {
-				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null);
+				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null, null);
 				$("#" + contentTag + "Container").append(grid);
 			} else if (defaultViewType == "filmstrip") {
 				var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
