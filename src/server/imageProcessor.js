@@ -5,8 +5,6 @@ var execFile = require('child_process').execFile;
 
 module.exports = {
 	applyStepsToImage : function(sourceImage, targetImage, steps, caption, next) {
-
-		console.log("applyStepsToImage: steps = " + JSON.stringify(steps));
 		if (targetImage) {
 			applySteps(sourceImage, targetImage, steps, caption, next);
 		} else {
