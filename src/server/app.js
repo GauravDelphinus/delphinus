@@ -172,7 +172,7 @@ module.exports = function() {
 					if (err) throw err;
 
 					var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image; //path to challenge image
-					imageProcessor.applyStepsToImage(sourceImagePath, targetImage, imageData.steps, function(err, image){
+					imageProcessor.applyStepsToImage(sourceImagePath, targetImage, imageData.steps, imageData.caption, function(err, image){
 						if (err) throw err;
 
 						//console.log("calling res.sendFile with " + image);
@@ -180,17 +180,16 @@ module.exports = function() {
 						res.sendFile(image, function(err) {
 							if (err) {
 								if (err.code == "ECONNABORTED") {
-								//console.log("err is " + err + ", continuing as usual ... ");
-								//console.log("err JSON is " + JSON.stringify(err));
-								//console.log("err.name is " + err.name);
 								} else {
 									throw err;
 								}
 							}
 							//dispose off the file
-							//fs.unlink(image, function(err) {
-							//	if (err) throw err;
-							//});
+							if (sourceImagePath != image) {
+								fs.unlink(image, function(err) {
+									if (err) throw err;
+								});
+							}
 						});
 					});
 				});

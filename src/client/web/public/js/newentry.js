@@ -128,6 +128,9 @@ function showLayoutStep() {
 
 					var jsonObj = {};
 					constructJSONObject(jsonObj);
+					if (!jsonObj.steps.layouts) {
+						jsonObj.steps.layouts = [{}];
+					}
 					jsonObj.steps.layouts[0].type = "preset";
 					jsonObj.steps.layouts[0].preset = l.id;
 					generateChanges(l.id, jsonObj, function(id, imgPath) {
@@ -377,6 +380,9 @@ function showFilterStep() {
 
 					var jsonObj = {};
 					constructJSONObject(jsonObj);
+					if (!jsonObj.steps.filters) {
+						jsonObj.steps.filters = [{}];
+					}
 					jsonObj.steps.filters[0].type = "preset";
 					jsonObj.steps.filters[0].preset = f.id;
 					generateChanges(f.id, jsonObj, function(id, imgPath) {
@@ -388,6 +394,7 @@ function showFilterStep() {
 
 				$("#presetFilters").remove();
 				var grid = createGrid("presetFilters", list, 3, true, true, function(id) {
+					console.log("selection callbac for id = " + id);
 					$("#presetFilterSection").data("selectedFilterID", id);
 					applyChanges();
 					$(window).scrollTop(0);
@@ -553,6 +560,9 @@ function showArtifactStep() {
 
 					var jsonObj = {};
 					constructJSONObject(jsonObj);
+					if (!jsonObj.steps.artifacts) {
+						jsonObj.steps.artifacts = [{}];
+					}
 					jsonObj.steps.artifacts[0].type = "preset";
 					jsonObj.steps.artifacts[0].preset = a.id;
 					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
@@ -654,6 +664,9 @@ function showDecorationStep() {
 
 					var jsonObj = {};
 					constructJSONObject(jsonObj);
+					if (!jsonObj.steps.decorations) {
+						jsonObj.steps.decorations = [{}];
+					}
 					jsonObj.steps.decorations[0].type = "preset";
 					jsonObj.steps.decorations[0].preset = d.id;
 					generateChanges(d.id, jsonObj, function(id, imgPath) {
@@ -761,7 +774,7 @@ function constructJSONObject(jsonObj) {
 	jsonObj.steps = {}; // the main object that encapsulates filters, layouts, etc.
 
 	/// LAYOUT
-	jsonObj.steps.layouts = [];
+	
 
 	var layout = {};
 	if ($("#layoutOptionsButton").data("state") == "preset") {
@@ -814,11 +827,12 @@ function constructJSONObject(jsonObj) {
 		}
 	}
 
-	jsonObj.steps.layouts.push(layout);
+	if (!$.isEmptyObject(layout)) {
+		jsonObj.steps.layouts = [];
+		jsonObj.steps.layouts.push(layout);
+	}
 
 	/// FILTERS
-	jsonObj.steps.filters = [];
-
 	var filter = {};
 
 	if ($("#filterOptionsButton").data("state") == "preset") { // PRESET FILTER
@@ -892,19 +906,15 @@ function constructJSONObject(jsonObj) {
 	}
 
 	
-
-	jsonObj.steps.filters.push(filter);
-
-	// ARTIFACTS
-
-	jsonObj.steps.artifacts = [];
-
+	if (!$.isEmptyObject(filter)) {
+		jsonObj.steps.filters = [];
+		jsonObj.steps.filters.push(filter);
+	}
 	
 
+	// ARTIFACTS
 	var artifact = {};
-
-	artifact.banner = {};
-	artifact.banner.text = $("#bannerText").prop("value");
+	
 	if ($("#artifactOptionsButton").data("state") == "preset") {
 		var presetValue = $("#presetArtifactSection").data("selectedArtifactID");
 		if (presetValue != undefined) {
@@ -912,7 +922,9 @@ function constructJSONObject(jsonObj) {
 			artifact.preset = presetValue;
 		}
 	} else if ($("#artifactOptionsButton").data("state") == "custom") {
-		artifact.type = "custom";
+			artifact.type = "custom";
+
+			artifact.banner = {};
 
 			if ($("#topBannerButton").hasClass("active")) {
 				artifact.banner.location = "top";
@@ -936,14 +948,12 @@ function constructJSONObject(jsonObj) {
 	}
 
 
-
-	jsonObj.steps.artifacts.push(artifact);
-
-
+	if (!$.isEmptyObject(artifact)) {
+		jsonObj.steps.artifacts = [];
+		jsonObj.steps.artifacts.push(artifact);
+	}
+	
 	// DECORATIONS
-
-	jsonObj.steps.decorations = [];
-
 	var decoration = {};
 
 	if ($("#decorationOptionsButton").data("state") == "preset") {
@@ -963,8 +973,10 @@ function constructJSONObject(jsonObj) {
 		}
 	}
 
-	jsonObj.steps.decorations.push(decoration);
-
+	if (!$.isEmptyObject(artifact)) {
+		jsonObj.steps.decorations = [];
+		jsonObj.steps.decorations.push(decoration);
+	}
 }
 
 function generateChanges(id, jsonObj, done) {
@@ -988,7 +1000,7 @@ function applyChanges(done) {
 	
 
 	constructJSONObject(jsonObj);
-	console.log(JSON.stringify(jsonObj));
+	console.log("Apply Changes: " + JSON.stringify(jsonObj));
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -996,7 +1008,7 @@ function applyChanges(done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			console.log("success with apply, data is " + JSON.stringify(jsonData));
+			console.log("success with apply");
 			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
 			if (done) {
 				done();

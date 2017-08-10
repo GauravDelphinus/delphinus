@@ -82,6 +82,7 @@ var routes = function(db) {
 				POST a new entry node, and link it to a Challenge node.
 			**/
 
+			console.log("POST on /api/entry, with req.body.steps = " + JSON.stringify(req.body.steps));
 			var id = shortid.generate();
 			/**
 				First create the entry node.  Then later, link them to Filter nodes.

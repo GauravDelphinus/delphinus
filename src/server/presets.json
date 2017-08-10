@@ -23,6 +23,8 @@
 		"whiteBorder10" : "10 Pixels wide White Border",
 		"blackBorder10" : "10 Pixels wide Black Border",
 		"whiteBorder20" : "20 Pixels wide White Border",
-		"blackBorder20" : "20 Pixels wide Black Border"
+		"blackBorder20" : "20 Pixels wide Black Border",
+		"grayBorder10" : "10 Pixels wide Gray Border",
+		"grayBorder20" : "20 Pixels wide Gray Border"
 	}
 }

@@ -289,20 +289,24 @@ module.exports = {
 
 	    		// Now, get the steps attached to this image
 
-				var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[u:USES]->(s) RETURN LABELS(s),s ORDER BY u.order;";
+				var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[u:USES]->(s) RETURN LABELS(s),s, e.caption ORDER BY u.order;";
+
 
 				myDB.cypherQuery(cypherQuery, function(err, result){
 	    			if(err) throw err;
 
 	    			//console.log(result.data); // delivers an array of query results
 
+	    			var imageCaption;
 	    			var stepsFromDB = result.data;
+
 	    			var steps = {};
 	    			var filters = [], layouts = [], artifacts = [], decorations = [];
 
 	    			// Now construct the filters array in the JSON format
 	    			for (var i = 0; i < stepsFromDB.length; i++) {
 	    				var stepFromDB = stepsFromDB[i];
+	    				imageCaption = stepFromDB[2];
 
 	    				if (stepFromDB[0][0] == "Filter") {
 	    					var filterFromDB = stepFromDB[1];
@@ -441,13 +445,12 @@ module.exports = {
 	    					} else if (artifactFromDB.artifact_type == "preset") {
 	    						artifact.type = "preset";
 
-	    						artifact.preset = artifactFromDB.id;
+	    						artifact.preset = artifactFromDB.id;			
 	    					} else if (artifactFromDB.artifact_type == "user_defined" || artifactFromDB.artifact_type == "custom") {
 	    						artifact.type = artifactFromDB.artifact_type;
 
-	    						if (artifactFromDB.banner == "on") {
+	    						if (artifactFromDB.banner == "on") { //actual banner text is stored in entry.caption
 	    							artifact.banner = {};
-	    							artifact.banner.text = artifactFromDB.banner_text;
 	    							artifact.banner.location = artifactFromDB.banner_location;
 	    							artifact.banner.fontSize = parseInt(artifactFromDB.banner_fontSize);
 	    							artifact.banner.fontName = artifactFromDB.banner_fontName;
@@ -502,7 +505,7 @@ module.exports = {
 	    				
 	    			}
 
-	    			next(0, { "image" : image, "steps" : steps});
+	    			next(0, { "image" : image, "steps" : steps, "caption" : imageCaption});
 	    	});
 
 		});
@@ -733,13 +736,8 @@ module.exports = {
 				cypherQuery += " id : '" + id + "' ";
 				cypherQuery += ", artifact_type : 'custom' ";
 
-				var bannerText = artifact.banner.text;
-				bannerText = bannerText.replace(/'/g, "\\'");
-
 				if (artifact.banner) {
 					cypherQuery += ", banner : 'on'";
-					cypherQuery += ", banner_text : '" + bannerText + "'";
-
 					cypherQuery += ", banner_location : '" + artifact.banner.location + "'";
 					cypherQuery += ", banner_fontSize : '" + artifact.banner.fontSize + "'";
 					cypherQuery += ", banner_fontName : '" + artifact.banner.fontName + "'";

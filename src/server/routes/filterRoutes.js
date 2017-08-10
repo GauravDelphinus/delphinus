@@ -4,6 +4,8 @@ var fs = require("fs");
 var config = require("../config");
 var async = require("async");
 var mime = require("mime");
+var spawn = require("child_process").spawn;
+var execFile = require("child_process").execFile;
 
 var routes = function(db) {
 
@@ -12,6 +14,7 @@ var routes = function(db) {
 
 	filterRouter.route("/")
 	.get(function(req, res) {
+		console.log("GET on /api/filters");
 		var cypherQuery;
 
 		if (req.query.type == "filter" && req.query.filterType == "preset") {
@@ -41,7 +44,7 @@ var routes = function(db) {
 
 	filterRouter.route("/apply") // /api/filters/apply ROUTE
 	.post(function(req, res){
-
+		console.log("POST on /api/filters/apply, req.body is " + JSON.stringify(req.body));
 		var sourceImagePath;
 		var purgeImageAfterUse = false;
 		// Normalize the image
@@ -56,9 +59,10 @@ var routes = function(db) {
 
 				var image = req.body.imageData; //challengeId
 				sourceImagePath = global.appRoot + config.path.challengeImages + image + "." + mime.extension(imageData.imageType);
-
+				console.log("1- req.body.steps = " + JSON.stringify(req.body.steps));
 	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
-	    			imageProcessor.applyStepsToImage(sourceImagePath, null, steps, function(err, imagePath){
+	    			console.log("2- steps = " + JSON.stringify(steps));
+	    			imageProcessor.applyStepsToImage(sourceImagePath, null, steps, req.body.caption, function(err, imagePath){
 						if (err) throw err;
 
 						//send the image as a base64 encoded image blob
@@ -69,8 +73,11 @@ var routes = function(db) {
 						//console.log("sending response to /api/filters/apply, jsonObj is " + JSON.stringify(jsonObj));
 						res.send(JSON.stringify(jsonObj));
 
-						//dispose off the temp file
-						fs.unlink(imagePath);
+						//dispose off the temp file, if source and target are not same
+						if (sourceImagePath != imagePath) {
+							fs.unlink(imagePath);
+						}
+						
 					});
 	    		});
     		});
@@ -108,7 +115,7 @@ var routes = function(db) {
 
 	    			for (var i = 0; i < singleStepList.length; i++) {
 	    				//console.log("singleStepList " + i + " is:" + JSON.stringify(singleStepList[i]));
-	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, null, singleStepList[i]));
+	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, null, singleStepList[i], imageData.caption));
 	    			}
 
 	    			var imagePaths = []; //list of image paths for each sub step
