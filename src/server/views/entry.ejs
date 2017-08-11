@@ -10,12 +10,37 @@
 <body>
 <% include ./header %>
 
-<div id="main" class="section">
-	<h1 id="mainTitle" class="title"></h1>
-</div>
-
 </div>
 <br><br>
+
+<div class="container-fluid">
+	<div class="row">
+	<div class="col-md-1">
+	</div>
+	<div class="col-md-2 col-md-offset-1 fixed">
+		<% include ./shortcutsSidebar %>
+		<div class="sidebar" id="categoriesSidebar">
+		</div>
+		<div class="sidebar">
+			<span class="sidebarHeading">Ad Space</span>
+		</div>
+	</div>
+	<div class="col-md-5 col-md-offset-2">
+		<div id="main">
+		</div>
+		<hr/>
+		<div id="tabs">
+		</div>
+	</div>
+	<div class="col-md-3 col-md-offset-8 fixed">
+		<div id="challenge">
+		</div>
+		<% include ./createEntrySidebar %>
+	</div>
+	<div class="col-md-1">
+	</div>
+</div>
+
 
 <script>
 	var entryId = '<%=entryId%>';

@@ -3,8 +3,6 @@ $(document).ready(function(){
 
 	createCategorySidebar();
 
-	createPopularChallengesSidebar();
-
 	setupMainItem();
 
 	setupTabs();

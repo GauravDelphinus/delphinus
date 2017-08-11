@@ -14,7 +14,9 @@
 
 <div class="container-fluid">
 	<div class="row">
-	<div class="col-md-2 fixed">
+	<div class="col-md-1">
+	</div>
+	<div class="col-md-2 col-md-offset-1 fixed">
 		<% include ./shortcutsSidebar %>
 		<div class="sidebar" id="categoriesSidebar">
 		</div>
@@ -22,21 +24,18 @@
 			<span class="sidebarHeading">Ad Space</span>
 		</div>
 	</div>
-	<div id="challenges" class="col-md-6 col-md-offset-2">
+	<div id="challenges" class="col-md-5 col-md-offset-2">
 		<div class="sectionHeader">
 			<span class="sectionTitle"><%=pageTitle%></span>
 			<button id="postChallenge" type="button" class="btn button-full pull-right"><span class="glyphicon glyphicon-plus"></span> Post New Challenge</button>
 		</div>
 		<hr/>
 	</div>
-	<div class="col-md-2">
+	<div class="col-md-3 col-md-offset-8 fixed">
 		<div class="sidebar" id="popularChallengesSidebar">
 		</div>
 	</div>
-	<div class="col-md-2">
-		<div class="sidebar">
-			<span class="sidebarHeading">Ad Space</span>
-		</div>
+	<div class="col-md-1">
 	</div>
 </div>
 

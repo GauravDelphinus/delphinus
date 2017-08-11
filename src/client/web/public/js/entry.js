@@ -3,6 +3,10 @@ $(document).ready(function(){
 
   	setupMainItem();
 
+  	setupChallengeSidebar();
+
+  	createCategorySidebar();
+
   	setupTabs();
 });
 
@@ -17,22 +21,17 @@ function setupMainItem() {
 
 function setupTabs() {
 	var tabGroup = createNewTabGroup("mainTabGroup");
-	$("body").append(tabGroup);
-
-	setupChallengeTab();
+	$("#tabs").append(tabGroup);
 
 	setupCommentsTab();
 
 	setupTabRedirection();
 }
 
-function setupChallengeTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenge");
-	//createAndAppendContentContainer(tabDiv, "challenges", [{type: "filmstrip"}], [{type: "date", url: "/api/challenges/" + challengeId}]);
-
+function setupChallengeSidebar() {
 	$.getJSON('/api/challenges/' + challengeId, function(data) {
-		var mainElement = createMainElement(data);
-		tabDiv.append(mainElement);
+		var element = createThumbnailElement(data);
+		$("#challenge").append(element);
 	});
 }
 
