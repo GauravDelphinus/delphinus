@@ -8,6 +8,8 @@ $(document).ready(function(){
   	createCategorySidebar();
 
   	setupTabs();
+
+  	keepSidebarVisible();
 });
 
 function setupMainItem() {

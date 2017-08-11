@@ -6,6 +6,8 @@ $(document).ready(function(){
 	createPopularUsersSidebar();
 
 	setupMainItem();
+
+	keepSidebarVisible();
 });
 
 function setupMainItem() {

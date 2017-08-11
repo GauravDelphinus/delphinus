@@ -6,6 +6,8 @@ $(document).ready(function(){
 	createPopularChallengesSidebar();
 
 	setupFeed();
+
+	keepSidebarVisible();
 });
 
 function setupFeed() {

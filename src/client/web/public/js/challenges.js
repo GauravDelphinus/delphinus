@@ -8,6 +8,8 @@ $(document).ready(function(){
 	setupMainItem();
 
 	setupButtons();
+
+	keepSidebarVisible();
 });
 
 function setupMainItem() {

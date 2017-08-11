@@ -1914,3 +1914,13 @@ function updateShortcutsSidebar() {
 		$("#sidebarProfileLink").remove();
 	}
 }
+
+/*
+	Keep the sidebars scrollable but visible in fixed positions.
+	Refer https://stackoverflow.com/questions/45626470/allow-one-column-to-scroll-till-end-of-content-and-then-remain-fixed
+*/
+function keepSidebarVisible() {
+	$(window).scroll(function(event) {
+        $('.fixed').scrollTop($(this).scrollTop());
+    });
+}

@@ -6,6 +6,8 @@ $(document).ready(function(){
 	setupMainItem();
 
 	setupTabs();
+
+	keepSidebarVisible();
 });
 
 function setupMainItem() {
