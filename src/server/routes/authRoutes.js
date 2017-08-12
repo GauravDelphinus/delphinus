@@ -1,6 +1,7 @@
 var express = require("express");
 var passport = require("passport");
 var config = require("../config");
+var dataUtils = require("../dataUtils");
 
 var routes = function(db) {
 	var authRouter = express.Router();
@@ -172,6 +173,67 @@ var routes = function(db) {
             }
         });
         
+    authRouter.route("/facebook/logout")
+    	.get(function(req, res) {
+    		//destroy facebook auth token
+    		
+			var facebook = require('../services/facebook')();
+			facebook.logout(req.user.facebook.token, function(error, data) {
+				if (!error) {
+					//delete locally stored tokens
+					dataUtils.removeAccessForUser(req.user.id, "facebook", function(err) {
+						console.log("removed from DB, req.session.user is " + JSON.stringify(req.session.user));
+
+						if (req.session.redirectTo) {
+			                var redirectTo = req.session.redirectTo;
+			                req.session.redirectTo = null;
+			                res.redirect(redirectTo);
+			            } else {
+			                res.redirect("/"); // redirect to home page by default
+			            }
+					});
+				} else {
+					if (req.session.redirectTo) {
+		                var redirectTo = req.session.redirectTo;
+		                req.session.redirectTo = null;
+		                res.redirect(redirectTo);
+		            } else {
+		                res.redirect("/"); // redirect to home page by default
+		            }	
+				}
+			});
+    	});
+
+       authRouter.route("/twitter/logout")
+    	.get(function(req, res) {
+    		//destroy facebook auth token
+    		
+			var twitter = require('../services/twitter')();
+			twitter.logout(req.user.twitter.token, req.user.twitter.tokenSecret, function(error, data) {
+				if (!error) {
+					//delete locally stored tokens
+					dataUtils.removeAccessForUser(req.user.id, "twitter", function(err) {
+						console.log("removed from DB, req.session.user is " + JSON.stringify(req.session.user));
+
+						if (req.session.redirectTo) {
+			                var redirectTo = req.session.redirectTo;
+			                req.session.redirectTo = null;
+			                res.redirect(redirectTo);
+			            } else {
+			                res.redirect("/"); // redirect to home page by default
+			            }
+					});
+				} else {
+					if (req.session.redirectTo) {
+		                var redirectTo = req.session.redirectTo;
+		                req.session.redirectTo = null;
+		                res.redirect(redirectTo);
+		            } else {
+		                res.redirect("/"); // redirect to home page by default
+		            }	
+				}
+			});
+    	});
 
     authRouter.route("/logout")
         .get(function (req, res) {

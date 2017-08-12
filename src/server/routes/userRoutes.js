@@ -161,17 +161,37 @@ var routes = function(db) {
 
 	userRouter.route("/:userId") // /api/users/<id>
 	.get(function(req, res) {
-		if (req.query.numFollowers) {
-			var cypherQuery = "MATCH (u:User {id: '" + req.params.userId + "'})<-[:FOLLOWING]-(f:User) RETURN COUNT(f);";
+			var meId = (req.user) ? (req.user.id) : (0);
+                  
+            var cypherQuery = "MATCH (u:User{id: '" + req.params.userId + "'}) WITH u " +
+                  		" OPTIONAL MATCH (u)<-[:FOLLOWING]-(follower:User) " +
+                  		" WITH u, COUNT(follower) AS numFollowers " +
+                  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(c:Challenge) " +
+                  		" WITH u, numFollowers, COLLECT(c) AS challengesPosted " +
+                  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(e:Entry) " +
+                  		" WITH u, numFollowers, challengesPosted, COLLECT(e) AS entriesPosted " +
+                  		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
+                  		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following), (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
+
+			//var cypherQuery = "MATCH (u:User {id: '" + req.params.userId + "'})<-[:FOLLOWING]-(f:User) RETURN COUNT(f);";
+
+			console.log("running query: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 
-				var output = {};
-
-				output.numFollowers = parseInt(result.data[0]);
-				res.json(output);
+				var socialInfo = {};
+				if (result.data[0][0].twitter_profile_link) {
+					socialInfo.twitterLink = result.data[0][0].twitter_profile_link;
+					console.log("adding twitter link: " + socialInfo.twitterLink);
+				}
+				if (result.data[0][0].facebook_profile_link) {
+					socialInfo.facebookLink = result.data[0][0].facebook_profile_link;
+					console.log("adding facebook link: " + socialInfo.facebookLink);
+				}
+				var data = dataUtils.constructEntityData("user", result.data[0][0], null, result.data[0][0].lastSeen, null, null, null, null, result.data[0][1], result.data[0][3] > 0, result.data[0][2], null, "none", null, null, null, null, null, socialInfo);
+				
+				res.json(data);
 			});
-		}
 	});
 
 	return userRouter;

@@ -14,7 +14,7 @@ module.exports = function () {
         },
         function(req, accessToken, refreshToken, profile, done){
 
-            //console.log("Info from Facebook Profile: " + JSON.stringify(profile));
+            console.log("******** Info from Facebook Profile: " + JSON.stringify(profile));
 
             var query = {};
             
@@ -50,6 +50,8 @@ module.exports = function () {
 
                 user.facebook = {};
                 user.facebook.id = profile.id;
+                user.facebook.profileLink = "https://www.facebook.com/" + profile.id;
+                console.log("******** set facebook access token: " +  accessToken);
                 user.facebook.token = accessToken;
                 user.facebook.displayName = profile.displayName;
                 user.facebook.emails = [];

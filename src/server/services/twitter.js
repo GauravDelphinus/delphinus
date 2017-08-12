@@ -29,8 +29,22 @@ var Twitter = function () {
 		);
     }
 
+    var logout = function(userAccessToken, userAccessTokenSecret, done) {
+    	oauth.post(
+		  "https://api.twitter.com/oauth2/invalidate_token",
+		  userAccessToken, userAccessTokenSecret,
+		  {"access_token": userAccessToken},
+		  "application/json",
+		  function(error, data) {
+		  	console.log("response from Twitter: error = " + JSON.stringify(error) + ", data = " + JSON.stringify(data));
+		    done(error, data);
+		  }
+		);
+    }
+
     return {
-        postUpdate: postUpdate
+        postUpdate: postUpdate,
+        logout: logout
     }
 }
 

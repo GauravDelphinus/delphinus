@@ -932,6 +932,7 @@ module.exports = {
 					user.twitter = {};
 					user.twitter.id = userFromDB.twitter_id;
 					user.twitter.username = userFromDB.twitter_username;
+					user.twitter.profileLink = userFromDB.twitter_profile_link;
 					user.twitter.token = userFromDB.twitter_token;
 					user.twitter.tokenSecret = userFromDB.twitter_tokenSecret;
 					user.twitter.displayName = userFromDB.twitter_displayName;
@@ -941,6 +942,7 @@ module.exports = {
 				if (userFromDB.facebook_id) {
 					user.facebook = {};
 					user.facebook.id = userFromDB.facebook_id;
+					user.facebook.profileLink = userFromDB.facebook_profile_link;
 					user.facebook.token = userFromDB.facebook_token;
 					user.facebook.displayName = userFromDB.facebook_displayName;
 					user.facebook.image = userFromDB.facebook_image;
@@ -1054,6 +1056,10 @@ module.exports = {
 						setValues.push(" u.twitter_username = '" + user.twitter.username + "'");
 					}
 
+					if (user.twitter.profileLink) {
+						setValues.push(" u.twitter_profile_link = '" + user.twitter.profileLink + "'");
+					}
+
 					if (user.twitter.displayName) {
 						setValues.push(" u.twitter_displayName = '" + user.twitter.displayName + "'");
 					}
@@ -1067,6 +1073,12 @@ module.exports = {
 					if (user.facebook.id) {
 						setValues.push(" u.facebook_id = '" + user.facebook.id + "'");
 					}
+
+					if (user.facebook.profileLink) {
+						setValues.push(" u.facebook_profile_link = '" + user.facebook.profileLink + "'");
+					}
+
+					console.log("set facebok profile link in db");
 
 					if (user.facebook.token) {
 						setValues.push(" u.facebook_token = '" + user.facebook.token + "'");
@@ -1177,6 +1189,10 @@ module.exports = {
 						cypherQuery += ", twitter_username: '" + user.twitter.username + "'";
 					}
 
+					if (user.twitter.profileLink) {
+						cypherQuery += ", twitter_profile_link: '" + user.twitter.profileLink + "'";
+					}
+
 					if (user.twitter.displayName) {
 						cypherQuery += ", twitter_displayName: '" + user.twitter.displayName + "'";
 					}
@@ -1189,6 +1205,10 @@ module.exports = {
 				if (user.facebook) {
 					if (user.facebook.id) {
 						cypherQuery += ", facebook_id: '" + user.facebook.id + "'";
+					}
+
+					if (user.facebook.profileLink) {
+						cypherQuery += ", facebook_profile_link: '" + user.facebook.profileLink + "'";
 					}
 
 					if (user.facebook.token) {
@@ -1221,7 +1241,7 @@ module.exports = {
 				cypherQuery += "});";
 			}
 
-			//console.log("running cypherquery: " + cypherQuery);
+			console.log("running cypherquery: " + cypherQuery);
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 
@@ -1234,14 +1254,32 @@ module.exports = {
 		});
 	},
 
+	removeAccessForUser: function(userId, provider, callback) {
+		if (provider == "facebook") {
+			removeQuery = " REMOVE u.facebook_id, u.facebook_profile_link, u.facebook_token, u.facebook_displayName, u.facebook_emails, u.facebook_image ";
+		} else if (provider == "twitter") {
+			removeQuery = " REMOVE u.twitter_id, u.twitter_token, u.twitter_tokenSecret, u.twitter_username, u.twitter_profile_link, u.twitter_displayName, u.twitter_images ";
+		}
+
+		var cypherQuery = "MATCH (u:User {id: '" + userId + "'}) ";
+		cypherQuery += removeQuery;
+		cypherQuery += " RETURN u;";
+
+		myDB.cypherQuery(cypherQuery, function(err, result) {
+			callback(err);
+		});
+
+	},
+
 	checkCachedFile : function(cachePath, callback) {
 		fs.stat(cachePath, function(err, stats) {
 			callback(err);
 		});
 	},
 
-	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, numFollowers, amFollowing, numPosts, amLiking, activityType, lastComment, lastCommenter, likeTime, liker, category) {
+	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, numFollowers, amFollowing, numPosts, amLiking, activityType, lastComment, lastCommenter, likeTime, liker, category, socialInfo) {
 
+		console.log("constructEntityData, entityTye: " + entityType + ", socialInfo: " + JSON.stringify(socialInfo));
 		var data = {
 			type : entityType,
 			id : entity.id,
@@ -1262,13 +1300,7 @@ module.exports = {
 		if (numEntries != null) {
 			data.socialStatus.entries = {numEntries: numEntries};
 		}
-		if (numFollowers != null && amFollowing != null) {
-			data.socialStatus.follows = {numFollowers: numFollowers, amFollowing: amFollowing};
-		}
-
-		if (numPosts != null) {
-			data.socialStatus.posts = {numPosts: numPosts};
-		}
+		
 
 		if (entityType == "challenge" || entityType == "entry") {
 			data.postedDate = entity.created;
@@ -1291,6 +1323,22 @@ module.exports = {
 			data.image = entity.image;
 			data.caption = entity.displayName;
 			data.link = config.url.user + entity.id;
+			if (socialInfo) {
+				if (socialInfo.facebookLink) {
+					data.socialStatus.facebook = {profileLink: socialInfo.facebookLink};
+					console.log("adding facebook link inside");
+				}
+				if (socialInfo.twitterLink) {
+					data.socialStatus.twitter = {profileLink: socialInfo.twitterLink};
+				}
+			}
+			if (numFollowers != null && amFollowing != null) {
+				data.socialStatus.follows = {numFollowers: numFollowers, amFollowing: amFollowing};
+			}
+
+			if (numPosts != null) {
+				data.socialStatus.posts = {numPosts: numPosts};
+			}
 		}
 
 		if (activityType != "none") {

@@ -1,6 +1,8 @@
 $(document).ready(function(){
 	createLoginHeader();
 
+	createCategorySidebar();
+
 	// NOTE:
 	// userInfo - whose page we're looking at
 	// user - currently logged in user
@@ -27,10 +29,12 @@ $(document).ready(function(){
 
 	setupNameSection(profileType);
 
-	setupFollowSection(profileType);
+	//setupFollowSection(profileType);
 
 	// set up the social information
 	setupSocialSection(profileType);
+
+	createPopularUsersSidebar();
 
 	setupTabs(profileType);
 });
@@ -200,80 +204,19 @@ function setupNameSection(profileType) {
 	});
 }
 
-function setupFollowSection(profileType) {
-	if (profileType == "mine") {
-		//don't show the follow button
-		$("#followButton").hide();
-	} else if (profileType == "member") {
-		//find out if you're already following this user or not
-
-		$.getJSON("/api/users/" + userInfo.id + "/follow", function(result) {
-			if (result.followStatus == "following") {
-				$("#followButton").prop("value", "FOLLOWING");
-          		$("#followButton").data("followStatus", "following");
-          		$("#followButton").show();
-          	} else if (result.followStatus == "not_following") {
-          		$("#followButton").prop("value", "FOLLOW " + userInfo.displayName);
-          		$("#followButton").data("followStatus", "not_following");
-          		$("#followButton").show();
-          }
-		});
-	} else if (profileType == "public") {
-		//redirect to sign-in
-		$("#followButton").prop("value", "FOLLOW " + userInfo.displayName);
-		$("#followButton").show();
-	}
-
-
-	$("#followButton").click(function() {
-		if (profileType == "public") {
-			window.open("/auth", "_self");
-		} else if (profileType == "member") {
-
-			var jsonObj = {};
-			if ($("#followButton").data("followStatus") == "not_following") {
-				jsonObj.followAction = "follow";
-			} else {
-				jsonObj.followAction = "unfollow";
-			}
-
-			$.ajax({
-				type: "PUT",
-				url: "/api/users/" + userInfo.id + "/follow",
-	          dataType: "json", // return data type
-	          contentType: "application/json; charset=UTF-8",
-	          data: JSON.stringify(jsonObj)
-	      	})
-			.done(function(data, textStatus, jqXHR) {
-	          	if (data.followStatus == "following") {
-	          		//already following
-	          		$("#followButton").prop("value", "FOLLOWING");
-	          		$("#followButton").data("followStatus", "following");
-	          		$("#followButton").show();
-	          	} else {
-	          		$("#followButton").prop("value", "FOLLOW " + userInfo.displayName);
-	          		$("#followButton").data("followStatus", "not_following");
-	          		$("#followButton").show();
-	          	}
-	      	})
-			.fail(function(jqXHR, textStatus, errorThrown) {
-				alert("some error was found, " + errorThrown);
-
-			});
-		}
-	});
-
-	//calculate the number of followers
-	$.getJSON("/api/users/" + userInfo.id + "?numFollowers=true", function(result) {
-		userInfo.numFollowers = result.numFollowers;
-
-		$("#numFollowers").text(userInfo.numFollowers);
-	});
-}
-
 function setupSocialSection(profileType) {
 	// Followers Section
-	//testing
+	console.log("calling get on /api/users/" + userInfo.id);
+	$.getJSON("/api/users/" + userInfo.id, function(data) {
+		console.log("received data = " + JSON.stringify(data));
+		var socialStatusSection = createSocialStatusSectionElement(data);
+		$("#socialStatusSection").append(socialStatusSection);
+
+		var socialActionsSection = createSocialActionsSectionElement(data, true);
+		$("#socialStatusSection").append(socialActionsSection);
+	});
+	
+	/*
 	
 	// Social Section
 	if (profileType == "public" || profileType == "member") {
@@ -292,19 +235,18 @@ function setupSocialSection(profileType) {
 	updateSocialStatus(profileType, googleIsConnected, "#linkGoogle", "#imageGoogle", "#imageGoogleTick", googleProfileLink, "/auth/google", "/images/social/google_regular_300x300.png", "/images/social/google_disabled_300x300.png");
 	updateSocialStatus(profileType, twitterIsConnected, "#linkTwitter", "#imageTwitter", "#imageTwitterTick", twitterProfileLink, "/auth/twitter", "/images/social/twitter_regular_300x300.png", "/images/social/twitter_disabled_300x300.png");
 	updateSocialStatus(profileType, facebookIsConnected, "#linkFacebook", "#imageFacebook", "#imageFacebookTick", facebookProfileLink, "/auth/facebook", "/images/social/facebook_regular_300x300.png", "/images/social/facebook_disabled_300x300.png");
-
-	// temporary for testing only
-	if (userInfo.id) {
-		$("#profileInfo").append($("<p>", {text: "ID: " + userInfo.id, class: "userInfoText"}));
-	}
+	*/
 }
 
 function setupTabs(profileType) {
 	var tabGroup = createNewTabGroup("mainTabGroup");
-	$("body").append(tabGroup);
+	$("#user").append(tabGroup);
 
 	//set up profile tab
-	setupProfileTab(profileType);
+	//Don't show profile tab until we have a way to figure out 
+	//how to revoke access for Twitter (already know how to do it for Facebook)
+	//the server side code is already in place
+	//setupProfileTab(profileType);
 
 	//challenges are shown irrespective of who is viewing, as long as there are challenges
 	setupChallengesTab();
@@ -324,64 +266,46 @@ function setupProfileTab(profileType) {
 	//if it's my profile, show the "Profile" tab
 	if (profileType == "mine") {
 		var tabDiv = appendNewTab("mainTabGroup", "profile", "Profile");
-		var h3 = $("<h3>").text("Edit your profile");
-		tabDiv.append(h3);
+		var title = $("<div>", {class: "sectionTitle"}).append("Manage your social networks");
+		tabDiv.append(title);
 
-		var profileSection = $("#profileSection").detach();
-		tabDiv.append(profileSection);
-		profileSection.show();
+		var connectedStatus = $("<span>", {class: "text-plain-small text-bold"}).append("Connected");
+		var disconnectedStatus = $("<span>", {class: "text-plain-small text-bold"}).append("Not Connected");
+		
+		var facebookLogo = $("<span>").append($("<img>", {src: "/images/social/facebook_share.png"}));
+		var connectFacebook = $("<a>", {class: "text-plain-small text-bold", href: "/auth/facebook"}).append("Connect");
+		var disconnectFacebook = $("<a>", {class: "text-plain-small text-bold", href: "/auth/facebook/logout"}).append("Disconnect");
 
-		//set initial values
-		if (userInfo.username) {
-			$("#username").val(userInfo.username);
+		var twitterLogo = $("<span>").append($("<img>", {src: "/images/social/twitter_share.png"}));
+		var connectTwitter = $("<a>", {class: "text-plain-small text-bold", href: "/auth/twitter"}).append("Connect");
+		var disconnectTwitter = $("<a>", {class: "text-plain-small text-bold", href: "/auth/twitter/logout"}).append("Disconnect");
+
+		var table = $("<table>", {width: "100%"});
+
+		//Facebook
+		var tr = $("<tr>").append($("<td>", {width: "33%"}).append(facebookLogo));
+		if (userInfo.facebook) {
+			tr.append($("<td>", {width: "33%"}).append(connectedStatus.clone()));
+			tr.append($("<td>", {width: "33%"}).append(disconnectFacebook));
+		} else {
+			tr.append($("<td>", {width: "33%"}).append(disconnectedStatus.clone()));
+			tr.append($("<td>", {width: "33%"}).append(connectFacebook));
 		}
-		$("#username").prop("disabled", true);
-		if (userInfo.email) {
-			$("#email").val(userInfo.email);
+		table.append(tr);
+
+		//Twitter
+		var tr = $("<tr>").append($("<td>", {width: "33%"}).append(twitterLogo));
+		if (userInfo.twitter) {
+			tr.append($("<td>", {width: "33%"}).append(connectedStatus.clone()));
+			tr.append($("<td>", {width: "33%"}).append(disconnectTwitter));
+		} else {
+			tr.append($("<td>", {width: "33%"}).append(disconnectedStatus.clone()));
+			tr.append($("<td>", {width: "33%"}).append(connectTwitter));
 		}
-		$("#email").prop("disabled", true);
-		if (userInfo.location) {
-			$("#location").val(userInfo.location);
-		}
-		$("#location").prop("disabled", true);
+		table.append(tr);
 
-		$("#editProfileButton").click(function() {
-			$("#editProfileButton").hide();
-			$("#saveProfileButton").show();
+		tabDiv.append(table);
 
-			$("#username").prop("disabled", false);
-			$("#email").prop("disabled", false);
-			$("#location").prop("disabled", false);
-		});
-
-		$("#saveProfileButton").click(function() {
-			var jsonObj = {};
-			jsonObj.user = {};
-			jsonObj.user.id = userInfo.id;
-			jsonObj.user.username = $("#username").val();
-			jsonObj.user.email = $("#email").val();
-			jsonObj.user.location = $('#location').find(":selected").val();
-
-			$.ajax({
-				type: "PUT",
-				url: "/api/users/",
-		        dataType: "json", // return data type
-		        contentType: "application/json; charset=UTF-8",
-		        data: JSON.stringify(jsonObj)
-	      	})
-			.done(function(data, textStatus, jqXHR) {
-
-	          $("#username").prop("disabled", true);
-	          $("#email").prop("disabled", true);
-	          $("#location").prop("disabled", true);
-	          $("#saveProfileButton").hide();
-	          $("#editProfileButton").show();
-	      	})
-			.fail(function(jqXHR, textStatus, errorThrown) {
-				alert("some error was found, " + errorThrown);
-
-			});
-		});
 	}
 }
 

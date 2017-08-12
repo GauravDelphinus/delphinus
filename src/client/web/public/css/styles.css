@@ -1,5 +1,5 @@
 /****
-Theme color: #9E1F63;
+Theme color light: fbeaf3; standard: #9E1F63; dark: #6B1044;
 ****/
 
 /********************************* CENTER DISPLAY **************************/
@@ -14,7 +14,15 @@ Theme color: #9E1F63;
 
 .centerDisplay {
 	width: 60%;
-	margin: 100px auto 0;
+	margin: 10px auto;
+	border: 2px dotted gray;
+	border-radius: 20px;
+	padding: 20px;
+}
+
+.centerDisplayWide {
+	width: 90%;
+	margin: 10px auto;
 	border: 2px dotted gray;
 	border-radius: 20px;
 	padding: 20px;
@@ -53,6 +61,9 @@ Theme color: #9E1F63;
 
 /********************************** GENERAL - INPUT ELEMENTS *****************************/
 
+/*
+	Button that has full background color.
+*/
 .button-full {
 	background-color: #9E1F63;
 	color: white;
@@ -65,6 +76,9 @@ Theme color: #9E1F63;
 	font-size: 16px;
 }
 
+/*
+	Button that has no background, but a border.
+*/
 .button-line {
 	color: #9E1F63;
 	border: 1px;
@@ -91,6 +105,9 @@ Theme color: #9E1F63;
 	font-size: 15px;
 }
 
+/*
+	Button with no background and border.
+*/
 .button-empty {
 	color: black;
 	font-size: 15px;
@@ -108,67 +125,92 @@ Theme color: #9E1F63;
 	color: #9E1F63;
 }
 
+/*
+	Button that looks like a link.
+*/
+.button-link {
+	background-color: transparent;
+	color: #676969;
+	/* padding: 8px; */
+	/* font-size: 1em; */
+	border: none;
+}
 
-/********************************** GENERAL *****************************/
+.button-link:hover {
+	color: #9E1F63;
+	text-decoration: underline;
+}
 
-.text-script {
+.button-link.active {
+	color: #9E1F63;
+	font-weight: bold;
+}
+
+/* 
+	Active Link that has a background hover color.  Used
+	for the Social Actions buttons such as Like, Share, etc.
+*/
+.button-active-link {
+	background-color: transparent;
+	color: #676969;
+	border: none;
+	padding: 8px;
+}
+
+.button-active-link:hover {
+	color: #9E1F63;
+	background-color: #fbeaf3;
+}
+
+.button-active-link.active {
+	color: #9E1F63;
+	font-weight: bold;
+}
+
+/********************************** GENERAL - TEXT ***********************/
+
+.text-plain-small {
+	font-size: 1.1em;
+}
+
+.text-plain-medium {
+	font-size: 1.4em;
+}
+
+.text-plain-large {
+	font-size: 1.6em;
+}
+
+.text-italic {
 	font-style: italic;
 }
 
-body {
-	font-family: Source Sans Pro,Helvetica,Arial,sans-serif;
-	padding-top: 40px;
-}
-
-.title {
-	text-align: center;
-	font-family: arial;	
-	font-size: 40px;
+.text-bold {
 	font-weight: bold;
 }
 
-.subTitle {
-	text-align: center;
-	font-family: arial;	
-	font-size: 30px;
-	font-weight: bold;
+/********************************* GENERAL - LINKS ***********************/
+
+.link-plain {
+	/* dummy - use standard links */
 }
 
-.creationDate {
-	font-family: arial;
-	font-size: 30px;
-	font-style: italic;
+.link-black {
+	color: black;
 }
 
-.section {
-	width: 60%;
-	margin: 0 auto;
+.link-black:hover {
+	color: black;
 }
 
-.section40 {
-	width: 40%;
-	margin: 0 auto;
+.link-theme {
+	color: #9E1F63;
 }
 
-.sectionHeader {
-	font-family: arial;	
-	font-size: 30px;
-	font-weight: bold;
-	padding: 5px 0px;
+.link-theme:hover{
+	color: #6B1044;;
 }
-
-.sectionButton {
-	font-size: 20px;
-	margin: 0 10px;
-}
-
-.submitButton {
-	font: bold 24px arial;
-	font-weight: bold;
-	display: inline-block;
-	margin: auto;
-	text-align: center;
-}
+/********************************** DRAG / DROP RELATED ******************/
 
 .dropZone {
 	/* position: relative; */
@@ -191,19 +233,27 @@ body {
 	vertical-align: middle;
 }
 
+/********************************** BRAND RELATED ************************/
 
-.settingsBlock {
-	margin: auto;
-	width: 60%;
-	font: 22px arial;
+
+
+/********************************** GENERAL *****************************/
+
+/**
+	Note: The body is pushed down by 50px since the nav-bar is 50px tall.
+	Please refer the rules for .navbar-nav li and .navbar-nav > li > a;
+**/
+body {
+	font-family: Source Sans Pro,Helvetica,Arial,sans-serif;
+	padding-top: 50px; /* Push content below the navbar */
 }
 
-.settingsSubBlock {
-	margin: 0 auto;
-	width: 100%;
+td {
+	vertical-align: center;
+	text-align: center;
 }
 
-.settingsSubBlockTitle {
+.sectionTitle {
 	display:block;
 	font-weight: bold;
 	font-family: sans-serif;
@@ -212,63 +262,51 @@ body {
 	margin-bottom: 10px;
 }
 
-.selectImageSection {
-	margin: auto;
-	width: 90%;
-	text-align: center;
-	/* font: 24px/200px arial; */
-}
-
-.gridTable {
-	width: 100%;
-}
-
+/*
 .textArea {
 	font: 24px arial;
 }
-
+*/
+/*
 .fontDropDown {
 	width: 100px;
 }
-
+*/
+/*
 .center {
 	margin: auto;
 	width: 60%;
 	text-align: center;
 	display: block;
 }
+*/
 
-
-
+/*
 .centerDiv {
 	width: 500px;
 	position: absolute;
 	margin: 0 auto;
 	top: 0; left: 0; bottom: 0; right: 0;
 }
-
+*/
+/*
 .signInTextHeader {
 	float: right;
 	font-family: arial;	
 	font-size: 15px;
 	font-weight: bold;
 }
-
+*/
+/*
 .signOutTextHeader {
 	float: right;
 	font-family: arial;	
 	font-size: 15px;
 	font-weight: bold;
 }
+*/
 
-.userInfoText {
-	font: 30px arial;
-	font-weight: bold;
-}
-
-.userInfoImage {
-	float: right;
-}
+/*
 
 .userNameHeader {
 	float: right;
@@ -276,16 +314,23 @@ body {
 	font-size: 15px;
 	font-weight: bold;
 }
-
+*/
+/*
 .userImageHeader {
 	float: right;
 	height: 50px;
 }
+*/
 
-/************** Main Image *******************/
-
+/*
 .clear { clear:  both; }
+*/
 
+/***************************** Challenge / Entry / Entity Related *********************/
+
+/*
+	Main Element - e.g., Challenge on the /challenge page, and Entry on the /entry page
+*/
 .mainElement {
 	border-right: 2px;
 	border-style: solid;
@@ -294,6 +339,9 @@ body {
 	margin: 20px 5px;
 }
 
+/*
+	Feed Element - e.g., one of the elements in the Home Feed View.
+*/
 .feedElement {
 	border-right: 2px;
 	border-style: solid;
@@ -302,217 +350,9 @@ body {
 	margin: 20px 5px;
 }
 
-.activitySection {
-	margin: 5px 20px;
-	padding: 10px 0px;
-	border-bottom-style: solid;
-	border-width: 0.1px;
-	border-color: gray;
-}
-
-.activityText {
-	font-size: 1.1em;
-}
-
-.postHeaderSection {
-	margin: 5px 5px 5px 10px; /* Right margin is less to allow the Drop Down menu (caret) to be as right as possible */
-	padding: 10px 0px;
-	/* overflow: hidden; */
-	position: relative;
-}
-
-.postedBySectionOldRemove {
-	width: 90%;
-	position: relative;
-	overflow: auto;
-	margin: 0 auto;
-}
-
-.postedByDate {
-	font-size: 1em;
-	font-family: sans-serif;
-	font-style: italic;
-}
-
-.postedByDateOldRemove {
-	float: left;
-	font-size: 1 em;
-	font-family: sans-serif;
-	font-style: italic;
-
-	/* below is a trick to vertically center the date - see http://stackoverflow.com/questions/19461521/how-to-center-an-element-horizontally-and-vertically */
-	position: absolute;
-	left: 2px;
-    top: 50%;
-    transform: translateY(-50%);
-}
-
-.postedBy {
-	float: right;
-}
-
-.postedByName a {
-	font-size: 1.1 em;
-	font-weight: bold;
-	color: black;
-}
-
-postedByName:hover{
-	color: #0073b6;
-}
-
-.postedByImage {
-	max-height: 50px;
-	margin-right: 10px;
-	border-radius: 50%;
-}
-
-.mainImage {
-	width: 100%;
-	display: block;
-	margin: 0 auto;
-}
-
-.entityImage {
-	width: 100%;
-	display: block;
-	margin: 0 auto;
-}
-
-.mainEntry {
-	border-radius: 10px;
-	border-style: dotted;
-	border-width: 0.5px;
-	padding: 20px;
-	margin: 0 auto;
-	width: 70%;
-}
-
-.socialStatusOldRemove {
-	float: left;
-}
-
-.timelapseSection {
-	float: right;
-}
-
-.timelapseRange {
-	width: 100%;
-}
-
-.bottomBar {
-	width: 90%;
-	margin: 0 auto;
-	padding: 5px;
-	overflow: auto;
-}
-
-.forceOverflow {
-	overflow: auto;
-}
-
-.socialStatusSectionOldRemove {
-	width: 90%;
-	margin: 0 auto;
-	padding: 5px;
-	overflow: auto;
-}
-
-.socialActionSectionOldRemove {
-	width: 90%;
-	margin: 0 auto;
-	padding: 5px;
-	overflow: auto;
-}
-
-.socialStatusSection {
-	margin: 5px 20px;
-	padding: 10px 0px;
-	border-bottom-style: solid;
-	border-width: 0.1px;
-	border-color: gray;
-}
-
-.socialActionsSection {
-	margin: 5px 20px;
-}
-
-.glyphiconAlign {
-	vertical-align: middle;
-}
-
-.socialStatusButton {
-	background-color: transparent;
-	color: #676969;
-	padding: 8px;
-	font-size: 1em;
-	border: none;
-}
-
-.socialStatusButton:hover {
-	/* background-color: #e2eff4; */
-	color: #0073b6;
-	text-decoration: underline;
-}
-
-.socialActionButton {
-	background-color: transparent;
-	padding: 8px;
-	font-size: 15px;
-	border: none;
-	font-weight: 600;
-	color: rgba(0,0,0,.85);
-}
-
-.socialActionButton.active {
-	background-color: transparent;
-	color: #0073b6;
-	padding: 8px;
-	font-size: 15px;
-	border: none;
-	font-weight: 600;
-}
-
-.socialActionButton:hover {
-	background-color: #e2eff4;
-	color: #0073b6;
-}
-
-.socialActionButtonOldRemove {
-	background-color: #5DADE2;
-	margin: 10px 5px;
-}
-
-.thumbnailTitle {
-	font-size: 2em;
-	font-family: sans-serif;
-	text-align: center;
-	width: 90%;
-	display: block;
-	margin: 0 auto;
-}
-
-.captionSection {
-	margin: 5px 20px;
-	padding: 10px 0px;
-}
-
-.captionSectionOldRemove {
-	width: 90%;
-	margin: 0 auto;
-	background-color: #EAECEE;
-	border-bottom-left-radius: 5px;
-	border-bottom-right-radius: 5px;
-	text-align: center;
-	padding: 10px;
-}
-
-.caption {
-	font-size: 15px;
-	font-weight: bold;
-	font-family: inherit;
-}
-
+/*
+	Scrollable Element - when you click on the FilmStrip view
+*/
 .scrollableElement {
 	border-right: 2px;
 	border-style: solid;
@@ -521,6 +361,9 @@ postedByName:hover{
 	margin: 20px 5px;
 }
 
+/*
+	Thumbnail Element - when you click on the Grid / Thumbnail view
+*/
 .thumbnailElement {
 	border-right: 2px;
 	border-style: solid;
@@ -529,39 +372,158 @@ postedByName:hover{
 	margin: 20px 5px;
 }
 
+.thumbnailElement.active {
+	background-color: #fbeaf3;
+}
+
+/*
+	Hover effect on thumbnail elements
+*/
 .elementHover:hover {
-	background-color: #F5CBA7;
+	background-color: #fbeaf3;
+	cursor: pointer;
 }
 
-.elementSelected {
-	background-color: #F5CBA7;
+/*
+	Activity Section - this is shown at the top of the element view and includes text
+	such as "Recently commented by XYZ, or Popular among other users, etc."
+*/
+.activitySection {
+	margin: 5px 20px;
+	padding: 10px 0px;
+	border-bottom-style: solid;
+	border-width: 0.1px;
+	border-color: gray;
 }
-/*************  Glyicon Sizes   *******************/
 
-.gi-2x{font-size: 2em;}
-.gi-3x{font-size: 3em;}
-.gi-4x{font-size: 4em;}
-.gi-5x{font-size: 5em;}
+/*
+	Header of the Element that includes things like Poster, Posted Date and the Drop-down menu.
+*/
+.postHeaderSection {
+	margin: 5px 5px 5px 10px; /* Right margin is less to allow the Drop Down menu (caret) to be as right as possible */
+	padding: 10px 0px;
+	position: relative;
+}
 
-/*************     *******************/
+/*
+	Image of the Poster
+*/
+.postedByImage {
+	max-height: 50px;
+	margin-right: 10px;
+	border-radius: 50%;
+}
 
-.header {
+/*
+.mainImage {
 	width: 100%;
+	display: block;
+	margin: 0 auto;
 }
 
-.userLoginHeader {
+
+.entityImage {
+	width: 100%;
+	display: block;
+	margin: 0 auto;
+}
+*/
+/*
+.mainEntry {
+	border-radius: 10px;
+	border-style: dotted;
+	border-width: 0.5px;
+	padding: 20px;
+	margin: 0 auto;
+	width: 70%;
+}
+*/
+
+/*
+	Time Lapse Button Section - Needs refinement
+*/
+.timelapseSection {
 	float: right;
 }
 
+.timelapseRange {
+	width: 100%;
+}
+
+/*
+.bottomBar {
+	width: 90%;
+	margin: 0 auto;
+	padding: 5px;
+	overflow: auto;
+}
+*/
+
+/*
+.forceOverflow {
+	overflow: auto;
+}
+*/
+
+/* Social Status section that contains buttons such as X Entries, Y Likes, etc. */
+.socialStatusSection {
+	margin: 5px 20px;
+	padding: 10px 0px;
+	border-bottom-style: solid;
+	border-width: 0.1px;
+	border-color: gray;
+}
+
+/* Social Actions section that contains buttons such as Like, Comment, etc. */
+.socialActionsSection {
+	margin: 5px 20px;
+}
+
+/*
+.thumbnailTitle {
+	font-size: 2em;
+	font-family: sans-serif;
+	text-align: center;
+	width: 90%;
+	display: block;
+	margin: 0 auto;
+}
+*/
+
+/* Caption Section that contains the Caption for the entity */
+.captionSection {
+	margin: 5px 20px;
+	padding: 10px 0px;
+}
+
+
+/*************     *******************/
+/*
+.header {
+	width: 100%;
+}
+*/
+
+/*
+.userLoginHeader {
+	float: right;
+}
+*/
+
+/****************************** USER PROFILE PAGE *************************/
+
+/* User's profile image */
 .profileImage {
 	display: block;
 	margin: 0 auto;
 	height: 200px;
 }
 
+/*
 .section100 {
 	width: 100%;
 }
+*/
 
 .mainProfileSection {
 	border-radius: 50px;
@@ -580,6 +542,7 @@ postedByName:hover{
   display: inline-block;
   margin:0 auto;
   padding: 0px;
+  width: 200px;
 }
 
 /*
@@ -589,9 +552,11 @@ postedByName:hover{
 }
 */
 
+/*
 input[type="file"] {
     display: none;
 }
+*/
 
 /*
 .custom-file-upload {
@@ -606,6 +571,7 @@ input[type="file"] {
 	display: block;
 }
 
+/* Buttons that show when you hover over the image */
 .buttonOverImage {
     position:absolute;
     background: rgba(0, 0, 0, 0);
@@ -614,6 +580,7 @@ input[type="file"] {
     display:none;
 }
 
+/* Button that shows when you hover over the text field */
 .buttonOverText {
     position:absolute;
     background: rgba(0, 0, 0, 0);
@@ -622,6 +589,16 @@ input[type="file"] {
     display:none;
 }
 
+.buttonOverlayRight {
+	right: 5px;
+    bottom: 2px;
+}
+
+.buttonOverlayLeft {
+	left: 5px;
+    bottom: 2px;
+}
+/*
 #changePicture {
 	right: 5px;
     bottom: 2px;
@@ -666,20 +643,28 @@ input[type="file"] {
 	left: 5px;
     bottom: 2px;	
 }
+*/
 
+/*
 .imageCarousel {
 	 display: none; 
 	 margin: 0 auto; 
 }
+*/
 
+/* User's profile name */
 .profileName {
-	position: relative;
+	/* position: relative; */
+	width: 90%;
 	display: inline-block;
-  margin:0 auto;
-  padding: 0px;
+  	margin:0 auto;
+  	padding: 0px;
+  	text-align: center;
 }
 
+/* Actual text box that contains the user's profile name */
 .displayName {
+	width: 100%;
 	font-style: sans-serif;
 	font-size: 2em;
 	font-weight: bold;
@@ -697,6 +682,7 @@ input[type="file"] {
 	display:block;
 }
 
+/* Social section shown in the user's profile page */
 .socialSection {
 	text-align: center;
 	border-radius: 5px;
@@ -707,6 +693,7 @@ input[type="file"] {
 	margin: 0 auto;
 	width: 30%;
 }
+
 .socialSection ul li {
 	display: inline;
 }
@@ -736,11 +723,12 @@ input[type="file"] {
 	height: 40px;
 }
 
-.subHeading {
+.socialHeader {
 	font-size: 1.5em;
 	text-align: center;
 }
 
+/*
 .numFollowers {
 	font-style: sans-serif;
 	font-size: 1.5em;
@@ -750,7 +738,9 @@ input[type="file"] {
 	font-style: serif;
 	font-size: 1.4em;
 }
+*/
 
+/*
 .followButton {
 	text-decoration: none;
 	background-color: #42c8f4;
@@ -1302,3 +1292,7 @@ ul.nav li.dropdown.open > a {
 	height: 100vh;
 }
 
+/* Align the Glyphicon to match the vertical alignment of the text in the Span */
+.glyphiconAlign {
+	vertical-align: middle;
+}

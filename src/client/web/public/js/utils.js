@@ -148,9 +148,9 @@ function createPostHeaderElement(data) {
 
  	
 	// Posted By Section
-	var postedBy = $("<div>", {class: "postedBy"});
-	var postedByName = $("<span>", {id: "postedByName", class: "postedByName"});
-	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName}));
+	var postedBy = $("<div>");
+	var postedByName = $("<span>", {id: "postedByName"});
+	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName, class: "text-plain-small text-bold link-black"}));
 	var postedByImage = $("<img>", {id: "postedByImage", class: "postedByImage"});
 	postedByImage.prop("src", data.postedByUser.image);
 	postedBy.append(postedByName);
@@ -170,7 +170,7 @@ function createPostHeaderElement(data) {
 
 	var tr2 = $("<tr>");
 	var postedDateTd = $("<td>");
-	var postedByDate = $("<span>", {id: "postedByDate", class: "postedByDate", text: "Posted " + formatDate(data.postedDate)});
+	var postedByDate = $("<span>", {id: "postedByDate", class: "text-plain-small text-italic", text: "Posted " + formatDate(data.postedDate)});
 	postedByDate.append(postedByDate);
 
 	if (data.categoryID && data.categoryName) {
@@ -342,7 +342,7 @@ function refreshContainerViewAfterDelete(id, contentTag) {
 function createCaptionSectionElement(data) {
 	// Caption (if available)
 	var captionSection = $("<div>", {class: "captionSection"});
-	var caption = $("<span>", {class: "caption", text: data.caption});
+	var caption = $("<span>", {class: "text-plain-large", text: data.caption});
 	captionSection.append(caption);
 
 	return captionSection;
@@ -591,13 +591,13 @@ function stopTimelapse(entityId, data) {
 
 
 function createEntityImageElement(data) {
-	var entityImage = $("<img>", {id: data.id + "EntityImage", class: "entityImage"});
+	var entityImage = $("<img>", {id: data.id + "EntityImage"});
 	entityImage.prop("src", data.image);
 	return entityImage;
 }
 
 function createMainImageElement(data) {
-	var mainImage = $("<img>", {id: "mainImage", class: "mainImage"});
+	var mainImage = $("<img>", {id: "mainImage"});
 	mainImage.prop("src", data.image);
 	return mainImage;
 }
@@ -617,8 +617,6 @@ function createMainElement(data, setupTimelapseView) {
 	if (data.caption) {
 		element.append(createCaptionSectionElement(data));
 	}
-
-	//var bottomBar = $("<div>", {id: data.id + "BottomBar", class: "bottomBar"});
 	
 	if (data.socialStatus) {
 		element.append(createSocialStatusSectionElement(data));
@@ -671,7 +669,7 @@ function createScrollableElement(data) {
 
 function createActivitySectionElement(data) {
 	var activitySection = $("<div>", {id: data.id + "ActivitySection", class: "activitySection"});
-	var activityText = $("<span>", {id: data.id + "ActivityText", class: "activityText"});
+	var activityText = $("<span>", {id: data.id + "ActivityText", class: "text-plain-small"});
 
 	if (data.activity) {
 		if (data.activity.type == "recentlyLiked") {
@@ -699,12 +697,12 @@ function createTextSection(data) {
 	return textSection;
 }
 
-function createSocialStatusSectionElement(data) {
+function createSocialStatusSectionElement(data, full /* Show all content */) {
 	var socialStatus = $("<div>", {id: data.id + "SocialStatus", class: "socialStatusSection"});
 
 	// For Challenges and Entries
 	if (data.socialStatus.likes) {
-		var likeButton = $("<button>", {id: data.id + "LikesButton", type: "button", class: "socialStatusButton"});
+		var likeButton = $("<button>", {id: data.id + "LikesButton", type: "button", class: "button-link text-plain-small"});
 		likeButton.append($("<span>", {id: data.id + "NumLikes", text: data.socialStatus.likes.numLikes}));
 		likeButton.append($("<span>", {text: " Likes"}));
 		if (data.socialStatus.likes.numLikes <= 0) {
@@ -718,7 +716,7 @@ function createSocialStatusSectionElement(data) {
 	}
 	
 	if (data.socialStatus.shares) {
-		var shareButton = $("<button>", {id: data.id + "SharesButton", type: "button", class: "socialStatusButton"});
+		var shareButton = $("<button>", {id: data.id + "SharesButton", type: "button", class: "button-link text-plain-small"});
 		shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.shares.numShares}));
 		shareButton.append($("<span>", {text: " Shares"}));
 		if (data.socialStatus.shares.numShares <= 0) {
@@ -728,7 +726,7 @@ function createSocialStatusSectionElement(data) {
 	}
 	
 	if (data.socialStatus.comments) {
-		var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "socialStatusButton"});
+		var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "button-link text-plain-small"});
 		commentButton.append($("<span>", {id: data.id + "NumComments", text: data.socialStatus.comments.numComments}));
 		commentButton.append($("<span>", {text: " Comments"}));
 		if (data.socialStatus.comments.numComments <= 0) {
@@ -743,7 +741,7 @@ function createSocialStatusSectionElement(data) {
 	
 	// For challenges only
 	if (data.socialStatus.entries) {
-		var entriesButton = $("<button>", {id: data.id + "EntriesButton", type: "button", class: "socialStatusButton"});
+		var entriesButton = $("<button>", {id: data.id + "EntriesButton", type: "button", class: "button-link text-plain-small"});
 		entriesButton.append($("<span>", {id: data.id + "NumEntries", text: data.socialStatus.entries.numEntries}));
 		entriesButton.append($("<span>", {text: " Entries"}));
 		if (data.socialStatus.entries.numEntries <= 0) {
@@ -759,23 +757,37 @@ function createSocialStatusSectionElement(data) {
 
 	// For Users
 	if (data.socialStatus.follows) {
-		var followersButton = $("<button>", {id: data.id + "FollowersButton", type: "button", class: "socialStatusButton"});
-		followersButton.append($("<span>", {id: data.id + "NumFollowers", text: data.socialStatus.follows.numFollowers}));
-		followersButton.append($("<span>", {text: " Followers"}));
-		if (data.socialStatus.follows.numFollowers <= 0) {
-			followersButton.hide();
+		if (data.socialStatus.follows.numFollowers) {
+			var followersButton = $("<button>", {id: data.id + "FollowersButton", type: "button", class: "button-link text-plain-small"});
+			followersButton.append($("<span>", {id: data.id + "NumFollowers", text: data.socialStatus.follows.numFollowers}));
+			followersButton.append($("<span>", {text: " Followers"}));
+			if (data.socialStatus.follows.numFollowers <= 0) {
+				followersButton.hide();
+			}
+			socialStatus.append(followersButton);
 		}
-		socialStatus.append(followersButton);
+		
+		if (data.socialStatus.follows.numFollowing) {
+			var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "button-link text-plain-small"});
+			followingButton.append($("<span>", {id: data.id + "NumFollowing", text: data.socialStatus.follows.numFollowing}));
+			followingButton.append($("<span>", {text: " Following"}));
+			if (data.socialStatus.follows.numFollowing <= 0) {
+				followingButton.hide();
+			}
+			socialStatus.append(followingButton);
+		}
 	}
 
 	if (data.socialStatus.posts) {
-		var postsButton = $("<button>", {id: data.id + "PostsButton", type: "button", class: "socialStatusButton"});
-		postsButton.append($("<span>", {id: data.id + "NumPosts", text: data.socialStatus.posts.numPosts}));
-		postsButton.append($("<span>", {text: " Posts"}));
-		if (data.socialStatus.posts.numPosts <= 0) {
-			postsButton.hide();
+		if (data.socialStatus.posts.numPosts) {
+			var postsButton = $("<button>", {id: data.id + "PostsButton", type: "button", class: "button-link text-plain-small"});
+			postsButton.append($("<span>", {id: data.id + "NumPosts", text: data.socialStatus.posts.numPosts}));
+			postsButton.append($("<span>", {text: " Posts"}));
+			if (data.socialStatus.posts.numPosts <= 0) {
+				postsButton.hide();
+			}
+			socialStatus.append(postsButton);
 		}
-		socialStatus.append(postsButton);
 	}
 
 	return socialStatus;
@@ -848,12 +860,12 @@ function refreshCommentsList(parentId) {
 	});
 }
 
-function createSocialActionsSectionElement(data) {
+function createSocialActionsSectionElement(data, full /* show full status */) {
 	var socialActionsSection = $("<div>", {id: data.id + "SocialActionsSection", class: "socialActionsSection"});
 
 	// LIKE BUTTON ---------------------------------
 	if (data.socialStatus.likes) {
-		var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "socialActionButton"});
+		var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		likeButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Like");
 		socialActionsSection.append(likeButton);
 
@@ -908,7 +920,7 @@ function createSocialActionsSectionElement(data) {
 
 	// COMMENT BUTTON ---------------------------------
 	if (data.socialStatus.comments) {
-		var commentButton = $("<button>", {id: data.id + "CommentButton", type: "button", class: "socialActionButton"});
+		var commentButton = $("<button>", {id: data.id + "CommentButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		commentButton.append($("<span>", {class: "glyphicon glyphicon-comment glyphiconAlign"})).append(" Comment");
 		socialActionsSection.append(commentButton);
 		
@@ -920,7 +932,7 @@ function createSocialActionsSectionElement(data) {
 
 	// SHARE BUTTON ---------------------------------
 	if (data.socialStatus.shares) {
-		var shareButton = $("<button>", {id: data.id + "ShareButton", type: "button", class: "socialActionButton"});
+		var shareButton = $("<button>", {id: data.id + "ShareButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		shareButton.append($("<span>", {class: "glyphicon glyphicon-share-alt glyphiconAlign"})).append(" Share");
 		
 		if (user.facebook || user.twitter || user.google) {
@@ -949,7 +961,7 @@ function createSocialActionsSectionElement(data) {
 	
 	// ADD ENTRY BUTTON ---------------------------------
 	if (data.socialStatus.entries) {
-		var addEntryButton = $("<button>", {id: data.id + "AddEntryButton", type: "button", class: "socialActionButton text-script"});
+		var addEntryButton = $("<button>", {id: data.id + "AddEntryButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		addEntryButton.append($("<span>", {class: "glyphicon glyphicon-flag glyphiconAlign"})).append(" Captionify");
 		socialActionsSection.append(addEntryButton);
 
@@ -959,13 +971,17 @@ function createSocialActionsSectionElement(data) {
 	}
 	
 	// FOLLOW BUTTON ---------------------------------
-	if (data.socialStatus.follows) {
-		var followButton = $("<button>", {id: data.id + "FollowButton", type: "button", class: "socialActionButton"});
-		followButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Follow");
+	console.log("data.socialStatus.follows = " + data.socialStatus.follows + ", user = " + user + ", user.id = " + user.id);
+	if (data.socialStatus.follows && (!user || user.id != data.id)) {
+		var followButton = $("<button>", {id: data.id + "FollowButton", type: "button", class: "button-active-link text-plain-small text-bold"}).append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append($("<span>", {id: data.id + "FollowText"}));
+		
 		socialActionsSection.append(followButton);
 
 		if (data.socialStatus.follows.amFollowing) {
 			followButton.addClass("active");
+			followButton.children("#" + data.id + "FollowText").append(" Following");
+		} else {
+			followButton.children("#" + data.id + "FollowText").append(" Follow");
 		}
 
 		var dataId = data.id;
@@ -985,11 +1001,13 @@ function createSocialActionsSectionElement(data) {
 			          		numFollowers ++;
 			          		$("#" + dataId + "NumFollowers").text(numFollowers);
 			          		$("#" + dataId + "FollowButton").addClass("active");
+			          		$("#" + dataId + "FollowText").empty().append(" Following");
 			          		$("#" + dataId + "FollowersButton").show();
 			          	} else {
 			          		numFollowers --;
 			          		$("#" + dataId + "NumFollowers").text(numFollowers);
 			          		$("#" + dataId + "FollowButton").removeClass("active");
+			          		$("#" + dataId + "FollowText").empty().append(" Follow");
 			          		if (numFollowers <= 0) {
 			          			$("#" + dataId + "FollowersButton").hide();
 			          		}
@@ -1000,6 +1018,30 @@ function createSocialActionsSectionElement(data) {
 				window.open("/auth", "_self");
 			}
 		});
+	}
+
+	if (full && data.socialStatus.facebook) {
+		if (data.socialStatus.facebook.profileLink) {
+			var facebookButton = $("<button>", {id: data.id + "FacebookButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+			facebookButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Facebook");
+			socialActionsSection.append(facebookButton);
+
+			facebookButton.click(function() {
+				window.open(data.socialStatus.facebook.profileLink, "_blank");
+			});
+		}
+	}
+
+	if (full && data.socialStatus.twitter) {
+		if (data.socialStatus.twitter.profileLink) {
+			var twitterButton = $("<button>", {id: data.id + "TwitterButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+			twitterButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Twitter");
+			socialActionsSection.append(twitterButton);
+
+			twitterButton.click(function() {
+				window.open(data.socialStatus.twitter.profileLink, "_blank");
+			});
+		}
 	}
 
 	return socialActionsSection;
@@ -1426,7 +1468,7 @@ function createPopupElement(id, headerContent, footerContent, bodyContent, close
 
 function createGrid(id, list, numCols, allowHover, allowSelection, defaultSelectedID, selectionCallback) {
 	console.log("createGrid, defaultSelectedID is " + defaultSelectedID);
-	var table = $("<table>", {id: id, class: "gridTable"});
+	var table = $("<table>", {id: id});
 
 	var tdWidth = 100 / numCols;
 	if (numCols < 2) {
@@ -1449,15 +1491,15 @@ function createGrid(id, list, numCols, allowHover, allowSelection, defaultSelect
 
 				if (allowSelection) {
 					element.click({id: data.id, element: element}, function(e) {
-						$("#" + id + " .thumbnailElement").removeClass("elementSelected"); //unselect all first
-						e.data.element.addClass("elementSelected"); //now make the selection
+						$("#" + id + " .thumbnailElement").removeClass("active"); //unselect all first
+						e.data.element.addClass("active"); //now make the selection
 						selectionCallback(e.data.id);
 					});
 				}
 
 				//if there's a default selection, make the selection
 				if (defaultSelectedID != null && defaultSelectedID != undefined && defaultSelectedID == data.id) {
-					element.addClass("elementSelected");
+					element.addClass("active");
 				}
 
 				td.append(element);
@@ -1576,7 +1618,7 @@ function createCommentsList(id, list) { //id is the entity id
 		var newCommentElement = createNewCommentElement(false, id);
 		appendNewCommentElement(newCommentElement, id, container, false);
 	} else {
-		var newCommentLink = $("<a>", {href: "/auth/", class: "btn btn-primary center", text: "Add new comment"});
+		var newCommentLink = $("<a>", {href: "/auth/", class: "btn btn-link", text: "Sign in to add a new comment"});
 		container.append(newCommentLink);
 	}
 	

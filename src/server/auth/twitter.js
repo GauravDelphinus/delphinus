@@ -49,6 +49,7 @@ module.exports = function () {
                 user.twitter = {};
                 user.twitter.id = profile.id;
                 user.twitter.username = profile.username; //twitter handle
+                user.twitter.profileLink = "https://twitter.com/" + profile.username;
                 user.twitter.token = token;
                 user.twitter.tokenSecret = tokenSecret;
                 user.twitter.displayName = profile.displayName;

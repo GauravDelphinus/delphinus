@@ -54,10 +54,28 @@ var Facebook = function () {
 		    }
 		);
     }
+
+    var logout = function(userKey, done) {
+    	var jsonObj = {
+    		uri: "https://graph.facebook.com/v2.8/me/permissions",
+    		access_token: userKey
+    	};
+
+    	console.log("sending request to facebook, jsonObj = " + JSON.stringify(jsonObj));
+    	request.del(
+    		"https://graph.facebook.com/v2.8/me/permissions",
+    		{ json: jsonObj}, 
+    		function(error, response, body) {
+	    		console.log("callback, error = " + error + ", response = " + JSON.stringify(response) + ", body = " + JSON.stringify(body));
+			    done(error, body);
+    	});
+    }
+
     return {
         getImage: getImage,
         getFriends: getFriends,
-        postUpdate: postUpdate
+        postUpdate: postUpdate,
+        logout: logout
     }
 
 }

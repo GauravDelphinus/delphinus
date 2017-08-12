@@ -25,8 +25,8 @@
 <div id="newentry" class="fullWidth" style="text-align: center;">
 	<div class="imageSection">
 		<img id="newentryimage" class="centerImage"/>
-		<input id="saveCrop" class="buttonOverImage" type="button" value="Save"/>
-		<input id="cancelCrop" class="buttonOverImage" type="button" value="Cancel"/>
+		<input id="saveCrop" class="buttonOverImage buttonOverlayRight" type="button" value="Save"/>
+		<input id="cancelCrop" class="buttonOverImage buttonOverlayLeft" type="button" value="Cancel"/>
 	</div>
 </div>
 
@@ -86,7 +86,7 @@
 				<!-- CUSTOM ARTIFACT SUBSECTION -->
 				<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
 					<div id="bannerSection">
-						<span class="settingsSubBlockTitle">Banner</span>
+						<span class="sectionTitle">Banner</span>
 						<div class="settingsSubBlock">
 							<b>Location:</b>
 							<button type="button" class="btn btn-default" id="topBannerButton">Top</button>
@@ -97,7 +97,7 @@
 							<button type="button" class="btn btn-default active" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
 							<input type="color" class="btn btn-default" id="bannerColorButton" value="#000000">
 						</div>
-						<span class="settingsSubBlockTitle">Text</span>
+						<span class="sectionTitle">Text</span>
 						<div class="settingsSubBlock">
 							<b>Font:</b>
 							<select id="bannerTextFontName" class="fontDropDown">
@@ -299,13 +299,6 @@
 					</div>
 				</div>
 			</div>
-			
-			<!-- POST SECTION -->
-			<!--
-			<div id="postSection" class="settingsBlock setup-content" style="display: none;">
-			<input type="button" value="Post Entry!" class="btn btn-primary" id="apply">
-			</div>
-			-->
 		</div>
 
 
