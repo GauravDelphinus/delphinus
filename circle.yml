@@ -1,0 +1,8 @@
+machine:
+  services:
+    - neo4j
+general:
+  build_dir: src/server
+dependencies:
+  override:
+    - npm install
