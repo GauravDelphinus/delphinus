@@ -262,70 +262,6 @@ td {
 	margin-bottom: 10px;
 }
 
-/*
-.textArea {
-	font: 24px arial;
-}
-*/
-/*
-.fontDropDown {
-	width: 100px;
-}
-*/
-/*
-.center {
-	margin: auto;
-	width: 60%;
-	text-align: center;
-	display: block;
-}
-*/
-
-/*
-.centerDiv {
-	width: 500px;
-	position: absolute;
-	margin: 0 auto;
-	top: 0; left: 0; bottom: 0; right: 0;
-}
-*/
-/*
-.signInTextHeader {
-	float: right;
-	font-family: arial;	
-	font-size: 15px;
-	font-weight: bold;
-}
-*/
-/*
-.signOutTextHeader {
-	float: right;
-	font-family: arial;	
-	font-size: 15px;
-	font-weight: bold;
-}
-*/
-
-/*
-
-.userNameHeader {
-	float: right;
-	font-family: arial;	
-	font-size: 15px;
-	font-weight: bold;
-}
-*/
-/*
-.userImageHeader {
-	float: right;
-	height: 50px;
-}
-*/
-
-/*
-.clear { clear:  both; }
-*/
-
 /***************************** Challenge / Entry / Entity Related *********************/
 
 /*
@@ -415,31 +351,6 @@ td {
 }
 
 /*
-.mainImage {
-	width: 100%;
-	display: block;
-	margin: 0 auto;
-}
-
-
-.entityImage {
-	width: 100%;
-	display: block;
-	margin: 0 auto;
-}
-*/
-/*
-.mainEntry {
-	border-radius: 10px;
-	border-style: dotted;
-	border-width: 0.5px;
-	padding: 20px;
-	margin: 0 auto;
-	width: 70%;
-}
-*/
-
-/*
 	Time Lapse Button Section - Needs refinement
 */
 .timelapseSection {
@@ -449,21 +360,6 @@ td {
 .timelapseRange {
 	width: 100%;
 }
-
-/*
-.bottomBar {
-	width: 90%;
-	margin: 0 auto;
-	padding: 5px;
-	overflow: auto;
-}
-*/
-
-/*
-.forceOverflow {
-	overflow: auto;
-}
-*/
 
 /* Social Status section that contains buttons such as X Entries, Y Likes, etc. */
 .socialStatusSection {
@@ -479,36 +375,11 @@ td {
 	margin: 5px 20px;
 }
 
-/*
-.thumbnailTitle {
-	font-size: 2em;
-	font-family: sans-serif;
-	text-align: center;
-	width: 90%;
-	display: block;
-	margin: 0 auto;
-}
-*/
-
 /* Caption Section that contains the Caption for the entity */
 .captionSection {
 	margin: 5px 20px;
 	padding: 10px 0px;
 }
-
-
-/*************     *******************/
-/*
-.header {
-	width: 100%;
-}
-*/
-
-/*
-.userLoginHeader {
-	float: right;
-}
-*/
 
 /****************************** USER PROFILE PAGE *************************/
 
@@ -518,12 +389,6 @@ td {
 	margin: 0 auto;
 	height: 200px;
 }
-
-/*
-.section100 {
-	width: 100%;
-}
-*/
 
 .mainProfileSection {
 	border-radius: 50px;
@@ -544,28 +409,6 @@ td {
   padding: 0px;
   width: 200px;
 }
-
-/*
-.imageSection:hover input
-{
-  display: block;
-}
-*/
-
-/*
-input[type="file"] {
-    display: none;
-}
-*/
-
-/*
-.custom-file-upload {
-    border: 1px solid #ccc;
-    display: inline-block;
-    padding: 6px 12px;
-    cursor: pointer;
-}
-*/
 
 .imageSectionHover:hover input {
 	display: block;
@@ -598,59 +441,6 @@ input[type="file"] {
 	left: 5px;
     bottom: 2px;
 }
-/*
-#changePicture {
-	right: 5px;
-    bottom: 2px;
-}
-
-#newImage {
-	left: 5px;
-    bottom: 2px;
-}
-
-#saveImage {
-	right: 5px;
-    bottom: 2px;
-}
-
-#setImage {
-	right: 5px;
-	bottom: 2px;
-}
-
-#browseImage {
-	right: 5px;
-	bottom: 2px;
-}
-
-#editName {
-	right: 5px;
-	bottom: 2px;
-}
-
-#saveName {
-	right: 5px;
-	bottom: 2px;
-}
-
-#saveCrop {
-	right: 5px;
-	bottom: 2px;
-}
-
-#cancelCrop {
-	left: 5px;
-    bottom: 2px;	
-}
-*/
-
-/*
-.imageCarousel {
-	 display: none; 
-	 margin: 0 auto; 
-}
-*/
 
 /* User's profile name */
 .profileName {
@@ -728,39 +518,6 @@ input[type="file"] {
 	text-align: center;
 }
 
-/*
-.numFollowers {
-	font-style: sans-serif;
-	font-size: 1.5em;
-}
-
-.followers {
-	font-style: serif;
-	font-size: 1.4em;
-}
-*/
-
-/*
-.followButton {
-	text-decoration: none;
-	background-color: #42c8f4;
-	padding: 5px;
-	color: white;
-	font-size: 1.2em;
-}
-
-.followSection {
-	text-align: center;
-}
-
-/* Tab Titles */
-/*
-.nav li {
-	font-size: 2em;
-	background-color: transparent;
-}
-*/
-
 .navbarItem {
 	font-size: 1.6em;
 	padding-top: 15px;
@@ -821,12 +578,6 @@ hr.small {
 
 /****************** New Entry ***********************/
 
-/*
-input[type=range] {
-	display: inline;
-	width: 200px;
-}
-*/
 .rangeInput {
 	float: right;
 }
