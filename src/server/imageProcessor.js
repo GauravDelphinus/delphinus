@@ -590,7 +590,7 @@ function applyCaption(imArgs, size, background, foreground, caption, placement, 
 	imArgs.push("center");
 	imArgs.push("-size");
 	imArgs.push(size.width + "x" + labelHeight);
-	imArgs.push("caption:" + "\"" + caption + "\"");
+	imArgs.push("caption:" + caption);
 	imArgs.push("-gravity");
 	imArgs.push(placement);
 	imArgs.push("-composite");
