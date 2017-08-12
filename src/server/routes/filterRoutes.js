@@ -123,7 +123,7 @@ var routes = function(db) {
 
 	    				//first item is the base challenge image
 	    				var sourceImagePublicPath = config.url.challengeImages + imageData.image;
-	    				jsonObj.timelapseData.push({"imageType" : "url", "imageData" : sourceImagePublicPath})
+	    				jsonObj.timelapseData.push({"imageType" : "url", "imageData" : sourceImagePublicPath});
 
 	    				for (var j = 0; j < imagePaths.length; j++) {
 	    					//send the image as a base64 encoded image blob
@@ -153,7 +153,7 @@ var routes = function(db) {
 	});
 	
 	return filterRouter;
-}
+};
 
 function cloneObject(input) {
 	return JSON.parse(JSON.stringify(input));

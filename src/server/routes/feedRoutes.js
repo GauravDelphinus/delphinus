@@ -683,14 +683,14 @@ var routes = function(db) {
 		});
 
 		return feedRouter;
-}
+};
 
 function checkIndexRemaining(index) {
 	return (index != -1);
 }
 
 function objectLessThan(data1, data2) {
-	if (data2 == null) {
+	if (data2 === null) {
 		return true;
 	}
 
@@ -751,13 +751,13 @@ function mergeFeeds(feedsArray, mergedFeed) {
 	}
 
 	while (true) {
-		var found = indices.find(checkIndexRemaining)
+		var found = indices.find(checkIndexRemaining);
 		//console.log("found is " + found);
-		if (found == undefined) {
+		if (found === undefined) {
 			break;
 		}
 		var smallestDataObject = findAndIncrementSmallest(indices, feedsArray);
-		if (smallestDataObject != null && (mergedFeed.findIndex(alreadyExists, smallestDataObject) == -1)) {
+		if (smallestDataObject !== null && (mergedFeed.findIndex(alreadyExists, smallestDataObject) == -1)) {
 			mergedFeed.push(smallestDataObject);
 		}
 		

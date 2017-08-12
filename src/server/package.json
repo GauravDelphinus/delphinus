@@ -39,5 +39,8 @@
     "request": "^2.81.0",
     "shortid": "^2.2.8",
     "tmp": "0.0.31"
+  },
+  "devDependencies": {
+    "jshint": "^2.9.5"
   }
 }

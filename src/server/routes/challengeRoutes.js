@@ -337,7 +337,7 @@ var routes = function(db) {
 		});
 
 		return challengeRouter;
-}
+};
 
 module.exports = routes;
 

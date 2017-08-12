@@ -32,9 +32,9 @@ var routes = function(db) {
 			var cypherQuery;
 
 			if (req.query.entityId && req.query.user) {
-				cypherQuery = "MATCH (c:Comment)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (c)-[:POSTED_IN]->({id: '" + req.query.entityId + "'}) "
+				cypherQuery = "MATCH (c:Comment)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (c)-[:POSTED_IN]->({id: '" + req.query.entityId + "'}) ";
 			} else if (req.query.entityId) {
-				cypherQuery = "MATCH (c:Comment)-[:POSTED_IN]->({id: '" + req.query.entityId + "'}), (c)-[:POSTED_BY]->(u:User) "
+				cypherQuery = "MATCH (c:Comment)-[:POSTED_IN]->({id: '" + req.query.entityId + "'}), (c)-[:POSTED_BY]->(u:User) ";
 			} else if (req.query.user) {
 				cypherQuery = "MATCH (c:Comment)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}) ";
 			} else {

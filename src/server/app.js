@@ -107,7 +107,7 @@ module.exports = function() {
 
 	app.get("/users", function(req, res) {
 		res.render("users", {user: normalizeUser(req.user)});
-	})
+	});
 
 	// 1 - Challenge Page
 	app.get("/challenge/:challengeId", function(req, res) {
@@ -284,7 +284,7 @@ module.exports = function() {
 		console.log("Listening on port " + config.port);
 	});
 
-}
+};
 
 function ensureLoggedIn(req, res, next) {
 	if (!req.user) {

@@ -22,9 +22,9 @@ var routes = function(db) {
 
     			res.json(result.data);
 			});
-		})
+		});
 
 		return categoryRouter;
-}
+};
 
 module.exports = routes;
