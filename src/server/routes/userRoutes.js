@@ -173,9 +173,6 @@ var routes = function(db) {
                   		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
                   		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following), (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
 
-			//var cypherQuery = "MATCH (u:User {id: '" + req.params.userId + "'})<-[:FOLLOWING]-(f:User) RETURN COUNT(f);";
-
-			console.log("running query: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 
