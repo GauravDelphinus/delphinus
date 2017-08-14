@@ -1,5 +1,6 @@
 /****
-Theme color light: fbeaf3; standard: #9E1F63; dark: #6B1044;
+Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
+Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
 ****/
 
 /********************************* CENTER DISPLAY **************************/
@@ -26,6 +27,10 @@ Theme color light: fbeaf3; standard: #9E1F63; dark: #6B1044;
 	border: 2px dotted gray;
 	border-radius: 20px;
 	padding: 20px;
+}
+
+.centerDisplayFull {
+	margin: 10px auto;
 }
 
 .centerDisplayContent {
@@ -57,6 +62,21 @@ Theme color light: fbeaf3; standard: #9E1F63; dark: #6B1044;
 	font-weight: bold;
 	color: black;
 	text-align: left; /* override left align from centerDisplayContent */
+}
+
+.centerDisplayFixedColumn {
+	position: fixed;
+	left: 30px;
+	top: 50%;
+	width: 40%;
+	height: 80%;
+	margin-top: -25%;
+}
+
+.centerDisplayScrollableColumn {
+	width: 55%;
+
+	float: right;
 }
 
 /********************************** GENERAL - INPUT ELEMENTS *****************************/
@@ -167,6 +187,37 @@ Theme color light: fbeaf3; standard: #9E1F63; dark: #6B1044;
 	font-weight: bold;
 }
 
+/*
+	Button used for settings
+*/
+.button-setting {
+	color: black;
+	border: 1px solid #808080;
+	background: #d9d9d9;
+	font-size: 1.1em;
+}
+
+.button-setting:hover {
+	color: white;
+	background: #9E1F63;
+	font-size: 1.1em;
+	border: 1px solid #6B1044;
+}
+
+.button-setting.active {
+	color: white;
+	background: #9E1F63;
+	font-size: 1.1em;
+	border: 1px solid #6B1044;
+}
+
+.button-setting.disabled {
+	color: #a6a6a6;
+	border: 1px solid #a6a6a6;
+	background: transparent;
+	font-size: 1.1em;
+}
+
 /********************************** GENERAL - TEXT ***********************/
 
 .text-plain-small {
@@ -188,6 +239,39 @@ Theme color light: fbeaf3; standard: #9E1F63; dark: #6B1044;
 .text-bold {
 	font-weight: bold;
 }
+
+/********************************* TITLES / HEADINGS *********************/
+
+.subHeading {
+	background: #fff;
+	padding: 0 10px 0 0;
+	font-size: 1.4em;
+	font-weight: bold;
+}
+
+.subCaption {
+	font-size: 1.1em;
+	font-weight: bold;
+}
+
+.lineBehindHeading {
+    position: relative;
+    z-index: 1;
+    /* font: 1.4em sans-serif; */
+    /* margin-top: 150px; */
+    text-align: left;
+    padding: 20px 0px;
+}
+
+.lineBehindHeading:before {
+        border-top: 2px solid #dfdfdf;
+        content:"";
+        margin: 0 auto; /* this centers the line to the full width specified */
+        position: absolute; /* positioning must be absolute here, and relative positioning must be applied to the parent */
+        top: 50%; left: 0; right: 0; bottom: 0;
+        width: 99%;
+        z-index: -1;
+    }
 
 /********************************* GENERAL - LINKS ***********************/
 
@@ -248,10 +332,12 @@ body {
 	padding-top: 50px; /* Push content below the navbar */
 }
 
+/*
 td {
 	vertical-align: center;
 	text-align: center;
 }
+*/
 
 .sectionTitle {
 	display:block;
@@ -402,12 +488,18 @@ td {
 	text-align: center;
 }
 
+/****************************** Button Over Image Related ********************/
+
+/**
+	These rules allow buttons to overlay on top of images, such as while editing
+	the user profile image, and using the Crop tool in the New Entry workflow.
+	The buttons will come and go as you hover over the imageSection.
+**/
 .imageSection {
   position: relative;
   display: inline-block;
   margin:0 auto;
   padding: 0px;
-  width: 200px;
 }
 
 .imageSectionHover:hover input {
@@ -432,11 +524,13 @@ td {
     display:none;
 }
 
+/* Hover the button towards the right */
 .buttonOverlayRight {
 	right: 5px;
     bottom: 2px;
 }
 
+/* Hover the button towards the left */
 .buttonOverlayLeft {
 	left: 5px;
     bottom: 2px;
@@ -473,6 +567,7 @@ td {
 }
 
 /* Social section shown in the user's profile page */
+/*
 .socialSection {
 	text-align: center;
 	border-radius: 5px;
@@ -492,19 +587,22 @@ td {
 	list-style: none;
 	padding: 0;
 }
-
+*/
+/*
 .socialImageSection {
 	display: inline-block;
 	position: relative;
 	width: 80px;
 	height: 80px;
 }
-
+*/
+/*
 .socialImage {
 	width: 80px;
 	height: 80px;
 }
-
+*/
+/*
 .socialTick {
 	position: absolute;
 	right: 0px;
@@ -512,18 +610,22 @@ td {
 	width: 40px;
 	height: 40px;
 }
-
+*/
+/*
 .socialHeader {
 	font-size: 1.5em;
 	text-align: center;
 }
-
+*/
+/*
 .navbarItem {
 	font-size: 1.6em;
 	padding-top: 15px;
 	padding-bottom: 15px;
 }
+*/
 
+/*
 .social a {
     text-align: center;
     font-size: 28px;
@@ -540,6 +642,9 @@ td {
     -moz-background-clip: padding;
     -webkit-background-clip: padding-box;
 }
+*/
+
+/*
 
 hr.small {
     max-width: 100px;
@@ -575,6 +680,7 @@ hr.small {
     background: #55acee;
     color: #ffffff;
 }
+*/
 
 /****************** New Entry ***********************/
 
@@ -634,6 +740,33 @@ img {
 	max-width: 100%;
 }
 
+/****************** SETTINGS **************************/
+/* Mostly used by settings on the New Entry workflow **/
+
+.settingsSubBlock {
+	padding: 10px 10px;
+	width: 100%;
+	clear: both;
+	display: table;
+}
+
+.settingsSubBlockCaption {
+	font-size: 1.1em;
+	font-weight: bold;
+	width: 30%;
+	display: inline-block;
+	overflow: hidden;
+	/* display: table-cell;
+	vertical-align: middle; */
+}
+
+.settingsSubBlockElements {
+	float: right;
+	width: 70%;
+	/*display: table-cell;
+	text-align: left; */
+}
+
 .mycheckbox input[type=checkbox] {
 	margin-left: 5px;
 	margin-right: 10px;
@@ -646,6 +779,7 @@ img {
 	font-size: 1.4em;
 	font-weight: bold;
 }
+
 
 .settingsSubBlock p {
 	font-size: 1.4em;
@@ -1046,4 +1180,10 @@ ul.nav li.dropdown.open > a {
 /* Align the Glyphicon to match the vertical alignment of the text in the Span */
 .glyphiconAlign {
 	vertical-align: middle;
+}
+
+/* Force an element to be centered, like buttons, without having to mess with the parent divs */
+.center {
+	margin:auto;
+  	display:block;
 }

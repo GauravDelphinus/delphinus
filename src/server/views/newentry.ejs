@@ -11,26 +11,33 @@
 <body>
 <% include ./header %>
 
-<div class="centerDisplay">
-	<!-- HEADER -->
+<br><br>
+<div class="centerDisplayFull">
 	<div class="centerDisplayHeader">
 		<img src="/images/branding/captionify_logo_small.png">
 		<p id="titleMessage">Let's get ready to post an awesome Caption entry!</p>
 	</div>
 	<hr>
+	<div class="row">
+	<div class="col-md-1">
+	</div>
+	<div class="col-md-5 col-md-offset-1 fixed">
+		<div id="newentry" class="fullWidth" style="text-align: center;">
+			<div class="imageSection">
+				<img id="newentryimage" class="centerImage"/>
+				<input id="saveCrop" class="buttonOverImage buttonOverlayRight" type="button" value="Save"/>
+				<input id="cancelCrop" class="buttonOverImage buttonOverlayLeft" type="button" value="Cancel"/>
+			</div>
+		</div>
+	</div>
+	<div class="col-md-5 col-md-offset-5">
+		<div>
+	<!-- HEADER -->
+	
 
 	<!-- CONTENT -->
-	<div class="centerDisplayContent">
 
-<div id="newentry" class="fullWidth" style="text-align: center;">
-	<div class="imageSection">
-		<img id="newentryimage" class="centerImage"/>
-		<input id="saveCrop" class="buttonOverImage buttonOverlayRight" type="button" value="Save"/>
-		<input id="cancelCrop" class="buttonOverImage buttonOverlayLeft" type="button" value="Cancel"/>
-	</div>
-</div>
-
-<div id="steps" class="stepwizard">
+	<div id="steps" class="stepwizard">
 
 		<div class="stepwizard-header">
 	      <div class="stepwizard-step">
@@ -59,17 +66,18 @@
 	      </div>
 	    </div>
 	  
-	
+		<br>
 		<div id="stepHeader" class="stepHeader">
 			<button id="prevButton" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-left"></span></button>
-			<span id="stepTitle" class="stepTitle"></span>
 			<button id="nextButton" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-arrow-right"></span></button>
+			<span id="stepTitle" class="text-plain-large text-bold"></span>
 		</div>
 
 		<div id="stepContent" class="stepContent">
 
 			<!-- CAPTION SECTION -->
 			<div id="captionSection" class="setup-content">
+				<br>
 				<div class="settingsSubBlock">
 					<input type="text" id="bannerText" class="form-control" placeholder="My Awesome Caption!" required>
 				</div>
@@ -77,7 +85,7 @@
 
 			<!-- ARTIFACT SECION -->
 			<div id="artifactSection" class="setup-content" style="display: none;">
-				<button type="button" class="btn btn-link" id="artifactOptionsButton">Show custom options</button>
+				<button type="button" class="btn button-link center" id="artifactOptionsButton">Show custom options</button>
 
 				<!-- PRESET ARTIFACT SUBSECTION -->
 				<div id="presetArtifactSection" class="settingsSubBlock">
@@ -86,26 +94,36 @@
 				<!-- CUSTOM ARTIFACT SUBSECTION -->
 				<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
 					<div id="bannerSection">
-						<span class="sectionTitle">Banner</span>
+						<div class="lineBehindHeading"><span class="subHeading">Banner</span></div>
 						<div class="settingsSubBlock">
-							<b>Location:</b>
-							<button type="button" class="btn btn-default" id="topBannerButton">Top</button>
-							<button type="button" class="btn btn-default active" id="bottomBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Bottom</button>
-							<button type="button" class="btn btn-default" id="aboveBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Above</button>
-							<button type="button" class="btn btn-default" id="belowBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Below</button><br><br>
-							<b>Background Color:</b>
-							<button type="button" class="btn btn-default active" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
-							<input type="color" class="btn btn-default" id="bannerColorButton" value="#000000">
+							<div class="settingsSubBlockCaption">Location:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting" id="topBannerButton">Top</button>
+								<button type="button" class="btn button-setting" id="bottomBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Bottom</button>
+								<button type="button" class="btn button-setting" id="aboveBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Above</button>
+								<button type="button" class="btn button-setting" id="belowBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Below</button>
+							</div>
 						</div>
-						<span class="sectionTitle">Text</span>
 						<div class="settingsSubBlock">
-							<b>Font:</b>
-							<select id="bannerTextFontName" class="fontDropDown">
-								<option value="arial">Arial</option>
-								<option value="times">Times</option>
-								<option value="courier">Courier</option>
-							</select>
-							<input type="number" id="bannerTextFontSize" value="30">
+							<div class="settingsSubBlockCaption">Background Color:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn btn-default active" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
+								<input type="color" class="btn btn-default" id="bannerColorButton" value="#000000">
+							</div>
+						</div>
+						<div class="lineBehindHeading"><span class="subHeading">Text</span></div>
+						<div class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Font:</div>
+							<div class="settingsSubBlockElements">
+								<select id="bannerTextFontName" class="fontDropDown">
+									<option value="arial">Arial</option>
+									<option value="times">Times</option>
+									<option value="courier">Courier</option>
+								</select>
+								<input type="number" id="bannerTextFontSize" value="30">
+							</div>
+						</div>
+						<div class="settingsSubBlock">
 							<b>Text Color:</b>
 							<input type="color" class="btn btn-default" id="bannerTextColorButton" value="#000000">
 						</div>
@@ -117,7 +135,7 @@
 			<!-- LAYOUT SECTION -->
 			<div id="layoutSection" class="setup-content" style="display: none;">
 				
-				<button type="button" class="btn btn-link" id="layoutOptionsButton">Show custom options</button>
+				<button type="button" class="btn button-link center" id="layoutOptionsButton">Show custom options</button>
 
 				<!-- PRESET LAYOUT SUBSECTION -->
 				<div id="presetLayoutSection" class="settingsSubBlock">
@@ -194,7 +212,7 @@
 			<!-- FILTER SECTION -->
 			<div id="filterSection" class="setup-content" style="display: none;">
 
-				<button type="button" class="btn btn-link" id="filterOptionsButton">Show custom options</button>
+				<button type="button" class="btn button-link center" id="filterOptionsButton">Show custom options</button>
 
 				<!-- PRESET FILTER SUBSECTION -->
 				<div id="presetFilterSection" class="settingsSubBlock">
@@ -284,7 +302,7 @@
 			<!-- DECORATION SECTION -->
 			<div id="decorationSection" class="setup-content" style="display: none;">
 
-				<button type="button" class="btn btn-link" id="decorationOptionsButton">Show custom options</button>
+				<button type="button" class="btn button-link center" id="decorationOptionsButton">Show custom options</button>
 
 				<!-- PRESET DECORATION SUBSECTION -->
 				<div id="presetDecorationSection" class="settingsSubBlock">
@@ -302,9 +320,7 @@
 		</div>
 
 
-</div>
 
-	</div>
 
 	<!-- FOOTER -->
 	<div id="postSection" class="centerDisplayFooter" style="display:none;">
@@ -316,7 +332,19 @@
 			<span id="shareTwitterSection"><input type="checkbox" id="checkboxTwitter" checked>Twitter</span>
 		</div>
 	</div>
+	</div>
+
+
+
 </div>
+	</div>
+	<div class="col-md-1">
+	</div>
+</div>
+
+
+
+
 
 <div id="backpack" style="display:hidden;"">
 	
