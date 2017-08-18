@@ -25,9 +25,10 @@
 		<div id="newentry" class="fullWidth" style="text-align: center;">
 			<div class="imageSection">
 				<img id="newentryimage" class="centerImage"/>
-				<input id="saveCrop" class="buttonOverImage buttonOverlayRight" type="button" value="Save"/>
-				<input id="cancelCrop" class="buttonOverImage buttonOverlayLeft" type="button" value="Cancel"/>
+				<input id="saveCropButton" class="buttonOverImage buttonOverlayRight" type="button" value="Save"/>
+				<input id="cancelCropButton" class="buttonOverImage buttonOverlayLeft" type="button" value="Cancel"/>
 			</div>
+			<div id="cropLabel" class="text-plain-small text-bold" style="display: none;">Hover over the image above to Crop the image</div>
 		</div>
 	</div>
 	<div class="col-md-5 col-md-offset-5">
@@ -93,41 +94,45 @@
 
 				<!-- CUSTOM ARTIFACT SUBSECTION -->
 				<div id="customArtifactSection" class="settingsSubBlock" style="display: none;">
-					<div id="bannerSection">
-						<div class="lineBehindHeading"><span class="subHeading">Banner</span></div>
-						<div class="settingsSubBlock">
-							<div class="settingsSubBlockCaption">Location:</div>
-							<div class="settingsSubBlockElements">
-								<button type="button" class="btn button-setting" id="topBannerButton">Top</button>
-								<button type="button" class="btn button-setting" id="bottomBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Bottom</button>
-								<button type="button" class="btn button-setting" id="aboveBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Above</button>
-								<button type="button" class="btn button-setting" id="belowBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Below</button>
-							</div>
+					<div class="lineBehindHeading"><span class="subHeading">Banner</span></div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Custom banner:</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="bannerEnabledButton">OFF</button>
 						</div>
-						<div class="settingsSubBlock">
-							<div class="settingsSubBlockCaption">Background Color:</div>
-							<div class="settingsSubBlockElements">
-								<button type="button" class="btn btn-default active" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
-								<input type="color" class="btn btn-default" id="bannerColorButton" value="#000000">
-							</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Location:</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting" id="topBannerButton">Top</button>
+							<button type="button" class="btn button-setting" id="bottomBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Bottom</button>
+							<button type="button" class="btn button-setting" id="aboveBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Above</button>
+							<button type="button" class="btn button-setting" id="belowBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Below</button>
 						</div>
-						<div class="lineBehindHeading"><span class="subHeading">Text</span></div>
-						<div class="settingsSubBlock">
-							<div class="settingsSubBlockCaption">Font:</div>
-							<div class="settingsSubBlockElements">
-								<select id="bannerTextFontName" class="fontDropDown">
-									<option value="arial">Arial</option>
-									<option value="times">Times</option>
-									<option value="courier">Courier</option>
-								</select>
-								<input type="number" id="bannerTextFontSize" value="30">
-							</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Background Color:</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
+							<input type="color" class="btn button-setting" id="bannerColorButton" value="#000000">
 						</div>
-						<div class="settingsSubBlock">
-							<b>Text Color:</b>
-							<input type="color" class="btn btn-default" id="bannerTextColorButton" value="#000000">
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Text font:</div>
+						<div class="settingsSubBlockElements">
+							<select id="bannerTextFontName" class="select-setting">
+								<option value="arial">Arial</option>
+								<option value="times">Times</option>
+								<option value="courier">Courier</option>
+							</select>
+							<input type="number" id="bannerTextFontSize" value="30">
 						</div>
-
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Text color:</div>
+						<div class="settingsSubBlockElements">
+							<input type="color" class="btn button-setting" id="bannerTextColorButton" value="#000000">
+						</div>
 					</div>
 				</div>
 			</div>
@@ -143,69 +148,81 @@
 
 				<!-- CUSTOM LAYOUT SUBSECTION -->
 				<div id="customLayoutSection" class="settingsSubBlock" style="display: none;">
-					<div id="customLayoutTabGroup" class="tabContainer">
-						<ul class="nav nav-tabs">
-						<li class="active">
-							<a data-toggle="tab" href="#crop">Crop</a>
-						</li>
-						<li>
-							<a data-toggle="tab" href="#flip">Flip</a>
-						</li>
-						<li>
-							<a data-toggle="tab" href="#rotate">Rotate</a>
-						</li>
-						<li>
-							<a data-toggle="tab" href="#shear">Shear</a>
-						</li>
-						</ul>
-						<div class="tab-content">
-						<div id="crop" class="tab-pane fade in active">
-
-							<div class="mycheckbox"><input type="checkbox" id="checkboxCrop" value="crop"><b><i class="fa fa-crop" aria-hidden="true"></i> Crop</b></div>
-							<div id="cropSection" class="settingsSubBlock">
-								<p id="cropSectionSettings" class="sectionSettings">Not Set</p>
-								<button type="button" class="btn btn-default" id="resetCropButton">Reset Crop</button>
-								<button type="button" class="btn btn-default" id="editCropButton"><i class="fa fa-crop" aria-hidden="true"></i> Edit Crop</button>
-							</div>
-						</div>
-						<div id="flip" class="tab-pane fade in">
-							<div class="mycheckbox"><input type="checkbox" id="checkboxFlip" value="flip"><b><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip</b></div>
-							<div id="flipSection" class="settingsSubBlock">
-								<p id="flipSectionSettings" class="sectionSettings">Not Set</p>
-								<button type="button" class="btn btn-default" id="flipHorizontalButton"><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip Horizontal</button>
-								<button type="button" class="btn btn-default" id="flipVerticalButton"><i class="fa fa-arrows-v" aria-hidden="true"></i> Flip Vertical</button>
-							</div>
-						</div>
-						<div id="rotate" class="tab-pane fade in">
-							<div class="mycheckbox"><input type="checkbox" id="checkboxRotate" value="rotate"><b><i class="fa fa-repeat" aria-hidden="true"></i> Rotate</b></div>
-							<div id="rotateSection" class="settingsSubBlock">
-								<p id="rotationSectionSettings" class="sectionSettings">Not Set</p>
-								<button type="button" class="btn btn-default" id="resetRotationButton">Reset Rotation</button>
-								<button type="button" class="btn btn-default" id="anticlockwise10RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 10&#176;</button>
-								<button type="button" class="btn btn-default" id="anticlockwise90RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 90&#176;</button>
-								<button type="button" class="btn btn-default" id="clockwise90RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 90&#176;</button>
-								<button type="button" class="btn btn-default" id="clockwise10RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 10&#176;</button><br><br>
-								<b>Background Color: </b><input type="color" class="btn btn-default" id="rotateColorButton" value="#000000">
-							</div>
-						</div>
-						<div id="shear" class="tab-pane fade in">
-							<div class="mycheckbox"><input type="checkbox" id="checkboxShear" value="shear"><b><i class="fa fa-exchange" aria-hidden="true"></i> Shear</b></div>
-							<div id="shearSection" class="settingsSubBlock">
-								<p id="shearSectionSettings" class="sectionSettings">Not Set</p>
-								<button type="button" class="btn btn-default" id="resetShearButton">Reset Shear</button>
-								<button type="button" class="btn btn-default" id="negative10ShearXButton"><i class="fa fa-arrow-left" aria-hidden="true"></i> Shear 10&#176;</button>
-								<button type="button" class="btn btn-default" id="positive10ShearXButton"><i class="fa fa-arrow-right" aria-hidden="true"></i> Shear 10&#176;</button>
-								<button type="button" class="btn btn-default" id="negative10ShearYButton"><i class="fa fa-arrow-up" aria-hidden="true"></i> Shear 10&#176;</button>
-								<button type="button" class="btn btn-default" id="positive10ShearYButton"><i class="fa fa-arrow-down" aria-hidden="true"></i> Shear 10&#176;</button>
-							</div>
-						</div>
-						</div>
-					</div>
-					<div>
-						
-					</div>
 					
-					
+						<div class="lineBehindHeading"><span class="subHeading">Crop</span></div>
+						<div id="crop" class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Crop Image:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting featureToggleButton" id="cropEnabledButton">OFF</button><br>
+							</div>
+						</div>
+						<div class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Options:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting" id="resetCropButton">Reset Crop</button>
+								<button type="button" class="btn button-setting" id="editCropButton"><i class="fa fa-crop" aria-hidden="true"></i> Edit Crop</button>
+							</div>
+						</div>
+						<div class="lineBehindHeading"><span class="subHeading">Mirror</span></div>
+						<div id="flip" class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Mirror Image:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting featureToggleButton" id="mirrorEnabledButton">OFF</button>
+							</div>
+						</div>
+						<div class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Options:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting" id="flipHorizontalButton"><i class="fa fa-arrows-h" aria-hidden="true"></i> Flip Horizontal</button>
+								<button type="button" class="btn button-setting" id="flipVerticalButton"><i class="fa fa-arrows-v" aria-hidden="true"></i> Flip Vertical</button>
+							</div>
+						</div>
+						<div class="lineBehindHeading"><span class="subHeading">Rotation</span></div>
+						<div id="rotate" class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Rotate Image:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting featureToggleButton" id="rotationEnabledButton">OFF</button>
+							</div>
+						</div>
+						<div class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Options:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting" id="resetRotationButton">Reset Rotation</button>
+								<button type="button" class="btn button-setting" id="anticlockwise10RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 10&#176;</button>
+								<button type="button" class="btn button-setting" id="anticlockwise90RotationButton"><i class="fa fa-undo" aria-hidden="true"></i> Rotate 90&#176;</button>
+								<button type="button" class="btn button-setting" id="clockwise90RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 90&#176;</button>
+								<button type="button" class="btn button-setting" id="clockwise10RotationButton"><i class="fa fa-repeat" aria-hidden="true"></i> Rotate 10&#176;</button>
+							</div>
+						</div>
+						<div class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Background color:</div>
+							<div class="settingsSubBlockElements">
+								<input type="color" class="btn button-setting" id="rotateColorButton" value="#000000">
+							</div>
+						</div>
+						<div class="lineBehindHeading"><span class="subHeading">Shear</span></div>
+						<div id="shear" class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Shear Image:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting featureToggleButton" id="shearEnabledButton">OFF</button>
+							</div>
+						</div>
+						<div class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Options:</div>
+							<div class="settingsSubBlockElements">
+								<button type="button" class="btn button-setting" id="resetShearButton">Reset Shear</button>
+								<button type="button" class="btn button-setting" id="negative10ShearXButton"><i class="fa fa-arrow-left" aria-hidden="true"></i> Shear 10&#176;</button>
+								<button type="button" class="btn button-setting" id="positive10ShearXButton"><i class="fa fa-arrow-right" aria-hidden="true"></i> Shear 10&#176;</button>
+								<button type="button" class="btn button-setting" id="negative10ShearYButton"><i class="fa fa-arrow-up" aria-hidden="true"></i> Shear 10&#176;</button>
+								<button type="button" class="btn button-setting" id="positive10ShearYButton"><i class="fa fa-arrow-down" aria-hidden="true"></i> Shear 10&#176;</button>
+							</div>
+						</div>
+						<div class="settingsSubBlock">
+							<div class="settingsSubBlockCaption">Background color:</div>
+							<div class="settingsSubBlockElements">
+								<input type="color" class="btn button-setting" id="shearColorButton" value="#000000">
+							</div>
+						</div>	
 				</div>
 			</div>
 
@@ -221,78 +238,121 @@
 
 				<!-- CUSTOM FILTER SUBSECTION -->
 				<div id="customFilterSection" class="settingsSubBlock" style="display: none;">
-					<div id="customLayoutTabGroup" class="tabContainer">
-						<ul class="nav nav-tabs">
-						<li class="active">
-							<a data-toggle="tab" href="#antique">Antique</a>
-						</li>
-						<li>
-							<a data-toggle="tab" href="#distortion">Distortion</a>
-						</li>
-						<li>
-							<a data-toggle="tab" href="#artistic">Artistic</a>
-						</li>
-						<li>
-							<a data-toggle="tab" href="#color">Color/Contrast</a>
-						</li>
-						</ul>
-						<div class="tab-content">
-						<div id="antique" class="tab-pane fade in active">
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxGrayscale" value="grayscale"><b><i class="fa fa-crop" aria-hidden="true"></i> Grayscale</b></div>
-
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxMonochrome" value="monochrome"><b><i class="fa fa-crop" aria-hidden="true"></i> Monochrome</b></div>
-
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxNegative" value="negative"><b><i class="fa fa-crop" aria-hidden="true"></i> Negative</b></div>
-
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxSolarize" value="solarize"><b><i class="fa fa-crop" aria-hidden="true"></i> Solarize</b></div>
+					
+					<!-- ANTIQUE OPTIONS -->
+					<div class="lineBehindHeading"><span class="subHeading">Antique</span></div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Grayscale</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="grayscaleEnabledButton">OFF</button>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Monochrome</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="monochromeEnabledButton">OFF</button>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Negative</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="negativeEnabledButton">OFF</button>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Solarize</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="solarizeEnabledButton">OFF</button>
 							<div id="solarizeSection" class="settingsSubBlock">
 							</div>
 						</div>
-						<div id="distortion" class="tab-pane fade in">
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxSpread" value="spread"><b><i class="fa fa-crop" aria-hidden="true"></i> Spread</b></div>
+					</div>
+
+					<!-- DISTORTION OPTIONS -->
+					<div class="lineBehindHeading"><span class="subHeading">Distortion</span></div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Spread</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="spreadEnabledButton">OFF</button>
 							<div id="spreadSection" class="settingsSubBlock">
 							</div>
-
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxSwirl" value="swirl"><b><i class="fa fa-crop" aria-hidden="true"></i> Swirl</b></div>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Swirl</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="swirlEnabledButton">OFF</button>
 							<div id="swirlSection" class="settingsSubBlock">
 							</div>
-
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxWave" value="wave"><b><i class="fa fa-crop" aria-hidden="true"></i> Wave</b></div>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Wave</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="waveEnabledButton">OFF</button>
 							<div id="waveSection" class="settingsSubBlock">
 							</div>
 						</div>
-						<div id="artistic" class="tab-pane fade in">
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxCharcoal" value="charcoal"><b><i class="fa fa-crop" aria-hidden="true"></i> Charcoal</b></div>
+					</div>
+
+					<!-- ARTISTIC OPTIONS -->
+					<div class="lineBehindHeading"><span class="subHeading">Artistic</span></div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Charcoal</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="spreadEnabledButton">OFF</button>
 							<div id="charcoalSection" class="settingsSubBlock">
 							</div>
-
-							
-
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxMosaic" value="mosaic"><b><i class="fa fa-crop" aria-hidden="true"></i> Mosaic</b></div>
-
-							
-							<div class="mycheckbox"><input type="checkbox" name="effects" id="checkboxPaint" value="paint"><b><i class="fa fa-crop" aria-hidden="true"></i> Paint</b></div>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Mosaic</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="mosaicEnabledButton">OFF</button>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Paint</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="paintEnabledButton">OFF</button>
 							<div id="paintSection" class="settingsSubBlock">
 							</div>
-
 						</div>
-						<div id="color" class="tab-pane fade in">
-							<b><i class="fa fa-crop" aria-hidden="true"></i> Contrast</b>
+					</div>
+
+
+					<!-- CONTRAST / COLOR OPTIONS -->
+					<div class="lineBehindHeading"><span class="subHeading">Contrast / Color</span></div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Contrast</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="contrastEnabledButton">OFF</button>
 							<div id="contrastSection" class="settingsSubBlock">
 							</div>
-
-							<b><i class="fa fa-crop" aria-hidden="true"></i> Brightness</b>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Brightness</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="brightnessEnabledButton">OFF</button>
 							<div id="brightnessSection" class="settingsSubBlock">
 							</div>
-
-							<b><i class="fa fa-crop" aria-hidden="true"></i> Hue</b>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Hue</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="hueEnabledButton">OFF</button>
 							<div id="hueSection" class="settingsSubBlock">
 							</div>
-
-							<b><i class="fa fa-crop" aria-hidden="true"></i> Saturation</b>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Saturation</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting featureToggleButton" id="saturationEnabledButton">OFF</button>
 							<div id="saturationSection" class="settingsSubBlock">
 							</div>
-						</div>
 						</div>
 					</div>
 				</div>
@@ -310,10 +370,25 @@
 
 				<!-- CUSTOM DECORATION SUBSECTION -->
 				<div id="customDecorationSection" class="settingsSubBlock" style="display: none;">
-					<div class="mycheckbox"><input type="checkbox" name="border" id="checkboxBorder" value="border"><b><i class="fa fa-crop" aria-hidden="true"></i> Add Border</b></div>
-					<div id="borderSection" class="settingsSubBlock">
-						<b>Border Width:</b><input type="number" id="borderWidth" value="0">
-						<b>Border Color</b><input type="color" class="btn btn-default" id="borderColor" value="#000000">
+
+					<div class="lineBehindHeading"><span class="subHeading">Border</span></div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Border around image:</div>
+						<div class="settingsSubBlockElements">
+							<button type="button" class="btn button-setting" id="borderEnabledButton">OFF</button>
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Border Width:</div>
+						<div class="settingsSubBlockElements">
+							<input type="number" id="borderWidth" value="0">
+						</div>
+					</div>
+					<div class="settingsSubBlock">
+						<div class="settingsSubBlockCaption">Border Color:</div>
+						<div class="settingsSubBlockElements">
+							<input type="color" class="btn button-setting" id="borderColor" value="#000000">
+						</div>
 					</div>
 				</div>
 			</div>

@@ -719,12 +719,14 @@ hr.small {
 }
 
 /* Changing the look and feel of the select element to match bootstrap - see http://stackoverflow.com/questions/1895476/how-to-style-a-select-dropdown-with-css-only-without-javascript */
-select {
+
+select2{
    -webkit-appearance: none; 
    -moz-appearance: none;
    appearance: none;       /* remove default arrow */
    background-image: url(...);   /* add custom arrow */
 }
+
 
 .tabContainer {
 	width: 90%;
@@ -753,6 +755,7 @@ img {
 .settingsSubBlockCaption {
 	font-size: 1.1em;
 	font-weight: bold;
+	color: gray;
 	width: 30%;
 	display: inline-block;
 	overflow: hidden;
@@ -765,6 +768,27 @@ img {
 	width: 70%;
 	/*display: table-cell;
 	text-align: left; */
+}
+
+.select-setting {
+	font-size: 1.1em;
+}
+
+ input[type=range]  {
+	display: inline;
+	width: 70%;
+	max-width: 200px;
+	min-width: 100px;
+}
+
+.settingsRangeWithValue {
+	text-align: center;
+	font-size: 1.1em;
+}
+
+.settingsRange {
+	padding: 0;
+	margin: 0;
 }
 
 .mycheckbox input[type=checkbox] {

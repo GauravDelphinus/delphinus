@@ -119,9 +119,9 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
 
 			if (layout.shear) {
 				layoutArgs.push("-background");
-				layoutArgs.push(layout.sheer.color);
+				layoutArgs.push(layout.shear.color);
 				layoutArgs.push("-shear");
-				layoutArgs.push(layout.shear.xDegrees + "x" + layout.sheer.yDegrees);
+				layoutArgs.push(layout.shear.xDegrees + "x" + layout.shear.yDegrees);
 			}
 		}
 	}
@@ -297,119 +297,88 @@ function applyFilters (image, filters, imArgs) {
 		if (filter.type == "preset") {
 			applyPresetFilter(filter.preset, imArgs);
 		} else if (filter.type == "custom") {
-			if (filter.settings) {
-
-				if (filter.settings.brightness) {
-					imArgs.push("-brightness-contrast");
-					imArgs.push(parseInt(filter.settings.brightness.value));
-				}
-
-				if (filter.settings.contrast) {
-					imArgs.push("-brightness-contrast");
-					imArgs.push("0x" + parseInt(filter.settings.contrast.value));
-				}
-
-				if (filter.settings.hue) {
-					imArgs.push("-modulate");
-					imArgs.push("100,100," + absoluteToPercentageChangeSigned(parseInt(filter.settings.hue.value)));
-				}
-
-				if (filter.settings.saturation) {
-					imArgs.push("-modulate");
-					imArgs.push("100," + absoluteToPercentageChangeSigned(parseInt(filter.settings.saturation.value)) + ",100");
-				}
-
-				/*
-				// Brigthness, Saturation and Hue
-				if (filter.settings.brightness || filter.settings.saturation || filter.settings.hue) {
-					var brightness, hue, saturation;
-					if (filter.settings.brightness) {
-						// Brightness values are from -100 to 100, 0 meaning no change
-						// Image Processor expects the values from -200% to 200%, 100% meaning no change
-						brightness = absoluteToPercentageChangeSigned(parseInt(filter.settings.brightness.value));
-					} else {
-						brightness = 100; // no change, 100%
-					}
-
-					if (filter.settings.saturation) {
-						saturation = absoluteToPercentageChangeSigned(parseInt(filter.settings.saturation.value));
-					} else {
-						saturation = 100; // no change, 100%
-					}
-
-					if (filter.settings.hue) {
-						hue = absoluteToPercentageChangeSigned(parseInt(filter.settings.hue.value));
-					} else {
-						hue = 100; // no change, 100%
-					}
-
-					// now, do the thing
-					//console.log("calling image.modulate with brightness = " + brightness + ", hue = " + hue + ", saturation = " + saturation);
-					image.modulate(brightness, saturation, hue);
-				}
-		
-						
-				// Contrast
-				if (filter.settings.contrast) {
-					image.contrast(absoluteToMultiplierSigned(parseInt(filter.settings.contrast.value)));
-				}
-				*/
-					
-			// ADD MORE
+			//Antique -------------
+			if (filter.grayscale == "on") {
+				//image.colorspace("GRAY");
+				imArgs.push("-colorspace");
+				imArgs.push("Gray");
 			}
 
-			if (filter.effects) {
-				if (filter.effects.paint) {
-					//image.paint(filter.effects.paint.radius);
-					imArgs.push("-paint");
-					imArgs.push(filter.effects.paint.radius);
-				}
-				if (filter.effects.grayscale == "on") {
-					//image.colorspace("GRAY");
-					imArgs.push("-colorspace");
-					imArgs.push("Gray");
-				}
-				if (filter.effects.mosaic == "on") {
-					//console.log("setting image.mosaic");
-					//image.mosaic();
-					imArgs.push("-mosaic");
-				}
-				if (filter.effects.negative == "on") {
-					//image.negative();
-					imArgs.push("-negate");
-				}
-				if (filter.effects.solarize) {
-					//image.solarize(filter.effects.solarize.threshold);
-					imArgs.push("-solarize");
-					imArgs.push(filter.effects.solarize.threshold);
-				}
-				if (filter.effects.monochrome == "on") {
-					//image.monochrome();
-					imArgs.push("-monochrome");
-				}
-				if (filter.effects.swirl) {
-					//image.swirl(filter.effects.swirl.degrees);
-					imArgs.push("-swirl");
-					imArgs.push(filter.effects.swirl.degrees);
-				}
-				if (filter.effects.wave) {
-					//image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
-					imArgs.push("-wave");
-					imArgs.push(filter.effects.wave.amplitude + "x" + filter.effects.wave.wavelength);
-				}
-				if (filter.effects.spread) {
-					//image.spread(filter.effects.spread.amount);
-					imArgs.push("-spread");
-					imArgs.push(filter.effects.spread.amount);
-				}
-				if (filter.effects.charcoal) {
-					//image.charcoal(filter.effects.charcoal.factor);
-					imArgs.push("-charcoal");
-					imArgs.push(filter.effects.charcoal.factor);
-				}
+			if (filter.monochrome == "on") {
+				//image.monochrome();
+				imArgs.push("-monochrome");
+			}
+
+			if (filter.negative == "on") {
+				//image.negative();
+				imArgs.push("-negate");
+			}
+
+			if (filter.solarize) {
+				//image.solarize(filter.effects.solarize.threshold);
+				imArgs.push("-solarize");
+				imArgs.push(filter.solarize.threshold);
+			}
+
+			//Distortion --------------
+			if (filter.spread) {
+				//image.spread(filter.effects.spread.amount);
+				imArgs.push("-spread");
+				imArgs.push(filter.spread.amount);
+			}
+			
+			if (filter.swirl) {
+				//image.swirl(filter.effects.swirl.degrees);
+				imArgs.push("-swirl");
+				imArgs.push(filter.swirl.degrees);
+			}
+
+			if (filter.wave) {
+				//image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
+				imArgs.push("-wave");
+				imArgs.push(filter.wave.amplitude + "x" + filter.wave.wavelength);
+			}
+			
+			//Artistic -----------------
+			if (filter.charcoal) {
+				//image.charcoal(filter.effects.charcoal.factor);
+				imArgs.push("-charcoal");
+				imArgs.push(filter.charcoal.factor);
+			}
+
+			if (filter.mosaic == "on") {
+				//console.log("setting image.mosaic");
+				//image.mosaic();
+				imArgs.push("-mosaic");
+			}
+
+			if (filter.paint) {
+				//image.paint(filter.effects.paint.radius);
+				imArgs.push("-paint");
+				imArgs.push(filter.paint.radius);
+			}
+
+			//Color/Contrast/Brightness
+			if (filter.contrast) {
+				imArgs.push("-brightness-contrast");
+				imArgs.push("0x" + parseInt(filter.contrast.value));
+			}
+
+			if (filter.brightness) {
+				imArgs.push("-brightness-contrast");
+				imArgs.push(parseInt(filter.brightness.value));
+			}
+
+			if (filter.hue) {
+				imArgs.push("-modulate");
+				imArgs.push("100,100," + absoluteToPercentageChangeSigned(parseInt(filter.hue.value)));
+			}
+
+			if (filter.saturation) {
+				imArgs.push("-modulate");
+				imArgs.push("100," + absoluteToPercentageChangeSigned(parseInt(filter.saturation.value)) + ",100");
 			}
 		}
-		
 	}
 }
 
@@ -497,7 +466,7 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 			applyPresetArtifact(size, artifact.preset, caption, imArgs);
 		} else if (artifact.type == "custom") {
 			if (artifact.banner) {
-				var backgroundColor = artifact.banner.backgroundColor;
+				var backgroundColor = normalizeColorToIM(artifact.banner.backgroundColor);
 				if (artifact.banner.backgroundColor == "transparent") {
 					backgroundColor = "none";
 				}
@@ -628,7 +597,7 @@ function applyDecorations (image, decorations, imArgs) {
 			if (decoration.border) {
 				//image.borderColor(decoration.border.color);
 				//image.border(decoration.border.width, decoration.border.width);
-				applyBorder(decoration.border.width, decoration.border.color);
+				applyBorder(imArgs, decoration.border.width, decoration.border.color);
 			}
 		}
 	}
@@ -742,6 +711,24 @@ function absoluteToMultiplierSigned(absoluteValue) {
 	var multiplierValue = absoluteValue;
 
 	return multiplierValue;
+}
+
+function normalizeColorToIM(color) {
+	console.log("normalizeColorToIM, color = " + color);
+	if (color == null || color == undefined || color == "transparent") {
+		normalizedColor = "none";
+	} else {
+		var color = color.toLowerCase();
+
+		if (/#[a-f0-9]+/.test(color)) {
+			normalizedColor = color.match(/#[a-f0-9]+/);
+		} else {
+			normalizedColor = "none";
+		}
+	}
+	
+	console.log("normalizeColorToIM, color is [" + color + "], normalizedColor is [" + normalizedColor + "]");
+	return normalizedColor;
 }
 
 /**

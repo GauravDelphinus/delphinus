@@ -8,7 +8,6 @@ $(document).ready(function(){
 	$("#apply").click(postEntry);
 
 	createLoginHeader();
-	
 });
 
 function setupMainItem() {
@@ -23,6 +22,9 @@ function setupMainItem() {
 	});
 }
 
+/*
+	Set up handlers for the Navigation / Step Wizard (buttons 1-6).
+*/
 function setupNavigation() {
 	var navListItems = $('div.stepwizard-header div a'),
           allWells = $('.setup-content'),
@@ -71,6 +73,9 @@ function setupSteps() {
 	setupDecorationStep();
 }
 
+/*
+	Switch to the specified step.
+*/
 function showStep(stepId) {
 	if (stepId == "captionSection") {
 		showCaptionStep();
@@ -103,13 +108,130 @@ function changeCallback(event) {
 	applyChanges(null);
 }
 
+/**************************** (1) CAPTION STEP **********************************************/
+
+function showCaptionStep() {
+	$("#stepTitle").text("Enter a really awesome caption for your entry!")
+}
+
+function setupCaptionStep() {
+
+}
+
+/**************************** (2) ARTIFACT STEP **********************************************/
+
+var defaultArtifactPresetSelectionID = "bannerBottomBlack";
+
+/*
+	Show the Artifact Step - either by navitating using the Next/Previous buttons,
+	or by clicking the step button directly.
+
+	This will refresh the thumbnail list from the server.
+*/
+function showArtifactStep() {
+	$("#stepTitle").text("Place your caption in the entry image")
+
+	if ($("#presetArtifactSection").is(":visible")) {
+		//default selection
+		var defaultSelectionID = $("#presetArtifactSection").data("selectedPresetID");
+		if (defaultSelectionID == undefined) {
+			defaultSelectionID = defaultArtifactPresetSelectionID;
+			$("#presetArtifactSection").data("selectedPresetID", defaultSelectionID);
+		}
+
+		$.getJSON('/api/filters?type=artifact' + "&artifactType=preset", function(result) {
+			if (result.length > 0) {
+				var list = [];
+				for (var i = 0; i < result.length; i++) {
+					var a = result[i][0];
+					//var u = result[i][1];
+
+					var data = {};
+					data.id = a.id;
+					data.caption = a.name;
+					data.image = "/images/static/progress.gif";
+
+					var jsonObj = {};
+					constructJSONObject(jsonObj);
+					if (!jsonObj.steps.artifacts) {
+						jsonObj.steps.artifacts = [{}];
+					}
+					jsonObj.steps.artifacts[0].type = "preset";
+					jsonObj.steps.artifacts[0].preset = a.id;
+					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
+					generateChanges(a.id, jsonObj, function(id, imgPath) {
+						$("#" + id + "EntityImage").prop("src", imgPath);
+					});
+
+					list.push(data);
+				}
+
+				$("#presetArtifacts").remove();
+				var grid = createGrid("presetArtifacts", list, 3, true, true, defaultSelectionID, function(id) {
+					switchStepOptions("artifact", "preset", id);
+					
+					$(window).scrollTop(0);
+				});
+				$("#presetArtifactSection").append(grid);
+
+				//apply changes to reflect default selection
+				applyChanges();
+			}
+		});
+	}
+}
+
+function setupArtifactStep() {
+	setupPresetAndCustomOptions("#artifactOptionsButton", "#presetArtifactSection", "#customArtifactSection", "preset");
+
+	setupBannerToggleSection();
+}
+
+function setupBannerToggleSection() {
+	var changeElementIds = [
+		"#bannerColorButton", 
+		"#bannerTextFontSize",
+		"#bannerTextFontName",
+		"#bannerTextColorButton"
+		];
+
+	var clickElementIds = [
+		"#topBannerButton",
+		"#bottomBannerButton",
+		"#aboveBannerButton",
+		"#belowBannerButton",
+		"#transparentBannerButton",
+		];
+
+	setupGeneralRulesForToggleSection("#bannerEnabledButton", changeElementIds, clickElementIds, "artifact");
+
+	setMutuallyExclusiveButtons(["#topBannerButton", "#bottomBannerButton", "#aboveBannerButton", "#belowBannerButton"]);
+
+	$("#transparentBannerButton, #bannerColorButton").click(function() {
+		if (this.id == "transparentBannerButton") {
+			$("#" + this.id).addClass("active");
+			$("#bannerColorButton").removeClass("active");
+		} else if (this.id == "bannerColorButton") {
+			$("#" + this.id).addClass("active");
+			$("#transparentBannerButton").removeClass("active");
+		}
+	});
+
+
+	clickElementIds.push("#bannerEnabledButton");
+	setChangeCallback(changeCallback, changeElementIds, clickElementIds);
+}
+
+
+
+/**************************** (3) LAYOUT STEP **********************************************/
+
 function showLayoutStep() {
 	$("#stepTitle").text("Tweak the layout of your entry")
 
-
 	if ($("#presetLayoutSection").is(":visible")) {
 		//default selection
-		var defaultSelectionID = $("#presetLayoutSection").data("selectedLayoutID");
+		var defaultSelectionID = $("#presetLayoutSection").data("selectedPresetID");
 		$.getJSON('/api/filters?type=layout' + "&layoutType=preset", function(result) {
 			if (result.length > 0) {
 				var list = [];
@@ -145,8 +267,8 @@ function showLayoutStep() {
 
 				$("#presetLayouts").remove();
 				var grid = createGrid("presetLayouts", list, 3, true, true, defaultSelectionID, function(id) {
-					$("#presetLayoutSection").data("selectedLayoutID", id);
-					applyChanges();
+					switchStepOptions("layout", "preset", id);
+
 					$(window).scrollTop(0);
 				});
 				$("#presetLayoutSection").append(grid);
@@ -158,49 +280,40 @@ function showLayoutStep() {
 }
 
 function setupLayoutStep() {
-	//default is preset
-	$("#layoutOptionsButton").data("state", "preset");
-	$("#layoutOptionsButton").click(function() {
-		if ($("#presetLayoutSection").is(":visible")) {
-			//presets already show, toggle
-			$("#presetLayoutSection").hide();
-			$("#customLayoutSection").show();
+	setupPresetAndCustomOptions("#layoutOptionsButton", "#presetLayoutSection", "#customLayoutSection", "preset");
 
-			$(this).text("Hide custom options");
-			$(this).data("state", "custom");
-		} else if ($("#customLayoutSection").is(":visible")) {
-			$("#presetLayoutSection").show();
-			$("#customLayoutSection").hide();
+	setupCropToggleSection();
 
-			$(this).text("Show custom options");
-			$(this).data("state", "preset");
-		}
-	});
+	setupMirrorToggleSection();
 
-	/*** CROP Handling ****/
-	$("#saveCrop").click(function() {
+	setupRotationToggleSection();
+
+	setupShearToggleSection();
+}
+
+function setupCropToggleSection() {
+	/*************************** CROP SECTION *****************************/
+	/**********************************************************************/
+
+	// Logic Specific to this section
+
+	setupGeneralRulesForToggleSection("#cropEnabledButton", [], ["#resetCropButton", "#editCropButton"], "layout");
+
+	$("#saveCropButton").click(function() {
 		var cropData = $("#newentryimage").cropper("getData");
 
 		jQuery.data(document.body, "cropData", cropData);
 
-		$("#cropSectionSettings").text("Left: " + Math.round(cropData.x) + " Top: " + Math.round(cropData.y) + " Width: " + Math.round(cropData.width) + " Height: " + Math.round(cropData.height));
-
 		endCrop();
-
-		applyChanges();
 	});
 
-	$("#cancelCrop").click(function() {
+	$("#cancelCropButton").click(function() {
 		endCrop();
 	});
 
 	$("#resetCropButton").click(function() {
 		//reset cached data
 		jQuery.data(document.body, "cropData", null);
-
-		$("#cropSectionSettings").text("Not Set");
-
-		applyChanges();
 	});
 
 	$("#editCropButton").click(function() {
@@ -214,53 +327,58 @@ function setupLayoutStep() {
 		});
 	});
 
-	enableDisableOnCheck("#checkboxCrop", ["#resetCropButton", "#editCropButton"]);
-	$("#checkboxCrop").on("change", function() {
-		if ($(this).prop("checked")) {
-			var cropData = jQuery.data(document.body, "cropData");
-			startCrop(cropData);
-		} else {
-			applyChanges();
-		}
-	});
-
-	//*********** FLIP Handling
-	enableDisableOnCheck("#checkboxFlip", ["#flipHorizontalButton", "#flipVerticalButton"]);
-	setChangeCallback(changeCallback, [
-				"#checkboxFlip",
-				"#flipHorizontalButton", "#flipVerticalButton"]);
+	setChangeCallback(changeCallback, [], ["#resetCropButton", "#cropEnabledButton", "#saveCropButton"]);
+}
 
 
-	$("#flipVerticalButton, #flipHorizontalButton").click(function() {
-		if ($(this).hasClass("active")) {
-			//flip is on, turn it off
-			$(this).removeClass("active");
-		} else {
-			$(this).addClass("active");
-		}
+/**
+	Enter Crop Mode / UI.
+	CropData is used to restore to previously stored crop box data, if available.
+**/
+function startCrop(cropData) {
+	var options = {};
 
-		var flipSettings = "Flip Vertical: ";
-		if ($("#flipVerticalButton").hasClass("active")) {
-			flipSettings += "ON";
-		} else {
-			flipSettings += "OFF";
-		}
+	if (cropData) {
+		options.data = cropData;
+	}
 
-		flipSettings += ", Flip Horizontal: ";
-		if ($("#flipHorizontalButton").hasClass("active")) {
-			flipSettings += "ON";
-		} else {
-			flipSettings += "OFF";
-		}
-		$("#flipSectionSettings").text(flipSettings);
+	$("#newentryimage").cropper(options);
 
-		applyChanges();
-	});
+	$(".imageSection").addClass("imageSectionHover");
 
-	// Rotate
-	enableDisableOnCheck("#checkboxRotate", ["#resetRotationButton", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton", "#rotateColorButton"]);
-	setChangeCallback(changeCallback, ["#checkboxRotate", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton", "#rotateColorButton"]);
+	//disable everything else until we're out of the crop mode
+	$("#steps").hide();
+	$("#cropLabel").show();
 
+}
+
+/**
+	Exit Crop Mode / UI.
+**/
+function endCrop() {
+	$("#newentryimage").cropper("destroy");
+	$(".imageSection").removeClass("imageSectionHover");
+
+	$("#steps").show();
+	$("#cropLabel").hide();
+}
+
+function setupMirrorToggleSection() {
+	/*************************** FLIP SECTION *****************************/
+	/**********************************************************************/
+
+	setupGeneralRulesForToggleSection("#mirrorEnabledButton", [], ["#flipHorizontalButton", "#flipVerticalButton"], "layout");
+
+	setMutuallyExclusiveButtons(["#flipHorizontalButton", "#flipVerticalButton"]);
+
+	setChangeCallback(changeCallback, [], ["#mirrorEnabledButton", "#flipVerticalButton", "#flipHorizontalButton"]);
+}
+
+function setupRotationToggleSection() {
+	/*************************** ROTATE SECTION *****************************/
+	/************************************************************************/
+
+	setupGeneralRulesForToggleSection("#rotationEnabledButton", [], ["#resetRotationButton", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton", "#rotateColorButton"], "layout");
 	
 	$("#anticlockwise10RotationButton, #anticlockwise90RotationButton, #clockwise90RotationButton, #clockwise10RotationButton").click(function() {
 		var rotationData = jQuery.data(document.body, "rotationData");
@@ -278,24 +396,23 @@ function setupLayoutStep() {
 			rotationData.degrees += 10;
 		}
 		
-		$("#rotationSectionSettings").html("Rotation: " + rotationData.degrees + "&#176;");
 		jQuery.data(document.body, "rotationData", rotationData);
-
-		applyChanges();
 	});
 
 	$("#resetRotationButton").click(function() {
 		jQuery.data(document.body, "rotationData", null);
-
-		$("#rotationSectionSettings").html("Not Set");
-
-		applyChanges();
 	});
 
-	// Shear
-	enableDisableOnCheck("#checkboxShear", ["#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton"]);
-	setChangeCallback(changeCallback, ["#checkboxShear", "#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton"]);
+	setChangeCallback(changeCallback, ["#rotateColorButton"], ["#rotationEnabledButton", "#resetRotationButton", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton"]);
 
+}
+
+function setupShearToggleSection() {
+	/*************************** SHEAR SECTION ******************************/
+	/************************************************************************/
+
+	setupGeneralRulesForToggleSection("#shearEnabledButton", [], ["#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton", "#shearColorButton"], "layout");
+	
 	$("#negative10ShearXButton, #positive10ShearXButton, #negative10ShearYButton, #positive10ShearYButton").click(function() {
 		var shearData = jQuery.data(document.body, "shearData");
 		if (!shearData) {
@@ -312,60 +429,24 @@ function setupLayoutStep() {
 			shearData.yDegrees += 10;
 		}
 		
-		$("#shearSectionSettings").html("Shear X: " + shearData.xDegrees + "&#176;, Y: " + shearData.yDegrees + "&#176;");
 		jQuery.data(document.body, "shearData", shearData);
-
-		applyChanges();
 	});
 
 	$("#resetShearButton").click(function() {
 		jQuery.data(document.body, "shearData", null);
-
-		$("#shearSectionSettings").html("Not Set");
-
-		applyChanges();
 	});
+
+	setChangeCallback(changeCallback, ["#shearColorButton"], ["#shearEnabledButton", "#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton"]);
 }
 
-
-/**
-	Enter Crop Mode / UI.
-	CropData is used to restore to previously stored crop box data, if available.
-**/
-function startCrop(cropData) {
-	if ($("#checkboxCrop").prop("checked")) {
-
-		var options = {};
-
-		if (cropData) {
-			options.data = cropData;
-		}
-
-		$("#newentryimage").cropper(options);
-
-		$(".imageSection").addClass("imageSectionHover");
-
-		//disable everything else until we're out of the crop mode
-		$("#steps").hide();
-	}
-}
-
-/**
-	Exit Crop Mode / UI.
-**/
-function endCrop() {
-	$("#newentryimage").cropper("destroy");
-	$(".imageSection").removeClass("imageSectionHover");
-
-	$("#steps").show();
-}
+/**************************** (4) FILTER STEP **********************************************/
 
 function showFilterStep() {
 	$("#stepTitle").text("Apply a really cool filter to your entry!")
 
 	if ($("#presetFilterSection").is(":visible")) {
 		//default selection
-		var defaultSelectionID = $("#presetFilterSection").data("selectedFilterID");
+		var defaultSelectionID = $("#presetFilterSection").data("selectedPresetID");
 
 		$.getJSON('/api/filters?type=filter' + "&filterType=preset", function(result) {
 			if (result.length > 0) {
@@ -403,8 +484,8 @@ function showFilterStep() {
 				$("#presetFilters").remove();
 				var grid = createGrid("presetFilters", list, 3, true, true, defaultSelectionID, function(id) {
 					console.log("selection callbac for id = " + id);
-					$("#presetFilterSection").data("selectedFilterID", id);
-					applyChanges();
+					switchStepOptions("filter", "preset", id);
+
 					$(window).scrollTop(0);
 				});
 				$("#presetFilterSection").append(grid);
@@ -416,255 +497,150 @@ function showFilterStep() {
 }
 
 function setupFilterStep() {
-	//default is preset
-	$("#filterOptionsButton").data("state", "preset");
-	$("#filterOptionsButton").click(function() {
-		if ($("#presetFilterSection").is(":visible")) {
-			//presets already show, toggle
-			$("#presetFilterSection").hide();
-			$("#customFilterSection").show();
+	setupPresetAndCustomOptions("#filterOptionsButton", "#presetFilterSection", "#customFilterSection", "preset");
 
-			$(this).text("Hide custom options");
-			$(this).data("state", "custom");
-		} else if ($("#customFilterSection").is(":visible")) {
-			$("#presetFilterSection").show();
-			$("#customFilterSection").hide();
+	setupGrayscaleToggleSection();
 
-			$(this).text("Show custom options");
-			$(this).data("state", "preset");
-		}
-	});
+	setupMonochromeToggleSection();
 
-	// FILTERS SECTION ----------------------
+	setupNegativeToggleSection();
 
-	//charcoal
-	$("#charcoalSection").append(createRangeSection("charcoalValueText", "charcoalRangeInput", 0, 20, 0, 1));
-	enableDisableOnCheck("#checkboxCharcoal", ["#charcoalRangeInput"]);
+	setupSolarizeToggleSection();
 
-	//paint
-	$("#paintSection").append(createRangeSection("paintValueText", "paintRangeInput", 0, 100, 0, 5));
-	enableDisableOnCheck("#checkboxPaint", ["#paintRangeInput"]);
+	setupSpreadToggleSection();
 
-	//solarize
-	$("#solarizeSection").append(createRangeSection("solarizeValueText", "solarizeRangeInput", 0, 100, 100, 5));
-	enableDisableOnCheck("#checkboxSolarize", ["#solarizeRangeInput"]);
+	setupSwirlToggleSection();
 
-	//spread
-	$("#spreadSection").append(createRangeSection("spreadValueText", "spreadRangeInput", 0, 100, 0, 5));
-	enableDisableOnCheck("#checkboxSpread", ["#spreadRangeInput"]);
+	setupWaveToggleSection();
 
-	//swirl
-	$("#swirlSection").append(createRangeSection("swirlValueText", "swirlRangeInput", 0, 100, 0, 5));
-	enableDisableOnCheck("#checkboxSwirl", ["#swirlRangeInput"]);
+	setupCharcoalToggleSection();
 
-	//Wave
-	$("#waveSection").append(createRangeSection("waveAmplitudeValueText", "waveAmplitudeRangeInput", 0, 100, 0, 5));
-	$("#waveSection").append(createRangeSection("waveLengthValueText", "waveLengthRangeInput", 0, 100, 100, 5));
-	enableDisableOnCheck("#checkboxWave", ["#waveAmplitudeRangeInput", "#waveLengthRangeInput"]);
+	setupMosaicToggleSection();
 
-	//contrast
-	$("#contrastSection").append(createRangeSection("contrastValueText", "contrastRangeInput", -100, 100, 0, 5));
-	//enableDisableOnCheck("#checkboxContrast", ["#contrastRangeInput"]);
+	setupPaintToggleSection();
 
-	//brightness
-	$("#brightnessSection").append(createRangeSection("brightnessValueText", "brightnessRangeInput", -100, 100, 0, 5));
-	//enableDisableOnCheck("#checkboxBrightness", ["#brightnessRangeInput"]);
+	setupContrastToggleSection();
 
-	//hue
-	$("#hueSection").append(createRangeSection("hueValueText", "hueRangeInput", -100, 100, 0, 5));
-	//enableDisableOnCheck("#checkboxHue", ["#hueRangeInput"]);
+	setupBrightnessToggleSection();
 
-	//saturation
-	$("#saturationSection").append(createRangeSection("saturationValueText", "saturationRangeInput", -100, 100, 0, 5));
-	//enableDisableOnCheck("#checkboxSaturation", ["#saturationRangeInput"]);
+	setupHueToggleSection();
 
-	//set change callback for all range inputs
-	$("input[type=range]").change(function() {
-		if (this.id == "charcoalRangeInput") {
-			$("#charcoalValueText").text("Factor: " + $("#" + this.id).val());
-		} else if (this.id == "paintRangeInput") {
-			$("#paintValueText").text("Radius: " + $("#" + this.id).val());
-		} else if (this.id == "solarizeRangeInput") {
-			$("#solarizeValueText").text("Threshold: " + $("#" + this.id).val());
-		} else if (this.id == "spreadRangeInput") {
-			$("#spreadValueText").text("Amount: " + $("#" + this.id).val());
-		} else if (this.id == "SwirlRangeInput") {
-			$("#swirlValueText").text("Degrees: " + $("#" + this.id).val());
-		} else if (this.id == "waveAmplitudeRangeInput") {
-			$("#waveAmplitudeValueText").text("Amplitude: " + $("#" + this.id).val());
-		} else if (this.id == "waveLengthRangeInput") {
-			$("#waveLengthValueText").text("Wavelength: " + $("#" + this.id).val());
-		} else if (this.id == "contrastRangeInput") {
-			$("#contrastValueText").text("Value: " + $("#" + this.id).val());
-		} else if (this.id == "brightnessRangeInput") {
-			$("#brightnessValueText").text("Value: " + $("#" + this.id).val());
-		} else if (this.id == "hueRangeInput") {
-			$("#hueValueText").text("Value: " + $("#" + this.id).val());
-		} else if (this.id == "saturationRangeInput") {
-			$("#saturationValueText").text("Value: " + $("#" + this.id).val());
-		} 
-	});
-	
-
-
-
-
-	/*
-	$("input[type=radio][name=filter]").change(function () {
-		showHideSection(this.value, 
-			[{value: "none", id: "#noneFilterSection"}, 
-			{value: "preset", id: "#presetFilterSection"}, 
-			{value: "user_defined", id: "#userDefinedFilterSection"}, 
-			{value: "custom", id: "#customFilterSection"}]);
-		applyChanges();
-	});
-	*/
-
-	setChangeCallback(changeCallback, [
-		"input[type=checkbox][name=effects]", 
-		"input[type=radio][name=preset]",
-		"input[type=range]",
-		"#contrast",
-		"#brightness",
-		"#hue",
-		"#saturation"
-		]);
+	setupSaturationToggleSection();
 }
 
-function createRangeSection(valueTextID, rangeInputID, min, max, value, step) {
-	var paintRangeSection = $("<div>", {class: "rangeSection"});
-	paintRangeSection.append($("<span>", {id: valueTextID, class: "sectionSettings"}).text("Not Set"));
-	var rangeInput = $("<div>", {class: "rangeInput"});
-	rangeInput.append($("<span>").append(min));
-	var input = $("<input>", {id: rangeInputID, type: "range", min: min, max: max, value: value, step: step});
-	rangeInput.append(input);
-	rangeInput.append($("<span>").append(max));
-	paintRangeSection.append(rangeInput);
+function setupGrayscaleToggleSection() {
+	setupGeneralRulesForToggleSection("#grayscaleEnabledButton", [], [], "filter");
 
-	return paintRangeSection;
+	setChangeCallback(changeCallback, [], ["#grayscaleEnabledButton"]);
 }
 
-function showCaptionStep() {
-	$("#stepTitle").text("Enter a really awesome caption for your entry!")
+function setupMonochromeToggleSection() {
+	setupGeneralRulesForToggleSection("#monochromeEnabledButton", [], [], "filter");
+
+	setChangeCallback(changeCallback, [], ["#monochromeEnabledButton"]);
 }
 
-function setupCaptionStep() {
+function setupNegativeToggleSection() {
+	setupGeneralRulesForToggleSection("#negativeEnabledButton", [], [], "filter");
 
+	setChangeCallback(changeCallback, [], ["#negativeEnabledButton"]);
 }
 
-function showArtifactStep() {
-	$("#stepTitle").text("Place your caption in the entry image")
+function setupSolarizeToggleSection() {
+	setupGeneralRulesForToggleSection("#solarizeEnabledButton", ["#solarizeRangeInput"], [], "filter");
 
-	if ($("#presetArtifactSection").is(":visible")) {
-		//default selection
-		var defaultSelectionID = $("#presetArtifactSection").data("selectedArtifactID");
-		if (defaultSelectionID == undefined) {
-			defaultSelectionID = "bannerBottomBlack";
-			$("#presetArtifactSection").data("selectedArtifactID", defaultSelectionID);
-		}
+	$("#solarizeSection").append(createRangeSection("Solarize factor", "solarizeRangeInput", 0, 100, 100, 5));
 
-		$.getJSON('/api/filters?type=artifact' + "&artifactType=preset", function(result) {
-			if (result.length > 0) {
-				var list = [];
-				for (var i = 0; i < result.length; i++) {
-					var a = result[i][0];
-					//var u = result[i][1];
-
-					var data = {};
-					data.id = a.id;
-					data.caption = a.name;
-					data.image = "/images/static/progress.gif";
-
-					var jsonObj = {};
-					constructJSONObject(jsonObj);
-					if (!jsonObj.steps.artifacts) {
-						jsonObj.steps.artifacts = [{}];
-					}
-					jsonObj.steps.artifacts[0].type = "preset";
-					jsonObj.steps.artifacts[0].preset = a.id;
-					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
-					generateChanges(a.id, jsonObj, function(id, imgPath) {
-						$("#" + id + "EntityImage").prop("src", imgPath);
-					});
-
-					list.push(data);
-				}
-
-				$("#presetArtifacts").remove();
-				var grid = createGrid("presetArtifacts", list, 3, true, true, defaultSelectionID, function(id) {
-					$("#presetArtifactSection").data("selectedArtifactID", id);
-					applyChanges();
-					$(window).scrollTop(0);
-				});
-				$("#presetArtifactSection").append(grid);
-
-				//apply changes to reflect default selection
-				applyChanges();
-			}
-		});
-	}
+	setChangeCallback(changeCallback, ["#solarizeRangeInput"], ["#solarizeEnabledButton"]);
 }
 
-function setupArtifactStep() {
-	//default is preset
-	$("#artifactOptionsButton").data("state", "preset");
-	$("#artifactOptionsButton").click(function() {
-		if ($("#presetArtifactSection").is(":visible")) {
-			//presets already show, toggle
-			$("#presetArtifactSection").hide();
-			$("#customArtifactSection").show();
+function setupSpreadToggleSection() {
+	setupGeneralRulesForToggleSection("#spreadEnabledButton", ["#spreadRangeInput"], [], "filter");
 
-			$(this).text("Hide custom options");
-			$(this).data("state", "custom");
-		} else if ($("#customArtifactSection").is(":visible")) {
-			$("#presetArtifactSection").show();
-			$("#customArtifactSection").hide();
+	$("#spreadSection").append(createRangeSection("Spread radius", "spreadRangeInput", 0, 100, 0, 5));
 
-			$(this).text("Show custom options");
-			$(this).data("state", "preset");
-		}
-	});
-
-	$("#topBannerButton, #bottomBannerButton, #aboveBannerButton, #belowBannerButton").click(function() {
-
-		$(this).toggleClass('active')
-			.siblings().not(this).not("#transparentBannerButton").not("#bannerColorButton").removeClass('active');
-
-		applyChanges();
-	});
-
-	$("#transparentBannerButton, #bannerColorButton").click(function() {
-		if (this.id == "transparentBannerButton") {
-			$("#" + this.id).addClass("active");
-			$("#bannerColorButton").removeClass("active");
-		} else if (this.id == "bannerColorButton") {
-			$("#" + this.id).addClass("active");
-			$("#transparentBannerButton").removeClass("active");
-		}
-
-		applyChanges();
-	});
-
-	setChangeCallback(changeCallback, [
-		"#topBannerButton",
-		"#bottomBannerButton",
-		"#aboveBannerButton",
-		"#belowBannerButton",
-		"#transparentBannerButton",
-		"#bannerColorButton", 
-		"#bannerText",
-		"#bannerTextFontSize",
-		"#bannerTextFontName",
-		"#bannerTextColorButton"
-		]);
+	setChangeCallback(changeCallback, ["#spreadRangeInput"], ["#spreadEnabledButton"]);
 }
+
+function setupSwirlToggleSection() {
+	setupGeneralRulesForToggleSection("#swirlEnabledButton", ["#swirlRangeInput"], [], "filter");
+
+	$("#swirlSection").append(createRangeSection("Swirl radius", "swirlRangeInput", 0, 100, 0, 5));
+
+	setChangeCallback(changeCallback, ["#swirlRangeInput"], ["#swirlEnabledButton"]);
+}
+
+function setupWaveToggleSection() {
+	setupGeneralRulesForToggleSection("#waveEnabledButton", ["#waveAmplitudeRangeInput", "#waveLengthRangeInput"], [], "filter");
+
+	$("#waveSection").append(createRangeSection("Wave amplitude", "waveAmplitudeRangeInput", 0, 100, 0, 5));
+	$("#waveSection").append(createRangeSection("Wave length", "waveLengthRangeInput", 0, 100, 100, 5));
+
+	setChangeCallback(changeCallback, ["#waveAmplitudeRangeInput", "#waveLengthRangeInput"], ["#waveEnabledButton"]);
+}
+
+function setupCharcoalToggleSection() {
+	setupGeneralRulesForToggleSection("#charcoalEnabledButton", ["#charcoalRangeInput"], [], "filter");
+
+	$("#charcoalSection").append(createRangeSection("Charcoal factor", "charcoalRangeInput", 0, 20, 0, 1));
+
+	setChangeCallback(changeCallback, ["#charcoalRangeInput"], ["#charcoalEnabledButton"]);
+}
+
+function setupMosaicToggleSection() {
+	setupGeneralRulesForToggleSection("#mosaicEnabledButton", [], [], "filter");
+
+	setChangeCallback(changeCallback, [], ["#mosaicEnabledButton"]);
+}
+
+function setupPaintToggleSection() {
+	setupGeneralRulesForToggleSection("#paintEnabledButton", ["#paintRangeInput"], [], "filter");
+
+	$("#paintSection").append(createRangeSection("Paint radius", "paintRangeInput", 0, 100, 0, 5));
+
+	setChangeCallback(changeCallback, ["#paintRangeInput"], ["#paintEnabledButton"]);
+}
+
+function setupContrastToggleSection() {
+	setupGeneralRulesForToggleSection("#contrastEnabledButton", ["#contrastRangeInput"], [], "filter");
+
+	$("#contrastSection").append(createRangeSection("Contrast", "contrastRangeInput", -100, 100, 0, 5));
+
+	setChangeCallback(changeCallback, ["#contrastRangeInput"], ["#contrastEnabledButton"]);
+}
+
+function setupBrightnessToggleSection() {
+	setupGeneralRulesForToggleSection("#brightnessEnabledButton", ["#brightnessRangeInput"], [], "filter");
+
+	$("#brightnessSection").append(createRangeSection("Brightness", "brightnessRangeInput", -100, 100, 0, 5));
+
+	setChangeCallback(changeCallback, ["#brightnessRangeInput"], ["#brightnessEnabledButton"]);
+}
+
+function setupHueToggleSection() {
+	setupGeneralRulesForToggleSection("#hueEnabledButton", ["#hueRangeInput"], [], "filter");
+
+	$("#hueSection").append(createRangeSection("Hue", "hueRangeInput", -100, 100, 0, 5));
+
+	setChangeCallback(changeCallback, ["#hueRangeInput"], ["#hueEnabledButton"]);
+}
+
+function setupSaturationToggleSection() {
+	setupGeneralRulesForToggleSection("#saturationEnabledButton", ["#saturationRangeInput"], [], "filter");
+
+	$("#saturationSection").append(createRangeSection("Saturation", "saturationRangeInput", -100, 100, 0, 5));
+
+	setChangeCallback(changeCallback, ["#saturationRangeInput"], ["#saturationEnabledButton"]);
+}
+
+/**************************** (5) DECORATION STEP **********************************************/
 
 function showDecorationStep() {
 	$("#stepTitle").text("Apply some final touches to your entry with a border!")
 
 	if ($("#presetDecorationSection").is(":visible")) {
 		//default selection
-		var defaultSelectionID = $("#presetDecorationSection").data("selectedDecorationID");
+		var defaultSelectionID = $("#presetDecorationSection").data("selectedPresetID");
 
 		$.getJSON('/api/filters?type=decoration' + "&decorationType=preset", function(result) {
 			if (result.length > 0) {
@@ -701,8 +677,8 @@ function showDecorationStep() {
 
 				$("#presetDecorations").remove();
 				var grid = createGrid("presetDecorations", list, 3, true, true, defaultSelectionID, function(id) {
-					$("#presetDecorationSection").data("selectedDecorationID", id);
-					applyChanges();
+					switchStepOptions("decoration", "preset", id);
+
 					$(window).scrollTop(0);
 				});
 				$("#presetDecorationSection").append(grid);
@@ -714,37 +690,120 @@ function showDecorationStep() {
 }
 
 function setupDecorationStep() {
-	//default is preset
-	$("#decorationOptionsButton").data("state", "preset");
-	$("#decorationOptionsButton").click(function() {
-		if ($("#presetDecorationSection").is(":visible")) {
-			//presets already show, toggle
-			$("#presetDecorationSection").hide();
-			$("#customDecorationSection").show();
+	setupPresetAndCustomOptions("#decorationOptionsButton", "#presetDecorationSection", "#customDecorationSection", "preset");
 
-			$(this).text("Hide custom options");
-			$(this).data("state", "custom");
-		} else if ($("#customDecorationSection").is(":visible")) {
-			$("#presetDecorationSection").show();
-			$("#customDecorationSection").hide();
-
-			$(this).text("Show custom options");
-			$(this).data("state", "preset");
-		}
-	});
-
-	// DECORATIONS SECTION ------------------------
-	enableDisableOnCheck("#checkboxBorder", ["#borderWidth", "#borderColor"]);
-	setChangeCallback(changeCallback, [
-		"#checkboxBorder", 
-		"#borderWidth",
-		"#borderColor"
-		]);
+	setupBorderToggleSection();
 }
+
+function setupBorderToggleSection() {
+	setupGeneralRulesForToggleSection("#borderEnabledButton", ["#borderWidth", "#borderColor"], [], "decoration");
+
+	setChangeCallback(changeCallback, ["#borderColor", "#borderWidth"], ["#borderEnabledButton"]);
+}
+
+/**************************** (6) POST STEP **********************************************/
 
 function showPostStep() {
 	$("#stepTitle").text("You're now ready to post!")
 }
+
+/*****************************************************************************************/
+/**************************** COMMON ROUTINES / HELPER FUNCTIONS **********************************************/
+
+/*
+	Switch between Preset and Custom options mode.
+
+	Note that these modes are mutually exclusive.
+*/
+function switchStepOptions(stepType, optionType, presetOptionID) {
+	if (optionType == "preset") {
+		//Switch to Preset mode.  Make sure to turn of Custom mode buttons, if any are still enabled.
+		switch (stepType) {
+			case "artifact":
+				$("#artifactOptionsButton").data("state", "preset");
+				$("#presetArtifactSection").data("selectedPresetID", presetOptionID);
+				$("#customArtifactSection button:not(.featureToggleButton), input, select ").prop("disabled", true);
+				$("#customArtifactSection .featureToggleButton").removeClass("active").text("OFF");
+				break;
+			case "layout":
+				$("#layoutOptionsButton").data("state", "preset");
+				$("#presetLayoutSection").data("selectedPresetID", presetOptionID);
+				$("#customLayoutSection button:not(.featureToggleButton), input, select ").prop("disabled", true);
+				$("#customLayoutSection .featureToggleButton").removeClass("active").text("OFF");
+				break;
+			case "filter":
+				$("#filterOptionsButton").data("state", "preset");
+				$("#presetFilterSection").data("selectedPresetID", presetOptionID);
+				$("#customFilterSection button:not(.featureToggleButton), input, select ").prop("disabled", true);
+				$("#customFilterSection .featureToggleButton").removeClass("active").text("OFF");
+				break;
+			case "decoration":
+				$("#decorationOptionsButton").data("state", "preset");
+				$("#presetDecorationSection").data("selectedPresetID", presetOptionID);
+				$("#customDecorationSection button:not(.featureToggleButton), input, select ").prop("disabled", true);
+				$("#customDecorationSection .featureToggleButton").removeClass("active").text("OFF");
+				break;
+		}
+		
+	} else if (optionType == "custom") {
+		//Switch to Custom mode.
+		switch (stepType) {
+			case "artifact":
+				$("#artifactOptionsButton").data("state", "custom");
+				break;
+			case "layout":
+				$("#layoutOptionsButton").data("state", "custom");
+				break;
+			case "filter":
+				$("#filterOptionsButton").data("state", "custom");
+				break;
+			case "decoration":
+				$("#decorationOptionsButton").data("state", "custom");
+				break;
+		}
+	}
+
+	applyChanges();
+}
+
+/*
+	Handlers for the Options button that switches between Preset and Custom mode.
+*/
+function setupPresetAndCustomOptions(optionsButtonId, presetSectionID, customSectionID, defaultSection) {
+	$(optionsButtonId).data("state", defaultSection);
+	$(optionsButtonId).click(function() {
+		if ($(presetSectionID).is(":visible")) {
+			$(presetSectionID).hide();
+			$(customSectionID).show();
+
+			$(this).text("Hide custom options");
+		} else if ($(customSectionID).is(":visible")) {
+			$(presetSectionID).show();
+			$(customSectionID).hide();
+
+			$(this).text("Show custom options");
+		}
+	});
+}
+
+/*
+	Create a range input, with min and max specified, and set
+	a label or caption with the currently selected value.
+*/
+function createRangeSection(caption, rangeInputID, min, max, value, step) {
+	var rangeSection = $("<div>", {class: "settingsRangeWithValue"});
+	var captionElement = $("<div>", {id: rangeInputID + "Caption"}).append(caption + ": " + value);
+	var input = $("<input>", {id: rangeInputID, type: "range", min: min, max: max, value: value, step: step});
+	input.change(function() {
+		$("#" + rangeInputID + "Caption").text(caption + ": " + $("#" + this.id).val());
+	});
+	
+	var rangeInputWithMinMax = $("<div>").append($("<span>").append(min + " ")).append(input).append($("<span>").append(" " + max));
+
+	rangeSection.append(captionElement).append(rangeInputWithMinMax);
+	return rangeSection;
+}
+
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 	for (var i = 0; i < listOfValuesAndSectionIds.length; i++) {
 		if (valueToMatch == listOfValuesAndSectionIds[i].value) {
@@ -755,31 +814,144 @@ function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 	}
 }
 
-function enableDisableOnCheck(checkBoxId, itemIds) {
-	for (var i = 0; i < itemIds.length; i++) {
-		if ($(checkBoxId).prop("checked")) {
-			$(itemIds[i]).prop("disabled", false);
+/*
+	Setup general rules for a custom section that has a main feature
+	toggle button, and other feature items that are dependent
+	on that toggle.
+
+	Also, the assumption is that this main feature toggle is mutually
+	exclusive to the presets settings, which means that if the toggle
+	is ON, the presets should be switched off.
+*/
+function setupGeneralRulesForToggleSection(mainFeatureButtonId, changeElementIds, clickElementIds, stepType) {
+	var allElementIds = changeElementIds.concat(clickElementIds);
+
+	enableDisableItems(allElementIds, $(mainFeatureButtonId).hasClass("active"));
+
+	setupMainFeatureToggle(mainFeatureButtonId, allElementIds, stepType);
+}
+
+/*
+	Enable or Disable the list of provided items.
+*/
+function enableDisableItems(elementIds, enable) {
+	for (var i = 0; i < elementIds.length; i++) {
+		$(elementIds[i]).prop("disabled", !enable);
+	}
+}
+
+/*
+	Activate or Deactive the list of provided items.
+*/
+function activateDeactivateItems(elementIds, activate) {
+	for (var i = 0; i < elementIds.length; i++) {
+		if (activate) {
+			$(elementIds[i]).addClass("active");
 		} else {
-			$(itemIds[i]).prop("disabled", true);
+			$(elementIds[i]).removeClass("active");
 		}
 	}
+}
 
-	$(checkBoxId).change(function () {
-		for (var i = 0; i < itemIds.length; i++) {
-			if ($(checkBoxId).prop("checked")) {
-				$(itemIds[i]).prop("disabled", false);
-			} else {
-				$(itemIds[i]).prop("disabled", true);
-			}
+/*
+	Handle toggle for main feature button.
+
+	Also, takes care of enabling/disabling other items that are dependent on the 
+	main feature button
+*/
+function setupMainFeatureToggle(mainFeatureButtonId, otherFeatureElementIds, stepType) {
+	//first, toggle the main feature button
+	var mainFeatureButton = $(mainFeatureButtonId);
+	mainFeatureButton.click(function() {
+		if ($(this).hasClass("active")) {
+			//already ON, switch OFF
+			$(this).removeClass("active");
+			$(this).text("OFF");
+			enableDisableItems(otherFeatureElementIds, false);
+
+			//deactivate the items since the main feature toggle is OFF
+			//activateDeactivateItems(otherFeatureElementIds, false);
+		} else {
+			//already OFF, switch ON
+			$(this).addClass("active");
+			$(this).text("ON");
+			enableDisableItems(otherFeatureElementIds, true);
+
+			//Switch on custom options mode, since at least one toggle feature has been turned ON
+			switchStepOptions(stepType, "custom", null);
 		}
+	});
+
+}
+
+/*
+	Set the callback that should be called when the list of elements
+	provided either change or are clicked.
+*/
+function setChangeCallback(callback, changeElementIds, clickElementIds) {
+	for (var i = 0; i < changeElementIds.length; i++) {
+		$(changeElementIds[i]).change({callback: null}, callback);
+	}
+
+	for (var i = 0; i < clickElementIds.length; i++) {
+		$(clickElementIds[i]).click({callback: null}, callback);
+	}
+}
+
+/*
+	Given the button list, set them to be toggleable
+	with the 'active' class mutually exclusively of each
+	other.
+
+	This assumes that the buttons are all siblings of
+	each other in the DOM hierarchy.
+*/
+function setMutuallyExclusiveButtons(buttonIdList) {
+	var selector = "";
+	for (var i = 0; i < buttonIdList.length; i++) {
+		if (i > 0) {
+			selector += ", ";
+		}
+		selector += buttonIdList[i];
+	}
+	console.log("selector is [" + selector + "]");
+	$(selector).click(function() {
+		$(this).toggleClass('active').siblings().not(this).removeClass('active');
 	});
 }
 
-function setChangeCallback(callback, listOfIds) {
-	for (var i = 0; i < listOfIds.length; i++) {
-		$(listOfIds[i]).change({callback: null}, callback);
+function getCurrentStep() {
+	if ($("#captionSection").is(":visible")) {
+		return "caption";
+	} else if ($("#layoutSection").is(":visible")) {
+		return "layout";
+	} else if ($("#filterSection").is(":visible")) {
+		return "filter";
+	} else if ($("#artifactSection").is(":visible")) {
+		return "artifact";
+	} else if ($("#decorationSection").is(":visible")) {
+		return "decoration";
+	} else if ($("#postSection").is(":visible")) {
+		return "post";
 	}
 }
+
+function parseEntry(entry) {
+	$("#entry").empty();
+	$("#entry").append($("<img>").attr("src", entry.image));
+	$("#entry").append($("<p>").text(entry.caption));
+	$("#entry").append($("<p>").text(entry.created));
+}
+
+/*****************************************************************************************/
+/*
+	Construct the JSON Object that contains all the currently selected
+	settings for all the steps.  This is sent to server for two purposes:
+
+	1) To generate intermediate thumbnail preset images based on current selections
+	2) To generate the final steps at the time of Posting the entry
+*/
+/*****************************************************************************************/
 
 function constructJSONObject(jsonObj) {
 	jsonObj.imageSource = "challengeId"; // Can be "url" | "challenge" | "blob"
@@ -800,10 +972,10 @@ function constructJSONObject(jsonObj) {
 
 	/// LAYOUT
 	
-
+	console.log("layoutOptionsButton state is " + $("#layoutOptionsButton").data("state"));
 	var layout = {};
 	if ($("#layoutOptionsButton").data("state") == "preset") {
-		var presetValue = $("#presetLayoutSection").data("selectedLayoutID");
+		var presetValue = $("#presetLayoutSection").data("selectedPresetID");
 		if (presetValue != undefined) {
 			layout.type = "preset";
 			layout.preset = presetValue;
@@ -812,7 +984,7 @@ function constructJSONObject(jsonObj) {
 		layout.type = "custom";
 		
 		//crop
-		if ($("#checkboxCrop").prop("checked")) {
+		if ($("#cropEnabledButton").hasClass("active")) {
 			var cropData = jQuery.data(document.body, "cropData");
 
 			if (cropData) {
@@ -821,7 +993,7 @@ function constructJSONObject(jsonObj) {
 		}
 
 		//flip
-		if ($("#checkboxFlip").prop("checked")) {
+		if ($("#mirrorEnabledButton").hasClass("active")) {
 			if ($("#flipHorizontalButton").hasClass("active")) {
 				layout.mirror = "flop";
 			}
@@ -831,7 +1003,8 @@ function constructJSONObject(jsonObj) {
 			}
 		}
 
-		if ($("#checkboxRotate").prop("checked")) {
+		//rotation
+		if ($("#rotationEnabledButton").hasClass("active")) {
 			var rotationData = jQuery.data(document.body, "rotationData");
 
 			if (rotationData) {
@@ -841,13 +1014,17 @@ function constructJSONObject(jsonObj) {
 			}
 		}
 
-		if ($("#checkboxShear").prop("checked")) {
+		//shear
+		if ($("#shearEnabledButton").hasClass("active")) {
+			console.log("toggle for shear is enabled");
 			var shearData = jQuery.data(document.body, "shearData");
 
+			console.log("shearData is " + JSON.stringify(shearData));
 			if (shearData) {
 				layout.shear = {};
 				layout.shear.xDegrees = shearData.xDegrees;
 				layout.shear.yDegrees = shearData.yDegrees;
+				layout.shear.color = $("#shearColorButton").val();
 			}
 		}
 	}
@@ -861,7 +1038,7 @@ function constructJSONObject(jsonObj) {
 	var filter = {};
 
 	if ($("#filterOptionsButton").data("state") == "preset") { // PRESET FILTER
-		var presetValue = $("#presetFilterSection").data("selectedFilterID");
+		var presetValue = $("#presetFilterSection").data("selectedPresetID");
 		if (presetValue != undefined) {
 			filter.type = "preset";
 			filter.preset = presetValue;
@@ -869,64 +1046,64 @@ function constructJSONObject(jsonObj) {
 	} else if ($("#filterOptionsButton").data("state") == "custom") { // CUSTOM FILTER
 		filter.type = "custom";
 
-		// ADD EFFECTS
-		filter.effects = {};
-		if ($("#checkboxCharcoal").prop("checked")) {
-			filter.effects.charcoal = {factor: $("#charcoalRangeInput").val()};
+		// Antique
+		if ($("#grayscaleEnabledButton").hasClass("active")) {
+			filter.grayscale = "on";
 		}
 
-		if ($("#checkboxGrayscale").prop("checked")) {
-			filter.effects.grayscale = "on";
+		if ($("#monochromeEnabledButton").hasClass("active")) {
+			filter.monochrome = "on";
 		}
 
-		if ($("#checkboxMonochrome").prop("checked")) {
-			filter.effects.monochrome = "on";
+		if ($("#negativeEnabledButton").hasClass("active")) {
+			filter.negative = "on";
 		}
 
-		if ($("#checkboxMosaic").prop("checked")) {
-			filter.effects.mosaic = "on";
+		if ($("#solarizeEnabledButton").hasClass("active")) {
+			filter.solarize = {threshold: $("#solarizeRangeInput").val()};
 		}
 
-		if ($("#checkboxNegative").prop("checked")) {
-			filter.effects.negative = "on";
+		// Distortion
+		if ($("#spreadEnabledButton").hasClass("active")) {
+			filter.spread = {amount : $("#spreadRangeInput").val()};
 		}
 
-		if ($("#checkboxPaint").prop("checked")) {
-			filter.effects.paint = {radius: $("#paintRangeInput").val() };
+		if ($("#swirlEnabledButton").hasClass("active")) {
+			filter.swirl = {degrees: $("#swirlRangeInput").val()};
 		}
 
-		if ($("#checkboxSolarize").prop("checked")) {
-			filter.effects.solarize = {threshold: $("#solarizeRangeInput").val()};
+		if ($("#waveEnabledButton").hasClass("active")) {
+			filter.wave = {amplitude : $("#waveAmplitudeRangeInput").val(), wavelength: $("#waveLengthRangeInput").val()};
 		}
 
-		if ($("#checkboxSpread").prop("checked")) {
-			filter.effects.spread = {amount : $("#spreadRangeInput").val()};
+		// Artistic
+		if ($("#charcoalEnabledButton").hasClass("active")) {
+			filter.charcoal = {factor: $("#charcoalRangeInput").val()};
 		}
 
-		if ($("#checkboxSwirl").prop("checked")) {
-			filter.effects.swirl = {degrees: $("#swirlRangeInput").val()};
+		if ($("#mosaicEnabledButton").hasClass("active")) {
+			filter.mosaic = "on";
 		}
 
-		if ($("#checkboxWave").prop("checked")) {
-			filter.effects.wave = {amplitude : $("#waveAmplitudeRangeInput").val(), wavelength: $("#waveLengthRangeInput").val()};
+		if ($("#paintEnabledButton").hasClass("active")) {
+			filter.paint = {radius: $("#paintRangeInput").val() };
 		}
 
-
-
-		// ADD SETTINGS
-		filter.settings = {};
-
-		if ($("#contrastRangeInput").val != $("#contrastRangeInput").prop("defaultValue")) {
-			filter.settings.contrast = {value: $("#contrastRangeInput").val()};
+		// Contrast/Brigthness/Color
+		if ($("#contrastEnabledButton").hasClass("active")) {
+			filter.contrast = {value: $("#contrastRangeInput").val()};
 		}
-		if ($("#brightnessRangeInput").val != $("#brightnessRangeInput").prop("defaultValue")) {
-			filter.settings.brightness = {value: $("#brightnessRangeInput").val()};
+
+		if ($("#brightnessEnabledButton").hasClass("active")) {
+			filter.brightness = {value: $("#brightnessRangeInput").val()};
 		}
-		if ($("#hueRangeInput").val != $("#hueRangeInput").prop("defaultValue")) {
-			filter.settings.hue = {value: $("#hueRangeInput").val()};
+
+		if ($("#hueEnabledButton").hasClass("active")) {
+			filter.hue = {value: $("#hueRangeInput").val()};
 		}
-		if ($("#saturationRangeInput").val != $("#saturationRangeInput").prop("defaultValue")) {
-			filter.settings.saturation = {value: $("#saturationRangeInput").val()};
+
+		if ($("#saturationEnabledButton").hasClass("active")) {
+			filter.saturation = {value: $("#saturationRangeInput").val()};
 		}
 	}
 
@@ -941,7 +1118,7 @@ function constructJSONObject(jsonObj) {
 	var artifact = {};
 	console.log("artifact state = " + $("#artifactOptionsButton").data("state"));
 	if ($("#artifactOptionsButton").data("state") == "preset") {
-		var presetValue = $("#presetArtifactSection").data("selectedArtifactID");
+		var presetValue = $("#presetArtifactSection").data("selectedPresetID");
 		console.log("presetValue = " + presetValue);
 		if (presetValue != undefined) {
 			artifact.type = "preset";
@@ -983,7 +1160,7 @@ function constructJSONObject(jsonObj) {
 	var decoration = {};
 
 	if ($("#decorationOptionsButton").data("state") == "preset") {
-		var presetValue = $("#presetDecorationSection").data("selectedDecorationID");
+		var presetValue = $("#presetDecorationSection").data("selectedPresetID");
 		if (presetValue != undefined) {
 			decoration.type = "preset";
 			decoration.preset = presetValue;
@@ -991,7 +1168,7 @@ function constructJSONObject(jsonObj) {
 	} else if ($("#decorationOptionsButton").data("state") == "custom") {
 		decoration.type = "custom";
 
-		if ($("#checkboxBorder").prop("checked")) {
+		if ($("#borderEnabledButton").hasClass("active")) {
 			decoration.border = {};
 
 			decoration.border.width = $("#borderWidth").val();
@@ -1005,6 +1182,10 @@ function constructJSONObject(jsonObj) {
 	}
 }
 
+/*
+	Generate the intermediate image based on given jsonObj.  Typically used
+	for generating thumbnail images for Preset options.
+*/
 function generateChanges(id, jsonObj, done) {
 	$.ajax({
 		type: "POST",
@@ -1021,10 +1202,12 @@ function generateChanges(id, jsonObj, done) {
 	});
 }
 
+/*
+	Apply changes based on current selection on the main preview image.
+*/
 function applyChanges(done) {
 	var jsonObj = {};
 	
-
 	constructJSONObject(jsonObj);
 	console.log("Apply Changes: " + JSON.stringify(jsonObj));
 	$.ajax({
@@ -1046,6 +1229,9 @@ function applyChanges(done) {
 	});
 }
 
+/*
+	Actually POST the new entry.
+*/
 function postEntry() {
 
 	var jsonObj = {};
@@ -1068,26 +1254,5 @@ function postEntry() {
 
 }
 
-function getCurrentStep() {
-	if ($("#captionSection").is(":visible")) {
-		return "caption";
-	} else if ($("#layoutSection").is(":visible")) {
-		return "layout";
-	} else if ($("#filterSection").is(":visible")) {
-		return "filter";
-	} else if ($("#artifactSection").is(":visible")) {
-		return "artifact";
-	} else if ($("#decorationSection").is(":visible")) {
-		return "decoration";
-	} else if ($("#postSection").is(":visible")) {
-		return "post";
-	}
-}
 
-function parseEntry(entry) {
-	$("#entry").empty();
-	$("#entry").append($("<img>").attr("src", entry.image));
-	$("#entry").append($("<p>").text(entry.caption));
-	$("#entry").append($("<p>").text(entry.created));
-}
 
