@@ -2,6 +2,7 @@
 <head>
 <title>Delphinus - New Entry</title>
 <link rel="stylesheet" href="/css/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
 <link ref="stylesheet" href="/css/font-awesome/css/font-awesome.min.css">
 
 <link rel="stylesheet" type="text/css" href="/css/cropper/cropper.css">
@@ -113,8 +114,7 @@
 					<div class="settingsSubBlock">
 						<div class="settingsSubBlockCaption">Background Color:</div>
 						<div class="settingsSubBlockElements">
-							<button type="button" class="btn button-setting" id="transparentBannerButton"><i class="fa fa-crop" aria-hidden="true"></i> Transparent</button>
-							<input type="color" class="btn button-setting" id="bannerColorButton" value="#000000">
+							<button type="button" class="btn button-setting" id="bannerColorButton">Choose</button>
 						</div>
 					</div>
 					<div class="settingsSubBlock">
@@ -131,7 +131,7 @@
 					<div class="settingsSubBlock">
 						<div class="settingsSubBlockCaption">Text color:</div>
 						<div class="settingsSubBlockElements">
-							<input type="color" class="btn button-setting" id="bannerTextColorButton" value="#000000">
+							<button type="button" class="btn button-setting" id="bannerTextColorButton">Choose</button>
 						</div>
 					</div>
 				</div>
@@ -197,7 +197,7 @@
 						<div class="settingsSubBlock">
 							<div class="settingsSubBlockCaption">Background color:</div>
 							<div class="settingsSubBlockElements">
-								<input type="color" class="btn button-setting" id="rotateColorButton" value="#000000">
+								<button type="button" class="btn button-setting" id="rotateColorButton">Choose</button>
 							</div>
 						</div>
 						<div class="lineBehindHeading"><span class="subHeading">Shear</span></div>
@@ -220,7 +220,7 @@
 						<div class="settingsSubBlock">
 							<div class="settingsSubBlockCaption">Background color:</div>
 							<div class="settingsSubBlockElements">
-								<input type="color" class="btn button-setting" id="shearColorButton" value="#000000">
+								<button type="button" class="btn button-setting" id="shearColorButton">Choose</button>
 							</div>
 						</div>	
 				</div>
@@ -387,7 +387,7 @@
 					<div class="settingsSubBlock">
 						<div class="settingsSubBlockCaption">Border Color:</div>
 						<div class="settingsSubBlockElements">
-							<input type="color" class="btn button-setting" id="borderColor" value="#000000">
+							<button type="button" class="btn button-setting" id="borderColor">Choose</button>
 						</div>
 					</div>
 				</div>
@@ -434,6 +434,7 @@
 </script>
 <script src="/js/jquery.js"></script>
 <script src="/js/bootstrap.js"></script>
+<script src="/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 <script src="/js/cropper/cropper.js"></script>
 <script src="/js/newentry.js"></script>
 <script src="/js/header.js"></script>

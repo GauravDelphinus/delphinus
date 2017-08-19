@@ -713,8 +713,14 @@ function absoluteToMultiplierSigned(absoluteValue) {
 	return multiplierValue;
 }
 
+/*
+	Convert color coming in from client to a format that ImageMagick
+	recognizes.  Refer https://www.imagemagick.org/script/color.php
+
+	If no match, default to "none" meaning transparent
+*/
 function normalizeColorToIM(color) {
-	console.log("normalizeColorToIM, color = " + color);
+	var normalizedColor = "none";
 	if (color == null || color == undefined || color == "transparent") {
 		normalizedColor = "none";
 	} else {
@@ -722,12 +728,13 @@ function normalizeColorToIM(color) {
 
 		if (/#[a-f0-9]+/.test(color)) {
 			normalizedColor = color.match(/#[a-f0-9]+/);
-		} else {
-			normalizedColor = "none";
+		} else if (/rgb\([0-9]+, [0-9]+, [0-9]+\)/.test(color)) {
+			normalizedColor = color.match(/rgb\([0-9]+, [0-9]+, [0-9]+\)/);
+		} else if (/rgba\([0-9]+, [0-9]+, [0-9]+, [0-9]+\.?[0-9]*\)/.test(color)) {
+			normalizedColor = color.match(/rgba\([0-9]+, [0-9]+, [0-9]+, [0-9]+\.?[0-9]*\)/);
 		}
 	}
 	
-	console.log("normalizeColorToIM, color is [" + color + "], normalizedColor is [" + normalizedColor + "]");
 	return normalizedColor;
 }
 

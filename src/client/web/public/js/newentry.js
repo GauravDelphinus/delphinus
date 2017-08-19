@@ -207,16 +207,8 @@ function setupBannerToggleSection() {
 
 	setMutuallyExclusiveButtons(["#topBannerButton", "#bottomBannerButton", "#aboveBannerButton", "#belowBannerButton"]);
 
-	$("#transparentBannerButton, #bannerColorButton").click(function() {
-		if (this.id == "transparentBannerButton") {
-			$("#" + this.id).addClass("active");
-			$("#bannerColorButton").removeClass("active");
-		} else if (this.id == "bannerColorButton") {
-			$("#" + this.id).addClass("active");
-			$("#transparentBannerButton").removeClass("active");
-		}
-	});
-
+	setupColorButton("#bannerColorButton");
+	setupColorButton("#bannerTextColorButton");
 
 	clickElementIds.push("#bannerEnabledButton");
 	setChangeCallback(changeCallback, changeElementIds, clickElementIds);
@@ -403,6 +395,8 @@ function setupRotationToggleSection() {
 		jQuery.data(document.body, "rotationData", null);
 	});
 
+	setupColorButton("#rotateColorButton");
+
 	setChangeCallback(changeCallback, ["#rotateColorButton"], ["#rotationEnabledButton", "#resetRotationButton", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton"]);
 
 }
@@ -435,6 +429,8 @@ function setupShearToggleSection() {
 	$("#resetShearButton").click(function() {
 		jQuery.data(document.body, "shearData", null);
 	});
+
+	setupColorButton("#shearColorButton");
 
 	setChangeCallback(changeCallback, ["#shearColorButton"], ["#shearEnabledButton", "#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton"]);
 }
@@ -483,7 +479,6 @@ function showFilterStep() {
 
 				$("#presetFilters").remove();
 				var grid = createGrid("presetFilters", list, 3, true, true, defaultSelectionID, function(id) {
-					console.log("selection callbac for id = " + id);
 					switchStepOptions("filter", "preset", id);
 
 					$(window).scrollTop(0);
@@ -698,6 +693,8 @@ function setupDecorationStep() {
 function setupBorderToggleSection() {
 	setupGeneralRulesForToggleSection("#borderEnabledButton", ["#borderWidth", "#borderColor"], [], "decoration");
 
+	setupColorButton("#borderColor");
+
 	setChangeCallback(changeCallback, ["#borderColor", "#borderWidth"], ["#borderEnabledButton"]);
 }
 
@@ -709,6 +706,17 @@ function showPostStep() {
 
 /*****************************************************************************************/
 /**************************** COMMON ROUTINES / HELPER FUNCTIONS **********************************************/
+
+/*
+	Set up the color button using the bootstrap-colorpicker module.
+	Refer: https://farbelous.github.io/bootstrap-colorpicker/
+*/
+function setupColorButton(buttonID) {
+	$(buttonID).colorpicker().on('changeColor', function(e) {
+        $(buttonID).css("background", e.color.toString("rgba"));
+        applyChanges();
+    });
+}
 
 /*
 	Switch between Preset and Custom options mode.
@@ -914,7 +922,6 @@ function setMutuallyExclusiveButtons(buttonIdList) {
 		}
 		selector += buttonIdList[i];
 	}
-	console.log("selector is [" + selector + "]");
 	$(selector).click(function() {
 		$(this).toggleClass('active').siblings().not(this).removeClass('active');
 	});
@@ -972,7 +979,6 @@ function constructJSONObject(jsonObj) {
 
 	/// LAYOUT
 	
-	console.log("layoutOptionsButton state is " + $("#layoutOptionsButton").data("state"));
 	var layout = {};
 	if ($("#layoutOptionsButton").data("state") == "preset") {
 		var presetValue = $("#presetLayoutSection").data("selectedPresetID");
@@ -1010,21 +1016,19 @@ function constructJSONObject(jsonObj) {
 			if (rotationData) {
 				layout.rotation = {};
 				layout.rotation.degrees = rotationData.degrees;
-				layout.rotation.color = $("#rotateColorButton").val();
+				layout.rotation.color = $("#rotateColorButton").css("background-color");
 			}
 		}
 
 		//shear
 		if ($("#shearEnabledButton").hasClass("active")) {
-			console.log("toggle for shear is enabled");
 			var shearData = jQuery.data(document.body, "shearData");
 
-			console.log("shearData is " + JSON.stringify(shearData));
 			if (shearData) {
 				layout.shear = {};
 				layout.shear.xDegrees = shearData.xDegrees;
 				layout.shear.yDegrees = shearData.yDegrees;
-				layout.shear.color = $("#shearColorButton").val();
+				layout.shear.color = $("#shearColorButton").css("background-color");
 			}
 		}
 	}
@@ -1116,10 +1120,8 @@ function constructJSONObject(jsonObj) {
 
 	// ARTIFACTS
 	var artifact = {};
-	console.log("artifact state = " + $("#artifactOptionsButton").data("state"));
 	if ($("#artifactOptionsButton").data("state") == "preset") {
 		var presetValue = $("#presetArtifactSection").data("selectedPresetID");
-		console.log("presetValue = " + presetValue);
 		if (presetValue != undefined) {
 			artifact.type = "preset";
 			artifact.preset = presetValue;
@@ -1141,13 +1143,8 @@ function constructJSONObject(jsonObj) {
 
 			artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
 			artifact.banner.fontName = $("#bannerTextFontName").val();
-			if ($("#bannerColorButton").hasClass("active")) {
-				artifact.banner.backgroundColor = $("#bannerColorButton").val();
-			} else if ($("#transparentBannerButton").hasClass("active")) {
-				artifact.banner.backgroundColor = "transparent";
-			}
-			
-			artifact.banner.textColor = $("#bannerTextColorButton").val();
+			artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
+			artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
 	}
 
 
@@ -1172,7 +1169,7 @@ function constructJSONObject(jsonObj) {
 			decoration.border = {};
 
 			decoration.border.width = $("#borderWidth").val();
-			decoration.border.color = $("#borderColor").val();
+			decoration.border.color = $("#borderColor").css("background-color");
 		}
 	}
 
@@ -1209,7 +1206,7 @@ function applyChanges(done) {
 	var jsonObj = {};
 	
 	constructJSONObject(jsonObj);
-	console.log("Apply Changes: " + JSON.stringify(jsonObj));
+	//console.log("Apply Changes: " + JSON.stringify(jsonObj));
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -1217,7 +1214,6 @@ function applyChanges(done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			console.log("success with apply");
 			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
 			if (done) {
 				done();

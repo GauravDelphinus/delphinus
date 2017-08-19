@@ -971,7 +971,6 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 	}
 	
 	// FOLLOW BUTTON ---------------------------------
-	console.log("data.socialStatus.follows = " + data.socialStatus.follows + ", user = " + user + ", user.id = " + user.id);
 	if (data.socialStatus.follows && (!user || user.id != data.id)) {
 		var followButton = $("<button>", {id: data.id + "FollowButton", type: "button", class: "button-active-link text-plain-small text-bold"}).append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append($("<span>", {id: data.id + "FollowText"}));
 		
@@ -1951,7 +1950,6 @@ function updateShortcutsSidebar() {
 	if (user) {
 		var link = $("<a>", {id: "sidebarProfileLink", class: "sidebarLink", href: "/user"}).append(user.displayName);
 		$("#shortcutsSidebar a:nth-of-type(1)").after(link);
-		console.log('added the link');
 	} else {
 		$("#sidebarProfileLink").remove();
 	}
