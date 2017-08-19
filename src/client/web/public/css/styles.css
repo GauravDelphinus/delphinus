@@ -348,6 +348,13 @@ td {
 	margin-bottom: 10px;
 }
 
+/* Limit image width to avoid overflow the container
+	as recommnded by cropper - see https://github.com/fengyuanchen/cropper
+	*/
+img {
+	max-width: 100%;
+}
+
 /***************************** Challenge / Entry / Entity Related *********************/
 
 /*
@@ -566,180 +573,12 @@ td {
 	display:block;
 }
 
-/* Social section shown in the user's profile page */
-/*
-.socialSection {
-	text-align: center;
-	border-radius: 5px;
-	border-style: dotted;
-	border-color: black;
-	border-width: 0.5px;
-	padding: 20px;
-	margin: 0 auto;
-	width: 30%;
-}
-
-.socialSection ul li {
-	display: inline;
-}
-
-.socialSection ul {
-	list-style: none;
-	padding: 0;
-}
-*/
-/*
-.socialImageSection {
-	display: inline-block;
-	position: relative;
-	width: 80px;
-	height: 80px;
-}
-*/
-/*
-.socialImage {
-	width: 80px;
-	height: 80px;
-}
-*/
-/*
-.socialTick {
-	position: absolute;
-	right: 0px;
-	bottom: 0px;
-	width: 40px;
-	height: 40px;
-}
-*/
-/*
-.socialHeader {
-	font-size: 1.5em;
-	text-align: center;
-}
-*/
-/*
-.navbarItem {
-	font-size: 1.6em;
-	padding-top: 15px;
-	padding-bottom: 15px;
-}
-*/
-
-/*
-.social a {
-    text-align: center;
-    font-size: 28px;
-    border-radius: 50%;
-    -webkit-border-radius: 50%;
-    -moz-border-radius: 50%;
-    -ms-border-radius: 50%;
-    -o-border-radius: 50%;
-    width: 43px;
-    height: 43px;
-    display: inline-block;
-    padding-top: 4px;
-    background-clip: padding-box;
-    -moz-background-clip: padding;
-    -webkit-background-clip: padding-box;
-}
-*/
-
-/*
-
-hr.small {
-    max-width: 100px;
-    margin: 15px auto;
-    border-width: 4px;
-    border-color: #fff;
-}
-
-.googleplus {
-    
-    background: #dd4b39;
-    color: #ffffff;
-}
-.googleplus {
-    background: #dd4b39;
-    color: #ffffff;
-}
-
-.linkedin {
-    background: #0976b4;
-    color: #ffffff;
-}
-
-.github {
-    background: #333;
-    color: #999;
-}
-.facebook{
-	color: #ffffff;
-	background: #3b5998;
-}
-.twitter {
-    background: #55acee;
-    color: #ffffff;
-}
-*/
-
 /****************** New Entry ***********************/
-
-.rangeInput {
-	float: right;
-}
-
-.rangeStart {
-	/*float: left;*/
-	display: inline;
-}
-
-.rangeEnd {
-	/*float: right;*/
-	display: inline;
-}
-.stepSection {
-	width: 80%;
-	margin: 0 auto;
-	border-radius: 5px;
-	border-style: dotted;
-	border-width: 0.5px;
-	background-color: #FDF2E9;
-}
-
-
 
 .stepContent {
 	padding: 10px;
 	width: 100%;
 	margin: 0 auto;
-}
-
-.stepNavigation {
-	float: right;
-}
-
-/* Changing the look and feel of the select element to match bootstrap - see http://stackoverflow.com/questions/1895476/how-to-style-a-select-dropdown-with-css-only-without-javascript */
-
-select2{
-   -webkit-appearance: none; 
-   -moz-appearance: none;
-   appearance: none;       /* remove default arrow */
-   background-image: url(...);   /* add custom arrow */
-}
-
-
-.tabContainer {
-	width: 90%;
-	margin: 0 auto;
-}
-
-/****************** GLOBAL RULES *************************/
-
-/* Limit image width to avoid overflow the container
-	as recommnded by cropper - see https://github.com/fengyuanchen/cropper
-	*/
-img {
-	max-width: 100%;
 }
 
 /****************** SETTINGS **************************/
@@ -774,7 +613,7 @@ img {
 	font-size: 1.1em;
 }
 
- input[type=range]  {
+input[type=range]  {
 	display: inline;
 	width: 70%;
 	max-width: 200px;
@@ -785,49 +624,6 @@ img {
 	text-align: center;
 	font-size: 1.1em;
 }
-
-.settingsRange {
-	padding: 0;
-	margin: 0;
-}
-
-.mycheckbox input[type=checkbox] {
-	margin-left: 5px;
-	margin-right: 10px;
-	margin-top: 10px;
-	margin-bottom: 7px;
-	font-size: 1.4em;
-}
-
-.mycheckbox {
-	font-size: 1.4em;
-	font-weight: bold;
-}
-
-
-.settingsSubBlock p {
-	font-size: 1.4em;
-	font-weight: normal;
-}
-
-.formCaption {
-	margin-top: 10px;
-	font-size: 1.5em;
-	font-weight: bold;
-}
-
-/* Overload bootstrap */
-.form-control {
-	font-size: 1.4em;
-	height: 50px;
-}
-
-/*
-.btn {
-	font-size: 1.4em;
-	height: 50px;
-}
-*/
 
 /*********************** COMMENTS LIST ************************/
 
@@ -1210,4 +1006,10 @@ ul.nav li.dropdown.open > a {
 .center {
 	margin:auto;
   	display:block;
+}
+
+/* Overload bootstrap */
+.form-control {
+	font-size: 1.4em;
+	height: 50px;
 }
