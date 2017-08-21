@@ -11,7 +11,7 @@ module.exports = function() {
 	var imageProcessor = require("./imageProcessor");
 
 	// Initialize the Neo4j Graph Database
-	var db = new neo4j("http://neo4j:Puzz1e$$@localhost:7474");
+	var db = new neo4j("http://neo4j:mypassword@localhost:7474");
 	dataUtils.initializeDB(db);
 	
 	var config = require('./config');
@@ -204,7 +204,7 @@ module.exports = function() {
 
 	// 6 - New Challenge
 	app.get("/newChallenge", ensureLoggedIn, function(req, res) {
-		res.render("newChallenge", {user: normalizeUser(req.user)});
+		res.render("newchallenge", {user: normalizeUser(req.user)});
 	});
 
 	app.get("/user", ensureLoggedIn, function(req, res) {
