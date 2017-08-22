@@ -100,7 +100,7 @@ module.exports = {
 			var id = key;
 			var categoryValue = categories[key];
 
-			createNodesForCategory(db, null, key, categories[key]);
+			createNodesForCategory(null, key, categories[key]);
 		}
 	},
 

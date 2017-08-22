@@ -4,8 +4,8 @@ var path = require("path");
 var config = require("../config");
 var shortid = require("shortid");
 var dataUtils = require("../dataUtils");
-var gm = require("gm");
 var mime = require("mime");
+var imageProcessor = require("../imageProcessor");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -102,7 +102,7 @@ var routes = function(db) {
 			//write the data to a file
 			var buffer = new Buffer(data, 'base64');
 			fs.writeFileSync(fullpath, buffer);
-			gm(fullpath).size(function(err, size) {
+			imageProcessor.findImageSize(fullpath, function(size) {
 				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) MATCH (category:Category {id: '" + req.body.category + "'}) CREATE (n:Challenge {" +
 					"id: '" + id + "'," +
 					"image : '" + name + "'," +

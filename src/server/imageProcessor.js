@@ -14,7 +14,9 @@ module.exports = {
     			applySteps(sourceImage, path, steps, caption, next);
 			});
 		}
-	}
+	},
+
+	findImageSize: findImageSize
 };
 
 
