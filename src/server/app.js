@@ -27,6 +27,7 @@ module.exports = function() {
 
 	// Set the view engine to ejs
 	app.set('view engine', 'ejs');
+	app.set("views", global.appRoot + "/views");
 
 
 	// Add cookie parsing functionality to our Express app
