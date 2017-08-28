@@ -40,7 +40,7 @@ module.exports = {
       //repo : 'https://github.com/ezeeideas/delphinus.git',
       repo : 'git@github.com:ezeeideas/delphinus.git',
       path : '/var/www/production',
-      'post-deploy' : 'npm install --prefix ./src/server && pm2 startOrRestart ./deployment/ecosystem.config.js --env production'
+      'post-deploy' : 'npm install --prefix ./src/server && pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env production'
     },
     staging : {
       user : 'node',
