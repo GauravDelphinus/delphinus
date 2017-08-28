@@ -14,7 +14,8 @@
 		"userImages" : "/data/users/images/",
 		"staticImages" : "../client/web/public/images/static/",
 		"entryImages" : "/data/entries/images/",
-		"brandImages" : "../client/web/public/images/static/branding/"
+		"brandImages" : "../client/web/public/images/static/branding/",
+		"logFolder" : "/var/log"
 	},
 	"social" : {
 		"facebook" : {
