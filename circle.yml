@@ -6,6 +6,8 @@ general:
 dependencies:
   override:
     - npm install
+  post:
+    - sudo npm install -g pm2@latest
 deployment:
   production:
     branch: master
