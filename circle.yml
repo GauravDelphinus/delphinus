@@ -6,3 +6,9 @@ general:
 dependencies:
   override:
     - npm install
+deployment:
+  production:
+    branch: master
+    commands:
+      - ./deployment/aws/circleci_deploy_prod.sh
+
