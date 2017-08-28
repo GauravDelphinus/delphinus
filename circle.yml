@@ -7,6 +7,7 @@ dependencies:
   override:
     - npm install
   post:
+    - sudo apt-get update
     - sudo apt-get install npm
     - sudo npm install -g pm2@latest 
 deployment:
