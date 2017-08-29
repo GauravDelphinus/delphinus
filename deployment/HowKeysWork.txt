@@ -1,0 +1,91 @@
+How SSH / RSA Keys Work
+=======================
+
+RSA Keys are a public/private key pair that are used by any two systems to identify each other.  In particular,
+there are two workflows involved:
+
+(A) ALICE WANTS TO IDENTIFY HERSELF AS ALICE, SO EVERYONE KNOWS IT IS REALLY ALICE
+
+How does anyone know that it is really Alice who is talking to him, and not someone else?
+- Only Alice has her private key
+- Alice has made her public key availabe to everyone else (including, say, Bob)
+- Alice encrypts her messages using her private key
+- Bob (or anyone else with her public key) tries to decrypt the message using Alice's public key, and if it succeeeds, he knows it's Alice
+
+(B) ALICE WANTS TO SEND A MESSAGE AND WANTS TO ENSURE ONLY BOB CAN READ IT
+
+How does Alice ensure that her message, even if others can access to it, can only really be read by Bob?
+- Only Bob has his private key
+- Alice (and anybody else) has access to Bob's public key
+- Alice encrypts her message using Bob's public key and sends it to him
+- Bob decrypts the message using his private key, and it succeeds, and he is able to read the message
+- Anyone else who tries to decrypt the message fails, since the message can only be decrypted using Bob's private key
+
+============================================
+
+(1) How to generate SSH Keys
+
+Run the below command on any Unix-like system (including Mac).  Doesn't matter where.
+Important: Store the Private Key in a secure location and do not check-into source code or keep lying on a computer.
+Note: Do not enter any paraphrase, as some systems (e.g., Circle CI) do not support decrypting paraphrases
+
+(a) $ssh-keygen -t rsa -b 4096 -C "Some Comment to identify this key" -f $HOME/.ssh/some_key_name
+
+The above command generates two files:
+-- $HOME/.ssh/some_key_name is the private key
+-- $HOME/.ssh/some_key_name.pub is the public key
+
+(2) How to Use the Private Key
+
+The Private key generated above in Step 1 can now be used by the user/system to "identify" itself.  See examples below.
+
+(3) How to Use the Public Key
+
+The Public key generated in Step 1 can be used to verify the "identity" of a user.  See examples below.
+
+Examples
+========
+
+Example 1: EC2 Machine wants to clone GIT Source Code without user password prompts
+-----------------------------------------------------------------------------------
+
+To make this happen, do these steps:
+
+(1) Generate a Key Pair using the Steps mentioned above in the "How to generate SSH Keys" section
+
+	Remember to keep the Private key secure (remove from the machine in which it was generated)
+
+(2) Add the private key to the EC2 machine to "identify" itself
+	(a) Login to the machine using the user that will be used to clone (e.g., 'node' deployment user)
+	(b) Create a file called $HOME/.ssh/name_of_private_key
+	(c) Copy the contents of the Private Key to the file in step b
+	(d) Create a file called $HOME/.ssh/config, and add the below to the file:
+		host github.com
+		 HostName github.com
+		 IdentityFile ~/.ssh/name_of_private_key
+		 User git
+
+(3) Let Github know the public key so it can identify the incoming Git Clone request.
+	(a) Go to (Settings > SSH and GPG Keys > SSH Keys > New SSH Key) and paste the public key contents
+
+Now, whenever the EC2 machine triggers a source code clone request to Github, Github will be able to identify that correctly.
+
+Example 2: Circle CI machine needs to be able to Deploy to the EC2 machine without prompts
+------------------------------------------------------------------------------------------
+
+To make this happen, do these steps:
+
+(1) Generate a Key Pair using the Steps mentioned above in the "How to generate SSH Keys" section
+
+	Remember to keep the Private key secure (remove from the machine in which it was generated)
+
+(2) Add the private key to the Circle CI system to "identify" itself
+	(a) Login to the Circle CI account > Project > Settings > Permissions > SSH Permissions
+	(b) Add the Private Key and Save (you can leave the host name empty if you want to use across multiple hosts)
+
+(3) Configure the EC2 Machine so it can identify the incoming SSH requests from Circle CI for deployment
+	(a) Login to EC2 machine using the same user that Circle CI will be using to deploy
+	(b) Edit the ~/.ssh/authorized_keys file (create if not present)
+	(c) Copy paste the Public Key (append to the file) and save
+
+Now, when Circle CI tries to deploy to the EC2 machine, the EC2 machine will be able to identify it correctly.
