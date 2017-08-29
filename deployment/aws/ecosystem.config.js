@@ -37,7 +37,7 @@ module.exports = {
   deploy : {
     production : {
       user : 'node',
-      host : 'ec2-13-58-138-53.us-east-2.compute.amazonaws.com',
+      host : 'ec2-13-58-138-53.us-east-2.compute.amazonaws.com', 
       ref  : 'origin/master',
       //repo : 'https://github.com/ezeeideas/delphinus.git',
       repo : 'git@github.com:ezeeideas/delphinus.git',
