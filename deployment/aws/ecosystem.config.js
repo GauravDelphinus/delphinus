@@ -8,7 +8,12 @@ module.exports = {
     // First application
     {
       name      : 'Captionify.com',
-      script    : 'src/server/index.js',
+      script    : 'index.js',
+      cwd: "src/server",
+      "log_date_format"  : "YYYY-MM-DD HH:mm Z",
+      "error_file" : "/var/log/captionify_error.log",
+      "out_file"   : "/var/log/captionify_out.log",
+      "pid_file"   : "/var/log/captionify.pid",
       env: {
         COMMON_VARIABLE: 'true'
       },
