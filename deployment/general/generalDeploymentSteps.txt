@@ -1,0 +1,148 @@
+####################################################################
+#Preparing the server for deployment (One-time)
+####################################################################
+
+####################################################################
+# INSTALL PREREQUISITIES
+####################################################################
+
+(1) Install NPM
+(a) $sudo apt-get install npm
+
+(2) Install PM2
+(a) $sudo npm install -g pm2@latest
+
+(3) Install nginx to route http:80 to the custom port
+(a) $sudo apt-get install nginx
+
+(4) Install Node Js
+	Instructions from: https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
+(a) $curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
+(b) $sudo apt-get install -y nodejs
+
+(5) Install Build Tools
+(a) $sudo apt-get install -y build-essential
+
+(6) Install Java (for Neo4j) (http://neo4j.com/docs/operations-manual/current/installation/linux/debian/)
+(a) $sudo add-apt-repository ppa:webupd8team/java
+(b) $sudo apt-get update
+(c) $sudo apt-get install oracle-java8-installer
+(d) $update-java-alternatives --list #list java versions on machine
+(e) $sudo update-java-alternatives --jre --set java-1.8.0-openjdk-amd64 #replace last argument with the Java 8 version name
+
+(7) Install Neo4j
+(a) $sudo wget --no-check-certificate -O - https://debian.neo4j.org/neotechnology.gpg.key | apt-key add -
+(b) $echo 'deb http://debian.neo4j.org/repo stable/' | sudo tee /etc/apt/sources.list.d/neo4j.list  # add -a for append (>>)
+(c) $sudo apt-get update
+(d) $sudo apt-get --assume-yes --allow-unauthenticated install neo4j=3.1.1 #don't prompt, and allow unathenticated
+
+(8) Install ImageMagick Library
+(a) $sudo apt install imagemagick #Intall ImageMagick
+
+####################################################################
+# PREPARE DEPLOYMENT SPACE
+####################################################################
+
+(1) Create deployment user - 'node'
+(a) $adduser --disabled-password --gecos "" node
+
+(2) Setup Production Directories for deployment
+(a) $sudo su
+(b) $mkdir /var/www/production
+(c) $cd /var/www/production
+(d) $chown -R node /var/www/production #change owner to new 'node' user
+
+(3) Setup Staging Directories for deployment
+(a) $sudo su
+(b) $mkdir /var/www/staging
+(c) $cd /var/www/staging
+(d) $chown -R node /var/www/staging #change owner to new 'node' user
+
+(4) Allow silent deployments from dev machine to server
+(a) Generate ssh keys for each machine
+	$ssh-keygen -t rsa
+
+Now, $HOME/.ssh/id_rsa is the private key and $HOME/.ssh/id_rsa.pub is the public key
+
+(b) Add the public key to the $HOME/.ssh/authorized_keys file in the target server
+
+(5) Allow silent deployments from CI/CD machine to server
+(a) Find public keys for CI/CD server (CircleCI, CodeShip etc.) - TODO
+(b) Add the public key to the $HOME/.ssh/authorized_keys file in the target server)
+
+####################################################################
+# PREPARE GITHUB PUBLIC/PRIVATE KEYS FOR CLONING SILENTLY
+# Refer: https://help.github.com/articles/which-remote-url-should-i-use/
+# https://help.github.com/articles/connecting-to-github-with-ssh/
+#
+# REFER KEYS.txt FOR THE ACTUAL KEYS.
+####################################################################
+
+(1) Create SSH key pair for authenticating against Github
+Note: Only needed if you don't already have the SSH Keys.  Refer Keys.txt
+Note: Good to use Paraphrase for more security, but leave empty if you want cloning to be silent
+(a) $ssh-keygen -t rsa -b 4096 -C "ezeeideas@gmail.com" -f $HOME/.ssh/id_rsa_github
+
+Now, $HOME/.ssh/id_rsa_github is the private key and $HOME/.ssh/id_rsa_github.pub is the public key
+
+(2) Add the Public key to the ezeeideas@gmail.com Github account 
+(a) Go to (Settings > SSH and GPG Keys > SSH Keys > New SSH Key) and paste the public key from $HOME/.ssh/id_rsa_github.pub
+
+(3) Add the Private key to the actual machine on which we need deploy / clone the code (e.g., EC2)
+(a) Login to the machine using the user that will be used to clone (e.g., 'node' deployment user)
+(b) Create a file called $HOME/.ssh/id_rsa_github
+(c) Copy the contents of the Private Key to the file in step 3b
+(d) Create a file called $HOME/.ssh/config, and add the below to the file:
+host github.com
+ HostName github.com
+ IdentityFile ~/.ssh/id_rsa_github
+ User git
+
+All Set!  You should now be able to clone the repository using the below command:
+(4) git clone git@github.com:ezeeideas/delphinus.git
+
+####################################################################
+# CONFIGURE NGINX TO ROUTE TRAFFIC FROM :80 (http) AND :443 (https) 
+# TO NODE JS
+####################################################################
+
+(1) Configure Nginx to route http (:80) traffic to Node JS at port :8080
+(a) $sudo rm /etc/nginx/sites-enabled/default
+(b) $echo "server {
+    listen 80;
+    server_name captionify.com;
+
+    location / {
+        proxy_set_header   X-Forwarded-For $remote_addr;
+        proxy_set_header   Host $http_host;
+        proxy_pass         "http://127.0.0.1:8080";
+    }
+}" | sudo tee /etc/nginx/sites-available/captionify.com
+(c) $sudo ln -s /etc/nginx/sites-available/captionify.com /etc/nginx/sites-enabled/captionify.com
+(d) $sudo service nginx restart
+
+(2) Congiure Nginx to route https (:443) traffic to Node JS at port :8080
+    Setup Certbot / Lets Encrypt for Automatic SSL Certificates (Excellent Tutorial: https://www.digitalocean.com/community/tutorials/how-to-secure-nginx-with-let-s-encrypt-on-ubuntu-16-04)
+(a) $sudo add-apt-repository ppa:certbot/certbot
+(b) $sudo apt-get update
+(c) $sudo apt-get install python-certbot-nginx
+(d) $sudo certbot --nginx -d captionify.com
+(e) $sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
+(f) Add this line anywhere in the 'server' block of /etc/nginx/sites-available/captionify.com -> ssl_dhparam /etc/ssl/certs/dhparam.pem;
+
+(g) $sudo systemctl reload nginx #reload Nginx
+(h) Setup cron job to auto-renew the certificate, if needed
+	$sudo crontab -e #edit crontab file in editor
+	$paste the following at the end of the crontab file => 15 3 * * * /usr/bin/certbot renew --quiet
+
+####################################################################
+# TRIGGER ACTUAL DEPLOYMENT (MANUAL)
+####################################################################
+
+(1) Ensure ecosystem.config.js is available and accurate
+
+(2) Trigger deployment setup for Production
+	$pm2 deploy ecosystem.config.js production setup
+
+(3) Trigger deployment setup for Staging
+	$pm2 deploy ecosystem.config.js staging setup
