@@ -51,7 +51,7 @@ module.exports = {
     },
     staging : {
       user : 'node',
-      host : 'ec2-18-221-57-11.us-east-2.compute.amazonaws.com',
+      host : 'ec2-18-221-25-182.us-east-2.compute.amazonaws.com',
       ref  : 'origin/master',
       repo : 'git@github.com:ezeeideas/delphinus.git',
       path : '/var/www/staging',
