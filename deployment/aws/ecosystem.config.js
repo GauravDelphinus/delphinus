@@ -42,7 +42,7 @@ module.exports = {
   deploy : {
     production : {
       user : 'node',
-      host : 'ec2-13-58-138-53.us-east-2.compute.amazonaws.com', 
+      host : 'ec2-18-220-56-134.us-east-2.compute.amazonaws.com', 
       ref  : 'origin/master',
       //repo : 'https://github.com/ezeeideas/delphinus.git',
       repo : 'git@github.com:ezeeideas/delphinus.git',
@@ -51,11 +51,11 @@ module.exports = {
     },
     staging : {
       user : 'node',
-      host : 'ec2-13-58-138-53.us-east-2.compute.amazonaws.com',
+      host : 'ec2-18-221-57-11.us-east-2.compute.amazonaws.com',
       ref  : 'origin/master',
       repo : 'git@github.com:ezeeideas/delphinus.git',
       path : '/var/www/staging',
-      'post-deploy' : 'npm install && pm2 startOrRestart ecosystem.config.js --env staging',
+      'post-deploy' : 'npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging',
       env  : {
         NODE_ENV: 'dev'
       }

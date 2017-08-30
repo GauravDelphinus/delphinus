@@ -8,6 +8,7 @@ var access = fs.createWriteStream(logDir + '/node.access.log', { flags: 'a' })
       , error = fs.createWriteStream(logDir + '/node.error.log', { flags: 'a' });
 
 // redirect stdout / stderr
+/*
 process.stdout.pipe(access);
 process.stderr.pipe(error);
 
@@ -18,6 +19,14 @@ process.on('uncaughtException', function(err) {
   console.error((err && err.stack) ? err.stack : err);
 });
 
+*/
+
+var env = process.env.NODE_ENV; //production or staging
+if (env == undefined) {
+	env = "dev"; //when running locally
+}
+
+console.log("Environment : " + env);
 console.log("testing");
 
 if (cluster.isMaster) {
