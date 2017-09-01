@@ -3,7 +3,7 @@ var app = require('./app');
 var fs = require("fs");
 var config = require("./config");
 
-var logDir = config.path.logFolder;
+var logDir = global.appRoot + config.path.logFolder;
 var access = fs.createWriteStream(logDir + '/node.access.log', { flags: 'a' })
       , error = fs.createWriteStream(logDir + '/node.error.log', { flags: 'a' });
 
