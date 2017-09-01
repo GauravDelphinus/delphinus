@@ -163,6 +163,9 @@ server {
 (d) $sudo certbot --nginx -d captionify.com #for production
 	OR
 	$sudo certbot --nginx -d stage.captionify.com #for stage
+
+	Note that the above will only work if the public domain captionify.com or stage.captionify.com (as the case may be) is
+	set up and reachable via http (note, not necessarily https)
 (e) $sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 (f) Add this line anywhere in the 'server' block of /etc/nginx/sites-available/captionify.com -> ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
