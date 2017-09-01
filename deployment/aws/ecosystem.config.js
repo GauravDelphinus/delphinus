@@ -96,7 +96,7 @@ module.exports = {
       repo : 'git@github.com:ezeeideas/delphinus.git',
       path : '/var/www/production',
 
-      "post-setup": "mkdir ../public; ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/css ../public/css; ln -s ../current/src/client/web/public/js ../public/js; ln -s ../current/src/client/web/public/images ../public/images;",
+      "post-setup": "mkdir ../data/log; mkdir ../data/contentImages; mkdir ../data/contentImages/challenges; mkdir ../data/contentImages/entries; mkdir ../data/contentImages/users; mkdir ../data/db; mkdir ../public; ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/css ../public/css; ln -s ../current/src/client/web/public/js ../public/js; ln -s ../current/src/client/web/public/images ../public/images;",
       'post-deploy' : 'npm install --prefix ./src/server && pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env production'
     },
 
@@ -107,7 +107,7 @@ module.exports = {
       repo : 'git@github.com:ezeeideas/delphinus.git',
       path : '/var/www/staging',
 
-      "post-setup": "mkdir ../data; mkdir ../data/contentImages; mkdir ../data/contentImages/challenges; mkdir ../data/contentImages/entries; mkdir ../data/contentImages/users; mkdir ../data/db; mkdir ../public; ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/css ../public/css; ln -s ../current/src/client/web/public/js ../public/js; ln -s ../current/src/client/web/public/images ../public/images;",
+      "post-setup": "mkdir ../data; mkdir ../data/log; mkdir ../data/contentImages; mkdir ../data/contentImages/challenges; mkdir ../data/contentImages/entries; mkdir ../data/contentImages/users; mkdir ../data/db; mkdir ../public; ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/css ../public/css; ln -s ../current/src/client/web/public/js ../public/js; ln -s ../current/src/client/web/public/images ../public/images;",
       'post-deploy' : 'npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging',
       env  : {
         NODE_ENV: 'dev'
