@@ -17,10 +17,6 @@ module.exports = function() {
 	var config = require('./config');
 	var app = express();
 
-	// Set global variable called 'appRoot' to store the Node JS root directory
-	var path = require('path');
-	global.appRoot = path.resolve(__dirname) + "/../../";
-	
 	require('./auth/passport')(app);
 
 	var flash = require("connect-flash");

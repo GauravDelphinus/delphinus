@@ -3,6 +3,10 @@ var app = require('./app');
 var fs = require("fs");
 var config = require("./config");
 
+// Set global variable called 'appRoot' to store the Node JS root directory
+var path = require('path');
+global.appRoot = path.resolve(__dirname) + "/../../";
+
 var logDir = global.appRoot + config.path.logFolder;
 var access = fs.createWriteStream(logDir + '/node.access.log', { flags: 'a' })
       , error = fs.createWriteStream(logDir + '/node.error.log', { flags: 'a' });
