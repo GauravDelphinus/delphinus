@@ -84,6 +84,9 @@ module.exports = {
   	- The server has allowed access to CircleCI by adding the public key to the ~/.ssh/authorized_keys file
   		(refer the "generalDeploymentSteps.txt" for more information)
   	- The folder /var/www/staging is already created and set up with access to the 'node' user
+
+  	NOTE: post-setup is only called when pm2 deploy .. setup is called, not for every deploy
+  		post-deploy is called at every deploy
   */
   deploy : {
     production : {
@@ -93,7 +96,6 @@ module.exports = {
       repo : 'git@github.com:ezeeideas/delphinus.git',
       path : '/var/www/production',
 
-      //the post-setup assumes that, for production, the ../data folder already exists (it is supposed to be the mount point for the data EBS volume)
       "post-setup": "mkdir ../public; ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/css ../public/css; ln -s ../current/src/client/web/public/js ../public/js; ln -s ../current/src/client/web/public/images ../public/images;",
       'post-deploy' : 'npm install --prefix ./src/server && pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env production'
     },
@@ -104,6 +106,7 @@ module.exports = {
       ref  : 'origin/master',
       repo : 'git@github.com:ezeeideas/delphinus.git',
       path : '/var/www/staging',
+
       "post-setup": "mkdir ../data; mkdir ../data/contentImages; mkdir ../data/contentImages/challenges; mkdir ../data/contentImages/entries; mkdir ../data/contentImages/users; mkdir ../data/db; mkdir ../public; ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/css ../public/css; ln -s ../current/src/client/web/public/js ../public/js; ln -s ../current/src/client/web/public/images ../public/images;",
       'post-deploy' : 'npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging',
       env  : {
