@@ -47,6 +47,7 @@ module.exports = {
       //repo : 'https://github.com/ezeeideas/delphinus.git',
       repo : 'git@github.com:ezeeideas/delphinus.git',
       path : '/var/www/production',
+      "post-setup": "mkdir ../public; ln -s ../data/contentImages ../public/contentImages",
       'post-deploy' : 'npm install --prefix ./src/server && pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env production'
     },
     staging : {

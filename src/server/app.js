@@ -19,7 +19,7 @@ module.exports = function() {
 
 	// Set global variable called 'appRoot' to store the Node JS root directory
 	var path = require('path');
-	global.appRoot = path.resolve(__dirname);
+	global.appRoot = path.resolve(__dirname) + "/../../";
 	
 	require('./auth/passport')(app);
 
@@ -27,7 +27,7 @@ module.exports = function() {
 
 	// Set the view engine to ejs
 	app.set('view engine', 'ejs');
-	app.set("views", global.appRoot + "/views");
+	app.set("views", global.appRoot + "/src/server/views");
 
 
 	// Add cookie parsing functionality to our Express app
@@ -278,7 +278,8 @@ module.exports = function() {
 		STATIC ROUTERS
 		Serve static files in public directory
 	**/
-	app.use(express.static(__dirname + '/public'));
+	console.log("/public is pointing at: " + global.appRoot + config.path.publicDir);
+	app.use(express.static(global.appRoot + config.path.publicDir));
 	
 	// Finally, start listening for requests
 	app.listen(config.port, function() {

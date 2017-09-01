@@ -10,12 +10,13 @@
 	"oauth_signature": "HMAC-SHA1",
 	"oauth_callback": "http://88fd8640.ngrok.io/request-token",
 	"path" : {
-		"challengeImages" : "/data/challenges/images/",
-		"userImages" : "/data/users/images/",
-		"staticImages" : "../client/web/public/images/static/",
-		"entryImages" : "/data/entries/images/",
-		"brandImages" : "../client/web/public/images/static/branding/",
-		"logFolder" : "/var/log"
+		"challengeImages" : "../data/contentImages/challenges/",
+		"userImages" : "../data/contentImages/users/",
+		"staticImages" : "src/client/web/public/images/static/",
+		"entryImages" : "../data/contentImages/entries/",
+		"brandImages" : "src/client/web/public/images/static/branding/",
+		"logFolder" : "../data/log/",
+		"publicDir" : "../public/"
 	},
 	"social" : {
 		"facebook" : {
@@ -41,9 +42,9 @@
 		"challenge" : "/challenge/",
 		"entry" : "/entry/",
 		"challenges" : "/challenges/",
-		"entryImages" : "/entries/images/",
-		"challengeImages" : "/challenges/images/",
-		"userImages" : "/users/images/",
+		"entryImages" : "/contentImages/entries/",
+		"challengeImages" : "/contentImages/challenges/",
+		"userImages" : "/contentImages/users/",
 		"staticImages" : "/images/static/",
 		"user" : "/user/",
 		"brandImages" : "/images/static/branding/"
