@@ -120,20 +120,19 @@ module.exports = function() {
 		});
 	});
 
+	
 	// 2 - Challenge Image
+	/*
 	app.get("/challenges/images/:imageName", function(req, res) {
-		/**
-			The /challenges/images/challengeId route returns the actual original image
-			for that challenge Id.  That is the only legal way for the client to retrieve
-			the challenge Image.  The actual image is stored under /data/challenges/images/<random name>
-			path, and the random name is stored in the neo4j db entry for that challenge node.
-		**/
+		
 		var targetImage = global.appRoot + config.path.challengeImages + req.params.imageName;
 		res.setHeader("Content-Type", mime.lookup(targetImage));
 		res.sendFile(targetImage, function(err) {
 			if (err && err.code !== "ECONNABORTED") throw err;
 		});
 	});
+	*/
+	
 
 	// 3 - Entry Page
 	app.get("/entry/:entryId", function(req, res) {
@@ -148,6 +147,7 @@ module.exports = function() {
 	});
 
 	// 4 - Entry Image
+	/*
 	app.get("/entries/images/:imageName", function(req, res) {
 		// TODO - this would ultimately process the image before sending it.  For entries, it will probably
 		// not need to story the image itself, but the steps that need to be performed on the challenge image
@@ -195,6 +195,7 @@ module.exports = function() {
 			}
 		});
 	});
+	*/
 
 	// 5 - Challenge - New Entry
 	app.get("/challenge/:challengeId/newEntry", ensureLoggedIn, function(req, res){
@@ -255,6 +256,7 @@ module.exports = function() {
             });
     });
 
+	/*
     app.get("/users/images/:imageName", function(req, res) {
     	var baseDir = global.appRoot + config.path.userImages;
     	var localImagePath = baseDir + "/" + req.params.imageName;
@@ -271,6 +273,7 @@ module.exports = function() {
 				});
 
     });
+    */
 
 	/**
 		STATIC ROUTERS
@@ -283,7 +286,7 @@ module.exports = function() {
 	// Finally, start listening for requests
 	app.listen(config.port, function() {
 		logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on port " + config.port);
-		logger.debug("Application Root: " + global.appRoot + ", Express Static directory: " + publicDir);
+		logger.info("Application Root: " + global.appRoot + ", Express Static directory: " + publicDir);
 	});
 };
 

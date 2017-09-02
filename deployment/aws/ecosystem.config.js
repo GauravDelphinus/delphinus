@@ -111,10 +111,12 @@ module.exports = {
       path : '/var/www/staging',
 
       "post-setup": "mkdir ../data; mkdir ../data/log; mkdir ../data/contentImages; mkdir ../data/contentImages/challenges; mkdir ../data/contentImages/entries; mkdir ../data/contentImages/users; mkdir ../data/db; mkdir ../public; ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/css ../public/css; ln -s ../current/src/client/web/public/js ../public/js; ln -s ../current/src/client/web/public/images ../public/images; ln -s ../current/src/client/web/public/third-party ../public/third-party;",
-      'post-deploy' : 'npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging',
+      'post-deploy' : 'npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging'
+      /*
       env  : {
         NODE_ENV: 'dev'
       }
+      */
     }
   }
 };
