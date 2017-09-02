@@ -21,7 +21,7 @@
 	Instructions from: https://nodejs.org/en/download/package-manager/#debian-and-ubuntu-based-linux-distributions
 (a) $curl -sL https://deb.nodesource.com/setup_6.x | sudo -E bash -
 (b) $sudo apt-get install -y nodejs
-(c) $sudo chmod 777 /var/log #set permissions to write logs
+(c) $--- > REmove as we'll log to our own folder --> sudo chmod 777 /var/log #set permissions to write logs
 
 (5) Install Build Tools
 (a) $sudo apt-get install -y build-essential
@@ -43,11 +43,36 @@
 (a) $sudo apt install imagemagick #Intall ImageMagick
 
 ####################################################################
+# MOUNT EBS VOLUME (PRODUCTION ONLY)
+# Refer: http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html
+####################################################################
+
+(1) List available devices
+(a) lsblk
+Look for the device that is not already mounted, because that's the EBS volume that we want to mount
+
+(2) Check if we need to format or not
+(a) sudo file -s /dev/<device_name> # as identified in step 1 above
+
+If the output is just "data" then we need to format using the following command
+
+(3) sudo mkfs -t ext4 /dev/<device_name> #only if the format in 2 was 'data'
+
+(4) sudo mkdir /var/www/production/data #create mount point directry
+
+(5) sudo mount /dev/<device_name> /var/www/production/data
+
+(6) sudo chown node /var/www/production/data #change ownership to node user
+
+
+
+####################################################################
 # PREPARE DEPLOYMENT SPACE
 ####################################################################
 
 (1) Create deployment user - 'node'
 (a) $sudo adduser --disabled-password --gecos "" node
+
 
 ####################################################################
 # PREPARE DEPLOYMENT SPACE FOR PRODUCTION ENVIRONMENT
@@ -91,6 +116,35 @@
 	(a) Login to EC2 machine using the same user that Circle CI will be using to deploy ('node')
 	(b) Edit the ~/.ssh/authorized_keys file (create if not present)
 	(c) Copy paste the Public Key (append to the file) and save
+
+
+####################################################################
+# PREPARE NEO4J
+####################################################################
+
+(1) Set up password / authentication for Neo4j
+(a) sudo neo4j-admin set-initial-password mypassword #Set Neo4j Database password (match with my code in app.js)
+(b) curl -H "Content-Type: application/json" -X POST -d '{"password":"mypassword"}' -u neo4j:neo4j http://localhost:7474/user/neo4j/password #change password
+
+Note: this needs to be done twice, since the initial password needs to be changed (for security purposes)
+TODO: Explore a more secure way to authenticate, using key pairs
+
+(2) Configure custom Database Path for Neo4j
+(a) sudo vi /etc/neo4j/neo4j.config #edit the configuration file
+(b) Find the line below and change the database directory as below:
+dbms.directories.data=/var/www/production/data
+
+(3) Configure Neo4j to allow Remote Web Admin Access
+(a) sudo vi /etc/neo4j/neo4j.conf #Edit the /etc/neo4j/neo4j.conf configuration file
+(b) Find the line under HTTP Connector section and uncomment/edit it to match the following:
+	dbms.connector.http.listen_address=0.0.0.0:7474
+
+(c) sudo service neo4j restart #Restart the neo4j service
+(d) You should now be able to access the web admin using the public url, something like:
+	http://ec2-18-221-25-182.us-east-2.compute.amazonaws.com:7474/
+
+(e) Disable Bolt in the web admin interface.  Go to Settings > BOLT + ROUTING > Check "Do not use bolt"
+(f) In the web admin interfae, enter :server connect, and enter the neo4j login credentials, and it should be connected
 
 ####################################################################
 # PREPARE GITHUB PUBLIC/PRIVATE KEYS FOR CLONING SILENTLY
@@ -165,7 +219,7 @@ server {
 	$sudo certbot --nginx -d stage.captionify.com #for stage
 
 	Note that the above will only work if the public domain captionify.com or stage.captionify.com (as the case may be) is
-	set up and reachable via http (note, not necessarily https)
+	set up and reachable via http and https
 (e) $sudo openssl dhparam -out /etc/ssl/certs/dhparam.pem 2048
 (f) Add this line anywhere in the 'server' block of /etc/nginx/sites-available/captionify.com -> ssl_dhparam /etc/ssl/certs/dhparam.pem;
 
