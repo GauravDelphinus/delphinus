@@ -6,6 +6,8 @@ module.exports = function() {
 	var async = require('async');
 	var fs = require("fs");
 	var mime = require("mime");
+	var logger = require("./logger");
+	var path = require("path");
 
 	var dataUtils = require("./dataUtils");
 	var imageProcessor = require("./imageProcessor");
@@ -274,14 +276,15 @@ module.exports = function() {
 		STATIC ROUTERS
 		Serve static files in public directory
 	**/
-	console.log("/public is pointing at: " + global.appRoot + config.path.publicDir);
-	app.use(express.static(global.appRoot + config.path.publicDir));
+
+	var publicDir = path.normalize(global.appRoot + config.path.publicDir);
+	app.use(express.static(publicDir));
 	
 	// Finally, start listening for requests
 	app.listen(config.port, function() {
-		console.log("Listening on port " + config.port);
+		logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on port " + config.port);
+		logger.debug("Application Root: " + global.appRoot + ", Express Static directory: " + publicDir);
 	});
-
 };
 
 function ensureLoggedIn(req, res, next) {

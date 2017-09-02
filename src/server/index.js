@@ -2,36 +2,16 @@ var cluster = require('cluster');
 var app = require('./app');
 var fs = require("fs");
 var config = require("./config");
+var path = require("path");
 
-// Set global variable called 'appRoot' to store the Node JS root directory
-var path = require('path');
-global.appRoot = path.resolve(__dirname) + "/../../";
+// Set up application root directory
+global.appRoot = path.normalize(path.resolve(__dirname) + "/../../");
 
-var logDir = global.appRoot + config.path.logFolder;
-var access = fs.createWriteStream(logDir + '/node.access.log', { flags: 'a' })
-      , error = fs.createWriteStream(logDir + '/node.error.log', { flags: 'a' });
-
-// redirect stdout / stderr
-/*
-process.stdout.pipe(access);
-process.stderr.pipe(error);
-
-process.stdout.write = access.write.bind(access);
-process.stderr.write = error.write.bind(error);
-
-process.on('uncaughtException', function(err) {
-  console.error((err && err.stack) ? err.stack : err);
-});
-
-*/
-
+// Set up Environment Variables
 var env = process.env.NODE_ENV; //production or staging
 if (env == undefined) {
-	env = "dev"; //when running locally
+	process.env.NODE_ENV = "dev"; //when running locally
 }
-
-console.log("Environment : " + env);
-console.log("testing");
 
 if (cluster.isMaster) {
         // // Count the machine's CPUs

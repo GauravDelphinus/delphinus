@@ -15,7 +15,7 @@
 		"staticImages" : "src/client/web/public/images/static/",
 		"entryImages" : "../data/contentImages/entries/",
 		"brandImages" : "src/client/web/public/images/static/branding/",
-		"logFolder" : "../data/log/",
+		"logDir" : "../data/log/",
 		"publicDir" : "../public/"
 	},
 	"social" : {
