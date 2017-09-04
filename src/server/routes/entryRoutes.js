@@ -3,6 +3,11 @@ var async = require("async");
 var dataUtils = require("../dataUtils");
 var shortid = require("shortid");
 var config = require("../config");
+var filterUtils = require("../filterUtils");
+var logger = require("../logger");
+var mime = require("mime");
+var fs = require("fs");
+var imageProcessor = require("../imageProcessor");
 
 var routes = function(db) {
 
@@ -82,6 +87,7 @@ var routes = function(db) {
 				POST a new entry node, and link it to a Challenge node.
 			**/
 
+			logger.debug("POST on /api/entries, req.body.steps is " + JSON.stringify(req.body.steps));
 			var id = shortid.generate();
 			/**
 				First create the entry node.  Then later, link them to Filter nodes.
@@ -108,7 +114,9 @@ var routes = function(db) {
 
 				var createFilterNodesFunctions = []; // array of functions that will create the Filter Nodes
 
-				// FILTERS
+				// STEPS
+
+				logger.debug("req.body.steps is " + JSON.stringify(req.body.steps));
 				if (req.body.steps) {
 					if (req.body.steps.layouts && req.body.steps.layouts.constructor === Array) {
 						for (var i = 0; i < req.body.steps.layouts.length; i++) {
@@ -179,11 +187,43 @@ var routes = function(db) {
 
 					cypherQuery += " return e;";
 
+					logger.debug("cypherQuery is " + cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result){
 						if(err) throw err;
 
 						if (result.data.length > 0) {
-							res.json(result.data[0]);
+
+							//now, generate the image(s)
+							logger.debug("starting to generate images, req.body.steps = " + JSON.stringify(req.body.steps));
+							var singleStepList = filterUtils.extractSingleStepList(req.body.steps);
+							var applySingleStepToImageFunctions = [];
+							for (var i = 0; i < singleStepList.length; i++) {
+								var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
+								var targetImage = global.appRoot + config.path.entryImages + id + "-" + hash + "." + mime.extension(req.body.imageType);
+								if (i == singleStepList.length - 1) {
+									//the last step is the cumulative of all filters, so just name that as the id of the entry
+									targetImage = global.appRoot + config.path.entryImages + id + "." + mime.extension(req.body.imageType)
+								}
+								logger.debug("In For loop, i = " + i + ", hash = " + hash + ", targetImage = " + targetImage);
+
+								if (!fs.existsSync(targetImage)) {
+									//image doesn't already exist
+									var sourceImage = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(req.body.imageType);
+
+									logger.debug("adding to function list, sourceImage = " + sourceImage);
+									applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
+								}
+							}
+
+							var imagePaths = []; //list of image paths for each sub step
+							logger.debug("calling async.series now ...");
+	    					async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
+	    						if (err) throw err;
+
+	    						logger.debug("all done successfully!  returning to client");
+	    						res.json(result.data[0]);
+	    					});
+							
 						}
 					});
 						
@@ -364,5 +404,7 @@ var routes = function(db) {
 
 	return entryRouter;
 };
+
+
 
 module.exports = routes;

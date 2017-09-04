@@ -505,7 +505,7 @@ module.exports = {
 	    				
 	    			}
 
-	    			next(0, { "image" : image, "steps" : steps, "caption" : imageCaption});
+	    			next(0, { "image" : image, "imageType" : imageType, "steps" : steps, "caption" : imageCaption});
 	    	});
 
 		});
@@ -1279,7 +1279,6 @@ module.exports = {
 
 	constructEntityData: function(entityType, entity, poster, compareDate, numLikes, numComments, numEntries, numShares, numFollowers, amFollowing, numPosts, amLiking, activityType, lastComment, lastCommenter, likeTime, liker, category, socialInfo) {
 
-		console.log("constructEntityData, entityTye: " + entityType + ", socialInfo: " + JSON.stringify(socialInfo));
 		var data = {
 			type : entityType,
 			id : entity.id,
@@ -1326,7 +1325,6 @@ module.exports = {
 			if (socialInfo) {
 				if (socialInfo.facebookLink) {
 					data.socialStatus.facebook = {profileLink: socialInfo.facebookLink};
-					console.log("adding facebook link inside");
 				}
 				if (socialInfo.twitterLink) {
 					data.socialStatus.twitter = {profileLink: socialInfo.twitterLink};
@@ -1367,7 +1365,6 @@ module.exports = {
 			
 		}
 		
-		//console.log("constructEntityData returning data = " + JSON.stringify(data));
 		return data;
 	},
 
