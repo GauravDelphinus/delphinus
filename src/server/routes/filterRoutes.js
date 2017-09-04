@@ -60,22 +60,19 @@ var routes = function(db) {
 				var image = req.body.imageData; //challengeId
 				sourceImagePath = global.appRoot + config.path.challengeImages + image + "." + mime.extension(imageData.imageType);
 	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
-	    			imageProcessor.applyStepsToImage(sourceImagePath, null, steps, req.body.caption, function(err, imagePath){
+
+	    			var hash = filterUtils.generateHash(JSON.stringify(steps));
+					var targetImageName = req.body.imageData + "-" + hash + "." + mime.extension(imageData.imageType);
+					var targetImage = global.appRoot + config.path.cacheImages + targetImageName;
+	    				
+	    			imageProcessor.applyStepsToImage(sourceImagePath, targetImage, steps, req.body.caption, function(err, imagePath){
 						if (err) throw err;
 
-						//send the image as a base64 encoded image blob
-						var imageBlob = fs.readFileSync(imagePath); //TODO - change to async
-						var imageBase64 = new Buffer(imageBlob).toString('base64');
-						var jsonObj = {"imageData" : imageBase64};
-						res.setHeader('Content-Type', 'application/json');
-						//console.log("sending response to /api/filters/apply, jsonObj is " + JSON.stringify(jsonObj));
-						res.send(JSON.stringify(jsonObj));
+						var imageUrlPath = config.url.cacheImages + targetImageName;
 
-						//dispose off the temp file, if source and target are not same
-						if (sourceImagePath != imagePath) {
-							fs.unlink(imagePath);
-						}
-						
+						var jsonObj = {"type" : "url", "imageData" : imageUrlPath};
+						res.setHeader('Content-Type', 'application/json');
+						res.send(JSON.stringify(jsonObj));
 					});
 	    		});
     		});
@@ -120,15 +117,8 @@ var routes = function(db) {
 
 						imageUrlPaths.push(config.url.cacheImages + targetImageName);
 
-	    				if (fs.existsSync(targetImage)) {
-	    					//file already exists, just use the existing file
-	    					applySingleStepToImageFunctions.push(async.apply(function(targetImage, next) {
-	    						next(0, targetImage); //pass the existing file path to the sync series function
-	    					}, targetImage));
-	    				} else {
-	    					//file not found, generate a new file
-	    					applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, targetImage, singleStepList[i], imageData.caption));
-	    				}
+						//apply steps - note that applyStepsToImage first checks for existance of cache image
+	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, targetImage, singleStepList[i], imageData.caption));
 	    			}
 
 	    			var imagePaths = []; //list of image paths for each sub step

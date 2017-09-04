@@ -1242,7 +1242,6 @@ module.exports = {
 				cypherQuery += "});";
 			}
 
-			console.log("running cypherquery: " + cypherQuery);
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) throw err;
 

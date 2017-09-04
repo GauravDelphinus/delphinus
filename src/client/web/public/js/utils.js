@@ -394,7 +394,6 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 	});
 
 	// Allow delete for comments posted by currently logged-in user
-	console.log("user is " + JSON.stringify(user) + ", data is " + JSON.stringify(data));
 	if (user && user.id == data.postedByUser.id) {
 		var deleteButton = $("<button>", {id: data.id + "DeleteButton", type: "button", class: "likeButtonSimple"}).append("Delete");
 		socialStatusSection.append(deleteButton);
@@ -1466,7 +1465,6 @@ function createPopupElement(id, headerContent, footerContent, bodyContent, close
 }
 
 function createGrid(id, list, numCols, allowHover, allowSelection, defaultSelectedID, selectionCallback) {
-	console.log("createGrid, defaultSelectedID is " + defaultSelectedID);
 	var table = $("<table>", {id: id});
 
 	var tdWidth = 100 / numCols;

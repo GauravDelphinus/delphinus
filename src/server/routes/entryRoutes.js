@@ -117,7 +117,6 @@ var routes = function(db) {
 
 				// STEPS
 
-				logger.debug("req.body.steps is " + JSON.stringify(req.body.steps));
 				if (req.body.steps) {
 					if (req.body.steps.layouts && req.body.steps.layouts.constructor === Array) {
 						for (var i = 0; i < req.body.steps.layouts.length; i++) {
@@ -188,14 +187,12 @@ var routes = function(db) {
 
 					cypherQuery += " return e;";
 
-					logger.debug("cypherQuery is " + cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result){
 						if(err) throw err;
 
 						if (result.data.length > 0) {
 
 							//now, generate the image(s)
-							logger.debug("starting to generate images, req.body.steps = " + JSON.stringify(req.body.steps));
 							var singleStepList = filterUtils.extractSingleStepList(req.body.steps);
 							var applySingleStepToImageFunctions = [];
 							var sourceImage = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(req.body.imageType);
@@ -204,18 +201,11 @@ var routes = function(db) {
 								var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
 								var targetImage = global.appRoot + config.path.cacheImages + req.body.challengeId + "-" + hash + "." + mime.extension(req.body.imageType);
 
-								logger.debug("In For loop, i = " + i + ", hash = " + hash + ", targetImage = " + targetImage);
+								applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
 
-								if (!fs.existsSync(targetImage)) {
-									//image doesn't already exist
-									
-									logger.debug("adding to function list, sourceImage = " + sourceImage);
-									applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
-								}
 							}
 
 							var imagePaths = []; //list of image paths for each sub step
-							logger.debug("calling async.series now ...");
 	    					async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
 	    						if (err) throw err;
 
@@ -224,7 +214,6 @@ var routes = function(db) {
 	    						serverUtils.copyFile(imagePaths[imagePaths.length - 1], targetEntryImage, function(err) {
 	    							if (err) throw err;
 
-	    							logger.debug("all done successfully!  returning to client");
 	    							res.json(result.data[0]);
 	    						});
 	    					});

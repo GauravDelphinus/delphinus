@@ -6,7 +6,11 @@ var execFile = require('child_process').execFile;
 module.exports = {
 	applyStepsToImage : function(sourceImage, targetImage, steps, caption, next) {
 		if (targetImage) {
-			applySteps(sourceImage, targetImage, steps, caption, next);
+			if (fs.existsSync(targetImage)) {
+				next(0, targetImage);
+			} else {
+				applySteps(sourceImage, targetImage, steps, caption, next);
+			}
 		} else {
 			tmp.tmpName(function _tempNameGenerated(err, path) {
     			if (err) throw err;

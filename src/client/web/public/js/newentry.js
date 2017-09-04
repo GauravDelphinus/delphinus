@@ -1191,7 +1191,12 @@ function generateChanges(id, jsonObj, done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			done(id, "data:image/jpeg;base64," + jsonData.imageData);
+			if (jsonData.type == "url") {
+				done(id, jsonData.imageData);
+			} else if (jsonData.type == "blob") {
+				done(id, "data:image/jpeg;base64," + jsonData.imageData);
+			}
+			
 		},
 		error: function(jsonData) {
 			alert("some error was found, " + jsonData.error);
@@ -1214,9 +1219,13 @@ function applyChanges(done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
-			if (done) {
-				done();
+			if (jsonData.type == "url") {
+				$("#newentryimage").attr("src", jsonData.imageData);
+			} else if (jsonData.type == "blob") {
+				$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
+				if (done) {
+					done();
+				}
 			}
 		},
 		error: function(jsonData) {
