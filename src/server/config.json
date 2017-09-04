@@ -16,7 +16,8 @@
 		"entryImages" : "../data/contentImages/entries/",
 		"brandImages" : "src/client/web/public/images/static/branding/",
 		"logDir" : "../data/log/",
-		"publicDir" : "../public/"
+		"publicDir" : "../public/",
+		"cacheImages" : "../data/cacheImages/"
 	},
 	"social" : {
 		"facebook" : {
@@ -47,7 +48,8 @@
 		"userImages" : "/contentImages/users/",
 		"staticImages" : "/images/static/",
 		"user" : "/user/",
-		"brandImages" : "/images/static/branding/"
+		"brandImages" : "/images/static/branding/",
+		"cacheImages" : "/cacheImages/"
 	},
 	"name" : {
 		"defaultProfileImageName" : "default.png"

@@ -114,13 +114,11 @@ var routes = function(db) {
 
 	    			for (var i = 0; i < singleStepList.length; i++) {
 	    				var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
-						var targetImageName = req.params.entryId + "-" + hash + "." + mime.extension(imageData.imageType);
-						if (i == singleStepList.length - 1) {
-							//the last step is the cumulative of all filters, so just name that as the id of the entry
-							targetImageName = req.params.entryId + "." + mime.extension(imageData.imageType)
-						}
-						var targetImage = global.appRoot + config.path.entryImages + targetImageName;
-						imageUrlPaths.push(config.url.entryImages + targetImageName);
+
+						var targetImageName = imageData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
+						var targetImage = global.appRoot + config.path.cacheImages + targetImageName;
+
+						imageUrlPaths.push(config.url.cacheImages + targetImageName);
 
 	    				if (fs.existsSync(targetImage)) {
 	    					//file already exists, just use the existing file

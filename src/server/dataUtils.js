@@ -282,7 +282,8 @@ module.exports = {
 	    		if (err) throw err;
 
 	    		var imageType = output.data[0][1];
-	    		var image = output.data[0][0] + "." + mime.extension(imageType);
+	    		var challengeId = output.data[0][0];
+	    		var image = challengeId + "." + mime.extension(imageType);
 	    		//var imagePath = global.appRoot + config.path.challengeImages + image + "." + extractExtension(imageType);
 
 	    		//console.log("Image is " + imagePath);
@@ -505,7 +506,7 @@ module.exports = {
 	    				
 	    			}
 
-	    			next(0, { "image" : image, "imageType" : imageType, "steps" : steps, "caption" : imageCaption});
+	    			next(0, { "challengeId" : challengeId, "image" : image, "imageType" : imageType, "steps" : steps, "caption" : imageCaption});
 	    	});
 
 		});

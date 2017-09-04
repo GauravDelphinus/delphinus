@@ -8,6 +8,7 @@ var logger = require("../logger");
 var mime = require("mime");
 var fs = require("fs");
 var imageProcessor = require("../imageProcessor");
+var serverUtils = require("../serverUtils");
 
 var routes = function(db) {
 
@@ -197,19 +198,17 @@ var routes = function(db) {
 							logger.debug("starting to generate images, req.body.steps = " + JSON.stringify(req.body.steps));
 							var singleStepList = filterUtils.extractSingleStepList(req.body.steps);
 							var applySingleStepToImageFunctions = [];
+							var sourceImage = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(req.body.imageType);
+
 							for (var i = 0; i < singleStepList.length; i++) {
 								var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
-								var targetImage = global.appRoot + config.path.entryImages + id + "-" + hash + "." + mime.extension(req.body.imageType);
-								if (i == singleStepList.length - 1) {
-									//the last step is the cumulative of all filters, so just name that as the id of the entry
-									targetImage = global.appRoot + config.path.entryImages + id + "." + mime.extension(req.body.imageType)
-								}
+								var targetImage = global.appRoot + config.path.cacheImages + req.body.challengeId + "-" + hash + "." + mime.extension(req.body.imageType);
+
 								logger.debug("In For loop, i = " + i + ", hash = " + hash + ", targetImage = " + targetImage);
 
 								if (!fs.existsSync(targetImage)) {
 									//image doesn't already exist
-									var sourceImage = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(req.body.imageType);
-
+									
 									logger.debug("adding to function list, sourceImage = " + sourceImage);
 									applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
 								}
@@ -220,8 +219,14 @@ var routes = function(db) {
 	    					async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
 	    						if (err) throw err;
 
-	    						logger.debug("all done successfully!  returning to client");
-	    						res.json(result.data[0]);
+	    						//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
+	    						var targetEntryImage = global.appRoot + config.path.entryImages + id + "." + mime.extension(req.body.imageType);
+	    						serverUtils.copyFile(imagePaths[imagePaths.length - 1], targetEntryImage, function(err) {
+	    							if (err) throw err;
+
+	    							logger.debug("all done successfully!  returning to client");
+	    							res.json(result.data[0]);
+	    						});
 	    					});
 							
 						}
