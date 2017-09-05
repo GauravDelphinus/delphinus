@@ -47,4 +47,8 @@ const logger = new (winston.Logger)({
   ]
 });
 
+logger.dbError = function(error, query) {
+	this.error("DB Error: " + error + ".  Cypher Query: " + query);
+}
+
 module.exports = logger;

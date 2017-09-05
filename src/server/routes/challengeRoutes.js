@@ -6,29 +6,55 @@ var shortid = require("shortid");
 var dataUtils = require("../dataUtils");
 var mime = require("mime");
 var imageProcessor = require("../imageProcessor");
+var logger = require("../logger");
+var serverUtils = require("../serverUtils");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
 
 	challengeRouter.route("/") // ROUTER FOR /api/challenges
 
+		/** 
+			GET challenges matching the query paramters.
+			Typical call would be a GET to the URL /api/challenges?param1=value1&param2=value2 etc.
+
+			Currently supported query paramters:
+			1. sortBy (required)
+				dateCreated - sort by the most recently created challenge
+				popularity - sort by popularity of challenge (likes + comments + entries)
+			2. postedBy (optional)
+				<user id> - only return challenges posted by the specified user
+			3. category (optional)
+				<category id> - only return challenges within the specified category (refer categories.json for list of categories)
+
+			Note: all query options can be cascaded on top of each other and the overall
+			effect will be an intersection.
+		**/
+
 		.get(function(req, res){
 
-			/** 
-				GET challenges matching the query paramters.
-				Typical call would be a GET to the URL /api/challenges?param1=value1&param2=value2 etc.
+			logger.debug("GET received on /api/challenges, query: " + JSON.stringify(req.query));
 
-				Currently supported query paramters:
-				1. search = <search query> - return all challenges matching the search query in their titles
-				2. sortby = recent | trending | popular
-					recent - sort by the most recently created challenge
-					trending - sort by the most trending challenge (most activity in the past 1 day)
-					popular - sort by the most popular challenge (most liked/shared of all time)
-				3. limit = <number of values> - number of values to limit in the returned results
+			var validationParams = [
+				{
+					name: "sortBy",
+					required: "yes",
+					type: ["dateCreated", "popularity"]
+				},
+				{
+					name: "postedBy",
+					type: "id"
+				},
+				{
+					name: "category",
+					type: "id"
+				}
+			];
 
-				Note: all query options can be cascaded on top of each other and the overall
-				effect will be an intersection.
-			**/
+			if (!serverUtils.validateQueryParams(req.query, validationParams)) {
+				res.sendStatus(400);
+				return;
+			}
 
 			var cypherQuery = "";
 
@@ -62,7 +88,11 @@ var routes = function(db) {
 			}
 
 			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+					res.sendStatus(500);
+    				return;
+    			}
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
