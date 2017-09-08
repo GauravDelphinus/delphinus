@@ -137,13 +137,16 @@ module.exports = {
 		
 		var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'})-[:POSTED_BY]->(poster:User) RETURN c, poster;";
 
-		//console.log("cypherQuery is " + cypherQuery);
 		myDB.cypherQuery(cypherQuery, function(err, result){
-	    	if(err || result.data.length <= 0) throw err;
+	    	if(err) {
+	    		return next(err, null);
+	    	} else if (result.data.length <= 0) {
+	    		return next(new Error("Database returned no results."), null);
+	    	}
 
 	    	var data = constructMetaData("challenge", result.data[0][0], result.data[0][1]);
 
-		    next(0, data);
+		    return next(0, data);
 		});
 
 	},
@@ -157,15 +160,19 @@ module.exports = {
 			var cypherQuery = "MATCH (c:Category {id: '" + categoryId + "'}) RETURN c;";
 
 			myDB.cypherQuery(cypherQuery, function(err, result){
-		    	if(err || result.data.length <= 0) throw err;
+				if(err) {
+		    		return next(err, null);
+		    	} else if (result.data.length <= 0) {
+		    		return next(new Error("Database returned no results."), null);
+		    	}
 
 		    	var data = constructMetaData("category", result.data[0], null);
 
-			    next(0, data);
+			    return next(0, data);
 			});
 		} else {
 			var data = this.constructMetaData("category", null, null);
-			next (0, data);
+			return next (0, data);
 		}
 	},
 
@@ -177,11 +184,15 @@ module.exports = {
 		var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) MATCH (c:Challenge)<-[:PART_OF]-(e)-[:POSTED_BY]->(poster:User) RETURN e, poster, c;";
 
 		myDB.cypherQuery(cypherQuery, function(err, result){
-	    	if(err || result.data.length <= 0) throw err;
+			if(err) {
+	    		return next(err, null);
+	    	} else if (result.data.length <= 0) {
+	    		return next(new Error("Database returned no results."), null);
+	    	}
 
 	    	var data = constructMetaData("entry", result.data[0][0], result.data[0][1], result.data[0][2]);
 
-		    next(0, data);
+		    return next(0, data);
 		});
 
 	},

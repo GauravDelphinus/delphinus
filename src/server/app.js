@@ -92,11 +92,16 @@ module.exports = function() {
 
 	app.get("/challenges", function(req, res) {
 		dataUtils.getMetaDataForCategory(req.query.category, function(err, data) {
+			if (err) {
+				logger.error("Error retrieving metadata for category '" + req.query.category + "': " + err);
+				return res.render("error", {redirectURL: "/"});
+			}
+
 			var jsonObj = data;
 			jsonObj.user = normalizeUser(req.user);
 			jsonObj.categoryId = (req.query.category) ? req.query.category : "all";
 
-			res.render("challenges", jsonObj);
+			return res.render("challenges", jsonObj);
 		});
 	});
 
@@ -112,6 +117,11 @@ module.exports = function() {
 	app.get("/challenge/:challengeId", function(req, res) {
 		// extract information for meta tags on the page
 		dataUtils.getMetaDataForChallenge(req.params.challengeId, function(err, data) {
+			if (err) {
+				logger.error("Error retrieving metadata for challenge '" + req.params.challengeId + "': " + err);
+				return res.render("error", {redirectURL: "/"});
+			}
+
 			var jsonObj = data;
 			jsonObj.challengeId = req.params.challengeId;
 			jsonObj.user = normalizeUser(req.user);
@@ -153,6 +163,11 @@ module.exports = function() {
 	app.get("/entry/:entryId", function(req, res) {
 		// extract information for meta tags on the page
 		dataUtils.getMetaDataForEntry(req.params.entryId, function(err, data) {
+			if (err) {
+				logger.error("Error retrieving metadata for entry '" + req.params.entryId + "': " + err);
+				return res.render("error", {redirectURL: "/"});
+			}
+
 			var jsonObj = data;
 			jsonObj.entryId = req.params.entryId;
 			jsonObj.user = normalizeUser(req.user);
@@ -160,57 +175,6 @@ module.exports = function() {
 			res.render("entry", jsonObj);
 		});
 	});
-
-	// 4 - Entry Image
-	/*
-	app.get("/entries/images/:imageName", function(req, res) {
-		// TODO - this would ultimately process the image before sending it.  For entries, it will probably
-		// not need to story the image itself, but the steps that need to be performed on the challenge image
-		//res.sendFile(__dirname + "/data/entries/images/" + req.params.imageName);
-
-		
-		var targetImage = global.appRoot + config.path.entryImages + req.params.imageName;
-		dataUtils.checkCachedFile(targetImage, function(err) {
-			if (!err) {
-				//cache found, so just send that back
-				res.setHeader("Content-Type", mime.lookup(targetImage));
-				res.sendFile(targetImage);
-			} else {
-				//cache not found, do the whole loop and make sure to save to cache
-
-				//imageName is supposed to be of the form "entryId.imageextension"
-				//extract the entryId
-				var entryId = req.params.imageName.replace(/\.[^/.]+$/, "");
-
-				dataUtils.getImageDataForEntry(entryId, function(err, imageData){
-					if (err) throw err;
-
-					var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image; //path to challenge image
-					imageProcessor.applyStepsToImage(sourceImagePath, targetImage, imageData.steps, imageData.caption, function(err, image){
-						if (err) throw err;
-
-						//console.log("calling res.sendFile with " + image);
-						res.setHeader("Content-Type", mime.lookup(image));
-						res.sendFile(image, function(err) {
-							if (err) {
-								if (err.code == "ECONNABORTED") {
-								} else {
-									throw err;
-								}
-							}
-							//dispose off the file
-							if (sourceImagePath != image) {
-								fs.unlink(image, function(err) {
-									if (err) throw err;
-								});
-							}
-						});
-					});
-				});
-			}
-		});
-	});
-	*/
 
 	// 5 - Challenge - New Entry
 	app.get("/challenge/:challengeId/newEntry", ensureLoggedIn, function(req, res){
@@ -249,46 +213,32 @@ module.exports = function() {
             	}
             	
             	dataUtils.findUser(query, function(err, user) {
-            		if (err) throw err;
+            		if (err) {
+            			logger.error("Couldn't find user, query: " + JSON.stringify(query) + ": " + err);
+            			return res.render("error", redirectURL: "/users");
+            		}
 
-            		//console.log("passing user to render, user = " + JSON.stringify(user));
-            		res.render("user", {user : user, userInfo: user});
+            		return res.render("user", {user : user, userInfo: user});
             	});
             } else {
-            	res.render("user", null);
+            	return res.render("user", null);
             }
     });
 
 	app.get("/user/:userID", function(req, res) {
             var query = {
-                  userID : req.params.userID
+				userID : req.params.userID
             };
 
             dataUtils.findUser(query, function(err, user) {
-                  if (err) throw err;
+				if (err) {
+					logger.error("Couldn't find user, query: " + JSON.stringify(query) + ": " + err);
+					return res.render("error", redirectURL: "/users");
+				}
 
-                  res.render("user", {userInfo: user, user: normalizeUser(req.user)});
+				return res.render("user", {userInfo: user, user: normalizeUser(req.user)});
             });
     });
-
-	/*
-    app.get("/users/images/:imageName", function(req, res) {
-    	var baseDir = global.appRoot + config.path.userImages;
-    	var localImagePath = baseDir + "/" + req.params.imageName;
-    	res.sendFile(localImagePath, function(err) {
-					if (err) {
-						if (err.code == "ECONNABORTED") {
-						//console.log("err is " + err + ", continuing as usual ... ");
-						//console.log("err JSON is " + JSON.stringify(err));
-						//console.log("err.name is " + err.name);
-						} else {
-							throw err;
-						}
-					}
-				});
-
-    });
-    */
 
 	/**
 		STATIC ROUTERS
