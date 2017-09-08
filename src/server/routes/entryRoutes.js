@@ -18,22 +18,36 @@ var routes = function(db) {
 
 		.get(function(req, res){
 
-			/**
-				GET entries that match the given query parameters.
+			logger.debug("GET received on /api/entries, query: " + JSON.stringify(req.query));
 
-				Typical call would be a GET to the URL /api/entries?param1=value1&param2=value2 etc.
+			var validationParams = [
+				{
+					name: "sortBy",
+					required: "yes",
+					type: ["dateCreated", "popularity"]
+				},
+				{
+					name: "challengeId",
+					type: "id"
+				},
+				{
+					name: "postedBy",
+					type: "id"
+				},
+				{
+					name: "user",
+					type: "id"
+				},
+				{
+					name: "excludeUser",
+					type: "id"
+				}
+			];
 
-				Currently supported query paramters:
-				1. search = <search query> - return all challenges matching the search query in their titles
-				2. sortby = recent | trending | popular
-					recent - sort by the most recently created challenge
-					trending - sort by the most trending challenge (most activity in the past 1 day)
-					popular - sort by the most popular challenge (most liked/shared of all time)
-				3. limit = <number of values> - number of values to limit in the returned results
+			if (!serverUtils.validateQueryParams(req.query, validationParams)) {
+				return res.sendStatus(400);
+			}
 
-				Note: all query options can be cascaded on top of each other and the overall
-				effect will be an intersection.
-			**/
 			var meId = (req.user) ? (req.user.id) : (0);
 
 			var cypherQuery;
@@ -61,7 +75,7 @@ var routes = function(db) {
 						" RETURN e, poster, like_count, comment_count, COUNT(like), (like_count + comment_count) AS popularity_count ";
 
 			if (req.query.sortBy) {
-				if (req.query.sortBy == "dateCreated") {
+				if (req.query.sortBy == "date") {
 					cypherQuery += " ORDER BY e.created DESC;";
 				} else if (req.query.sortBy == "popularity") {
 					cypherQuery += " ORDER BY popularity_count DESC;";
@@ -69,7 +83,10 @@ var routes = function(db) {
 			}
 
 			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+    				return res.sendStatus(500);
+    			}
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
@@ -78,7 +95,7 @@ var routes = function(db) {
 					output.push(data);
     			}
 
-    			res.json(output);
+    			return res.json(output);
 			});
 		})
 
@@ -88,7 +105,45 @@ var routes = function(db) {
 				POST a new entry node, and link it to a Challenge node.
 			**/
 
-			logger.debug("POST on /api/entries, req.body.steps is " + JSON.stringify(req.body.steps));
+			logger.debug("POST received on /api/entries, req.body: " + JSON.stringify(req.body));
+
+			var validationParams = [
+				{
+					name: "challengeId",
+					type: "id",
+					required: "yes"
+				},
+				{
+					name: "caption",
+					type: "string",
+					required: "yes"
+				},
+				{
+					name: "imageHeight",
+					type: "number",
+					required: "yes"
+				},
+				{
+					name: "imageWidth",
+					type: "number",
+					required: "yes"
+				},
+				{
+					name: "imageType",
+					type: "imageType",
+					required: "yes"
+				},
+				{
+					name: "created",
+					type: "number",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
 			var id = shortid.generate();
 			/**
 				First create the entry node.  Then later, link them to Filter nodes.
@@ -104,7 +159,10 @@ var routes = function(db) {
 							"})-[:PART_OF]->(c), (u)<-[r:POSTED_BY]-(e) RETURN e;";
 			
 			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) throw err;
+				if(err) {
+					logger.dbError(err, cypherQuery);
+					return res.sendStatus(500);
+				}
 
 				var newEntryId = result.data[0].id;
 
@@ -164,7 +222,8 @@ var routes = function(db) {
 
 				async.series(createFilterNodesFunctions, function(err, filterNodes) {
 					if (err) {
-						throw err;
+						logger.error("Created Entry Node, but error creating Filter Nodes");
+						return res.sendStatus(500);
 					}
 
 					var cypherQuery = "MATCH (e:Entry {id: '" + newEntryId + "'}) ";
@@ -188,7 +247,10 @@ var routes = function(db) {
 					cypherQuery += " return e;";
 
 					db.cypherQuery(cypherQuery, function(err, result){
-						if(err) throw err;
+						if(err) {
+							logger.dbError(err, cypherQuery);
+							return res.sendStatus(500);
+						}
 
 						if (result.data.length > 0) {
 
@@ -202,19 +264,24 @@ var routes = function(db) {
 								var targetImage = global.appRoot + config.path.cacheImages + req.body.challengeId + "-" + hash + "." + mime.extension(req.body.imageType);
 
 								applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
-
 							}
 
 							var imagePaths = []; //list of image paths for each sub step
 	    					async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
-	    						if (err) throw err;
+	    						if (err) {
+	    							logger.error("Error creating Images for the Entry Steps: " + err);
+	    							return res.sendStatus(500);
+	    						}
 
 	    						//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
 	    						var targetEntryImage = global.appRoot + config.path.entryImages + id + "." + mime.extension(req.body.imageType);
 	    						serverUtils.copyFile(imagePaths[imagePaths.length - 1], targetEntryImage, function(err) {
-	    							if (err) throw err;
+	    							if (err) {
+	    								logger.error("Error creating the final Entry Image: " + err);
+	    								return res.sendStatus(500);
+	    							}
 
-	    							res.json(result.data[0]);
+	    							return res.json(result.data[0]);
 	    						});
 	    					});
 							
@@ -233,6 +300,21 @@ var routes = function(db) {
 				GET the specific entry node data.  
 				Returns a single JSON object of type entry
 			**/
+
+			logger.debug("GET received o /api/entries/" + req.params.entryId + ", query: " + JSON.stringify(req.query));
+
+			var validationParams = [
+				{
+					name: "entryId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
+
 			var meId = (req.user) ? (req.user.id) : (0);
 
 			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'})-[:POSTED_BY]->(poster:User) " +
@@ -245,81 +327,14 @@ var routes = function(db) {
 						" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
 	
 			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+    				return res.sendStatus(500);
+    			}
 
     			var data = dataUtils.constructEntityData("entry", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], null, 0, null, null, null, result.data[0][4] > 0, "recentlyPosted", null, null, null, null);
-    			res.json(data);
+    			return res.json(data);
 			});
-		})
-
-		.put(function(req, res){
-
-			/**
-				PUT the specific entry.  Replace the data with the incoming values.
-				Returns the updated JSON object.
-			**/
-
-			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'}) ";
-
-			cypherQuery += " SET ";
-
-			// In PUT requests, the missing properties should be Removed from the node.  Hence, setting them to NULL
-			cypherQuery += " e.steps = " + ((req.body.steps) ? ("'" + req.body.steps + "'") : "NULL") + " , ";
-			cypherQuery += " e.created = " + ((req.body.created) ? ("'" + req.body.created + "'") : "NULL") + " , ";
-			cypherQuery += " e.caption = " + ((req.body.caption) ? ("'" + req.body.caption + "'") : "NULL") + " ";
-
-			cypherQuery += " RETURN e;";
-
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
-
-    			res.json(result.data[0]);
-			});
-		})
-
-		.patch(function(req, res){
-
-			/**
-				PATCH the specific entry.  Update some properties of the entry.
-				Returns the updated JSON object.
-			**/
-
-			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'}) ";
-
-			cypherQuery += " SET ";
-
-			// In PATCH request, we updated only the available properties, and leave the rest
-			// in tact with their current values.
-			var addComma = false;
-			if (req.body.image) {
-				cypherQuery += " e.steps = '" + req.body.steps + "' ";
-				addComma = true;
-			}
-
-			if (req.body.created) {
-				if (addComma) {
-					cypherQuery += " , ";
-				}
-				cypherQuery += " e.created = '" + req.body.created + "' ";
-				addComma = true;
-			}
-
-			if (req.body.title) {
-				if (addComma) {
-					cypherQuery += " , ";
-				}
-				cypherQuery += " e.title = '" + req.body.title + "' ";
-				addComma = true;
-			}
-
-			cypherQuery += " RETURN e;";
-
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
-
-    			res.json(result.data[0]);
-			});
-
 		})
 
 		.delete(function(req, res){
@@ -329,68 +344,105 @@ var routes = function(db) {
 				Deletes the comments linked to this Entry up to level 2 (we currently only support comments till level 2)
 			**/
 
+			logger.debug("DELETE received on /api/entries/" + req.params.entryId);
+
+			var validationParams = [
+				{
+					name: "entryId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
+
 			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'}) OPTIONAL MATCH (e)<-[:POSTED_IN*1..2]-(comment:Comment) detach delete comment, e;";
 
 			db.cypherQuery(cypherQuery, function(err, result) {
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+    				return res.sendStatus(500);
+    			}
 
-    			res.json(result.data);
+    			return res.json(result.data);
 			});
 		});
 
-		entryRouter.route("/:entryId/like") // /api/entries/:entryId/like
+	entryRouter.route("/:entryId/like") // /api/entries/:entryId/like
 
 		.get(function(req, res) { //get current like status
-			if (req.user && req.user.id) {
-	      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
-	      			"'})-[:LIKES]->(e:Entry {id: '" + req.params.entryId + "'}) RETURN e;";
-	      		db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
 
-	                var output = {};
-	                if (result.data.length == 1) {
-	                	output = {likeStatus : "on"};
-	                } else {
-	                	output = {likeStatus : "off"};
-	                }
+			logger.debug("GET received on /api/entries/" + req.params.entryId + "/like, query: " + JSON.stringify(req.query));
 
-	                res.json(output);
-				});
-      		} else {
-      			res.json({error: "Not Logged In"});
-      		}
+			var validationParams = [
+				{
+					name: "entryId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
+      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
+      			"'})-[:LIKES]->(e:Entry {id: '" + req.params.entryId + "'}) RETURN e;";
+      		db.cypherQuery(cypherQuery, function(err, result){
+                if(err) {
+                	logger.dbError(err, cypherQuery);
+                	return res.sendStatus(500);
+                }
+
+                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
+
+                return res.json(output);
+			});
+
 		})
 		.put(function(req, res) {
+			
+			logger.debug("PUT received on /api/entries/" + req.params.entryId + "/like");
+
+			var validationParams = [
+				{
+					name: "entryId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
 			if (req.body.likeAction == "like") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
       				"'}), (e:Entry {id: '" + req.params.entryId + "'}) CREATE (u)-[r:LIKES {created: '" + req.body.created + "'}]->(e) RETURN r;";
       			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
-
-	                var output = {};
-
-	                if (result.data.length == 1) {
-	                	output.likeStatus = "on";
-	                } else {
-	                	output.likeStatus = "off";
+	                if(err) {
+	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
 	                }
-	                res.json(output);
+
+	                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
+
+	                return res.json(output);
 				});
       		} else if (req.body.likeAction == "unlike") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
       				"'})-[r:LIKES]->(e:Entry {id: '" + req.params.entryId + "'}) DELETE r RETURN COUNT(r);";
       			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
+	                if(err) {
+	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
+	                }
 
-					var output = {};
-
-					if (result.data.length == 1) {
-						output.likeStatus = "off";
-					} else {
-						output.likeStatus = "on";
-					}
+					var output = {likeStatus: (result.data.length == 1) ? "off" : "on"};
 					
-					res.json(output);
+					return res.json(output);
 				});
       		}
 		});

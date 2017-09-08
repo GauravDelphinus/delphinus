@@ -961,11 +961,7 @@ function parseEntry(entry) {
 /*****************************************************************************************/
 
 function constructJSONObject(jsonObj) {
-	jsonObj.imageSource = "challengeId"; // Can be "url" | "challenge" | "blob"
-										// url is path to any web url
-										// challengeId is the challengeId
-										// blob is the base64 encoded version of the image data itself
-	jsonObj.imageData = challengeId;
+
 	jsonObj.challengeId = challengeId;
 	jsonObj.created = (new Date()).getTime();
 	jsonObj.caption = $("#bannerText").prop("value");

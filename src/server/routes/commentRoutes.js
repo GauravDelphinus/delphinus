@@ -2,6 +2,8 @@ var express = require("express");
 var async = require("async");
 var shortid = require("shortid");
 var config = require("../config");
+var logger = require("../logger");
+var serverUtils = require("../serverUtils");
 
 var routes = function(db) {
 
@@ -11,23 +13,35 @@ var routes = function(db) {
 
 		.get(function(req, res){
 
-			/**
-				GET comments that match the given query parameters.
+			logger.debug("GET received on /api/comments, req.query = " + JSON.stringify(req.query));
 
-				Typical call would be a GET to the URL /api/comments?param1=value1&param2=value2 etc.
+			var validationParams = [
+				{
+					name: "entityId",
+					type: "id"
+				},
+				{
+					name: "user",
+					type: "id"
+				},
+				{
+					name: "category",
+					type: "id"
+				},
+				{
+					name: "sortBy",
+					type: ["popularity", "date", "reverseDate"],
+					required: "yes"
+				},
+				{
+					name: "count",
+					type: "number"
+				}
+			];
 
-				Currently supported query paramters:
-				1. entityId = id of entity to which the comments are attached (mandatory)
-				2. sortby = recent | trending | popular
-					recent - sort by the most recently created challenge
-					trending - sort by the most trending challenge (most activity in the past 1 day)
-					popular - sort by the most popular challenge (most liked/shared of all time)
-				3. limit = <number of values> - number of values to limit in the returned results
-				4. user = <user id> - comments posted by this user
-
-				Note: all query options can be cascaded on top of each other and the overall
-				effect will be an intersection.
-			**/
+			if (!serverUtils.validateQueryParams(req.query, validationParams)) {
+				return res.sendStatus(400);
+			}
 
 			var cypherQuery;
 
@@ -61,7 +75,10 @@ var routes = function(db) {
 			cypherQuery += " ;";
 		
 			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+    				return res.sendStatus(500);
+    			}
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
@@ -88,7 +105,7 @@ var routes = function(db) {
 					output.push(data);
     			}
 
-    			res.json(output);
+    			return res.json(output);
 			});
 		})
 
@@ -97,6 +114,27 @@ var routes = function(db) {
 			/**
 				POST a new comment node
 			**/
+
+			logger.debug("POST received on /api/comments, req.body = " + JSON.stringify(req.body));
+
+			var validationParams = [
+				{
+					name: "entityId",
+					type: "id"
+				},
+				{
+					name: "created",
+					type: "number"
+				},
+				{
+					name: "text",
+					type: "string"
+				}	
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
 
 			var id = shortid.generate();
 			/**
@@ -112,7 +150,10 @@ var routes = function(db) {
 
 			
 			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) throw err;
+				if(err) {
+					logger.dbError(err, cypherQuery);
+					return res.sendStatus(500);
+				}
 
 				var newEntryId = result.data[0].id;
 
@@ -132,114 +173,11 @@ var routes = function(db) {
 				data.socialStatus.numLikes = 0;
 
 				data.text = c.text;
-				res.json(data);
+				return res.json(data);
 			});
 		});
 
 	commentRouter.route("/:commentId")
-
-		.get(function(req, res){
-
-			/**
-				GET the specific entry node data.  
-				Returns a single JSON object of type entry
-			**/
-
-			var cypherQuery = "MATCH (c:Comment {id: '" + req.params.commentId + "'})-[:POSTED_BY]->(u:User) ";
-
-			// add social count check
-			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(c) RETURN c, u, COUNT(u2)";
-			
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
-
-				var c = result.data[0][0];
-				var u = result.data[0][1];
-				var numLikes = result.data[0][2];
-
-				var data = {};
-				data.type = "comment";
-				data.id = c.id;
-
-				data.postedDate = e.created;
-				data.postedByUser = {};
-				data.postedByUser.id = u.id;
-				data.postedByUser.displayName = u.displayName;
-				data.postedByUser.image = u.image;
-
-				data.socialStatus = {};
-				data.socialStatus.numLikes = numLikes;
-
-				data.text = c.text;
-    			
-    			res.json(data);
-			});
-		})
-
-		.put(function(req, res){
-
-			/**
-				PUT the specific entry.  Replace the data with the incoming values.
-				Returns the updated JSON object.
-			**/
-
-			var cypherQuery = "MATCH (c:Comment {id: '" + req.params.commentId + "'}) ";
-
-			cypherQuery += " SET ";
-
-			// In PUT requests, the missing properties should be Removed from the node.  Hence, setting them to NULL
-			cypherQuery += " c.created = " + ((req.body.created) ? ("'" + req.body.created + "'") : "NULL") + " , ";
-			cypherQuery += " c.text = " + ((req.body.text) ? ("'" + req.body.text + "'") : "NULL") + " ";
-
-			cypherQuery += " RETURN c;";
-
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
-
-    			res.json(result.data[0]);
-			});
-		})
-
-		.patch(function(req, res){
-
-			/**
-				PATCH the specific entry.  Update some properties of the entry.
-				Returns the updated JSON object.
-			**/
-
-			var cypherQuery = "MATCH (c:Comment {id: '" + req.params.commentId + "'}) ";
-
-			cypherQuery += " SET ";
-
-			// In PATCH request, we updated only the available properties, and leave the rest
-			// in tact with their current values.
-			var addComma = false;
-
-			if (req.body.created) {
-				if (addComma) {
-					cypherQuery += " , ";
-				}
-				cypherQuery += " c.created = '" + req.body.created + "' ";
-				addComma = true;
-			}
-
-			if (req.body.text) {
-				if (addComma) {
-					cypherQuery += " , ";
-				}
-				cypherQuery += " c.text = '" + req.body.text + "' ";
-				addComma = true;
-			}
-
-			cypherQuery += " RETURN c;";
-
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
-
-    			res.json(result.data[0]);
-			});
-
-		})
 
 		.delete(function(req, res){
 			
@@ -247,71 +185,120 @@ var routes = function(db) {
 				DELETE will permantently delete the specified comment, along with all child comments.  Call with Caution!
 			**/
 
+			logger.debug("DELETE received on /api/comments/" + req.params.commentId);
+
+			var validationParams = [
+				{
+					name: "commentId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
 			var cypherQuery = "MATCH (c:Comment {id: '" + req.params.commentId + "'}) OPTIONAL MATCH (c)<-[:POSTED_IN*1..2]-(comment:Comment) detach delete comment, c;";
 
 			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+    				return res.sendStatus(500);
+    			}
 
-    			res.json(result.data);
+    			return res.json(result.data);
 			});
 		});
 
-		commentRouter.route("/:commentId/like") // /api/comments/:commentId/like
+	commentRouter.route("/:commentId/like") // /api/comments/:commentId/like
 
 		.get(function(req, res) { //get current like status
-			if (req.user && req.user.id) {
-	      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
-	      			"'})-[:LIKES]->(c:Comment {id: '" + req.params.commentId + "'}) RETURN c;";
 
-	      		db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
+			logger.debug("GET received on /api/comments/" + req.params.commentId + "/like, query: " + JSON.stringify(req.query));
 
-	                var output = {};
-	                if (result.data.length == 1) {
-	                	output = {likeStatus : "on"};
-	                } else {
-	                	output = {likeStatus : "off"};
-	                }
+			var validationParams = [
+				{
+					name: "commentId",
+					type: "id",
+					required: "yes"
+				}
+			];
 
-	                res.json(output);
-				});
-      		} else {
-      			res.json({error: "Not Logged In"});
-      		}
+			if (!serverUtils.validateQueryParams(req.params, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
+      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
+      			"'})-[:LIKES]->(c:Comment {id: '" + req.params.commentId + "'}) RETURN c;";
+
+      		db.cypherQuery(cypherQuery, function(err, result){
+                if(err) {
+                	logger.dbError(err, cypherQuery);
+                	return res.sendStatus(500);
+                }
+
+                var output = {};
+         		output.likeStatus = (result.data.length == 1) ? "on" : "off";
+
+                return res.json(output);
+			});
+
 		})
+
 		.put(function(req, res) {
+
+			logger.debug("PUT received on /api/comments/" + req.params.commentId + "/like, req.body = " + JSON.stringify(req.body));
+
+			var validationParams = [
+				{
+					name: "commentId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
+			validationParams = [
+				{
+					name: "created",
+					type: "number",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams)) {
+				return res.sendStatus(400);
+			}
+
 			if (req.body.likeAction == "like") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
       				"'}), (c:Comment {id: '" + req.params.commentId + "'}) CREATE (u)-[r:LIKES {created: '" + req.body.created + "'}]->(c) RETURN r;";
       			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
-
-	                var output = {};
-
-	                if (result.data.length == 1) {
-
-	                	output.likeStatus = "on";
-	                } else {
-
-	                	output.likeStatus = "off";
+	                if(err) {
+	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
 	                }
-	                res.json(output);
+
+	                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
+
+	                return res.json(output);
 				});
       		} else if (req.body.likeAction == "unlike") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
       				"'})-[r:LIKES]->(c:Comment {id: '" + req.params.commentId + "'}) DELETE r RETURN COUNT(r);";
       			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
+	                if(err) {
+	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
+	                }
 
-					var output = {};
-
-					if (result.data.length == 1) {
-						output.likeStatus = "off";
-					} else {
-						output.likeStatus = "on";
-					}
+					var output = {likeStatus: (result.data.length == 1) ? "off" : "on"};
 					
-					res.json(output);
+					return res.json(output);
 				});
       		}
 		});

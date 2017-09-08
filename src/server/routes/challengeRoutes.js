@@ -14,23 +14,6 @@ var routes = function(db) {
 
 	challengeRouter.route("/") // ROUTER FOR /api/challenges
 
-		/** 
-			GET challenges matching the query paramters.
-			Typical call would be a GET to the URL /api/challenges?param1=value1&param2=value2 etc.
-
-			Currently supported query paramters:
-			1. sortBy (required)
-				dateCreated - sort by the most recently created challenge
-				popularity - sort by popularity of challenge (likes + comments + entries)
-			2. postedBy (optional)
-				<user id> - only return challenges posted by the specified user
-			3. category (optional)
-				<category id> - only return challenges within the specified category (refer categories.json for list of categories)
-
-			Note: all query options can be cascaded on top of each other and the overall
-			effect will be an intersection.
-		**/
-
 		.get(function(req, res){
 
 			logger.debug("GET received on /api/challenges, query: " + JSON.stringify(req.query));
@@ -47,13 +30,12 @@ var routes = function(db) {
 				},
 				{
 					name: "category",
-					type: "id"
+					type: "category"
 				}
 			];
 
 			if (!serverUtils.validateQueryParams(req.query, validationParams)) {
-				res.sendStatus(400);
-				return;
+				return res.sendStatus(400);
 			}
 
 			var cypherQuery = "";
@@ -90,8 +72,7 @@ var routes = function(db) {
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) {
     				logger.dbError(err, cypherQuery);
-					res.sendStatus(500);
-    				return;
+					return res.sendStatus(500);
     			}
 
     			var output = [];
@@ -101,7 +82,7 @@ var routes = function(db) {
 					output.push(data);
 
     			}
-    			res.json(output);
+    			return res.json(output);
 			});
 		})
 
@@ -110,6 +91,40 @@ var routes = function(db) {
 			/**
 				POST a new challenge node.
 			**/
+
+			logger.debug("POST received on /api/challenges, body: " + JSON.stringify(req.body));
+
+			var validationParams = [
+				{
+					name: "imageDataURI",
+					required: "yes",
+					type: "imageData"
+				},
+				{
+					name: "imageType",
+					type: "imageType",
+					required: "yes"
+				},
+				{
+					name: "category",
+					type: "id",
+					required: "yes"
+				},
+				{
+					name: "created",
+					type: "number",
+					required: "yes"
+				},
+				{
+					name: "caption",
+					type: "string",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
 
 			// Store the incoming base64 encoded image into a local image file first
 			var fs = require('fs');
@@ -144,7 +159,10 @@ var routes = function(db) {
 					"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
 			
 				db.cypherQuery(cypherQuery, function(err, result){
-					if(err) throw err;
+					if(err) {
+						logger.dbError(err, cypherQuery);
+						return res.sendStatus(500);
+					}
 
 					//now, check if the user selected to share to social networks
 					if (req.body.socialShare) {
@@ -161,7 +179,7 @@ var routes = function(db) {
 					        });
 						}
 					}
-					res.json(result.data[0]);
+					return res.json(result.data[0]);
 				});
 			});
 		});
@@ -170,12 +188,19 @@ var routes = function(db) {
 
 		.get(function(req, res){
 
-			/**
-				GET the specific challenge node data.  
-				Returns a single JSON object of type challenge
-			**/
+			logger.debug("GET received on /api/challenges/" + req.params.challengeId + ", query: " + JSON.stringify(req.query));
 
-			//var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'})-[:POSTED_BY]->(u:User) OPTIONAL MATCH (u2:User)-[:LIKES]->(c) OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) RETURN c, u, COUNT(u2), COUNT(comment), COUNT(entry);";
+			var validationParams = [
+				{
+					name: "challengeId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
 
 			var meId = (req.user) ? (req.user.id) : (0);
 
@@ -191,89 +216,14 @@ var routes = function(db) {
 						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), category ORDER BY c.created DESC;";
 
 			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+    				return res.sendStatus(500);
+    			}
 
     			var data = dataUtils.constructEntityData("challenge", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], result.data[0][4], 0, null, null, null, result.data[0][5] > 0, "none", null, null, null, null, result.data[0][6]);
-    			res.json(data);
+    			return res.json(data);
 			});
-		})
-
-		.put(function(req, res){
-
-			/**
-				PUT the specific challenge.  Replace the data with the incoming values.
-				Returns the updated JSON object.
-			**/
-
-			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'}) ";
-
-			cypherQuery += " SET ";
-
-			// In PUT requests, the missing properties should be Removed from the node.  Hence, setting them to NULL
-			cypherQuery += " c.image = " + ((req.body.image) ? ("'" + req.body.image + "'") : "NULL") + " , ";
-			cypherQuery += " c.created = " + ((req.body.created) ? ("'" + req.body.created + "'") : "NULL") + " , ";
-			cypherQuery += " c.title = " + ((req.body.title) ? ("'" + req.body.title + "'") : "NULL") + " ";
-
-			cypherQuery += " RETURN c;";
-
-			//console.log("PUT received, Running cypherQuery: " + cypherQuery);
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
-
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
-
-    			res.json(result.data[0]);
-			});
-		})
-
-		.patch(function(req, res){
-
-			/**
-				PATCH the specific challenge.  Update some properties of the challenge.
-				Returns the updated JSON object.
-			**/
-
-			var cypherQuery = "MATCH (c:Challenge {id : '" + req.params.challengeId + "'}) ";
-
-			cypherQuery += " SET ";
-
-			// In PATCH request, we updated only the available properties, and leave the rest
-			// in tact with their current values.
-			var addComma = false;
-			if (req.body.image) {
-				cypherQuery += " c.image = '" + req.body.image + "' ";
-				addComma = true;
-			}
-
-			if (req.body.created) {
-				if (addComma) {
-					cypherQuery += " , ";
-				}
-				cypherQuery += " c.created = '" + req.body.created + "' ";
-				addComma = true;
-			}
-
-			if (req.body.title) {
-				if (addComma) {
-					cypherQuery += " , ";
-				}
-				cypherQuery += " c.title = '" + req.body.title + "' ";
-				addComma = true;
-			}
-
-			cypherQuery += " RETURN c;";
-
-			//console.log("PATCH received, Running cypherQuery: " + cypherQuery);
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
-
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
-
-    			res.json(result.data[0]);
-			});
-
 		})
 
 		.delete(function(req, res){
@@ -282,86 +232,92 @@ var routes = function(db) {
 				DELETE will permantently delete the specified node.  Call with Caution!
 			**/
 
+			logger.debug("DELETE received on /api/challenges/" + req.params.challengeid);
+
+			var validationParams = [
+				{
+					name: "challengeId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
+
 			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'}) OPTIONAL MATCH (c)<-[:POSTED_IN*1..2]-(challengeComment:Comment) OPTIONAL MATCH (c)<-[:PART_OF]-(e:Entry) OPTIONAL MATCH(e)<-[:POSTED_IN*1..2]-(entryComment:Comment) DETACH DELETE challengeComment, entryComment, c, e;";
 
-			//console.log("DELETE received, Running cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+    				return res.sendStatus(500);
+    			}
 
-    			//console.log(result.data); // delivers an array of query results
-    			//console.log(result.columns); // delivers an array of names of objects getting returned
-
-    			res.json(result.data);
+    			return res.json(result.data);
 			});
 		});
 
 	challengeRouter.route("/:challengeId/like") // /api/challenges/:challengeId/like
 
-		.get(function(req, res) { //get current like status
-			if (req.user && req.user.id) {
-	      		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
-	      			"'})-[:LIKES]->(c:Challenge {id: '" + req.params.challengeId + "'}) RETURN c;";
-	      		//console.log("running cypherQuery: " + cypherQuery);
-	      		db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
-
-	                //console.log("result of get likes is " + JSON.stringify(result.data)); // delivers an array of query results
-	                //console.log(result.columns); // delivers an array of names of objects getting returned
-
-	                //console.log(result.data);
-	                var output = {};
-	                if (result.data.length == 1) {
-	                	output = {likeStatus : "on"};
-	                } else {
-	                	output = {likeStatus : "off"};
-	                }
-
-	                //console.log("sending back to client: " + JSON.stringify(output));
-	                res.json(output);
-				});
-      		} else {
-      			res.json({error: "Not Logged In"});
-      		}
-		})
-
 		.put(function(req, res) {
+
+			logger.debug("PUT received on /api/challenges/" + req.params.challengeId + "/like, req.body = " + JSON.stringify(req.body));
+
+			var validationParams = [
+				{
+					name: "likeAction",
+					type: ["like", "unlike"],
+					required: "yes"
+				},
+				{
+					name: "created",
+					type: "number",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
+			validationParams = [
+				{
+					name: "challengeId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
+
 			if (req.body.likeAction == "like") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
       				"'}), (c:Challenge {id: '" + req.params.challengeId + "'}) CREATE (u)-[r:LIKES {created: '" + req.body.created + "'}]->(c) RETURN r;";
       			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
-
-	                //console.log(result.data); // delivers an array of query results
-	                //console.log(result.columns); // delivers an array of names of objects getting returned
-
-	                var output = {};
-
-	                //console.log(result.data);
-	                if (result.data.length == 1) {
-
-	                	output.likeStatus = "on";
-	                } else {
-
-	                	output.likeStatus = "off";
+	                if(err) {
+	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
 	                }
-	                res.json(output);
+
+	                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
+
+	                return res.json(output);
 				});
       		} else if (req.body.likeAction == "unlike") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
       				"'})-[r:LIKES]->(c:Challenge {id: '" + req.params.challengeId + "'}) DELETE r RETURN COUNT(r);";
       			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) throw err;
+	                if(err) {
+	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
+	                }
 
-					//console.log("result of deletion: " + JSON.stringify(result));
-					var output = {};
+					var output = {likeStatus: (result.data.length == 1) ? "off" : "on"};
 
-					if (result.data.length == 1) {
-						output.likeStatus = "off";
-					} else {
-						output.likeStatus = "on";
-					}
-					
-					res.json(output);
+					return res.json(output);
 				});
       		}
 		});

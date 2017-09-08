@@ -33,6 +33,7 @@ var path = require("path");
 var config = require("../config");
 var shortid = require("shortid");
 var dataUtils = require("../dataUtils");
+var logger = require("../logger");
 
 var routes = function(db) {
 	var feedRouter = express.Router();
@@ -40,6 +41,8 @@ var routes = function(db) {
 	feedRouter.route("/") // ROUTER FOR /api/feeds
 
 		.get(function(req, res){
+
+			logger.debug("GET received on /api/feeds, query: " + JSON.stringify(req.query));
 
 			var runQueryFunctions = [];
 			var resultArrays = [];
@@ -102,6 +105,7 @@ var routes = function(db) {
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -130,6 +134,7 @@ var routes = function(db) {
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -166,6 +171,7 @@ var routes = function(db) {
 					
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -201,6 +207,7 @@ var routes = function(db) {
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -235,7 +242,8 @@ var routes = function(db) {
 						" RETURN c, poster, like_count, comment_count, entry_count, liked[0], likers[0], COUNT(like), category ORDER BY liked[0] DESC;";
 
 					db.cypherQuery(cypherQuery, function(err, result) {
-						if (err) {	
+						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -269,6 +277,7 @@ var routes = function(db) {
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -310,7 +319,8 @@ var routes = function(db) {
 						" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
 
 					db.cypherQuery(cypherQuery, function(err, result) {
-						if (err) {	
+						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -352,7 +362,8 @@ var routes = function(db) {
 						" RETURN c, poster, size(liked) as like_count, comment_count, entry_count, liked[0], likers[0], COUNT(like), category ORDER BY liked[0] DESC;";
 
 					db.cypherQuery(cypherQuery, function(err, result) {
-						if (err) {	
+						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -394,7 +405,8 @@ var routes = function(db) {
 						" RETURN c, poster, like_count, size(comments) AS comment_count, entry_count, comments[0], commenters[0], COUNT(like), category ORDER BY comments[0].created DESC;";
 					
 					db.cypherQuery(cypherQuery, function(err, result) {
-						if (err) {	
+						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -432,7 +444,8 @@ var routes = function(db) {
 						" RETURN e, poster, size(liked) as like_count, comment_count, liked[0], likers[0], COUNT(like) ORDER BY liked[0] DESC;";
 
 					db.cypherQuery(cypherQuery, function(err, result) {
-						if (err) {	
+						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -472,7 +485,8 @@ var routes = function(db) {
 						" ORDER BY comments[0].created DESC; ";
 						
 					db.cypherQuery(cypherQuery, function(err, result) {
-						if (err) {	
+						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -505,6 +519,7 @@ var routes = function(db) {
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -531,6 +546,7 @@ var routes = function(db) {
 
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
+							logger.dbError(err, cypherQuery);
 							callback(err, 0);
 						}
 
@@ -572,6 +588,7 @@ var routes = function(db) {
 
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
+						logger.dbError(err, cypherQuery);
 						callback(err, 0);
 					}
 
@@ -603,6 +620,7 @@ var routes = function(db) {
 
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
+						logger.dbError(err, cypherQuery);
 						callback(err, 0);
 					}
 
@@ -632,6 +650,7 @@ var routes = function(db) {
 
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
+						logger.dbError(err, cypherQuery);
 						callback(err, 0);
 					}
 
@@ -661,6 +680,7 @@ var routes = function(db) {
 
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
+						logger.dbError(err, cypherQuery);
 						callback(err, 0);
 					}
 
@@ -676,9 +696,14 @@ var routes = function(db) {
 			});
 
 			async.series(runQueryFunctions, function(err, unusedList) {
+				if (err) {
+					logger.error("Error with one of the query functions: " + err);
+					return res.sendStatus(500);
+				}
+
 				var mergedOutput = [];
 				mergeFeeds(resultArrays, mergedOutput);
-				res.json(mergedOutput);
+				return res.json(mergedOutput);
 			});
 		});
 

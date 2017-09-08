@@ -321,12 +321,12 @@ function setupEntriesTab() {
 
 function setupFollowersTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "followers", "Followers");
-	createAndAppendContentContainer(tabDiv, 0, "followers", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followedId=" + userInfo.id}]);
+	createAndAppendContentContainer(tabDiv, 0, "followers", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followedId=" + userInfo.id + "&sortBy=lastSeen"}]);
 }
 
 function setupFollowingTab() {
 	var tabDiv = appendNewTab("mainTabGroup", "following", "Following");
-	createAndAppendContentContainer(tabDiv, 0, "following", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followingId=" + userInfo.id}]);
+	createAndAppendContentContainer(tabDiv, 0, "following", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followingId=" + userInfo.id + "&sortBy=lastSeen"}]);
 }
 
 function setupAndShowCarousel() {

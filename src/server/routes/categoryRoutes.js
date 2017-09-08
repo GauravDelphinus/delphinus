@@ -1,4 +1,6 @@
 var express = require("express");
+var logger = require("../logger");
+var serverUtils = require("../serverUtils");
 
 var routes = function(db) {
 	var categoryRouter = express.Router();
@@ -6,6 +8,19 @@ var routes = function(db) {
 	categoryRouter.route("/") // ROUTER FOR /api/categories
 
 		.get(function(req, res){
+
+			logger.debug("GET received on /api/categories, query = " + JSON.stringify(req.query));
+
+			var validationParams = [
+				{
+					name: "category",
+					type: "category"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.query, validationParams)) {
+				return res.sendStatus(400);
+			}
 
 			var cypherQuery = "MATCH (c:Category)";
 
@@ -18,9 +33,12 @@ var routes = function(db) {
 			cypherQuery += " RETURN c;";
 
 			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) throw err;
+    			if(err) {
+    				logger.dbError(err, cypherQuery);
+    				return res.sendStatus(500);
+    			}
 
-    			res.json(result.data);
+    			return res.json(result.data);
 			});
 		});
 

@@ -8,6 +8,7 @@ var spawn = require("child_process").spawn;
 var execFile = require("child_process").execFile;
 var filterUtils = require("../filterUtils");
 var logger = require("../logger");
+var serverUtils = require("../serverUtils");
 
 var routes = function(db) {
 
@@ -15,93 +16,157 @@ var routes = function(db) {
 	var imageProcessor = require("../imageProcessor");
 
 	filterRouter.route("/")
-	.get(function(req, res) {
-		var cypherQuery;
+		.get(function(req, res) {
 
-		if (req.query.type == "filter" && req.query.filterType == "preset") {
-			cypherQuery = "MATCH (f:Filter {filter_type : 'preset'}) RETURN f;";
-		} else if (req.query.type == "layout" && req.query.layoutType == "preset") {
-			cypherQuery = "MATCH (l:Layout {layout_type : 'preset'}) RETURN l;";
-		} else if (req.query.type == "artifact" && req.query.artifactType == "preset") {
-			cypherQuery = "MATCH (a:Artifact {artifact_type : 'preset'}) RETURN a;";
-		} else if (req.query.type == "decoration" && req.query.decorationType == "preset") {
-			cypherQuery = "MATCH (d:Decoration {decoration_type : 'preset'}) RETURN d;";
-		}
+			logger.debug("GET received on /api/filters, query: " + JSON.stringify(req.query));
 
-		//console.log("Running cypherQuery: " + cypherQuery);
-		db.cypherQuery(cypherQuery, function(err, result){
-			if(err) throw err;
+			var validationParams = [
+				{
+					name: "type",
+					required: "yes",
+					type: ["filter", "layout", "artifact", "decoration"]
+				},
+				{
+					name: "filterType",
+					type: ["preset"]
+				},
+				{
+					name: "layoutType",
+					type: ["preset"]
+				},
+				{
+					name: "artifactType",
+					type: ["preset"]
+				},
+				{
+					name: "decorationType",
+					type: ["preset"]
+				}
+			];
 
-			var output = [];
-			for (var i = 0; i < result.data.length; i++) {
-				output.push([{id: result.data[i].id, name: result.data[i].name}]);
+			if (!serverUtils.validateQueryParams(req.query, validationParams)) {
+				return res.sendStatus(400);
 			}
-		
-			//console.log("for /api/filters returning to client: " + JSON.stringify(output));
 
-			res.json(output);
+			var cypherQuery;
+
+			if (req.query.type == "filter" && req.query.filterType && req.query.filterType == "preset") {
+				cypherQuery = "MATCH (f:Filter {filter_type : 'preset'}) RETURN f;";
+			} else if (req.query.type == "layout" && req.query.layoutType && req.query.layoutType == "preset") {
+				cypherQuery = "MATCH (l:Layout {layout_type : 'preset'}) RETURN l;";
+			} else if (req.query.type == "artifact" && req.query.artifactType && req.query.artifactType == "preset") {
+				cypherQuery = "MATCH (a:Artifact {artifact_type : 'preset'}) RETURN a;";
+			} else if (req.query.type == "decoration" && req.query.decorationType && req.query.decorationType == "preset") {
+				cypherQuery = "MATCH (d:Decoration {decoration_type : 'preset'}) RETURN d;";
+			} else {
+				logger.error("Invalid request received");
+				return res.sendStatus(400);
+			}
+
+			db.cypherQuery(cypherQuery, function(err, result){
+				if(err) {
+					logger.dbError(err, cypherQuery);
+					return res.sendStatus(500);
+				}
+
+				var output = [];
+				for (var i = 0; i < result.data.length; i++) {
+					output.push([{id: result.data[i].id, name: result.data[i].name}]);
+				}
+			
+				return res.json(output);
+			});
 		});
-	});
 
 	filterRouter.route("/apply") // /api/filters/apply ROUTE
-	.post(function(req, res){
-		var sourceImagePath;
-		var purgeImageAfterUse = false;
-		// Normalize the image
-		// check what format the image source is of
-		if (req.body.imageSource == "challengeId") {
-			// find local path to the challenge's source image
-			purgeImageAfterUse = false;
 
-			
-			dataUtils.getImageDataForChallenge(req.body.imageData, function(err, imageData){
-				if (err) throw err;
+		.post(function(req, res){
 
-				var image = req.body.imageData; //challengeId
-				sourceImagePath = global.appRoot + config.path.challengeImages + image + "." + mime.extension(imageData.imageType);
+			logger.debug("POST received on /api/filters/apply, body: " + JSON.stringify(req.body));
+
+			var validationParams = [
+				{
+					name: "challengeId",
+					required: "yes",
+					type: "id"
+				},
+				{
+					name: "caption",
+					type: "string",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
+			if (!req.body.steps || !filterUtils.validateSteps(req.body.steps)) {
+				logger.error("Steps validation failed, steps: " + JSON.stringify(req.body.steps));
+				return res.sendStatus(400);
+			}
+				
+			dataUtils.getImageDataForChallenge(req.body.challengeId, function(err, imageData){
+				if (err) {
+					return res.sendStatus(500);
+				}
+
+				var image = req.body.challengeId;
+				var sourceImagePath = global.appRoot + config.path.challengeImages + image + "." + mime.extension(imageData.imageType);
 	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
+	    			if (err) {
+	    				return res.sendStatus(500);
+	    			}
 
 	    			var hash = filterUtils.generateHash(JSON.stringify(steps));
-					var targetImageName = req.body.imageData + "-" + hash + "." + mime.extension(imageData.imageType);
+					var targetImageName = req.body.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
 					var targetImage = global.appRoot + config.path.cacheImages + targetImageName;
 	    				
 	    			imageProcessor.applyStepsToImage(sourceImagePath, targetImage, steps, req.body.caption, function(err, imagePath){
-						if (err) throw err;
+						if (err) {
+							return res.sendStatus(500);
+						}
 
 						var imageUrlPath = config.url.cacheImages + targetImageName;
 
 						var jsonObj = {"type" : "url", "imageData" : imageUrlPath};
 						res.setHeader('Content-Type', 'application/json');
-						res.send(JSON.stringify(jsonObj));
+
+						return res.send(JSON.stringify(jsonObj));
 					});
 	    		});
     		});
-		} else if (req.body.imageSource == "url") {
-			// download the external web image into a local temp path, also set the "delete" flag to true
-			purgeImageAfterUse = true;
-		} else if (req.body.imageSource == "blob") {
-			// convert the base64 encoded image blob into a local temp path, and set the purge flag to true
-			purgeImageAfterUse = true;
-		}
-		
-	});
+		});
 
 	filterRouter.route("/timelapse/:entryId") // /api/filters/timelapse ROUTE
-	.get(function(req, res){
-		logger.debug("GET received on /timelapse/" + req.params.entryId);
-		var sourceImagePath;
-		// Normalize the image
-		// check what format the image source is of
-		if (req.params.entryId) {
-			// find local path to the challenge's source image
+
+		.get(function(req, res){
+
+			logger.debug("GET received on api/filters/timelapse/" + req.params.entryId + ", query: " + JSON.stringify(req.query));
+			
+			var validationParams = [
+				{
+					name: "entryId",
+					required: "yes",
+					type: "id"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
 
 			dataUtils.getImageDataForEntry(req.params.entryId, function(err, imageData){
-				if (err) throw err;
+				if (err) {
+					return res.sendStatus(500);
+				}
 
-				sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image;
+				var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image;
 
 	    		dataUtils.normalizeSteps(imageData.steps, function(err, steps){
-	    			if (err) throw err;
+	    			if (err) {
+	    				return res.sendStatus(500);
+	    			}
 
 	    			//extract the steps (cumulative format) and generate the hash to 
 	    			//look for actual step images
@@ -123,7 +188,10 @@ var routes = function(db) {
 
 	    			var imagePaths = []; //list of image paths for each sub step
 	    			async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
-	    				if (err) throw err;
+	    				if (err) {
+	    					logger.error("Failed to apply the single steps - " + err);
+	    					return res.sendStatus(500);
+	    				}
 
 	    				var jsonObj = {};
 	    				jsonObj.timelapseData = [];
@@ -138,25 +206,14 @@ var routes = function(db) {
 	    				}
 
 						res.setHeader('Content-Type', 'application/json');
-						res.send(JSON.stringify(jsonObj));
+
+						return res.send(JSON.stringify(jsonObj));
 	    			});
 	    		});
 			});
-		}
-	});
+		});
 	
 	return filterRouter;
 };
-
-function sendImage(err, imagePath, purge) {
-	if (err) throw err;
-
-	var json = "{ image : '" + imagePath + "' }";
-	res.send(json); //, function(err) {
-			
-	if (purge) {
-		//unlink the tmp image
-	}
-}
 
 module.exports = routes;

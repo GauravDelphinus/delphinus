@@ -170,6 +170,10 @@ module.exports = {
 		return singleStepList;
 	},
 
+	validateSteps: function(steps) {
+		return true;
+	},
+
 	generateHash: function(string) {
 		var hash = 0;
 		if (string.length == 0) return hash;

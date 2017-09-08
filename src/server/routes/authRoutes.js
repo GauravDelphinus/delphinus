@@ -2,12 +2,15 @@ var express = require("express");
 var passport = require("passport");
 var config = require("../config");
 var dataUtils = require("../dataUtils");
+var logger = require("../logger");
 
 var routes = function(db) {
 	var authRouter = express.Router();
 
     authRouter.route("/")
         .get(function(req, res, next) {
+        	logger.debug("GET received on /auth, req.query = " + JSON.stringify(req.query));
+
             if (!req.session.redirectTo) {
                 /**
                     If the redirectTo is not set, this means that this wasn't set explicitly
@@ -15,12 +18,10 @@ var routes = function(db) {
                     on the "Sign In" link from some web page.  Check the referring site's URL
                     and set that to the redirectTo value in the session.
                 **/
-                //console.log("referrer: " + req.get('Referrer'));
                 req.session.redirectTo = req.get('Referrer');
             }
 
 			res.render("auth", {pageTitle: "Sign In - " + config.branding.siteName});
-
         });
 
     authRouter.route("/login")
