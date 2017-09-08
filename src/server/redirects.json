@@ -1,0 +1,8 @@
+{
+	"/challenge/" : "/challenges",
+	"/entry/" : "/entries",
+	"/user/" : "/users",
+	"/challenges" : "/",
+	"/entries" : "/",
+	"/users" : "/"
+}

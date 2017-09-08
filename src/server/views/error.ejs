@@ -1,0 +1,35 @@
+<html>
+
+  <head>
+  <link rel="stylesheet" href="/third-party/bootstrap/css/bootstrap.min.css">
+  <link ref="stylesheet" href="/third-party/font-awesome/css/font-awesome.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/styles.css">
+ <title>Oops! - Captionify.com</title>
+  </head>
+
+  <body>
+
+<div class="centerDisplay">
+	<div class="centerDisplayHeader">
+		<img src="/images/branding/captionify_logo_small.png">
+		<p class="centerDisplayTitle">Oops... Something's not right.  Sorry about that.</p>
+		<hr>
+	</div>
+	<div class="centerDisplayContent">
+	    <a href="/auth/twitter"><img src="/images/social/sign_in_with_twitter.png"></a><br>
+	    <a href="/auth/facebook"><img src="/images/social/sign_in_with_facebook.png"></a><br>
+	    <a href="/auth/login"><img src="/images/social/sign_in_with_email.png"></a>
+    </div>
+    <div class="centerDisplayFooter">
+    	<hr>
+    	<p>Let's take you to a <a href="<%=redirectURL%>">better place</a>.  Redirecting in <span id="redirectSeconds">5</span> seconds.</p>
+    </div>
+</div>
+<script>
+	var redirectURL = '<%=redirectURL%>';
+</script>
+<script src="/third-party/jquery/js/jquery.min.js"></script>
+<script src="/js/error.js"></script>
+  </body>
+
+</html>

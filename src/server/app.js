@@ -120,6 +120,21 @@ module.exports = function() {
 		});
 	});
 
+	//load the error page and then redirect to the appropriate
+	//page depending on the referrer
+	app.get("/error", function(req, res) {
+		var referrerURL = req.get('Referrer');
+		var redirectURL = "/"; //by default, redirect to home page
+
+		var redirects = require("./redirects");
+		for (redirect in redirects) {
+			if (referrerURL.includes(redirect)) {
+				redirectURL = redirects[redirect];
+				break;
+			}
+		}
+		res.render("error", {redirectURL: redirectURL});
+	});
 	
 	// 2 - Challenge Image
 	/*

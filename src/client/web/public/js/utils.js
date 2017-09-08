@@ -1779,6 +1779,8 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 				$("#" + contentTag + "Container").append(feedList);
 			}
 		}
+	}).fail(function() {
+		window.location.replace("/error");
 	});
 }
 

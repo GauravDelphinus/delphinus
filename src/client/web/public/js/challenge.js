@@ -12,11 +12,10 @@ $(document).ready(function(){
 
 function setupMainItem() {
 	$.getJSON('/api/challenges/' + challengeId, function(data) {
-		//console.log("result is " + JSON.stringify(data));
 		var mainElement = createMainElement(data);
 		$("#main").append(mainElement);
-
-		$("#mainTitle").text(data.caption);
+	}).fail(function() {
+		window.location.replace("/error");
 	});
 }
 

@@ -16,8 +16,8 @@ function setupMainItem() {
 	$.getJSON('/api/entries/' + entryId, function(data) {
 		var mainElement = createMainElement(data, true);
 		$("#main").append(mainElement);
-
-		$("#mainTitle").text(data.caption);
+	}).fail(function() {
+		window.location.replace("/error");
 	});
 }
 
@@ -34,6 +34,8 @@ function setupChallengeSidebar() {
 	$.getJSON('/api/challenges/' + challengeId, function(data) {
 		var element = createThumbnailElement(data);
 		$("#challenge").append(element);
+	}).fail(function() {
+		window.location.replace("/error");
 	});
 }
 
