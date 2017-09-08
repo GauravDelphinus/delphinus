@@ -12,26 +12,6 @@ module.exports = {
 	initializeDB : function(db) {
 		myDB = db;
 
-		/*
-		var setConstraintsQuery = "CREATE CONSTRAINT ON (c:Challenge) ASSERT c.id IS UNIQUE";
-		db.cypherQuery(setConstraintsQuery, function(err, result) {
-			if (err) throw err;
-
-		});
-
-		setConstraintsQuery = "CREATE CONSTRAINT ON (e:Entry) ASSERT e.id IS UNIQUE";
-		db.cypherQuery(setConstraintsQuery, function(err, result) {
-			if (err) throw err;
-
-		});
-
-		setConstraintsQuery = "CREATE CONSTRAINT ON (u:User) ASSERT u.id IS UNIQUE";
-		db.cypherQuery(setConstraintsQuery, function(err, result) {
-			if (err) throw err;
-
-		});
-		*/
-
 		//enumerate preset filters and create the nodes if not present
 
 		for (var key in presets.presetLayout) {
@@ -43,10 +23,9 @@ module.exports = {
 			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
 				
 			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) throw err;
-
-				//console.log(result.data); // delivers an array of query results
-
+				if(err) {
+					logger.dbError(err, cypherQuery);
+				}
 			});
 		}
 		for (var key in presets.presetFilter) {
@@ -58,10 +37,9 @@ module.exports = {
 			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
 				
 			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) throw err;
-
-				//console.log(result.data); // delivers an array of query results
-
+				if(err) {
+					logger.dbError(err, cypherQuery);
+				}
 			});
 		}
 		for (var key in presets.presetArtifact) {
@@ -73,10 +51,9 @@ module.exports = {
 			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
 				
 			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) throw err;
-
-				//console.log(result.data); // delivers an array of query results
-
+				if(err) {
+					logger.dbError(err, cypherQuery);
+				}
 			});
 		}
 		for (var key in presets.presetDecoration) {
@@ -88,10 +65,9 @@ module.exports = {
 			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
 				
 			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) throw err;
-
-				//console.log(result.data); // delivers an array of query results
-
+				if(err) {
+					logger.dbError(err, cypherQuery);
+				}
 			});
 		}
 
@@ -261,7 +237,9 @@ module.exports = {
 	getImageDataForChallenge : function(challengeId, next) {
 		var fetchChallengeQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) RETURN c;"
 		myDB.cypherQuery(fetchChallengeQuery, function(err, output){
-	    	if (err) throw err;
+	    	if (err) {
+	    		return next(err, null);
+	    	}
 
 	    	var c = output.data[0];
 	    	var imageData = {};
@@ -269,7 +247,7 @@ module.exports = {
 	    	imageData.imageWidth = c.image_width;
 	    	imageData.imageHeight = c.image_height;
 
-	    	next(0, imageData);
+	    	return next(0, imageData);
 	    });
 	},
 
@@ -290,7 +268,9 @@ module.exports = {
 		// First get the original image from the challenge
 		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id, c.image_type;"
 		myDB.cypherQuery(fetchChallengeQuery, function(err, output){
-	    		if (err) throw err;
+	    		if (err) {
+	    			return next(err, null);
+	    		}
 
 	    		var imageType = output.data[0][1];
 	    		var challengeId = output.data[0][0];
@@ -305,7 +285,9 @@ module.exports = {
 
 
 				myDB.cypherQuery(cypherQuery, function(err, result){
-	    			if(err) throw err;
+	    			if(err) {
+	    				return next(err, null);
+	    			}
 
 	    			//console.log(result.data); // delivers an array of query results
 
@@ -326,11 +308,7 @@ module.exports = {
 	    					var filter = {};
 		    				filter.effects = {};
 
-		    				if (filterFromDB.filter_type == "none") {
-		    		
-		    					// shouldn't happen
-		    					throw err;
-		    				} else if (filterFromDB.filter_type == "preset") {
+		    				if (filterFromDB.filter_type == "preset") {
 		    					filter.type = "preset";
 
 		    					filter.preset = filterFromDB.id;
@@ -395,7 +373,9 @@ module.exports = {
 		    					if (filterFromDB.settings_contrast == "on") {
 		    						filter.settings.contrast = { value: filterFromDB.settings_contrast_value};
 		    					}
-		    				} 
+		    				} else {
+		    					return next(new Error("Invalid type '" + filterFromDB.filter_type + "' found for filterFromDB.filter_type"), null);
+		    				}
 
 		    				filters.push(filter);
 
@@ -404,11 +384,7 @@ module.exports = {
 
 	    					var layout = {};
 
-		    				if (layoutFromDB.layout_type == "none") {
-		    		
-		    					// shouldn't happen
-		    					throw err;
-		    				} else if (layoutFromDB.layout_type == "preset") {
+		    				if (layoutFromDB.layout_type == "preset") {
 		    					layout.type = "preset";
 
 		    					layout.preset = layoutFromDB.id;
@@ -442,6 +418,8 @@ module.exports = {
 		    						layout.shear.xDegrees = parseInt(layoutFromDB.shear_xDegrees);
 		    						layout.shear.yDegrees = parseInt(layoutFromDB.shear_yDegrees);
 		    					}
+		    				} else {
+		    					return next(new Error("Invalid type '" + layoutFromDB.layout_type + "' found for layoutFromDB.layout_type"), null);
 		    				}
 
 		    				layouts.push(layout);
@@ -451,10 +429,7 @@ module.exports = {
 
 	    					var artifact = {};
 
-	    					if (artifactFromDB.artifact_type == "none") {
-	    						// shouldn't happen
-	    						throw err;
-	    					} else if (artifactFromDB.artifact_type == "preset") {
+	    					if (artifactFromDB.artifact_type == "preset") {
 	    						artifact.type = "preset";
 
 	    						artifact.preset = artifactFromDB.id;			
@@ -469,7 +444,9 @@ module.exports = {
 	    							artifact.banner.backgroundColor = artifactFromDB.banner_backgroundColor;
 	    							artifact.banner.textColor = artifactFromDB.banner_textColor;
 	    						}
-	    					}
+	    					} else {
+		    					return next(new Error("Invalid type '" + artifactFromDB.artifact_type + "' found for artifactFromDB.artifact_type"), null);
+		    				}
 
 	    					artifacts.push(artifact);
 
@@ -478,10 +455,7 @@ module.exports = {
 
 	    					var decoration = {};
 
-	    					if (decorationFromDB.decoration_type == "none") {
-	    						//shouldn't happen
-	    						throw err;
-	    					} else if (decorationFromDB.decoration_type == "preset") {
+	    					if (decorationFromDB.decoration_type == "preset") {
 	    						decoration.type = "preset";
 
 	    						decoration.preset = decorationFromDB.id;
@@ -494,7 +468,9 @@ module.exports = {
 	    							decoration.border.width = parseInt(decorationFromDB.border_width);
 	    							decoration.border.color = decorationFromDB.border_color;
 	    						}
-	    					}
+	    					} else {
+		    					return next(new Error("Invalid type '" + decorationFromDB.decoration_type + "' found for decorationFromDB.decoration_type"), null);
+		    				}
 
 	    					decorations.push(decoration);
 	    				}
@@ -517,7 +493,7 @@ module.exports = {
 	    				
 	    			}
 
-	    			next(0, { "challengeId" : challengeId, "image" : image, "imageType" : imageType, "steps" : steps, "caption" : imageCaption});
+	    			return next(0, { "challengeId" : challengeId, "image" : image, "imageType" : imageType, "steps" : steps, "caption" : imageCaption});
 	    	});
 
 		});
@@ -579,16 +555,8 @@ module.exports = {
 			}
 	**/
 	createFilterNode : function(filter, callback) {
-		if (filter.type == "none") {
-			// There's no need to create a filter node in this case.
-			// This shouldn't be called, and should get handled by caller
-			throw err;
-		} else if (filter.type == "user_defined") {
-			callback(null, filter.user_defined);
-			return;
-		} else if (filter.type == "preset") {
-			callback(null, filter.preset);
-			return;
+		if (filter.type == "preset") {
+			return callback(null, filter.preset);
 		} else if (filter.type == "custom") {
 			var cypherQuery = "CREATE (f:Filter {";
 			var id = shortid.generate();
@@ -665,26 +633,20 @@ module.exports = {
 			//console.log("Running cypherQuery: " + cypherQuery);
 					
 			myDB.cypherQuery(cypherQuery, function(err, result){
-	    		if(err) throw err;
+	    		if(err) {
+	    			return callback(err, 0);
+	    		}
 
-	    		//console.log(result.data[0]); // delivers an array of query results
-
-				callback(null, id);
+				return callback(null, id);
 			});
 		} else {
-			callback(new Error("Invalid filter.type value passed to createFilterNode: " + filter.type), 0);
+			return callback(new Error("Invalid filter.type value passed to createFilterNode: " + filter.type), 0);
 		}
 	},
 
 	createDecorationNode : function(decoration, callback) {
-		if (decoration.type == "none") {
-			throw err; // shouldn't happen
-		} else if (decoration.type == "user_defined") {
-			callback(null, parseInt(decoration.user_defined));
-			return;
-		} else if (decoration.type == "preset") {
-			callback(null, decoration.preset);
-			return;
+		if (decoration.type == "preset") {
+			return callback(null, decoration.preset);
 		} else if (decoration.type == "custom") {
 			var cypherQuery = "CREATE (d:Decoration {";
 			var id = shortid.generate();
@@ -705,16 +667,16 @@ module.exports = {
 			//console.log("Running cypherQuery: " + cypherQuery);
 
 			myDB.cypherQuery(cypherQuery, function(err, result) {
-				if (err) throw err;
+				if (err) {
+					return callback(err, 0);
+				}
 
-				//console.log(result.data[0]);
-
-				callback(null, id);
+				return callback(null, id);
 			});
 
 			return;
 		} else {
-			callback(new Error("Invalid decoration.type value passed to createDecorationNode: " + decoration.type), 0);
+			return callback(new Error("Invalid decoration.type value passed to createDecorationNode: " + decoration.type), 0);
 		}
 	},
 
@@ -731,14 +693,8 @@ module.exports = {
 		//console.log("createArtifactNode: artifact = " + JSON.stringify(artifact));
 		
 
-		if (artifact.type == "none") {
-			throw err; // shouldn't happen
-		} else if (artifact.type == "user_defined") {
-			callback(null, parseInt(artifact.user_defined));
-			return;
-		} else if (artifact.type == "preset") {
-			callback(null, artifact.preset);
-			return;
+		if (artifact.type == "preset") {
+			return callback(null, artifact.preset);
 		} else if (artifact.type == "custom") {
 			var cypherQuery = "CREATE (a:Artifact {";
 
@@ -763,32 +719,22 @@ module.exports = {
 			//console.log("Running cypherQuery: " + cypherQuery);
 
 			myDB.cypherQuery(cypherQuery, function(err, result) {
-				if (err) throw err;
+				if (err) {
+					return callback(err, 0);
+				}
 
-				//console.log(result.data[0]);
-
-				callback(null, id);
+				return callback(null, id);
 			});
 
 			return;
 		} else {
-			callback(new Error("Invalid artifact.type value passed to createArtifactNode: " + artifact.type), 0);
+			return callback(new Error("Invalid artifact.type value passed to createArtifactNode: " + artifact.type), 0);
 		}
-
-		
 	},
 
 	createLayoutNode : function(layout, callback) {
-		if (layout.type == "none") {
-			// There's no need to create a layout node in this case.
-			// This shouldn't be called, and should get handled by caller
-			throw err;
-		} else if (layout.type == "user_defined") {
-			callback(null, parseInt(layout.user_defined));
-			return;
-		} else if (layout.type == "preset") {
-			callback(null, layout.preset);
-			return;
+		if (layout.type == "preset") {
+			return callback(null, layout.preset);
 		} else if (layout.type == "custom") {
 			var id = shortid.generate();
 
@@ -832,16 +778,16 @@ module.exports = {
 			//console.log("Running cypherQuery: " + cypherQuery);
 					
 			myDB.cypherQuery(cypherQuery, function(err, result){
-	    		if(err) throw err;
+	    		if(err) {
+	    			return callback(err, 0);
+	    		}
 
-	    		//console.log(result.data[0]); // delivers an array of query results
-
-				callback(null, id);
+				return callback(null, id);
 			});
 
 			return;
 		} else {
-			callback(new Error("Invalid layout.type property passed to createLayoutNode: " + layout.type), 0);
+			return callback(new Error("Invalid layout.type property passed to createLayoutNode: " + layout.type), 0);
 		}
 	},
 
@@ -895,7 +841,9 @@ module.exports = {
 
 		//console.log("running 2 cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
-			if (err) throw err;
+			if (err) {
+				return callback(err, null);
+			}
 
 			//console.log("result is " + JSON.stringify(result.data[0]));
 
@@ -998,7 +946,9 @@ module.exports = {
 		}
 
 		this.findUser(query, function(err, existingUser) {
-			if (err) throw err;
+			if (err) {
+				return next(err, null);
+			}
 
 			var cypherQuery = "";
 			if (existingUser) { // user already exists in DB
@@ -1130,7 +1080,7 @@ module.exports = {
 					}
 				} else {
 					//shouldn't happen
-					throw "No values to edit";
+					return next(new Error("setValues is empty"), null);
 				}
 			} else { // user doesn't exist in DB
 				cypherQuery = "CREATE(u:User {";
@@ -1254,13 +1204,15 @@ module.exports = {
 			}
 
 			myDB.cypherQuery(cypherQuery, function(err, result) {
-				if (err) throw err;
+				if (err) {
+					return next(err, null);
+				}
 
 				/**
 					It's critical to pass the user to this function, because in case we created
 					a new user node, we want to pass on the new id, which is generated above (uuid).
 				**/
-				next(null, user);
+				return next(null, user);
 			});
 		});
 	},
@@ -1395,7 +1347,10 @@ function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {
 		cypherQuery += " ON CREATE SET c.name = '" + categoryObj.displayName + "' RETURN c;";
 			
 		myDB.cypherQuery(cypherQuery, function(err, result){
-			if(err) throw err;
+			if(err) {
+				logger.dbError(err, cypherQuery);
+				return;
+			}
 
 			//now, look for any subcategories
 			if (categoryObj.subCategories) {

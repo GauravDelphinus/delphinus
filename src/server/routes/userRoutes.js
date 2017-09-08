@@ -145,12 +145,22 @@ var routes = function(db) {
                   
 					user.image = config.url.userImages + name;
 
-					updateUserInDB(res, user);
+					updateUserInDB(res, user, function(err) {
+						if (err) {
+							logger.error("Failed to save user in DB: " + err);
+							return res.sendStatus(500);
+						}
+					});
 
 					return res.json({}); 
 				});
             } else { // URL
-				updateUserInDB(res, user);
+				updateUserInDB(res, user, function(err) {
+					if (err) {
+						logger.error("Failed to save user in DB: " + err);
+						return res.sendStatus(500);
+					}
+				});
 
 				return res.json({}); 
             }
@@ -264,12 +274,15 @@ var routes = function(db) {
 	return userRouter;
 };
 
-function updateUserInDB(res, user) {
-      dataUtils.saveUser(user, function(err) {
-            if (err) throw err;
+function updateUserInDB(res, user, next) {
+	dataUtils.saveUser(user, function(err) {
+		if (err) {
+			next(err);
+		}
 
-            res.json(user);
-      });
+		res.json(user);
+		next(0);
+	});
 }
 
 module.exports = routes;

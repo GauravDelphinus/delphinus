@@ -145,19 +145,6 @@ module.exports = function() {
 		}
 		res.render("error", {redirectURL: redirectURL});
 	});
-	
-	// 2 - Challenge Image
-	/*
-	app.get("/challenges/images/:imageName", function(req, res) {
-		
-		var targetImage = global.appRoot + config.path.challengeImages + req.params.imageName;
-		res.setHeader("Content-Type", mime.lookup(targetImage));
-		res.sendFile(targetImage, function(err) {
-			if (err && err.code !== "ECONNABORTED") throw err;
-		});
-	});
-	*/
-	
 
 	// 3 - Entry Page
 	app.get("/entry/:entryId", function(req, res) {
@@ -215,7 +202,7 @@ module.exports = function() {
             	dataUtils.findUser(query, function(err, user) {
             		if (err) {
             			logger.error("Couldn't find user, query: " + JSON.stringify(query) + ": " + err);
-            			return res.render("error", redirectURL: "/users");
+            			return res.render("error", {redirectURL: "/users"});
             		}
 
             		return res.render("user", {user : user, userInfo: user});
@@ -233,7 +220,7 @@ module.exports = function() {
             dataUtils.findUser(query, function(err, user) {
 				if (err) {
 					logger.error("Couldn't find user, query: " + JSON.stringify(query) + ": " + err);
-					return res.render("error", redirectURL: "/users");
+					return res.render("error", {redirectURL: "/users"});
 				}
 
 				return res.render("user", {userInfo: user, user: normalizeUser(req.user)});
