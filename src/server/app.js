@@ -1,3 +1,11 @@
+var config = require('./config');
+var path = require("path");
+
+
+// Set up application root directory
+global.appRoot = path.normalize(path.resolve(__dirname) + "/../../");
+configureEnvironment();
+
 module.exports = function() {
 	
 	var express = require('express');
@@ -7,17 +15,17 @@ module.exports = function() {
 	var fs = require("fs");
 	var mime = require("mime");
 	var logger = require("./logger");
-	var path = require("path");
 	var serverUtils = require("./serverUtils");
 
 	var dataUtils = require("./dataUtils");
 	var imageProcessor = require("./imageProcessor");
 
+
+
 	// Initialize the Neo4j Graph Database
 	var db = new neo4j("http://neo4j:mypassword@localhost:7474");
 	dataUtils.initializeDB(db);
 	
-	var config = require('./config');
 	var app = express();
 
 	require('./auth/passport')(app);
@@ -269,6 +277,8 @@ module.exports = function() {
 		logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on port " + config.port);
 		logger.info("Application Root: " + global.appRoot + ", Express Static directory: " + publicDir);
 	});
+
+	return app;
 };
 
 function ensureLoggedIn(req, res, next) {
@@ -286,4 +296,20 @@ function normalizeUser(user) {
 	}
 
 	return user;
+}
+
+function configureEnvironment() {
+	// Set up Environment Variables
+	var env = process.env.NODE_ENV; //production or staging
+	if (env == undefined) {
+		process.env.NODE_ENV = "development"; //when running locally
+	}
+	
+	if (process.env.NODE_ENV == "development") {
+		global.hostname = config.development.hostname;
+	} else if (process.env.NODE_ENV == "staging") {
+		global.hostname = config.staging.hostname;
+	} else if (process.env.NODE_ENV == "production") {
+		global.hostname = config.production.hostname;
+	}
 }
