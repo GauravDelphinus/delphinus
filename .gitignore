@@ -3,3 +3,4 @@
 /src/server/data/entries/images/
 /src/server/data/users/images/
 /src/server/node_modules/
+/src/server/.nyc_output/

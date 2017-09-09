@@ -54,7 +54,7 @@ module.exports = {
 
 			if (query.hasOwnProperty(param.name)) {
 				if (param.type.constructor === Array) {
-					if (!param.type.includes(query[param.name])) {
+					if (param.type.indexOf(query[param.name]) == -1) {
 						logger.error("Invalid value '" + query[param.name] + "' received for param: '" + param.name + "', expected among " + JSON.stringify(param.type));
 						return false;
 					}
