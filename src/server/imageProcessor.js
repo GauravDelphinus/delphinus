@@ -7,13 +7,15 @@ module.exports = {
 	applyStepsToImage : function(sourceImage, targetImage, steps, caption, next) {
 		if (targetImage) {
 			if (fs.existsSync(targetImage)) {
-				next(0, targetImage);
+				return next(0, targetImage);
 			} else {
 				applySteps(sourceImage, targetImage, steps, caption, next);
 			}
 		} else {
 			tmp.tmpName(function _tempNameGenerated(err, path) {
-    			if (err) throw err;
+    			if (err) {
+    				return next(err, 0);
+    			}
     			
     			applySteps(sourceImage, path, steps, caption, next);
 			});
@@ -30,7 +32,11 @@ function applySteps(sourceImage, targetImage, steps, caption, next) {
 		(steps.artifacts && steps.artifacts.length > 0) || (steps.decorations && steps.decorations.length > 0)) {
 		
 		var imArgs = []; //imageMagickArgs
-		applyLayouts(sourceImage, steps.layouts, imArgs, function(newSourceImage, imageSize) {
+		applyLayouts(sourceImage, steps.layouts, imArgs, function(err, newSourceImage, imageSize) {
+			if (err) {
+				return next(err, 0);
+			}
+
 			if (steps.filters) {
 				applyFilters(newSourceImage, steps.filters, imArgs);
 			}
@@ -51,7 +57,7 @@ function applySteps(sourceImage, targetImage, steps, caption, next) {
 		});
 	} else {
 		//since there weren't any changes, just pass along the original image
-		next(0, sourceImage);
+		return next(0, sourceImage);
 	}
 }
 
@@ -135,31 +141,35 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
 	if (layoutArgs.length > 0) {
 		//something to layout
 		tmp.tmpName(function _tempNameGenerated(err, newSourceImage) {
-    		if (err) throw err;
+    		if (err) {
+    			return next(err, 0, 0);
+    		}
 
     		layoutArgs.unshift(sourceImage);
     		layoutArgs.push(newSourceImage);
     		writeImage(sourceImage, newSourceImage, layoutArgs, function(err, targetImage, changesDone) {
-    			if (err) throw err;
+    			if (err) {
+    				return next(err, 0, 0);
+    			}
 
     			if (!changesDone && sourceImage == targetImage) {
     				//get rid of the temp file
     				fs.unlink(newSourceImage, function(err) {
     					if (err) {
-    						throw err;
+    						return next(err, 0, 0);
     					}
     				});
     			}
 
-    			findImageSize(targetImage, function(newImageSize) {
-    				next(targetImage, newImageSize);
+    			findImageSize(targetImage, function(err, newImageSize) {
+    				return next(err, targetImage, newImageSize);
     			});
     		});
     	});
 	} else {
 		//nothing to layout, so just find the size of original image and pass on to next step
-		findImageSize(sourceImage, function(imageSize) {
-			next(sourceImage, imageSize);
+		findImageSize(sourceImage, function(err, imageSize) {
+			return next(err, sourceImage, imageSize);
 		});
 	}
 }
@@ -680,13 +690,13 @@ function writeImage(sourceImage, targetImage, imArgs, next) {
 function findImageSize(imagePath, next) {
 	var child = execFile('identify', ["-format", "%Wx%H", imagePath], (error, stdout, stderr) => {
 	  	if (error) {
-	    	throw error;
+	    	return next(error, 0);
 	  	}
 
 	  	var sizeArray = stdout.trim().split("x");
 	  	var newImageSize = {width: parseInt(sizeArray[0]), height: parseInt(sizeArray[1])};
 
-	  	next(newImageSize);
+	  	return next(0, newImageSize);
 	});
 }
 

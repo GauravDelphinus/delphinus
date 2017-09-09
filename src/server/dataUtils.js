@@ -839,13 +839,11 @@ module.exports = {
 
 		findUserQuery += " RETURN u;";
 
-		//console.log("running 2 cypherquery: " + findUserQuery);
 		myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) {
+				logger.dbError(err, findUserQuery);
 				return callback(err, null);
 			}
-
-			//console.log("result is " + JSON.stringify(result.data[0]));
 
 			if (result.data.length == 0) {
 				// no user found
@@ -915,7 +913,6 @@ module.exports = {
 					user.local.password = userFromDB.local_password;
 				}
 
-				//console.log("calling callback with user = " + JSON.stringify(user));
 				callback(null, user);
 			}
 		});
@@ -947,6 +944,7 @@ module.exports = {
 
 		this.findUser(query, function(err, existingUser) {
 			if (err) {
+				logger.dbError(err, query);
 				return next(err, null);
 			}
 
@@ -1040,8 +1038,6 @@ module.exports = {
 						setValues.push(" u.facebook_profile_link = '" + user.facebook.profileLink + "'");
 					}
 
-					console.log("set facebok profile link in db");
-
 					if (user.facebook.token) {
 						setValues.push(" u.facebook_token = '" + user.facebook.token + "'");
 					}
@@ -1080,6 +1076,7 @@ module.exports = {
 					}
 				} else {
 					//shouldn't happen
+					logger.error("saveUser: setValues is empty");
 					return next(new Error("setValues is empty"), null);
 				}
 			} else { // user doesn't exist in DB
@@ -1205,6 +1202,7 @@ module.exports = {
 
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) {
+					logger.dbError(err, cypherQuery);
 					return next(err, null);
 				}
 

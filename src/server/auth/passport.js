@@ -1,6 +1,7 @@
 var passport = require('passport');
 var session = require("express-session");
 var flash = require("connect-flash");
+var logger = require("../logger");
 
 module.exports = function (app) {
 

@@ -9,7 +9,7 @@ var routes = function(db) {
 
     authRouter.route("/")
         .get(function(req, res, next) {
-        	logger.debug("GET received on /auth, req.query = " + JSON.stringify(req.query));
+        	logger.debug("GET received on /auth, query: " + JSON.stringify(req.query));
 
             if (!req.session.redirectTo) {
                 /**
@@ -26,14 +26,18 @@ var routes = function(db) {
 
     authRouter.route("/login")
         .get(function(req, res, next) {
+        	logger.debug("GET received on /auth/login, query: " + JSON.stringify(req.query));
+
             res.render("login", {message: []});
         })
+
         .post(passport.authenticate("local-login", {
-            failureRedirect : "/auth/login",
-            failureFlash: true
-        }), function(req, res) {
-            //console.log("**** Local login callback **** ");
-            //console.log("req.session.redirectTo is " + req.session.redirectTo);
+	            failureRedirect : "/auth/login",
+	            failureFlash: true
+        	}), function(req, res) {
+
+        	logger.debug("POST received on /auth/login, body: " + JSON.stringify(req.body));
+
             if (req.session.redirectTo) {
                 var redirectTo = req.session.redirectTo;
                 req.session.redirectTo = null;
@@ -45,14 +49,17 @@ var routes = function(db) {
 
     authRouter.route("/signup")
         .get(function(req, res, next) {
+        	logger.debug("GET received on /auth/signup, query: " + JSON.stringify(req.query));
+
             res.render("signup", {message: req.flash("signupMessage")});
         })
         .post(passport.authenticate("local-signup", {
-            failureRedirect: "/auth/signup",
-            failureFlash: true
-        }), function(req, res) {
-            //console.log(" ****** Local Signup callback ************* ");
-            //console.log("req.session.redirectTo is " + req.session.redirectTo);
+	            failureRedirect: "/auth/signup",
+	            failureFlash: true
+	        }), function(req, res) {
+            
+            logger.debug("POST received on /auth/signup, body: " + JSON.stringify(req.body));
+
             if (req.session.redirectTo) {
                 var redirectTo = req.session.redirectTo;
                 req.session.redirectTo = null;
@@ -65,6 +72,8 @@ var routes = function(db) {
 	authRouter.route("/google")
     
         .get(function (req, res, next) {
+
+        	logger.debug("GET received on /auth/google, query: " + JSON.stringify(req.query));
 
             //console.log("########## /auth/google ##############");
             //console.log("req.sessiom is " + JSON.stringify(req.session));
@@ -81,8 +90,6 @@ var routes = function(db) {
         	scope: ['https://www.googleapis.com/auth/userinfo.profile',
             'https://www.googleapis.com/auth/userinfo.email']
     	   }) , function(req, res) {
-            //console.log("########## /auth/google authenticate ##############");
-            //console.log("req.sessiom is " + JSON.stringify(req.session));
         });
 
 	authRouter.route('/google/callback')
@@ -91,8 +98,8 @@ var routes = function(db) {
         	//successRedirect: '/user/',
         	failureRedirect: '/error/'
     	}), function(req, res) {
-            //console.log("########## Google callback ##############");
-            //console.log("req.sessiom is " + JSON.stringify(req.session));
+            logger.debug("GET received on /auth/google/callback, query: " + JSON.stringify(req.query));
+
             if (req.session.redirectTo) {
                 var redirectTo = req.session.redirectTo;
                 req.session.redirectTo = null;
@@ -104,6 +111,7 @@ var routes = function(db) {
 
     authRouter.route("/twitter")
         .get(function (req, res, next) {
+        	logger.debug("GET received on /auth/twitter, query: " + JSON.stringify(req.query));
             if (!req.session.redirectTo) {
                 /**
                     If the redirectTo is not set, this means that this wasn't set explicitly
@@ -130,6 +138,7 @@ var routes = function(db) {
             //successRedirect: '/user/',
             failureRedirect: '/error/'
         }), function(req, res) {
+        	logger.debug("GET received on /auth/twitter/callback, query: " + JSON.stringify(req.query));
             if (req.session.redirectTo) {
                 var redirectTo = req.session.redirectTo;
                 req.session.redirectTo = null;
@@ -141,6 +150,7 @@ var routes = function(db) {
 
     authRouter.route("/facebook")
         .get(function (req, res, next) {
+        	logger.debug("GET received on /auth/facebook, query: " + JSON.stringify(req.query));
             if (!req.session.redirectTo) {
                 /**
                     If the redirectTo is not set, this means that this wasn't set explicitly
@@ -165,6 +175,7 @@ var routes = function(db) {
             //successRedirect: '/user/',
             failureRedirect: '/error/'
         }), function(req, res) {
+        	logger.debug("GET received on /auth/facebook/callback, query: " + JSON.stringify(req.query));
             if (req.session.redirectTo) {
                 var redirectTo = req.session.redirectTo;
                 req.session.redirectTo = null;
@@ -176,6 +187,7 @@ var routes = function(db) {
         
     authRouter.route("/facebook/logout")
     	.get(function(req, res) {
+    		logger.debug("GET received on /auth/facebook/logout, query: " + JSON.stringify(req.query));
     		//destroy facebook auth token
     		
 			var facebook = require('../services/facebook')();
@@ -207,6 +219,7 @@ var routes = function(db) {
 
        authRouter.route("/twitter/logout")
     	.get(function(req, res) {
+    		logger.debug("GET received on /auth/twitter/logout, query: " + JSON.stringify(req.query));
     		//destroy facebook auth token
     		
 			var twitter = require('../services/twitter')();
@@ -238,13 +251,16 @@ var routes = function(db) {
 
     authRouter.route("/logout")
         .get(function (req, res) {
+        	logger.debug("GET received on /auth/logout, query: " + JSON.stringify(req.query));
             req.logout();
             //res.redirect("/");
             
             req.session.destroy(function(err) {
-                if (err) throw err;
+                if (err) {
+                	logger.error("Session destory failed: " + err);
+                	return;
+                }
 
-                //console.log("session.destroy callback");
                 res.redirect("/");
             });
             

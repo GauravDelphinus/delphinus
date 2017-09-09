@@ -2,6 +2,7 @@ var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
 var dataUtils = require("../dataUtils");
 var config = require('../config');
+var logger = require("../logger");
 
 module.exports = function () {
 
@@ -13,8 +14,7 @@ module.exports = function () {
             passReqToCallback: true
         },
         function(req, accessToken, refreshToken, profile, done){
-
-            console.log("******** Info from Facebook Profile: " + JSON.stringify(profile));
+        	logger.debug("Facebook Profile: " + JSON.stringify(profile));
 
             var query = {};
             
@@ -39,6 +39,9 @@ module.exports = function () {
             }
 
             dataUtils.findUser(query, function (error, user) {
+            	if (error) {
+            		return done(error, 0);
+            	}
              
                 if (!user) {
                     if (req.user) {
@@ -51,7 +54,6 @@ module.exports = function () {
                 user.facebook = {};
                 user.facebook.id = profile.id;
                 user.facebook.profileLink = "https://www.facebook.com/" + profile.id;
-                console.log("******** set facebook access token: " +  accessToken);
                 user.facebook.token = accessToken;
                 user.facebook.displayName = profile.displayName;
                 user.facebook.emails = [];
@@ -61,7 +63,6 @@ module.exports = function () {
                 
                 var facebook = require('../services/facebook')(config.social.facebook.clientID, config.social.facebook.clientSecret);
                 facebook.getImage(user.facebook.token, function (imageUrl) {
-                    //console.log("getImage returned, imageUrl = " + imageUrl);
                     user.facebook.image = imageUrl;
 
                     // set the user name and image, if not already set
@@ -82,9 +83,11 @@ module.exports = function () {
                     user.lastSeen = (new Date()).getTime();
 
                     dataUtils.saveUser(user, function(err, user) {
-                        if (err) throw err;
+                        if (err) {
+                        	return done(err, null);
+                        }
 
-                        done(null, user);
+                        return done(null, user);
                     });   
                 });  
             });

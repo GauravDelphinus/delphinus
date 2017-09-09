@@ -13,7 +13,7 @@ module.exports = function () {
         },
         function(req, accessToken, refreshToken, profile, done){
 
-            //console.log("Info from Google Profile: " + JSON.stringify(profile));
+            logger.debug("Info from Google Profile: " + JSON.stringify(profile));
 
             var query = {};
 
@@ -38,6 +38,10 @@ module.exports = function () {
             }
 
             dataUtils.findUser(query, function (error, user) {
+            	if (error) {
+            		return done(error, null);
+            	}
+
                 if (!user) {
                     if (req.user) {
                         user = req.user;
@@ -83,9 +87,11 @@ module.exports = function () {
 				user.lastSeen = (new Date()).getTime();
                 
                 dataUtils.saveUser(user, function(err, user) {
-                    if (err) throw err;
+                    if (err) {
+                    	return done(err, null);
+                    }
 
-                    done(null, user);
+                    return done(null, user);
                 });
             });
         })
