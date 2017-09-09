@@ -7,11 +7,8 @@ var path = require("path");
 // Set up application root directory
 global.appRoot = path.normalize(path.resolve(__dirname) + "/../../");
 
-// Set up Environment Variables
-var env = process.env.NODE_ENV; //production or staging
-if (env == undefined) {
-	process.env.NODE_ENV = "dev"; //when running locally
-}
+configureEnvironment();
+
 
 if (cluster.isMaster) {
         // // Count the machine's CPUs
@@ -28,3 +25,18 @@ if (cluster.isMaster) {
         app();
 }
 
+function configureEnvironment() {
+	// Set up Environment Variables
+	var env = process.env.NODE_ENV; //production or staging
+	if (env == undefined) {
+		process.env.NODE_ENV = "development"; //when running locally
+	}
+	
+	if (process.env.NODE_ENV == "development") {
+		global.hostname = config.development.hostname;
+	} else if (process.env.NODE_ENV == "staging") {
+		global.hostname = config.staging.hostname;
+	} else if (process.env.NODE_ENV == "production") {
+		global.hostname = config.production.hostname;
+	}
+}

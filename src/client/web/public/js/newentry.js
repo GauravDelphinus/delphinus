@@ -14,6 +14,9 @@ function setupMainItem() {
 	$.getJSON('/api/challenges/' + challengeId, function(result) {
 		$("#newentryimage").prop("src", result.image);
 		$("#newentryimage").data("imageType", result.imageType);
+	})
+	.fail(function() {
+		window.location.replace("/error");
 	});
 
 	$("#newentryimage").on("load", function() {
@@ -177,6 +180,9 @@ function showArtifactStep() {
 				//apply changes to reflect default selection
 				applyChanges();
 			}
+		})
+		.fail(function() {
+			window.location.replace("/error");
 		});
 	}
 }
@@ -267,6 +273,9 @@ function showLayoutStep() {
 
 				applyChanges(); //for default selection
 			}
+		})
+		.fail(function() {
+			window.location.replace("/error");
 		});
 	}
 }
@@ -487,6 +496,9 @@ function showFilterStep() {
 
 				applyChanges(); //for default selection
 			}
+		})
+		.fail(function() {
+			window.location.replace("/error");
 		});
 	}
 }
@@ -680,6 +692,9 @@ function showDecorationStep() {
 
 				applyChanges(); //for default selection
 			}
+		})
+		.fail(function() {
+			window.location.replace("/error");
 		});
 	}
 }
@@ -1179,6 +1194,7 @@ function constructJSONObject(jsonObj) {
 	Generate the intermediate image based on given jsonObj.  Typically used
 	for generating thumbnail images for Preset options.
 */
+var generateFailCount = 0;
 function generateChanges(id, jsonObj, done) {
 	$.ajax({
 		type: "POST",
@@ -1195,7 +1211,14 @@ function generateChanges(id, jsonObj, done) {
 			
 		},
 		error: function(jsonData) {
-			alert("some error was found, " + jsonData.error);
+			generateFailCount ++;
+
+			if (generateFailCount == 1) {
+				generateChanges(id, jsonObj, done);
+			} else {
+				//if more than once, redirect to error page and restart
+				window.location.replace("/error");
+			}
 		}
 	});
 }
@@ -1203,11 +1226,11 @@ function generateChanges(id, jsonObj, done) {
 /*
 	Apply changes based on current selection on the main preview image.
 */
+var applyFailCount = 0;
 function applyChanges(done) {
 	var jsonObj = {};
 	
 	constructJSONObject(jsonObj);
-	//console.log("Apply Changes: " + JSON.stringify(jsonObj));
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -1225,7 +1248,14 @@ function applyChanges(done) {
 			}
 		},
 		error: function(jsonData) {
-			alert("some error was found, " + jsonData.error);
+			applyFailCount ++;
+			if (applyFailCount == 1) {
+				//try one more time
+				applyChanges(done);
+			} else {
+				//if more than once, redirect to error page and restart
+				window.location.replace("/error");
+			}
 		}
 	});
 }
@@ -1233,6 +1263,7 @@ function applyChanges(done) {
 /*
 	Actually POST the new entry.
 */
+var failCount = 0;
 function postEntry() {
 
 	var jsonObj = {};
@@ -1244,15 +1275,28 @@ function postEntry() {
 		url: "/api/entries",
 		dataType: "json",
 		contentType: "application/json; charset=UTF-8",
-		data: JSON.stringify(jsonObj),
-		success: function(jsonData) {
-			window.open("/entry/" + jsonData.id, "_self");
-		},
-		error: function(jsonData) {
-			alert("some error was found, " + jsonData.error);
+		data: JSON.stringify(jsonObj)
+	})
+	.done(function(data, textStatus, jqXHR) {
+    	window.open("/entry/" + jsonData.id, "_self");
+	})
+	.fail(function(jqXHR, textStatus, errorThrown) {
+		failCount ++;
+
+		if (failCount == 1) {
+			//in case of some failure, allow the user another chance at posting by clicking the Post Challenge button again
+			alert("Oops.. Something prevented us from posting your entry.  Please try again.");
+		    $("#apply").prop("value", "Post");
+		    $("#apply").prop("disabled", false);
+		} else {
+			window.location.replace("/error");
 		}
 	});
 
+	//as soon as the user clicks Post Entry button, disable the button to prevent multiple clicks
+	//change button to 'posting ...'
+	$("#apply").prop("value", "Posting...");
+	$("#apply").prop("disabled", true);
 }
 
 

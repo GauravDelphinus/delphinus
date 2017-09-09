@@ -213,7 +213,6 @@ function appendMenuItemButton(menu, menuItemButton) {
 	Also, refresh client as required.
 */
 function deleteItem(data) {
-	console.log("deleteItem, data is " + JSON.stringify(data));
 	var deleteURL;
 	if (data.type == "challenge") {
 		deleteURL = "/api/challenges/" + data.id;
@@ -236,11 +235,10 @@ function deleteItem(data) {
 		data: JSON.stringify(jsonObj)
 	})
 	.done(function(retdata, textStatus, jqXHR) {
-		console.log("successfully deleted!");
 		refreshAfterDelete(data.id, data.type);
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
-		alert("some error was found, " + errorThrown);
+		showAlert("There appears to be a problem deleting that item.  Please try again.", 2);
 	});
 }
 
@@ -359,6 +357,9 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 				//show button as depressed
 				$("#" + data.id + "LikeButton").addClass("active");
 			}
+		})
+		.fail(function() {
+			//eat this
 		});
 	}
 
@@ -441,6 +442,9 @@ function createCommentsSectionTrimmed(data) {
 				//show button as depressed
 				$("#" + data.id + "LikeButton").addClass("active");
 			}
+		})
+		.fail(function() {
+			//eat this
 		});
 	}
 
@@ -513,6 +517,9 @@ function createTimelapseView(data) {
 	startTimelapseButton.click(function() {
 		$.getJSON('/api/filters/timelapse/' + entityId, function(data) {
 			startTimelapse(entityId, data.timelapseData);
+		})
+		.fail(function() {
+			window.location.replace("/error?reload=yes"); //reload the page to see if it works the next time
 		});
 	});
 
@@ -801,6 +808,9 @@ function showHideLikersList(parentId) {
 		$.getJSON("/api/users/?likedEntityId=" + parentId + "&sortBy=reverseDate", function(list) {
 			var likersList = createLikersList(parentId, list);
 			$("#" + parentId + "LikersContainer").empty().append(likersList);
+		})
+		.fail(function() {
+			//eat this
 		});
 
 		if ($("#" + parentId + "LikersPopup").length) {
@@ -826,6 +836,9 @@ function showHideCommentsList(parentId) {
 			var commentsList = createCommentsList(parentId, list);
 			$("#" + parentId + "CommentsContainer").empty().append(commentsList);
 			$("#" + parentId + "NewCommentText").focus(); // set focus in the input field
+		})
+		.fail(function() {
+			//eat this
 		});
 
 		//if we're showing the comments list on a popup, then show the popup
@@ -856,6 +869,9 @@ function refreshCommentsList(parentId) {
 
 		//also, update the counter
 		$("#" + parentId + "NumComments").text(list.length);
+	})
+	.fail(function() {
+		//eat this
 	});
 }
 
@@ -892,7 +908,7 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 			if (user) {
 				sendLikeAction(restURL, !$("#" + this.id).hasClass("active"), function(err, likeStatus) {
 					if (err) {
-						alert("some error was found, " + jsonData.error);
+						// eat this
 					} else {
 						var numLikes = parseInt($("#" + data.id + "NumLikes").text());
 						if (likeStatus) {
@@ -1068,7 +1084,7 @@ function sendShare(provider, data) {
       	showAlert("Posted successfully!", 2);
   	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
-		showAlert("There appears to be a problem.  Please try again later.", 2);
+		showAlert("There appears to be a problem posting.  Please try again later.", 2);
 	});	
 }
 
@@ -1149,54 +1165,6 @@ function createFeedElement(data) {
 
 	return element;
 }
-
-/*
-function createShareContainer(data) {
-	var container = $("<div>", {id: data.id + "ShareContainer", class: "ShareContainer"});
-	var facebookCheck = $("<input>", {id: data.id + "FacebookCheckbox", type: "checkbox", value: "facebook"});
-	var twitterCheck = $("<input>", {id: data.id + "TwitterCheckbox", type: "checkbox", value: "twitter"});
-
-	var shareButton = $("<button>", {type: "button", class: "btn button-full"}).append("Share");
-	shareButton.click(function(e) {
-		var jsonObj = {};
-		jsonObj.message = data.caption;
-		jsonObj.link = "localhost:8080" + data.link;
-
-		var postURL = "/api/social";
-		if (facebookCheck.is(":checked")) {
-			postURL += "?target=facebook";
-		} else if (twitterCheck.is(":checked")) {
-			postURL += "?target=twitter";
-		}
-
-		$.ajax({
-			type: "POST",
-			url: postURL,
-	      	dataType: "json", // return data type
-	      	contentType: "application/json; charset=UTF-8",
-	      	data: JSON.stringify(jsonObj)
-	  	})
-		.done(function(data, textStatus, jqXHR) {
-	      	alert("success!  data is " + JSON.stringify(data));
-	  	})
-		.fail(function(jqXHR, textStatus, errorThrown) {
-			alert("failure! error is " + errorThrown + ", textStatus is " + textStatus);
-		});	
-	});
-
-	if (user.facebook) {
-		container.append(facebookCheck).append($("<img>", {src: "/images/social/facebook_blue.png", class: "socialIcon"})).append($("<br>"));
-	}
-	
-	if (user.twitter) {
-		container.append(twitterCheck).append($("<img>", {src: "/images/social/twitter_blue.png", class: "socialIcon"})).append($("<br>"));
-	}
-	
-	container.append(shareButton);
-
-	return container;
-}
-*/
 
 function createLikersContainer(data) {
 	var container = $("<div>", {id: data.id + "LikersContainer"}).empty();
@@ -1311,7 +1279,7 @@ function createNewCommentElement(isReply, parentId) {
 		    	}
 			})
 			.fail(function(jqXHR, textStatus, errorThrown) {
-				alert("some error was found, " + errorThrown);
+				showAlert("There appears to be a problem posting your comment.  Please try again.", 2);
 			});
 	    }
 	});
@@ -1559,7 +1527,7 @@ function createLikersList(id, list) {
 
 				sendFollow(id, true, function(err, followResult) {
 					if (err) {
-						alert("some error occured " + err);
+						//eat this
 					} else {
 						if (followResult) {
 							//now following
@@ -1606,6 +1574,9 @@ function createCommentsList(id, list) { //id is the entity id
 						appendCommentElement(replyElement, id, true);
 					}
 				}
+			})
+			.fail(function() {
+				//eat this
 			});
 		})(data.id);
 	}
@@ -1829,6 +1800,9 @@ function createCategorySidebar() {
 		}
 
 		updateSidebar("categoriesSidebar", "Categories", list);
+	})
+	.fail(function() {
+		//eat this
 	});
 }
 
@@ -1894,6 +1868,9 @@ function createPopularChallengesSidebar() {
 		}
 
 		updateRichSidebar("popularChallengesSidebar", "Popular Challenges", list, true);
+	})
+	.fail(function() {
+		//eat this
 	});
 }
 
@@ -1919,6 +1896,9 @@ function createPopularEntriesSidebar() {
 		}
 
 		updateRichSidebar("popularEntriesSidebar", "Popular Entries", list, true);
+	})
+	.fail(function() {
+		//eat this
 	});
 }
 
@@ -1940,6 +1920,9 @@ function createPopularUsersSidebar() {
 		}
 
 		updateRichSidebar("popularUsersSidebar", "Popular Users", list, true);
+	})
+	.fail(function() {
+		//eat this
 	});
 }
 

@@ -4,5 +4,7 @@
 	"/user/" : "/users",
 	"/challenges" : "/",
 	"/entries" : "/",
-	"/users" : "/"
+	"/users" : "/",
+	"/newchallenge" : "/newchallenge",
+	"/newentry" : "/newentry"
 }

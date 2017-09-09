@@ -2,6 +2,7 @@ var fs = require("fs");
 var logger = require("./logger");
 var shortid = require("shortid");
 var validUrl = require("valid-url");
+var url = require("url");
 
 module.exports = {
 	/**
@@ -109,6 +110,11 @@ module.exports = {
 					var categories = require("./categories");
 					if (!categories.hasOwnProperty(query[param.name])) {
 						logger.error("Invalid Category '" + query[param.name] + "' received for param '" + param.name + "'");
+						return false;
+					}
+				} else if (param.type == "myURL") {
+					if (!(query[param.name].startsWith("/") || url.parse(query[param.name]).hostname == global.hostname)) {
+						logger.error("Invalid URL '" + query[param.name] + "' received for param '" + param.name + "'");
 						return false;
 					}
 				}

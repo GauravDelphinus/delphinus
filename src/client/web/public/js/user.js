@@ -95,8 +95,8 @@ function setupImageHandlers(profileType) {
 			$("#saveImage").hide();
 			$("#changePicture").show();
 		})
-		.fail(function(jqXHR, textStatus, errorThrown) {
-			alert("some error was found, " + errorThrown);
+		.fail(function() {
+			window.location.replace("/error");
 		});
 	});
 
@@ -133,9 +133,8 @@ function setupImageHandlers(profileType) {
           $("#setImage").hide();
           $("#changePicture").show();
       	})
-		.fail(function(jqXHR, textStatus, errorThrown) {
-			alert("some error was found, " + errorThrown);
-
+		.fail(function() {
+			window.location.replace("/error");
 		});
 	});
 
@@ -197,9 +196,8 @@ function setupNameSection(profileType) {
           $("#saveName").hide();
           $("#editName").show();
       	})
-		.fail(function(jqXHR, textStatus, errorThrown) {
-			alert("some error was found, " + errorThrown);
-
+		.fail(function() {
+			window.location.replace("/error");
 		});
 	});
 }
@@ -214,28 +212,10 @@ function setupSocialSection(profileType) {
 
 		var socialActionsSection = createSocialActionsSectionElement(data, true);
 		$("#socialStatusSection").append(socialActionsSection);
+	})
+	.fail(function() {
+		window.location.replace("/error");
 	});
-	
-	/*
-	
-	// Social Section
-	if (profileType == "public" || profileType == "member") {
-		$("#socialHeader").text("Connect with " + userInfo.displayName);
-	} else if (profileType == "mine") {
-		$("#socialHeader").text("Manage your Social Networks");
-	}
-
-	var googleIsConnected = userInfo.hasOwnProperty("google") ? userInfo.google.hasOwnProperty("id") : false;
-	var googleProfileLink = (googleIsConnected) ? "https://plus.google.com/" + userInfo.google.id : "/auth/google";
-	var twitterIsConnected = userInfo.hasOwnProperty("twitter") ? userInfo.twitter.hasOwnProperty("username") : false;
-	var twitterProfileLink = (twitterIsConnected) ? "https://twitter.com/" + userInfo.twitter.username : "/auth/twitter";
-	var facebookIsConnected = userInfo.hasOwnProperty("facebook") ? userInfo.facebook.hasOwnProperty("id") : false;
-	var facebookProfileLink = (facebookIsConnected) ? "https://www.facebook.com/" + userInfo.facebook.id : "/auth/facebook";
-
-	updateSocialStatus(profileType, googleIsConnected, "#linkGoogle", "#imageGoogle", "#imageGoogleTick", googleProfileLink, "/auth/google", "/images/social/google_regular_300x300.png", "/images/social/google_disabled_300x300.png");
-	updateSocialStatus(profileType, twitterIsConnected, "#linkTwitter", "#imageTwitter", "#imageTwitterTick", twitterProfileLink, "/auth/twitter", "/images/social/twitter_regular_300x300.png", "/images/social/twitter_disabled_300x300.png");
-	updateSocialStatus(profileType, facebookIsConnected, "#linkFacebook", "#imageFacebook", "#imageFacebookTick", facebookProfileLink, "/auth/facebook", "/images/social/facebook_regular_300x300.png", "/images/social/facebook_disabled_300x300.png");
-	*/
 }
 
 function setupTabs(profileType) {

@@ -60,6 +60,9 @@ function setupCategories() {
 			option.text(data[i].name);
 			$("#categoryList").append(option);
 		}
+	})
+	.fail(function() {
+		window.location.replace("/error");
 	});
 }
 
@@ -102,6 +105,7 @@ function handleFileSelected(data, path, title, type) {
 /**
 	Post the challenge to the server
 **/
+var failCount = 0;
 function postChallenge() {
 	//construct the json object to be posted
 	var jsonObj = {};
@@ -134,10 +138,16 @@ function postChallenge() {
     	window.open("/challenge/" + data.id, "_self");
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
-		//in case of some failure, allow the user another chance at posting by clicking the Post Challenge button again
-		alert("Something prevented us from posting your Challenge.  Please try again.");
-	    $("#postChallenge").prop("value", "Post");
-	    $("#postChallenge").prop("disabled", false);
+		failCount ++;
+
+		if (failCount == 1) {
+			//in case of some failure, allow the user another chance at posting by clicking the Post Challenge button again
+			alert("Oops.. Something prevented us from posting your Challenge.  Please try again.");
+		    $("#postChallenge").prop("value", "Post");
+		    $("#postChallenge").prop("disabled", false);
+		} else {
+			window.location.replace("/error");
+		}
 	});
 
 	//as soon as the user clicks Post Challenge button, disable the button to prevent multiple clicks

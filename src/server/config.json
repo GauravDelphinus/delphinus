@@ -1,4 +1,16 @@
 {
+	"development" : {
+		"hostname" : "localhost",
+		"host" : "localhost:8080"
+	},
+	"staging" : {
+		"hostname" : "stage.captionify.com",
+		"host" : "stage.captionify.com"
+	},
+	"production" : {
+		"hostname" : "www.captionify.com",
+		"host" : "www.captionify.com"
+	},
 	"hostname" : "http://localhost:8080",
 	"port" : "8080",
 	"request_token_url": "https://api.twitter.com/oauth/request_token",

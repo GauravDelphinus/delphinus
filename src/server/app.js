@@ -8,6 +8,7 @@ module.exports = function() {
 	var mime = require("mime");
 	var logger = require("./logger");
 	var path = require("path");
+	var serverUtils = require("./serverUtils");
 
 	var dataUtils = require("./dataUtils");
 	var imageProcessor = require("./imageProcessor");
@@ -133,16 +134,44 @@ module.exports = function() {
 	//load the error page and then redirect to the appropriate
 	//page depending on the referrer
 	app.get("/error", function(req, res) {
+
+		/*
+			Supported params
+		*/
+		var validationParams = [
+			{
+				name: "reload",
+				type: ["yes", "no"]
+			},
+			{
+				name: "target",
+				type: "myURL"
+			}
+		];
+
+		
+
 		var referrerURL = req.get('Referrer');
 		var redirectURL = "/"; //by default, redirect to home page
 
-		var redirects = require("./redirects");
-		for (redirect in redirects) {
-			if (referrerURL.includes(redirect)) {
-				redirectURL = redirects[redirect];
-				break;
+		if (serverUtils.validateQueryParams(req.query, validationParams)) {
+			if (req.query.reload && req.query.reload == "yes") {
+				redirectURL = referrerURL;
+			} else if (req.query.target) {
+				redirectURL = req.query.target;
+			} else {
+				var redirects = require("./redirects");
+				for (redirect in redirects) {
+					if (referrerURL.includes(redirect)) {
+						redirectURL = redirects[redirect];
+						break;
+					}
+				}
 			}
+		} else {
+			logger.warn("/error Query Validation failed, query: " + JSON.stringify(req.query));
 		}
+
 		res.render("error", {redirectURL: redirectURL});
 	});
 
