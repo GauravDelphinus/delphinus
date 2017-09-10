@@ -118,6 +118,31 @@ module.exports = {
 				}
 			});
 		}
+
+
+
+		var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
+		cypherQuery +=
+						" WITH c, category, poster " +
+						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
+						" WITH c, category, poster, COUNT(u2) AS like_count " + 
+						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
+						" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
+						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
+						" WITH c, category, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
+						" OPTIONAL MATCH (me:User {id: '" + 0 + "'})-[like:LIKES]->(c) " +
+						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), (like_count + comment_count + entry_count) AS popularity_count, category ";
+
+		cypherQuery += " ORDER BY c.created DESC;";
+
+		logger.dbDebug(cypherQuery);
+		db.cypherQuery(cypherQuery, function(err, result){
+			if(err) {
+				logger.dbError(err, cypherQuery);
+			}
+
+			logger.debug("after building: result.data from query: " + JSON.stringify(result.data));
+		});
 	},
 
 
