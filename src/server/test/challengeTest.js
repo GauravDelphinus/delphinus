@@ -8,16 +8,18 @@ var assert = chai.assert;
 chai.use(chaiHttp);
 
 describe("Challenge Routes", function() {
+	this.timeout(10000);
+
+
 	describe("GET /api/challenges?sortBy=dateCreated", function() {
 		it("should return list of all challenges", function(done) {
-			this.timeout(10000);
 			chai.request(app)
 			.get("/api/challenges?sortBy=dateCreated")
 			.end(function(err, res) {
 				res.should.have.status(200);
 				res.body.should.be.an("array");
 				res.body.length.should.be.eql(25);
-				done(err);
+				done();
 			});
 		});
 	});
@@ -30,7 +32,7 @@ describe("Challenge Routes", function() {
 				res.should.have.status(200);
 				res.body.should.be.an("array");
 				res.body.length.should.be.eql(25);
-				done(err);
+				done();
 			});
 		});
 	});
@@ -42,7 +44,7 @@ describe("Challenge Routes", function() {
 			.end(function(err, res) {
 				res.should.have.status(400);
 				res.body.should.be.an("object"); //object contains the 400 status message - see http://expressjs.com/en/api.html#res.sendStatus
-				done(err);
+				done();
 			});
 		});
 	});
