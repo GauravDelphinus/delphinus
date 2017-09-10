@@ -87,6 +87,7 @@ module.exports = {
 				"u.image = '" + user.image + "', " +
 				"u.lastSeen = '" + user.lastSeen + "' RETURN u;";
 
+			logger.dbDebug(cypherQuery);
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) {
 					logger.dbError(err, cypherQuery);
@@ -109,6 +110,7 @@ module.exports = {
 					"n.title = '" + challenge.title + "'" +
 					" RETURN n;";
 
+			logger.dbDebug(cypherQuery);
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) {
 					logger.dbError(err, cypherQuery);
