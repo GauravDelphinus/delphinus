@@ -18,7 +18,7 @@ describe("Challenge Routes", function() {
 			.end(function(err, res) {
 				res.should.have.status(200);
 				res.body.should.be.an("array");
-				res.body.length.should.be.eql(25);
+				res.body.length.should.be.eql(0); //since we don't have anything in the db
 				done();
 			});
 		});
@@ -31,7 +31,7 @@ describe("Challenge Routes", function() {
 			.end(function(err, res) {
 				res.should.have.status(200);
 				res.body.should.be.an("array");
-				res.body.length.should.be.eql(25);
+				res.body.length.should.be.eql(0); //since we don't have anything in the db
 				done();
 			});
 		});
