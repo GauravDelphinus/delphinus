@@ -69,7 +69,7 @@ var routes = function(db) {
 					cypherQuery += " ORDER BY popularity_count DESC;";
 				}
 			}
-			
+
 			logger.dbDebug(cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) {
@@ -77,6 +77,7 @@ var routes = function(db) {
 					return res.sendStatus(500);
     			}
 
+    			logger.debug("result.data from query: " + JSON.stringify(result.data));
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
 
@@ -85,6 +86,7 @@ var routes = function(db) {
 
     			}
 
+    			logger.debug("output sent back to client: " + JSON.stringify(output));
     			return res.json(output);
 			});
 		})
