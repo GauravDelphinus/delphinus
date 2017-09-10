@@ -136,7 +136,7 @@ module.exports = {
 		cypherQuery += " ORDER BY c.created DESC;";
 
 		logger.dbDebug(cypherQuery);
-		db.cypherQuery(cypherQuery, function(err, result){
+		myDB.cypherQuery(cypherQuery, function(err, result){
 			if(err) {
 				logger.dbError(err, cypherQuery);
 			}
