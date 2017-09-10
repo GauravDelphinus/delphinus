@@ -85,50 +85,14 @@ module.exports = {
 		for (var i = 0; i < data.users.length; i++) {
 			var user = data.users[i];
 
-			var cypherQuery = "MERGE (u:User {id: '" + user.id + "'}) ON CREATE SET " +
-				"u.displayName = '" + user.displayName + "', " +
-				"u.image = '" + user.image + "', " +
-				"u.lastSeen = '" + user.lastSeen + "' RETURN u;";
-
-			functions.push(async.apply(function(next) {
-				logger.dbDebug(cypherQuery);
-				myDB.cypherQuery(cypherQuery, function(err, result) {
-					if (err) {
-						logger.dbError(err, cypherQuery);
-						next(err, 0);
-						return;
-					}
-					next(0, 0);
-				});
-			}));
-			
+			functions.push(async.apply(createUserNode, myDB, user));
 		}
 
 		//Create challenges
 		for (var i = 0; i < data.challenges.length; i++) {
 			var challenge = data.challenges[i];
 
-			var cypherQuery = "MATCH(u:User {id: '" + challenge.poster_id + "'}) MATCH (category:Category {id: '" + challenge.category + "'}) MERGE (category)<-[:POSTED_IN]-(n:Challenge {" +
-					"id: '" + challenge.id + "'})-[r:POSTED_BY]->(u) ON CREATE SET " +
-					"n.image = '" + challenge.image + "'," +
-					"n.image_type = '" + challenge.image_type + "'," + 
-					"n.image_width = '" + challenge.image_width + "'," +
-					"n.image_height = '" + challenge.image_height + "'," +
-					"n.created = '" + challenge.created + "'," + 
-					"n.title = '" + challenge.title + "'" +
-					" RETURN n;";
-
-			functions.push(async.apply(function(next) {
-				logger.dbDebug(cypherQuery);
-				myDB.cypherQuery(cypherQuery, function(err, result) {
-					if (err) {
-						logger.dbError(err, cypherQuery);
-						next(err, 0);
-						return;
-					}
-					next(0, 0);
-				});
-			}));
+			functions.push(async.apply(createChallengeNode, myDB, challenge));
 		}
 
 		async.series(functions, function(err, array) {
@@ -1456,5 +1420,44 @@ function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {
 			}
 		});
 	}
+}
+
+function createUserNode(db, user, next) {
+	var cypherQuery = "MERGE (u:User {id: '" + user.id + "'}) ON CREATE SET " +
+		"u.displayName = '" + user.displayName + "', " +
+		"u.image = '" + user.image + "', " +
+		"u.lastSeen = '" + user.lastSeen + "' RETURN u;";
+
+	logger.dbDebug(cypherQuery);
+	myDB.cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			next(err, 0);
+			return;
+		}
+		next(0, 0);
+	});
+}
+
+function createChallengeNode(db, challenge, next) {
+	var cypherQuery = "MATCH(u:User {id: '" + challenge.poster_id + "'}) MATCH (category:Category {id: '" + challenge.category + "'}) MERGE (category)<-[:POSTED_IN]-(n:Challenge {" +
+		"id: '" + challenge.id + "'})-[r:POSTED_BY]->(u) ON CREATE SET " +
+		"n.image = '" + challenge.image + "'," +
+		"n.image_type = '" + challenge.image_type + "'," + 
+		"n.image_width = '" + challenge.image_width + "'," +
+		"n.image_height = '" + challenge.image_height + "'," +
+		"n.created = '" + challenge.created + "'," + 
+		"n.title = '" + challenge.title + "'" +
+		" RETURN n;";
+
+	logger.dbDebug(cypherQuery);
+	db.cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			next(err, 0);
+			return;
+		}
+		next(0, 0);
+	});
 }
 

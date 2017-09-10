@@ -9,16 +9,27 @@ var assert = chai.assert;
 
 chai.use(chaiHttp);
 
-//initialize DB
-var testData = require("./testData");
-dataUtils.initializeDBWithData(testData, function(err) {
-	if (err) {
-		//DB couldn't be initialized.
-	}
-});
+
 
 describe("Challenge Routes", function() {
 	this.timeout(10000);
+
+	//call before running any tests in this block
+	before(function(done) {
+      //initialize DB
+		var testData = require("./testData");
+		dataUtils.initializeDBWithData(testData, function(err) {
+			if (err) {
+				//DB couldn't be initialized.
+			}
+			done();
+		});
+    });
+
+	//call after running all tests in this block
+    after(function(done) {
+    	//potentially, remove the db stuff that was added
+    });
 
 	describe("GET /api/challenges?sortBy=dateCreated", function() {
 		it("should return list of all challenges sorted by dateCreated", function(done) {
