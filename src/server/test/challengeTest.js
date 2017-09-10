@@ -10,6 +10,7 @@ chai.use(chaiHttp);
 describe("Challenge Routes", function() {
 	describe("GET /api/challenges?sortBy=dateCreated", function() {
 		it("should return list of all challenges", function(done) {
+			this.timeout(10000);
 			chai.request(app)
 			.get("/api/challenges?sortBy=dateCreated")
 			.end(function(err, res) {
