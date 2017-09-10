@@ -16,7 +16,7 @@ describe("Challenge Routes", function() {
 				res.should.have.status(200);
 				res.body.should.be.an("array");
 				res.body.length.should.be.eql(25);
-				done();
+				done(err);
 			});
 		});
 	});
@@ -29,7 +29,7 @@ describe("Challenge Routes", function() {
 				res.should.have.status(200);
 				res.body.should.be.an("array");
 				res.body.length.should.be.eql(25);
-				done();
+				done(err);
 			});
 		});
 	});
@@ -41,7 +41,7 @@ describe("Challenge Routes", function() {
 			.end(function(err, res) {
 				res.should.have.status(400);
 				res.body.should.be.an("object"); //object contains the 400 status message - see http://expressjs.com/en/api.html#res.sendStatus
-				done();
+				done(err);
 			});
 		});
 	});
