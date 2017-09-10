@@ -10,6 +10,8 @@ var assert = chai.assert;
 chai.use(chaiHttp);
 
 describe("HTTP Routes", function() {
+	this.timeout(10000);
+	
 	//call before running any tests in this block
 	before(function(done) {
       //initialize DB
