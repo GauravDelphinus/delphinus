@@ -2,6 +2,7 @@ var chai = require("chai");
 var chaiHttp = require("chai-http");
 var app = require("../app")();
 var dataUtils = require("../dataUtils");
+var logger = require("../logger");
 
 var should = chai.should();
 var assert = chai.assert;
@@ -23,6 +24,7 @@ describe("Challenge Routes", function() {
 				assert.equal(res.status, 200);
 				assert.isArray(res.body);
 				assert.isAtLeast(res.body.length, 3);
+				logger.debug("res.body is " + JSON.stringify(res.body));
 				done();
 			});
 		});
