@@ -71,6 +71,7 @@ var routes = function(db) {
 
 			logger.debug("Calling cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
+				logger.debug("callback called, err = " + err);
     			if(err) {
     				logger.dbError(err, cypherQuery);
 					return res.sendStatus(500);
