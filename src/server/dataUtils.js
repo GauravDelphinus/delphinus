@@ -4,6 +4,7 @@ var categories = require("./categories");
 var shortid = require("shortid");
 var fs = require("fs");
 var mime = require("mime");
+var logger = require("./logger");
 
 module.exports = {
 
