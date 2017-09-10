@@ -119,6 +119,25 @@ module.exports = {
 			});
 		}
 
+		var cypherQueryU = "MATCH (u:User) RETURN u;";
+		logger.dbDebug(cypherQueryU);
+		myDB.cypherQuery(cypherQueryU, function(err, result){
+			if(err) {
+				logger.dbError(err, cypherQueryU);
+			}
+
+			logger.debug("Plain Users: result.data from query: " + JSON.stringify(result.data));
+		});
+
+		var cypherQueryC = "MATCH (c:Challenge) RETURN c;";
+		logger.dbDebug(cypherQueryC);
+		myDB.cypherQuery(cypherQueryC, function(err, result){
+			if(err) {
+				logger.dbError(err, cypherQueryC);
+			}
+
+			logger.debug("Plain Challenges: result.data from query: " + JSON.stringify(result.data));
+		});
 
 
 		var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
