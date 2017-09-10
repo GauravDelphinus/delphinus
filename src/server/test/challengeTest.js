@@ -29,6 +29,7 @@ describe("Challenge Routes", function() {
 	//call after running all tests in this block
     after(function(done) {
     	//potentially, remove the db stuff that was added
+    	done();
     });
 
 	describe("GET /api/challenges?sortBy=dateCreated", function() {
