@@ -1,4 +1,4 @@
-var config = require('./config');
+	var config = require('./config');
 var presets = require("./presets");
 var categories = require("./categories");
 var shortid = require("shortid");
@@ -20,8 +20,7 @@ module.exports = {
 
 			var cypherQuery = "MERGE (l:Layout {id: '" + id + "'}) ON CREATE SET l.name = '" + presetLayoutName + "', l.layout_type = 'preset' RETURN l;";
 
-			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
-				
+			logger.dbDebug(cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
@@ -34,8 +33,7 @@ module.exports = {
 
 			var cypherQuery = "MERGE (f:Filter {id: '" + id + "'}) ON CREATE SET f.name = '" + presetFilterName + "', f.filter_type = 'preset' RETURN f;";
 
-			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
-				
+			logger.dbDebug(cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
@@ -48,8 +46,7 @@ module.exports = {
 
 			var cypherQuery = "MERGE (a:Artifact {id: '" + id + "'}) ON CREATE SET a.name = '" + presetArtifactName + "', a.artifact_type = 'preset' RETURN a;";
 
-			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
-				
+			logger.dbDebug(cypherQuery);				
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
@@ -61,9 +58,8 @@ module.exports = {
 			var presetDecorationName = presets.presetDecoration[key];
 
 			var cypherQuery = "MERGE (d:Decoration {id: '" + id + "'}) ON CREATE SET d.name = '" + presetDecorationName + "', d.decoration_type = 'preset' RETURN d;";
-
-			//console.log("INIT DB Running cypherQuery: " + cypherQuery);
-				
+			
+			logger.dbDebug(cypherQuery);				
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
@@ -1344,6 +1340,7 @@ function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {
 
 		cypherQuery += " ON CREATE SET c.name = '" + categoryObj.displayName + "' RETURN c;";
 			
+		logger.dbDebug(cypherQuery);
 		myDB.cypherQuery(cypherQuery, function(err, result){
 			if(err) {
 				logger.dbError(err, cypherQuery);

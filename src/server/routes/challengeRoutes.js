@@ -89,6 +89,7 @@ var routes = function(db) {
     			logger.debug("returning from the function: " + JSON.stringify(output));
     			return res.json(output);
 			});
+			logger.debug("After calling query");
 		})
 
 		.post(function(req, res){

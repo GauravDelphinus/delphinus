@@ -51,4 +51,8 @@ logger.dbError = function(error, query) {
 	this.error("DB Error: " + error + ".  Cypher Query: " + query);
 }
 
+logger.dbDebug = function(query) {
+	this.debug("Calling Cypher Query: " + query);
+}
+
 module.exports = logger;
