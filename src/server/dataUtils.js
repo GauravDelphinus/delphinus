@@ -95,9 +95,17 @@ module.exports = {
 			functions.push(async.apply(createChallengeNode, myDB, challenge));
 		}
 
+		//Create entries
+		for (var i = 0; i < data.entries.length; i++) {
+			var entry = data.entries[i];
+
+			functions.push(async.apply(createEntryNode, myDB, entry));
+		}
+
 		async.series(functions, function(err, array) {
 
 			//////////////
+			/*
 			var cypherQueryU = "MATCH (u:User) RETURN u;";
 			logger.dbDebug(cypherQueryU);
 			myDB.cypherQuery(cypherQueryU, function(err, result){
@@ -141,6 +149,7 @@ module.exports = {
 
 				logger.debug("after building: result.data from query: " + JSON.stringify(result.data));
 			});
+			*/
 			//////////////
 
 			callback(err);
@@ -1449,6 +1458,28 @@ function createChallengeNode(db, challenge, next) {
 		"n.created = '" + challenge.created + "'," + 
 		"n.title = '" + challenge.title + "'" +
 		" RETURN n;";
+
+	logger.dbDebug(cypherQuery);
+	db.cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			next(err, 0);
+			return;
+		}
+		next(0, 0);
+	});
+}
+
+function createEntryNode(db, entry, next) {
+
+	var cypherQuery = "MATCH(u:User {id: '" + entry.poster_id + "'}) MATCH (c:Challenge {id: '" + entry.challenge + "'}) MERGE (c)<-[:PART_OF]-(e:Entry {" +
+		"id: '" + entry.id + "'})-[r:POSTED_BY]->(u) ON CREATE SET " +
+		"e.image_type = '" + entry.image_type + "'," + 
+		"e.image_width = '" + entry.image_width + "'," +
+		"e.image_height = '" + entry.image_height + "'," +
+		"e.created = '" + entry.created + "'," + 
+		"e.caption = '" + entry.caption + "'" +
+		" RETURN e;";
 
 	logger.dbDebug(cypherQuery);
 	db.cypherQuery(cypherQuery, function(err, result) {
