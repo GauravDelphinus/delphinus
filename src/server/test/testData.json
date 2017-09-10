@@ -1,28 +1,51 @@
 {
+	"users" : [
+		{
+			"id" : "GkQawQ3PW",
+			"displayName" : "Test User 1",
+			"image" : "https://wwwf.imperial.ac.uk/blog/student-blogs/files/2017/01/stokes-profile-400-1.png",
+			"lastSeen" : "1501996987212"
+		},
+		{
+			"id" : "qkA2d7VDb",
+			"displayName" : "Test User 2",
+			"image" : "https://i.pinimg.com/736x/60/01/09/6001092b77455466fd535cd72b0b5529--doll-display-display-pictures.jpg",
+			"lastSeen" : "1502056812889"
+		}
+	],
 	"challenges" : [
 		{
 			"id" : "HkQawQ4PW",
 			"image" : "HkQawQ4PW.jpeg",
+			"image_type" : "image/jpeg",
 			"image_height" : "3264",
 			"image_width" : "2448",
 			"created" : "1501996987212",
-			"title" : "My First Challenge Title"
+			"title" : "My First Challenge Title",
+			"category" : "motivation",
+			"poster_id" : "GkQawQ3PW"
 		},
 		{
 			"id" : "rkA1d7VDb",
 			"image" : "rkA1d7VDb.jpeg",
+			"image_type" : "image/jpeg",
 			"image_height" : "1280",
 			"image_width" : "960",
 			"created" : "1501996987212",
-			"title" : "My Second Challenge Title"
+			"title" : "My Second Challenge Title",
+			"category" : "family",
+			"poster_id" : "qkA2d7VDb"
 		},
 		{
 			"id" : "BkSubfHDZ",
 			"image" : "BkSubfHDZ.jpeg",
+			"image_type" : "image/jpeg",
 			"image_height" : "720",
 			"image_width" : "1250",
 			"created" : "1502056812889",
-			"title" : "My Third Challenge Title"
+			"title" : "My Third Challenge Title",
+			"category" : "nature",
+			"poster_id" : "qkA2d7VDb"
 		}
 	]
 }

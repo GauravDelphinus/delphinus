@@ -50,6 +50,7 @@ var routes = function(db) {
 				cypherQuery += "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
 			}
 
+
 			cypherQuery +=
 						" WITH c, category, poster " +
 						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
@@ -68,7 +69,8 @@ var routes = function(db) {
 					cypherQuery += " ORDER BY popularity_count DESC;";
 				}
 			}
-
+			
+			logger.dbDebug(cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) {
     				logger.dbError(err, cypherQuery);

@@ -78,17 +78,36 @@ module.exports = {
 	},
 
 	initializeDBWithData: function(data) {
+		//Create users
+		for (var i = 0; i < data.users.length; i++) {
+			var user = data.users[i];
+
+			var cypherQuery = "MERGE (u:User {id: '" + user.id + "'}) ON CREATE SET " +
+				"u.displayName = '" + user.displayName + "', " +
+				"u.image = '" + user.image + "', " +
+				"u.lastSeen = '" + user.lastSeen + "' RETURN u;";
+
+			myDB.cypherQuery(cypherQuery, function(err, result) {
+				if (err) {
+					logger.dbError(err, cypherQuery);
+					return;
+				}
+			});
+		}
+
+		//Create challenges
 		for (var i = 0; i < data.challenges.length; i++) {
 			var challenge = data.challenges[i];
-			var cypherQuery = "MERGE (c:Challenge {id: '" + challenge.id + "'}) ON CREATE SET ";
 
-			cypherQuery += " c.image = '" + challenge.image + "'";
-			cypherQuery += ", c.image_width = '" + challenge.image_width + "'";
-			cypherQuery += ", c.image_height = '" + challenge.image_height + "'";
-			cypherQuery += ", c.created = '" + challenge.created + "'";
-			cypherQuery += ", c.title = '" + challenge.title + "'";
-
-			cypherQuery += " RETURN c;";
+			var cypherQuery = "MATCH(u:User {id: '" + challenge.poster_id + "'}) MATCH (category:Category {id: '" + challenge.category + "'}) MERGE (category)<-[:POSTED_IN]-(n:Challenge {" +
+					"id: '" + challenge.id + "'})-[r:POSTED_BY]->(u) ON CREATE SET " +
+					"n.image = '" + challenge.image + "'," +
+					"n.image_type = '" + challenge.image_type + "'," + 
+					"n.image_width = '" + challenge.image_width + "'," +
+					"n.image_height = '" + challenge.image_height + "'," +
+					"n.created = '" + challenge.created + "'," + 
+					"n.title = '" + challenge.title + "'" +
+					" RETURN n;";
 
 			myDB.cypherQuery(cypherQuery, function(err, result) {
 				if (err) {

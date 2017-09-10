@@ -16,7 +16,7 @@ describe("Challenge Routes", function() {
 	this.timeout(10000);
 
 	describe("GET /api/challenges?sortBy=dateCreated", function() {
-		it("should return list of all challenges", function(done) {
+		it("should return list of all challenges sorted by dateCreated", function(done) {
 			chai.request(app)
 			.get("/api/challenges?sortBy=dateCreated")
 			.end(function(err, res) {
@@ -29,7 +29,7 @@ describe("Challenge Routes", function() {
 	});
 
 	describe("GET /api/challenges?sortBy=popularity", function() {
-		it("should return list of all challenges", function(done) {
+		it("should return list of all challenges sorted by popularity", function(done) {
 			chai.request(app)
 			.get("/api/challenges?sortBy=popularity")
 			.end(function(err, res) {
@@ -48,6 +48,19 @@ describe("Challenge Routes", function() {
 			.end(function(err, res) {
 				assert.equal(res.status, 400);
 				assert.isObject(res.body); //object contains the 400 status message - see http://expressjs.com/en/api.html#res.sendStatus
+				done();
+			});
+		});
+	});
+
+	describe("GET /api/challenges/:challengeId", function() {
+		it("should return the specific challenge details", function(done) {
+			chai.request(app)
+			.get("/api/challenges/HkQawQ4PW")
+			.end(function(err, res) {
+				assert.equal(res.status, 200);
+				assert.isObject(res.body);
+				assert.equal(res.body.type, "challenge");
 				done();
 			});
 		});
