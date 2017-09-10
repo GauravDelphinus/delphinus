@@ -5,6 +5,7 @@ var shortid = require("shortid");
 var fs = require("fs");
 var mime = require("mime");
 var logger = require("./logger");
+var async = require("async");
 
 module.exports = {
 
@@ -77,7 +78,9 @@ module.exports = {
 		return myDB;
 	},
 
-	initializeDBWithData: function(data) {
+	initializeDBWithData: function(data, callback) {
+		var functions = [];
+
 		//Create users
 		for (var i = 0; i < data.users.length; i++) {
 			var user = data.users[i];
@@ -87,13 +90,18 @@ module.exports = {
 				"u.image = '" + user.image + "', " +
 				"u.lastSeen = '" + user.lastSeen + "' RETURN u;";
 
-			logger.dbDebug(cypherQuery);
-			myDB.cypherQuery(cypherQuery, function(err, result) {
-				if (err) {
-					logger.dbError(err, cypherQuery);
-					return;
-				}
-			});
+			functions.push(async.apply(function(next) {
+				logger.dbDebug(cypherQuery);
+				myDB.cypherQuery(cypherQuery, function(err, result) {
+					if (err) {
+						logger.dbError(err, cypherQuery);
+						next(err, 0);
+						return;
+					}
+					next(0, 0);
+				});
+			}));
+			
 		}
 
 		//Create challenges
@@ -110,57 +118,68 @@ module.exports = {
 					"n.title = '" + challenge.title + "'" +
 					" RETURN n;";
 
-			logger.dbDebug(cypherQuery);
-			myDB.cypherQuery(cypherQuery, function(err, result) {
-				if (err) {
-					logger.dbError(err, cypherQuery);
-					return;
-				}
-			});
+			functions.push(async.apply(function(next) {
+				logger.dbDebug(cypherQuery);
+				myDB.cypherQuery(cypherQuery, function(err, result) {
+					if (err) {
+						logger.dbError(err, cypherQuery);
+						next(err, 0);
+						return;
+					}
+					next(0, 0);
+				});
+			}));
 		}
 
-		var cypherQueryU = "MATCH (u:User) RETURN u;";
-		logger.dbDebug(cypherQueryU);
-		myDB.cypherQuery(cypherQueryU, function(err, result){
-			if(err) {
-				logger.dbError(err, cypherQueryU);
-			}
+		async.series(functions, function(err, array) {
 
-			logger.debug("Plain Users: result.data from query: " + JSON.stringify(result.data));
-		});
+			//////////////
+			var cypherQueryU = "MATCH (u:User) RETURN u;";
+			logger.dbDebug(cypherQueryU);
+			myDB.cypherQuery(cypherQueryU, function(err, result){
+				if(err) {
+					logger.dbError(err, cypherQueryU);
+				}
 
-		var cypherQueryC = "MATCH (c:Challenge) RETURN c;";
-		logger.dbDebug(cypherQueryC);
-		myDB.cypherQuery(cypherQueryC, function(err, result){
-			if(err) {
-				logger.dbError(err, cypherQueryC);
-			}
+				logger.debug("Plain Users: result.data from query: " + JSON.stringify(result.data));
+			});
 
-			logger.debug("Plain Challenges: result.data from query: " + JSON.stringify(result.data));
-		});
+			var cypherQueryC = "MATCH (c:Challenge) RETURN c;";
+			logger.dbDebug(cypherQueryC);
+			myDB.cypherQuery(cypherQueryC, function(err, result){
+				if(err) {
+					logger.dbError(err, cypherQueryC);
+				}
+
+				logger.debug("Plain Challenges: result.data from query: " + JSON.stringify(result.data));
+			});
 
 
-		var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
-		cypherQuery +=
-						" WITH c, category, poster " +
-						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
-						" WITH c, category, poster, COUNT(u2) AS like_count " + 
-						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
-						" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
-						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-						" WITH c, category, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
-						" OPTIONAL MATCH (me:User {id: '" + 0 + "'})-[like:LIKES]->(c) " +
-						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), (like_count + comment_count + entry_count) AS popularity_count, category ";
+			var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
+			cypherQuery +=
+							" WITH c, category, poster " +
+							" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
+							" WITH c, category, poster, COUNT(u2) AS like_count " + 
+							" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
+							" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
+							" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
+							" WITH c, category, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
+							" OPTIONAL MATCH (me:User {id: '" + 0 + "'})-[like:LIKES]->(c) " +
+							" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), (like_count + comment_count + entry_count) AS popularity_count, category ";
 
-		cypherQuery += " ORDER BY c.created DESC;";
+			cypherQuery += " ORDER BY c.created DESC;";
 
-		logger.dbDebug(cypherQuery);
-		myDB.cypherQuery(cypherQuery, function(err, result){
-			if(err) {
-				logger.dbError(err, cypherQuery);
-			}
+			logger.dbDebug(cypherQuery);
+			myDB.cypherQuery(cypherQuery, function(err, result){
+				if(err) {
+					logger.dbError(err, cypherQuery);
+				}
 
-			logger.debug("after building: result.data from query: " + JSON.stringify(result.data));
+				logger.debug("after building: result.data from query: " + JSON.stringify(result.data));
+			});
+			//////////////
+
+			callback(err);
 		});
 	},
 

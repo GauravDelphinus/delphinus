@@ -11,7 +11,11 @@ chai.use(chaiHttp);
 
 //initialize DB
 var testData = require("./testData");
-dataUtils.initializeDBWithData(testData);
+dataUtils.initializeDBWithData(testData, function(err) {
+	if (err) {
+		//DB couldn't be initialized.
+	}
+});
 
 describe("Challenge Routes", function() {
 	this.timeout(10000);
