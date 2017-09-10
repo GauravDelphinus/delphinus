@@ -21,7 +21,6 @@ module.exports = {
 
 			var cypherQuery = "MERGE (l:Layout {id: '" + id + "'}) ON CREATE SET l.name = '" + presetLayoutName + "', l.layout_type = 'preset' RETURN l;";
 
-			logger.dbDebug(cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
@@ -34,7 +33,6 @@ module.exports = {
 
 			var cypherQuery = "MERGE (f:Filter {id: '" + id + "'}) ON CREATE SET f.name = '" + presetFilterName + "', f.filter_type = 'preset' RETURN f;";
 
-			logger.dbDebug(cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
@@ -47,7 +45,6 @@ module.exports = {
 
 			var cypherQuery = "MERGE (a:Artifact {id: '" + id + "'}) ON CREATE SET a.name = '" + presetArtifactName + "', a.artifact_type = 'preset' RETURN a;";
 
-			logger.dbDebug(cypherQuery);				
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
@@ -60,7 +57,6 @@ module.exports = {
 
 			var cypherQuery = "MERGE (d:Decoration {id: '" + id + "'}) ON CREATE SET d.name = '" + presetDecorationName + "', d.decoration_type = 'preset' RETURN d;";
 			
-			logger.dbDebug(cypherQuery);				
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
@@ -81,6 +77,27 @@ module.exports = {
 		return myDB;
 	},
 
+	initializeDBWithData: function(data) {
+		for (var i = 0; i < data.challenges.length; i++) {
+			var challenge = data.challenges[i];
+			var cypherQuery = "MERGE (c:Challenge {id: '" + challenge.id + "'}) ON CREATE SET ";
+
+			cypherQuery += " c.image = '" + challenge.image + "'";
+			cypherQuery += ", c.image_width = '" + challenge.image_width + "'";
+			cypherQuery += ", c.image_height = '" + challenge.image_height + "'";
+			cypherQuery += ", c.created = '" + challenge.created + "'";
+			cypherQuery += ", c.title = '" + challenge.title + "'";
+
+			cypherQuery += " RETURN c;";
+
+			myDB.cypherQuery(cypherQuery, function(err, result) {
+				if (err) {
+					logger.dbError(err, cypherQuery);
+					return;
+				}
+			});
+		}
+	},
 
 
 	/**
@@ -1341,7 +1358,6 @@ function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {
 
 		cypherQuery += " ON CREATE SET c.name = '" + categoryObj.displayName + "' RETURN c;";
 			
-		logger.dbDebug(cypherQuery);
 		myDB.cypherQuery(cypherQuery, function(err, result){
 			if(err) {
 				logger.dbError(err, cypherQuery);

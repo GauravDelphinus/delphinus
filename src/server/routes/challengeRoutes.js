@@ -69,15 +69,11 @@ var routes = function(db) {
 				}
 			}
 
-			logger.debug("Calling cypherQuery: " + cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
-				logger.debug("callback called, err = " + err);
     			if(err) {
     				logger.dbError(err, cypherQuery);
 					return res.sendStatus(500);
     			}
-
-    			logger.debug("query returned: " + JSON.stringify(result.data));
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
@@ -87,10 +83,8 @@ var routes = function(db) {
 
     			}
 
-    			logger.debug("returning from the function: " + JSON.stringify(output));
     			return res.json(output);
 			});
-			logger.debug("After calling query");
 		})
 
 		.post(function(req, res){
