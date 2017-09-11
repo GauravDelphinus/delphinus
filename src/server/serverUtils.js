@@ -53,70 +53,198 @@ module.exports = {
 			}
 
 			if (query.hasOwnProperty(param.name)) {
-				if (param.type.constructor === Array) {
-					if (param.type.indexOf(query[param.name]) == -1) {
-						logger.error("Invalid value '" + query[param.name] + "' received for param: '" + param.name + "', expected among " + JSON.stringify(param.type));
-						return false;
-					}
-				} else if (param.type == "id") {
-					if (!shortid.isValid(query[param.name])) {
-						logger.error("Invalid ID '" + query[param.name] + "' received for param: '" + param.name + "'");
-						return false;
-					}
-				} else if (param.type == "imageType") {
-					if (!(query[param.name] == "image/png" || query[param.name] == "image/jpeg" || query[param.name] == "image/gif")) {
-						logger.error("Invalid Image Type '" + query[param.name] + "' received for param: '" + param.name + "'");
-						return false;
-					}
-				} else if (param.type == "imageData") {
-					var imageData = query[param.name];
-					if (!imageData.startsWith("data:image/")) {
-						logger.error("Invalid Image Data received - does not start with 'data:image/'");
-						return false;
-					}
+				if (!validateItem(param.type, param.name, query[param.name])) {
+					return false;
+				}
+			}
+		}
 
-					var imageBlob; //actual image data in base64 encoding
-					var index = imageData.indexOf("base64,");
-					if (index == -1) {
-						logger.error("Invalid Image Data received - does not contain 'base64,'");
-						return false; //expected the format to include base64
-					}
+		return true;
+	},
+	/*
+	object: {
+	    "type": "challenge",
+	    "id": "HkQawQ4PW",
+	    "compareDate": "1501996987212",
+	    "socialStatus": {
+	        "likes": {
+	            "numLikes": 0,
+	            "amLiking": false
+	        },
+	        "shares": {
+	            "numShares": 0
+	        },
+	        "comments": {
+	            "numComments": 0
+	        },
+	        "entries": {
+	            "numEntries": 1
+	        }
+	    },
+	    "postedDate": "1501996987212",
+	    "postedByUser": {
+	        "image": "https://wwwf.imperial.ac.uk/blog/student-blogs/files/2017/01/stokes-profile-400-1.png",
+	        "lastSeen": "1501996987212",
+	        "displayName": "Test User 1",
+	        "id": "GkQawQ3PW",
+	        "_id": 1030
+	    },
+	    "image": "/contentImages/challenges/HkQawQ4PW.jpeg",
+	    "imageType": "image/jpeg",
+	    "caption": "My First Challenge Title",
+	    "link": "/challenge/HkQawQ4PW",
+	    "categoryName": "Motivation",
+	    "categoryID": "motivation"
+	}
 
-					imageBlob = imageDataURI.slice(index + 7);
-					/*
-						Now, check that the starting few bytes match either jpeg, png or gif
-						Refer: https://stackoverflow.com/questions/3312607/php-binary-image-data-checking-the-image-type
-					*/
-					if (!(imageBlob.startsWith("/9j/") || imageBlob.startsWith("iVBORw0KGgo=") || imageBlob.startsWith("R0lG"))) {
-						logger.error("Invalid Image Data received - Starting bytes don't match PNG, JPEG or GIF");
-						return false;
-					}
-				} else if (param.type == "string") {
-					if (query[param.name].length > 1000) {
-						logger.error("Invalid value '" + query[param.name] + "' received for param '" + param.name + "' - Character Length > 1000");
-						return false;
-					}
-				} else if (param.type == "number") {
-					if (query[param.name] !== parseInt(query[param.name], 10)) {
-						logger.error("Invalid value '" + query[param.name] + "' received for param '" + param.name + "' - Not an integer");
-						return false;
-					}
-				} else if (param.type == "url") {
-					if (!validUrl.isUri(query[param.name])) {
-						logger.error("Invalid URL '" + query[param.name] + "' received for param '" + param.name + "'");
-						return false;
-					}
-				} else if (param.type == "category") {
-					var categories = require("./categories");
-					if (!categories.hasOwnProperty(query[param.name])) {
-						logger.error("Invalid Category '" + query[param.name] + "' received for param '" + param.name + "'");
-						return false;
-					}
-				} else if (param.type == "myURL") {
-					if (!(query[param.name].startsWith("/") || url.parse(query[param.name]).hostname == global.hostname)) {
-						logger.error("Invalid URL '" + query[param.name] + "' received for param '" + param.name + "'");
-						return false;
-					}
+	prototype: 
+
+	var prototype = {
+		"challenge" : {
+			"type" : ["challenge" | "entry" | "user"],
+			"id" : "id",
+			"compareDate" : "number",
+			"socialStatus" : {
+				"likes" : {
+					"numLikes" : "number",
+					"amLiking" : ["true" | "false"]
+				},
+				"shares" : {
+					"numShares" : "number"
+				},
+				"comments" : {
+					"numComments" : "number"
+				},
+				"entries": {
+					"numEntries" : "number"
+				}
+			},
+			"postedDate" : "number",
+			"postedByUser" : "postedByUser",
+			"image": "url",
+			"imageType": "imageType",
+			"caption": "string",
+			"link" : "url",
+			"categoryName" : "string",
+			"categoryID" : "id"
+		},
+		"postedByUser" : {
+			"id" : "id",
+			"displayName" : "string",
+			"image" : "url",
+			"lastSeen" : "number"
+		}
+	};
+	*/
+	validateItem: function(type, name, value) {
+		if (type.constructor === Array) {
+			if (type.indexOf(value) == -1) {
+				logger.error("Invalid value '" + value + "' received for param: '" + name + "', expected among " + JSON.stringify(type));
+				return false;
+			}
+		} else if (type == "id") {
+			if (!shortid.isValid(value)) {
+				logger.error("Invalid ID '" + value + "' received for param: '" + name + "'");
+				return false;
+			}
+		} else if (type == "imageType") {
+			if (!(value == "image/png" || value == "image/jpeg" || value == "image/gif")) {
+				logger.error("Invalid Image Type '" + value + "' received for param: '" + name + "'");
+				return false;
+			}
+		} else if (type == "imageData") {
+			if (!value.startsWith("data:image/")) {
+				logger.error("Invalid Image Data received for param: " + name + " - does not start with 'data:image/'");
+				return false;
+			}
+
+			var imageBlob; //actual image data in base64 encoding
+			var index = value.indexOf("base64,");
+			if (index == -1) {
+				logger.error("Invalid Image Data received - does not contain 'base64,'");
+				return false; //expected the format to include base64
+			}
+
+			imageBlob = value.slice(index + 7);
+			/*
+				Now, check that the starting few bytes match either jpeg, png or gif
+				Refer: https://stackoverflow.com/questions/3312607/php-binary-image-data-checking-the-image-type
+			*/
+			if (!(imageBlob.startsWith("/9j/") || imageBlob.startsWith("iVBORw0KGgo=") || imageBlob.startsWith("R0lG"))) {
+				logger.error("Invalid Image Data received - Starting bytes don't match PNG, JPEG or GIF");
+				return false;
+			}
+		} else if (type == "string") {
+			if (value.length > 1000) {
+				logger.error("Invalid value '" + value + "' received for param '" + name + "' - Character Length > 1000");
+				return false;
+			}
+		} else if (type == "number") {
+			if (isNaN(parseFloat(value))) {
+				logger.error("Invalid value '" + value + "' received for param '" + name + "' - Not an integer");
+				return false;
+			}
+		} else if (type == "url") {
+			if (!validUrl.isUri(value)) {
+				logger.error("Invalid URL '" + value + "' received for param '" + name + "'");
+				return false;
+			}
+		} else if (type == "category") {
+			var categories = require("./categories");
+			if (!categories.hasOwnProperty(value)) {
+				logger.error("Invalid Category '" + value + "' received for param '" + name + "'");
+				return false;
+			}
+		} else if (type == "myURL") {
+			if (!(value.startsWith("/") || url.parse(value).hostname == global.hostname)) {
+				logger.error("Invalid URL '" + value + "' received for param '" + name + "'");
+				return false;
+			}
+		}
+
+		return true;
+	},
+
+	validateObjectWithPrototype: function(object, prototype) {
+		if (typeof object !== 'object' || typeof prototype !== 'object') {
+			logger.error("validateObjectWithPrototype: either one of object or prototype are not a valid object");
+			return false;
+		}
+
+		for (var key in object) {
+			if (!prototype.hasOwnProperty(key)) {
+				logger.error("prototype doesn't have the key: " + key);
+				return false;
+			}
+
+			if (typeof object[key] === 'object') {
+				if (typeof prototype[key] !== 'object') {
+					return false;
+				}
+
+				//call recursively if object found
+				if (!this.validateObjectWithPrototype(object[key], prototype[key])) {
+					return false;
+				}
+			} else {
+				if (!this.validateItem(prototype[key], key, object[key])) {
+					return false;
+				}
+			}
+		}
+
+		return true;
+	},
+
+	validateData: function(data, prototype) {
+		if (data.constructor === Object) { //object
+			if (!this.validateObjectWithPrototype(data, prototype)) {
+				return false;
+			}
+		} else if (data.constructor === Array) { //array
+			for (var i = 0; i < data.length; i++) {
+				if (!this.validateObjectWithPrototype(data[i], prototype)) {
+					return false;
 				}
 			}
 		}
