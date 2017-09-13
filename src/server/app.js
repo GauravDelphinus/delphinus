@@ -293,7 +293,7 @@ function normalizeUser(user) {
 		return 0;
 	}
 
-	return user;
+	return {id: user.id, displayName: user.displayName, image: user.image};
 }
 
 function configureEnvironment() {
