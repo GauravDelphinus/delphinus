@@ -1439,7 +1439,7 @@ function createUserNode(db, user, next) {
 	var cypherQuery = "MERGE (u:User {id: '" + user.id + "'}) ON CREATE SET " +
 		"u.displayName = '" + user.displayName + "', " +
 		"u.image = '" + user.image + "', " +
-		"u.lastSeen = '" + user.lastSeen + "' RETURN u;";
+		"u.last_seen = '" + user.lastSeen + "' RETURN u;";
 
 	logger.dbDebug(cypherQuery);
 	myDB.cypherQuery(cypherQuery, function(err, result) {
