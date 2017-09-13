@@ -87,11 +87,14 @@ var routes = function(db) {
 
                 var output = [];
     			for (var i = 0; i < result.data.length; i++) {
-    				var data = dataUtils.constructEntityData("user", result.data[i][0], null, result.data[i][0].lastSeen, null, null, null, null, result.data[i][1], result.data[i][3] > 0, result.data[i][2], "none", null, null, null, null);
+    				var data = dataUtils.constructEntityData("user", result.data[i][0], null, result.data[i][0].last_seen, null, null, null, null, result.data[i][1], result.data[i][3] > 0, result.data[i][2], "none", null, null, null, null);
 		
 					output.push(data);
     			}
                 
+                if (!serverUtils.validateData(output, serverUtils.prototypes.user)) {
+                	return res.sendStatus(500);
+                }
                 return res.json(output);
 			});
 		});
@@ -152,7 +155,7 @@ var routes = function(db) {
 						}
 					});
 
-					return res.json({}); 
+					return res.sendStatus(200);
 				});
             } else { // URL
 				updateUserInDB(res, user, function(err) {
@@ -162,7 +165,7 @@ var routes = function(db) {
 					}
 				});
 
-				return res.json({}); 
+				return res.sendStatus(200);
             }
 		});
 
@@ -203,6 +206,9 @@ var routes = function(db) {
 	                if(err) {
 	                	logger.dbError(err, cypherQuery);
 	                	return res.sendStatus(500);
+	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
+	                	return res.sendStatus(500);
 	                }
 
 	                var output = {followStatus: (result.data.length == 1) ? "following" : "not_following"};
@@ -214,6 +220,9 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) {
 	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
+	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
 	                	return res.sendStatus(500);
 	                }
 
@@ -256,7 +265,10 @@ var routes = function(db) {
 				if (err) {
 					logger.dbError(err, cypherQuery);
 					return res.sendStatus(500);
-				}
+				} else if (result.data.length != 1) {
+                	logger.dbResultError(cypherQuery, 1, result.data.length);
+                	return res.sendStatus(500);
+                }
 
 				var socialInfo = {};
 				if (result.data[0][0].twitter_profile_link) {
@@ -265,8 +277,11 @@ var routes = function(db) {
 				if (result.data[0][0].facebook_profile_link) {
 					socialInfo.facebookLink = result.data[0][0].facebook_profile_link;
 				}
-				var data = dataUtils.constructEntityData("user", result.data[0][0], null, result.data[0][0].lastSeen, null, null, null, null, result.data[0][1], result.data[0][3] > 0, result.data[0][2], null, "none", null, null, null, null, null, socialInfo);
+				var data = dataUtils.constructEntityData("user", result.data[0][0], null, result.data[0][0].last_seen, null, null, null, null, result.data[0][1], result.data[0][3] > 0, result.data[0][2], null, "none", null, null, null, null, null, socialInfo);
 				
+				if (!serverUtils.validateData(data, serverUtils.prototypes.user)) {
+					return res.sendStatus(500);
+				}
 				return res.json(data);
 			});
 		});
@@ -276,12 +291,7 @@ var routes = function(db) {
 
 function updateUserInDB(res, user, next) {
 	dataUtils.saveUser(user, function(err) {
-		if (err) {
-			next(err);
-		}
-
-		res.json(user);
-		next(0);
+		next(err);
 	});
 }
 

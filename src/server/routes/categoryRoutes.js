@@ -36,9 +36,21 @@ var routes = function(db) {
     			if(err) {
     				logger.dbError(err, cypherQuery);
     				return res.sendStatus(500);
+    			} else if (result.data.length <= 0) {
+    				logger.dbResultError(cypherQuery, "> 0", result.data.length);
+    				return res.sendStatus(500);
     			}
 
-    			return res.json(result.data);
+    			var output = [];
+    			for (var i = 0; i < result.data.length; i++) {
+    				output.push({name: result.data[i].name, id: result.data[i].id});
+    			}
+
+    			if (!serverUtils.validateData(output, serverUtils.prototypes.category)) {
+    				return res.sendStatus(500);
+    			}
+
+    			return res.json(output);
 			});
 		});
 

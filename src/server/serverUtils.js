@@ -53,7 +53,7 @@ module.exports = {
 			}
 
 			if (query.hasOwnProperty(param.name)) {
-				if (!validateItem(param.type, param.name, query[param.name])) {
+				if (!this.validateItem(param.type, param.name, query[param.name])) {
 					return false;
 				}
 			}
@@ -137,10 +137,20 @@ module.exports = {
 	};
 	*/
 	validateItem: function(type, name, value) {
+		//logger.debug("validateItem: type: " + JSON.stringify(type) + ", name: " + name + ", value: " + value);
 		if (type.constructor === Array) {
 			if (type.indexOf(value) == -1) {
-				logger.error("Invalid value '" + value + "' received for param: '" + name + "', expected among " + JSON.stringify(type));
-				return false;
+				var found = false;
+				for (var i = 0; i < type.length; i++) {
+					if (this.validateItem(type[i], name, value)) {
+						found = true;
+						break;
+					}
+				}
+				if (!found) {
+					logger.error("Invalid value '" + value + "' received for param: '" + name + "', expected among " + JSON.stringify(type));
+					return false;
+				}
 			}
 		} else if (type == "id") {
 			if (!shortid.isValid(value)) {
@@ -181,11 +191,17 @@ module.exports = {
 			}
 		} else if (type == "number") {
 			if (isNaN(parseFloat(value))) {
-				logger.error("Invalid value '" + value + "' received for param '" + name + "' - Not an integer");
+				logger.error("Invalid value '" + value + "' received for param '" + name + "' - Not a number");
+				//throw new Error("");
 				return false;
 			}
 		} else if (type == "url") {
 			if (!validUrl.isUri(value)) {
+				logger.error("Invalid URL '" + value + "' received for param '" + name + "'");
+				return false;
+			}
+		} else if (type == "myURL") {
+			if (!(value.startsWith("/") || url.parse(value).hostname == global.hostname)) {
 				logger.error("Invalid URL '" + value + "' received for param '" + name + "'");
 				return false;
 			}
@@ -195,9 +211,28 @@ module.exports = {
 				logger.error("Invalid Category '" + value + "' received for param '" + name + "'");
 				return false;
 			}
-		} else if (type == "myURL") {
-			if (!(value.startsWith("/") || url.parse(value).hostname == global.hostname)) {
-				logger.error("Invalid URL '" + value + "' received for param '" + name + "'");
+		} else if (type == "filter") {
+			var filters = require("./presets").presetFilter;
+			if (!filters.hasOwnProperty(value)) {
+				logger.error("Invalid Filter '" + value + "' received for param '" + name + "'");
+				return false;
+			}
+		} else if (type == "layout") {
+			var layouts = require("./presets").presetLayout;
+			if (!layouts.hasOwnProperty(value)) {
+				logger.error("Invalid Layout '" + value + "' received for param '" + name + "'");
+				return false;
+			}
+		} else if (type == "artifact") {
+			var artifacts = require("./presets").presetArtifact;
+			if (!artifacts.hasOwnProperty(value)) {
+				logger.error("Invalid Artifact '" + value + "' received for param '" + name + "'");
+				return false;
+			}
+		} else if (type == "decoration") {
+			var decorations = require("./presets").presetDecoration;
+			if (!decorations.hasOwnProperty(value)) {
+				logger.error("Invalid Decoration '" + value + "' received for param '" + name + "'");
 				return false;
 			}
 		}
@@ -206,6 +241,7 @@ module.exports = {
 	},
 
 	validateObjectWithPrototype: function(object, prototype) {
+		//logger.debug("validateObjectWithPrototype: object: " + JSON.stringify(object) + ", prototype: " + JSON.stringify(prototype));
 		if (typeof object !== 'object' || typeof prototype !== 'object') {
 			logger.error("validateObjectWithPrototype: either one of object or prototype are not a valid object");
 			return false;
@@ -219,11 +255,16 @@ module.exports = {
 
 			if (typeof object[key] === 'object') {
 				if (typeof prototype[key] !== 'object') {
-					return false;
-				}
-
-				//call recursively if object found
-				if (!this.validateObjectWithPrototype(object[key], prototype[key])) {
+					//logger.debug("prototype[key] is not an object, so looking at the predefined prototypes");
+					//check to see if there's a prototype available
+					if (this.prototypes.hasOwnProperty(key) && typeof this.prototypes[key] === 'object') {
+						if (!this.validateObjectWithPrototype(object[key], this.prototypes[key])) {
+							return false;
+						}
+					} else {
+						return false;
+					}
+				} else if (!this.validateObjectWithPrototype(object[key], prototype[key])) { //call recursively if object found
 					return false;
 				}
 			} else {
@@ -236,6 +277,12 @@ module.exports = {
 		return true;
 	},
 
+	/*
+		Validate output sent back to client from server.
+		Note that this acts like a filter - if a property is not present in the actual data
+		it will *not* catch it, but if it is present it will make sure to match and validate
+		it using the prototype.
+	*/
 	validateData: function(data, prototype) {
 		if (data.constructor === Object) { //object
 			if (!this.validateObjectWithPrototype(data, prototype)) {
@@ -274,5 +321,148 @@ module.exports = {
 	      cbCalled = true;
 	    }
 	  }
+	},
+
+	/*
+		Prototypes used for validating output sent back to client from server.
+		Note that this acts like a filter - if a property is not present in the actual data
+		it will *not* catch it, but if it is present it will make sure to match and validate
+		it using the prototype.
+	*/
+	prototypes: {
+		"challenge" : {
+			"type" : ["challenge"],
+			"id" : "id",
+			"compareDate" : "number",
+			"socialStatus" : {
+				"likes" : {
+					"numLikes" : "number",
+					"amLiking" : [true , false]
+				},
+				"shares" : {
+					"numShares" : "number"
+				},
+				"comments" : {
+					"numComments" : "number"
+				},
+				"entries": {
+					"numEntries" : "number"
+				}
+			},
+			"postedDate" : "number",
+			"postedByUser" : "postedByUser",
+			"image": "myURL",
+			"imageType": "imageType",
+			"caption": "string",
+			"link" : "myURL",
+			"categoryName" : "string",
+			"categoryID" : "id",
+			"activity" : "activity"
+		},
+		"postedByUser" : {
+			"id" : "id",
+			"displayName" : "string",
+			"image" : ["url", "myURL"],
+			"lastSeen" : "number"
+		},
+		"onlyId" : {
+			"id" : "id"
+		},
+		"category" : {
+			"name" : "string",
+			"id" : "category"
+		},
+		"comment" : {
+			"type" : ["comment"],
+			"id" : "id",
+			"postedByDate" : "number",
+			"postedByUser" : "postedByUser",
+			"socialStatus" : {
+				"numLikes" : "number"
+			},
+			"text" : "string"
+		},
+		"entry" : {
+			"type" : ["entry"],
+			"id" : "id",
+			"compareDate" : "number",
+			"socialStatus" : {
+				"likes" : {
+					"numLikes" : "number",
+					"amLiking" : [true , false]
+				},
+				"shares" : {
+					"numShares" : "number"
+				},
+				"comments" : {
+					"numComments" : "number"
+				}
+			},
+			"postedDate" : "number",
+			"postedByUser" : "postedByUser",
+			"image": "myURL",
+			"imageType": "imageType",
+			"caption": "string",
+			"link" : "myURL",
+			"activity" : "activity"
+		},
+		"activity" : {
+			"type" : ["recentlyPosted", "recentlyLiked", "recentlyCommented"],
+			"comment": {
+				"postedDate" : "number",
+				"postedByUser" : "postedByUser",
+				"socialStatus" : {
+					"numLikes" : "number"
+				}
+			},
+			"like" : {
+				"postedByUser" : "postedByUser",
+				"postedDate": "number"
+			}
+		},
+		"filter" : {
+			"id" : "filter",
+			"name" : "string"
+		},
+		"artifact" : {
+			"id" : "artifact",
+			"name" : "string"
+		},
+		"decoration" : {
+			"id" : "decoration",
+			"name" : "string"
+		},
+		"layout" : {
+			"id" : "layout",
+			"name" : "string"
+		},
+		"imageInfo" :  {
+			"imageType" : ["url"],
+			"imageData" : "myURL"
+		},
+		"user" : {
+			"type" : ["user"],
+			"id" : "id",
+			"compareDate" : "number",
+			"image": ["url", "myURL"],
+			"caption": "string",
+			"link" : "myURL",
+			"lastSeen" : "number",
+			"socialStatus" : {
+				"facebook" : {
+					"profileLink" : "url"
+				},
+				"twitter" : {
+					"profileLink" : "url"
+				},
+				"follows" : {
+					"numFollowers" : "number",
+					"amFollowing" : [true, false]
+				},
+				"posts" : {
+					"numPosts" : "number"
+				}
+			}
+		}
 	}
 }

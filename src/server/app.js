@@ -157,8 +157,6 @@ module.exports = function() {
 			}
 		];
 
-		
-
 		var referrerURL = req.get('Referrer');
 		var redirectURL = "/"; //by default, redirect to home page
 

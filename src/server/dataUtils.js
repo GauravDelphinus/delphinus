@@ -1335,7 +1335,11 @@ module.exports = {
 
 		if (entityType == "challenge" || entityType == "entry") {
 			data.postedDate = entity.created;
-			data.postedByUser = poster;
+			data.postedByUser = {};
+			data.postedByUser.id = poster.id;
+			data.postedByUser.displayName = poster.displayName;
+			data.postedByUser.image = poster.image;
+			data.postedByUser.lastSeen = poster.last_seen;
 		}
 
 		if (entityType == "challenge") {
@@ -1371,7 +1375,7 @@ module.exports = {
 			}
 		}
 
-		if (activityType != "none") {
+		if (activityType != null && activityType != "none") {
 			data.activity = {};
 			data.activity.type = activityType;
 

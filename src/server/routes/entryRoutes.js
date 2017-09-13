@@ -95,6 +95,9 @@ var routes = function(db) {
 					output.push(data);
     			}
 
+    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+    				return res.sendStatus(500);
+    			}
     			return res.json(output);
 			});
 		})
@@ -161,6 +164,9 @@ var routes = function(db) {
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
+					return res.sendStatus(500);
+				} else if (result.data.length != 1) {
+					logger.dbResultError(cypherQuery, 1, result.data.length);
 					return res.sendStatus(500);
 				}
 
@@ -250,44 +256,48 @@ var routes = function(db) {
 						if(err) {
 							logger.dbError(err, cypherQuery);
 							return res.sendStatus(500);
+						} else if (result.data.length != 1) {
+							logger.dbResultError(cypherQuery, 1, result.data.length);
+							return res.sendStatus(500);
 						}
 
-						if (result.data.length > 0) {
+						//now, generate the image(s)
+						var singleStepList = filterUtils.extractSingleStepList(req.body.steps);
+						var applySingleStepToImageFunctions = [];
+						var sourceImage = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(req.body.imageType);
 
-							//now, generate the image(s)
-							var singleStepList = filterUtils.extractSingleStepList(req.body.steps);
-							var applySingleStepToImageFunctions = [];
-							var sourceImage = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(req.body.imageType);
+						for (var i = 0; i < singleStepList.length; i++) {
+							var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
+							var targetImage = global.appRoot + config.path.cacheImages + req.body.challengeId + "-" + hash + "." + mime.extension(req.body.imageType);
 
-							for (var i = 0; i < singleStepList.length; i++) {
-								var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
-								var targetImage = global.appRoot + config.path.cacheImages + req.body.challengeId + "-" + hash + "." + mime.extension(req.body.imageType);
-
-								applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
-							}
-
-							var imagePaths = []; //list of image paths for each sub step
-	    					async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
-	    						if (err) {
-	    							logger.error("Error creating Images for the Entry Steps: " + err);
-	    							return res.sendStatus(500);
-	    						}
-
-	    						//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
-	    						var targetEntryImage = global.appRoot + config.path.entryImages + id + "." + mime.extension(req.body.imageType);
-	    						serverUtils.copyFile(imagePaths[imagePaths.length - 1], targetEntryImage, function(err) {
-	    							if (err) {
-	    								logger.error("Error creating the final Entry Image: " + err);
-	    								return res.sendStatus(500);
-	    							}
-
-	    							return res.json(result.data[0]);
-	    						});
-	    					});
-							
+							applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
 						}
+
+						var imagePaths = []; //list of image paths for each sub step
+    					async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
+    						if (err) {
+    							logger.error("Error creating Images for the Entry Steps: " + err);
+    							return res.sendStatus(500);
+    						}
+
+    						//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
+    						var targetEntryImage = global.appRoot + config.path.entryImages + id + "." + mime.extension(req.body.imageType);
+    						serverUtils.copyFile(imagePaths[imagePaths.length - 1], targetEntryImage, function(err) {
+    							if (err) {
+    								logger.error("Error creating the final Entry Image: " + err);
+    								return res.sendStatus(500);
+    							}
+
+    							var output = {id: result.data[0].id};
+								if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+			    					return res.sendStatus(500);
+			    				}
+
+			    				res.header("Location", "/api/entries/" + result.data[0].id);
+    							return res.status(201).json(output);
+    						});
+    					});	
 					});
-						
 				});
 			});
 		});
@@ -330,9 +340,16 @@ var routes = function(db) {
     			if(err) {
     				logger.dbError(err, cypherQuery);
     				return res.sendStatus(500);
+    			} else if (result.data.length != 1) {
+    				logger.dbResultError(cypherQuery, 1, result.data.length);
+    				return res.sendStatus(404); //not found
     			}
 
     			var data = dataUtils.constructEntityData("entry", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], null, 0, null, null, null, result.data[0][4] > 0, "recentlyPosted", null, null, null, null);
+
+    			if (!serverUtils.validateData(data, serverUtils.prototypes.entry)) {
+    				return res.sendStatus(500);
+    			}
     			return res.json(data);
 			});
 		})
@@ -366,7 +383,7 @@ var routes = function(db) {
     				return res.sendStatus(500);
     			}
 
-    			return res.json(result.data);
+    			return res.sendStatus(204);
 			});
 		});
 
@@ -393,6 +410,9 @@ var routes = function(db) {
       		db.cypherQuery(cypherQuery, function(err, result){
                 if(err) {
                 	logger.dbError(err, cypherQuery);
+                	return res.sendStatus(500);
+                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
                 	return res.sendStatus(500);
                 }
 
@@ -425,6 +445,9 @@ var routes = function(db) {
 	                if(err) {
 	                	logger.dbError(err, cypherQuery);
 	                	return res.sendStatus(500);
+	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
+	                	return res.sendStatus(500);
 	                }
 
 	                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
@@ -437,6 +460,9 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) {
 	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
+	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
 	                	return res.sendStatus(500);
 	                }
 

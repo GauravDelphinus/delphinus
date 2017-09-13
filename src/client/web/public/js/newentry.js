@@ -143,10 +143,11 @@ function showArtifactStep() {
 		}
 
 		$.getJSON('/api/filters?type=artifact' + "&artifactType=preset", function(result) {
+			console.log("received result: " + JSON.stringify(result));
 			if (result.length > 0) {
 				var list = [];
 				for (var i = 0; i < result.length; i++) {
-					var a = result[i][0];
+					var a = result[i];
 					//var u = result[i][1];
 
 					var data = {};
@@ -162,7 +163,9 @@ function showArtifactStep() {
 					jsonObj.steps.artifacts[0].type = "preset";
 					jsonObj.steps.artifacts[0].preset = a.id;
 					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
+					console.log("artifact, calling generateChanges");
 					generateChanges(a.id, jsonObj, function(id, imgPath) {
+						console.log("artifact: setting source for image: imgPath: " + imgPath);
 						$("#" + id + "EntityImage").prop("src", imgPath);
 					});
 
@@ -234,7 +237,7 @@ function showLayoutStep() {
 			if (result.length > 0) {
 				var list = [];
 				for (var i = 0; i < result.length; i++) {
-					var l = result[i][0];
+					var l = result[i];
 					//var u = result[i][1];
 
 					var data = {};
@@ -256,7 +259,9 @@ function showLayoutStep() {
 					}
 					jsonObj.steps.layouts[0].type = "preset";
 					jsonObj.steps.layouts[0].preset = l.id;
+					console.log("l, calling generateChanges");
 					generateChanges(l.id, jsonObj, function(id, imgPath) {
+						console.log("layout: setting source for image: imgPath: " + imgPath);
 						$("#" + id + "EntityImage").prop("src", imgPath);
 					});
 
@@ -457,7 +462,7 @@ function showFilterStep() {
 			if (result.length > 0) {
 				var list = [];
 				for (var i = 0; i < result.length; i++) {
-					var f = result[i][0];
+					var f = result[i];
 					//var u = result[i][1];
 
 					var data = {};
@@ -479,7 +484,9 @@ function showFilterStep() {
 					}
 					jsonObj.steps.filters[0].type = "preset";
 					jsonObj.steps.filters[0].preset = f.id;
+					console.log("f, calling generateChanges");
 					generateChanges(f.id, jsonObj, function(id, imgPath) {
+						console.log("filter: setting source for image: imgPath: " + imgPath);
 						$("#" + id + "EntityImage").prop("src", imgPath);
 					});
 
@@ -653,7 +660,7 @@ function showDecorationStep() {
 			if (result.length > 0) {
 				var list = [];
 				for (var i = 0; i < result.length; i++) {
-					var d = result[i][0];
+					var d = result[i];
 					//var u = result[i][1];
 
 					var data = {};
@@ -675,7 +682,9 @@ function showDecorationStep() {
 					}
 					jsonObj.steps.decorations[0].type = "preset";
 					jsonObj.steps.decorations[0].preset = d.id;
+					console.log("d, calling generateChanges");
 					generateChanges(d.id, jsonObj, function(id, imgPath) {
+						console.log("decoration: setting source for image: imgPath: " + imgPath);
 						$("#" + id + "EntityImage").prop("src", imgPath);
 					});
 
@@ -1203,14 +1212,19 @@ function generateChanges(id, jsonObj, done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			if (jsonData.type == "url") {
+			console.log("generateChanges returned success, jsonData = " + JSON.stringify(jsonData));
+			if (jsonData.imageType == "url") {
+				console.log("calling done ... ");
 				done(id, jsonData.imageData);
-			} else if (jsonData.type == "blob") {
+			} else if (jsonData.imageType == "blob") {
 				done(id, "data:image/jpeg;base64," + jsonData.imageData);
 			}
+
+			console.log("after calling done");
 			
 		},
 		error: function(jsonData) {
+			console.log("generateChanges returned failure");
 			generateFailCount ++;
 
 			if (generateFailCount == 1) {
@@ -1238,9 +1252,9 @@ function applyChanges(done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			if (jsonData.type == "url") {
+			if (jsonData.imageType == "url") {
 				$("#newentryimage").attr("src", jsonData.imageData);
-			} else if (jsonData.type == "blob") {
+			} else if (jsonData.imageType == "data") {
 				$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
 				if (done) {
 					done();
@@ -1278,7 +1292,7 @@ function postEntry() {
 		data: JSON.stringify(jsonObj)
 	})
 	.done(function(data, textStatus, jqXHR) {
-    	window.open("/entry/" + jsonData.id, "_self");
+    	window.open("/entry/" + data.id, "_self");
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
 		failCount ++;

@@ -70,14 +70,12 @@ var routes = function(db) {
 				}
 			}
 
-			logger.dbDebug(cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) {
     				logger.dbError(err, cypherQuery);
 					return res.sendStatus(500);
     			}
 
-    			logger.debug("result.data from query: " + JSON.stringify(result.data));
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
 
@@ -86,7 +84,10 @@ var routes = function(db) {
 
     			}
 
-    			logger.debug("output sent back to client: " + JSON.stringify(output));
+    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+    				return res.sendStatus(500);
+    			}
+
     			return res.json(output);
 			});
 		})
@@ -112,7 +113,7 @@ var routes = function(db) {
 				},
 				{
 					name: "category",
-					type: "id",
+					type: "category",
 					required: "yes"
 				},
 				{
@@ -167,7 +168,15 @@ var routes = function(db) {
 					if(err) {
 						logger.dbError(err, cypherQuery);
 						return res.sendStatus(500);
+					} else if (result.data.length != 1) {
+						logger.dbResultError(cypherQuery, 1, result.data.length);
+						return res.sendStatus(500);
 					}
+
+					var output = {id: result.data[0].id};
+					if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+    					return res.sendStatus(500);
+    				}
 
 					//now, check if the user selected to share to social networks
 					if (req.body.socialShare) {
@@ -184,7 +193,9 @@ var routes = function(db) {
 					        });
 						}
 					}
-					return res.json(result.data[0]);
+					
+					res.header("Location", "/api/challenges/" + result.data[0].id);
+					return res.status(201).json(output);
 				});
 			});
 		});
@@ -224,10 +235,17 @@ var routes = function(db) {
     			if(err) {
     				logger.dbError(err, cypherQuery);
     				return res.sendStatus(500);
+    			} else if (result.data.length != 1) {
+    				logger.dbResultError(cypherQuery, 1, result.data.length);
+    				return res.sendStatus(404); //invalid request
     			}
 
-    			var data = dataUtils.constructEntityData("challenge", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], result.data[0][4], 0, null, null, null, result.data[0][5] > 0, "none", null, null, null, null, result.data[0][6]);
-    			return res.json(data);
+    			var output = dataUtils.constructEntityData("challenge", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], result.data[0][4], 0, null, null, null, result.data[0][5] > 0, "none", null, null, null, null, result.data[0][6]);
+    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+    				return res.sendStatus(500);
+    			}
+
+    			return res.json(output);
 			});
 		})
 
@@ -259,7 +277,7 @@ var routes = function(db) {
     				return res.sendStatus(500);
     			}
 
-    			return res.json(result.data);
+    			return res.sendStatus(204);
 			});
 		});
 
@@ -305,6 +323,9 @@ var routes = function(db) {
 	                if(err) {
 	                	logger.dbError(err, cypherQuery);
 	                	return res.sendStatus(500);
+	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
+	                	return res.sendStatus(500);
 	                }
 
 	                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
@@ -317,6 +338,9 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) {
 	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
+	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
 	                	return res.sendStatus(500);
 	                }
 

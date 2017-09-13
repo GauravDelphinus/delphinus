@@ -34,6 +34,8 @@ var config = require("../config");
 var shortid = require("shortid");
 var dataUtils = require("../dataUtils");
 var logger = require("../logger");
+var serverUtils = require("../serverUtils");
+var error = require("../error");
 
 var routes = function(db) {
 	var feedRouter = express.Router();
@@ -106,7 +108,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -115,8 +117,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -135,7 +140,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -144,8 +149,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -172,7 +180,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -182,8 +190,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 				
@@ -208,7 +219,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -217,8 +228,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -244,7 +258,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -253,8 +267,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -278,7 +295,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -287,8 +304,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -321,7 +341,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -330,8 +350,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -364,7 +387,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -373,8 +396,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -407,7 +433,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -416,8 +442,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -446,7 +475,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -456,8 +485,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -487,7 +519,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -497,8 +529,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -520,7 +555,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -529,8 +564,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -547,7 +585,7 @@ var routes = function(db) {
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);
-							callback(err, 0);
+							return callback(err, 0);
 						}
 
 						var output = [];
@@ -556,8 +594,11 @@ var routes = function(db) {
 							output.push(data);
 		    			}
 
+		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    			}
 						resultArrays.push(output);
-						callback(null, 0);
+						return callback(null, 0);
 					});
 				});
 
@@ -589,7 +630,7 @@ var routes = function(db) {
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
 						logger.dbError(err, cypherQuery);
-						callback(err, 0);
+						return callback(err, 0);
 					}
 
 					var output = [];
@@ -598,8 +639,11 @@ var routes = function(db) {
 						output.push(data);
 	    			}
 
+	    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+	    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
+	    			}
 					resultArrays.push(output);
-					callback(null, 0);
+					return callback(null, 0);
 				});
 			});
 
@@ -621,7 +665,7 @@ var routes = function(db) {
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
 						logger.dbError(err, cypherQuery);
-						callback(err, 0);
+						return callback(err, 0);
 					}
 
 					var output = [];
@@ -630,8 +674,11 @@ var routes = function(db) {
 						output.push(data);
 	    			}
 
+	    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+	    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+	    			}
 					resultArrays.push(output);
-					callback(null, 0);
+					return callback(null, 0);
 				});
 			});
 
@@ -651,7 +698,7 @@ var routes = function(db) {
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
 						logger.dbError(err, cypherQuery);
-						callback(err, 0);
+						return callback(err, 0);
 					}
 
 					var output = [];
@@ -660,8 +707,11 @@ var routes = function(db) {
 						output.push(data);
 	    			}
 
+	    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+	    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+	    			}
 					resultArrays.push(output);
-					callback(null, 0);
+					return callback(null, 0);
 				});
 			});
 
@@ -681,7 +731,7 @@ var routes = function(db) {
 				db.cypherQuery(cypherQuery, function(err, result) {
 					if (err) {
 						logger.dbError(err, cypherQuery);
-						callback(err, 0);
+						return callback(err, 0);
 					}
 
 					var output = [];
@@ -690,8 +740,11 @@ var routes = function(db) {
 						output.push(data);
 	    			}
 
+	    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+	    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+	    			}
 					resultArrays.push(output);
-					callback(null, 0);
+					return callback(null, 0);
 				});
 			});
 

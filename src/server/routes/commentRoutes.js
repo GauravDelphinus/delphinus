@@ -89,22 +89,25 @@ var routes = function(db) {
     				var data = {};
     				data.type = "comment";
     				data.id = c.id;
-    				data.children = c.children;
     				
 					data.postedDate = c.created;
 					data.postedByUser = {};
 					data.postedByUser.id = u.id;
 					data.postedByUser.displayName = u.displayName;
 					data.postedByUser.image = u.image;
+					data.postedByUser.lastSeen = u.lastSeen;
 
 					data.socialStatus = {};
 					data.socialStatus.numLikes = numLikes;
 
 					data.text = c.text;
 
-					output.push(data);
+					return output.push(data);
     			}
 
+    			if (!serverUtils.validateData(output, serverUtils.prototypes.comment)) {
+					return res.sendStatus(500);
+				}
     			return res.json(output);
 			});
 		})
@@ -144,7 +147,6 @@ var routes = function(db) {
 							" MATCH (u:User {id: '" + req.user.id + "'}) CREATE (c:Comment {" +
 							"id: '" + id + "', " + 
 							"created : '" + req.body.created + "', " + 
-							"children : 0, " + 
 							"text : '" + req.body.text + "'" + 
 							"})-[:POSTED_IN]->(e), (u)<-[r:POSTED_BY]-(c) RETURN c;";
 
@@ -153,27 +155,18 @@ var routes = function(db) {
 				if(err) {
 					logger.dbError(err, cypherQuery);
 					return res.sendStatus(500);
+				} else if (result.data.length != 1) {
+					logger.dbResultError(cypherQuery, 1, result.data.length);
+					return res.sendStatus(500);
 				}
 
-				var newEntryId = result.data[0].id;
-
-				var c = result.data[0];
-
-				var data = {};
-				data.type = "comment";
-				data.id = c.id;
+				var output = {id: result.data[0].id};
+				if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+					return res.sendStatus(500);
+				}
 				
-				data.postedDate = c.created;
-				data.postedByUser = {};
-				data.postedByUser.id = req.user.id;
-				data.postedByUser.displayName = req.user.displayName;
-				data.postedByUser.image = req.user.image;
-
-				data.socialStatus = {};
-				data.socialStatus.numLikes = 0;
-
-				data.text = c.text;
-				return res.json(data);
+				res.header("Location", "/api/comments/" + result.data[0].id);
+				return res.status(201).json(output);
 			});
 		});
 
@@ -207,7 +200,7 @@ var routes = function(db) {
     				return res.sendStatus(500);
     			}
 
-    			return res.json(result.data);
+    			return res.sendStatus(204);
 			});
 		});
 
@@ -235,6 +228,9 @@ var routes = function(db) {
       		db.cypherQuery(cypherQuery, function(err, result){
                 if(err) {
                 	logger.dbError(err, cypherQuery);
+                	return res.sendStatus(500);
+                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
                 	return res.sendStatus(500);
                 }
 
@@ -281,6 +277,9 @@ var routes = function(db) {
 	                if(err) {
 	                	logger.dbError(err, cypherQuery);
 	                	return res.sendStatus(500);
+	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
+	                	return res.sendStatus(500);
 	                }
 
 	                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
@@ -293,6 +292,9 @@ var routes = function(db) {
       			db.cypherQuery(cypherQuery, function(err, result){
 	                if(err) {
 	                	logger.dbError(err, cypherQuery);
+	                	return res.sendStatus(500);
+	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
 	                	return res.sendStatus(500);
 	                }
 

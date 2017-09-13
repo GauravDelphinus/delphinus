@@ -55,4 +55,8 @@ logger.dbDebug = function(query) {
 	this.debug("Calling Cypher Query: " + query);
 }
 
+//if length of result from query does not match expected count
+logger.dbResultError = function(query, expectedCount, actualCount) {
+	this.error("Ran Cypher Query: " + query + ", Expected Count of Result: " + expectedCount + ", but Actual Count: " + actualCount);
+}
 module.exports = logger;

@@ -48,16 +48,21 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
+			var prototype;
 			var cypherQuery;
 
 			if (req.query.type == "filter" && req.query.filterType && req.query.filterType == "preset") {
 				cypherQuery = "MATCH (f:Filter {filter_type : 'preset'}) RETURN f;";
+				prototype = serverUtils.prototypes.filter;
 			} else if (req.query.type == "layout" && req.query.layoutType && req.query.layoutType == "preset") {
 				cypherQuery = "MATCH (l:Layout {layout_type : 'preset'}) RETURN l;";
+				prototype = serverUtils.prototypes.layout;
 			} else if (req.query.type == "artifact" && req.query.artifactType && req.query.artifactType == "preset") {
 				cypherQuery = "MATCH (a:Artifact {artifact_type : 'preset'}) RETURN a;";
+				prototype = serverUtils.prototypes.artifact;
 			} else if (req.query.type == "decoration" && req.query.decorationType && req.query.decorationType == "preset") {
 				cypherQuery = "MATCH (d:Decoration {decoration_type : 'preset'}) RETURN d;";
+				prototype = serverUtils.prototypes.decoration;
 			} else {
 				logger.error("Invalid request received");
 				return res.sendStatus(400);
@@ -67,13 +72,19 @@ var routes = function(db) {
 				if(err) {
 					logger.dbError(err, cypherQuery);
 					return res.sendStatus(500);
-				}
+				} else if (result.data.length <= 0) {
+    				logger.dbResultError(cypherQuery, "> 0", result.data.length);
+    				return res.sendStatus(500);
+    			}
 
 				var output = [];
 				for (var i = 0; i < result.data.length; i++) {
-					output.push([{id: result.data[i].id, name: result.data[i].name}]);
+					output.push({id: result.data[i].id, name: result.data[i].name});
 				}
 			
+				if (!serverUtils.validateData(output, prototype)) {
+    				return res.sendStatus(500);
+    			}
 				return res.json(output);
 			});
 		});
@@ -129,10 +140,12 @@ var routes = function(db) {
 
 						var imageUrlPath = config.url.cacheImages + targetImageName;
 
-						var jsonObj = {"type" : "url", "imageData" : imageUrlPath};
-						res.setHeader('Content-Type', 'application/json');
+						var jsonObj = {"imageType" : "url", "imageData" : imageUrlPath};
 
-						return res.send(JSON.stringify(jsonObj));
+						if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
+							return res.sendStatus(500);
+						}
+						return res.json(jsonObj);
 					});
 	    		});
     		});
@@ -158,6 +171,7 @@ var routes = function(db) {
 
 			dataUtils.getImageDataForEntry(req.params.entryId, function(err, imageData){
 				if (err) {
+					logger.error("getImageDataForEntry, entry: " + req.params.entryId + ": " + err);
 					return res.sendStatus(500);
 				}
 
@@ -165,6 +179,7 @@ var routes = function(db) {
 
 	    		dataUtils.normalizeSteps(imageData.steps, function(err, steps){
 	    			if (err) {
+	    				logger.error("normalizeSteps, steps: " + imageDate.steps + ": " + err);
 	    				return res.sendStatus(500);
 	    			}
 
@@ -205,9 +220,10 @@ var routes = function(db) {
 							jsonObj.timelapseData.push({"imageType" : "url", "imageData" : imageUrlPaths[j]});
 	    				}
 
-						res.setHeader('Content-Type', 'application/json');
-
-						return res.send(JSON.stringify(jsonObj));
+	    				if (!validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
+	    					return res.sendStatus(500);
+	    				}
+						return res.json(jsonObj);
 	    			});
 	    		});
 			});
