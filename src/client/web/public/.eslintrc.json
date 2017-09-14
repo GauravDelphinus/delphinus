@@ -1,0 +1,15 @@
+{
+	"parserOptions" : {
+		"sourceType" : "script"
+	},
+	"env" : {
+		"node" : false,
+		"browser" : true,
+		"jquery" : true
+	},
+	"rules" : {
+		"no-var" : "error",
+		"prefer-const" : "error"
+	},
+	"extends" : "eslint:recommended"
+}

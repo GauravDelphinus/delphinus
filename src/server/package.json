@@ -4,7 +4,8 @@
   "description": "Social App that allows users to share their creations",
   "main": "index.js",
   "scripts": {
-    "test": "nyc mocha --recursive test"
+    "test": "nyc mocha --recursive test",
+    "eslint": "eslint"
   },
   "keywords": [
     "social",
@@ -47,6 +48,9 @@
   "devDependencies": {
     "chai": "^4.1.2",
     "chai-http": "^3.0.0",
+    "eslint": "^4.6.1",
+    "eslint-config-airbnb": "^15.1.0",
+    "eslint-config-google": "^0.9.1",
     "jshint": "^2.9.5",
     "mocha": "^3.5.0",
     "nyc": "^11.2.1",
