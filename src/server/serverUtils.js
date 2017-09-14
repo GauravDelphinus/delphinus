@@ -136,42 +136,42 @@ module.exports = {
 		}
 	};
 	*/
-	validateItem: function(type, name, value) {
+	validateItem: function(type, name, value, logError = true) {
 		//logger.debug("validateItem: type: " + JSON.stringify(type) + ", name: " + name + ", value: " + value);
 		if (type.constructor === Array) {
 			if (type.indexOf(value) == -1) {
 				var found = false;
 				for (var i = 0; i < type.length; i++) {
-					if (this.validateItem(type[i], name, value)) {
+					if (this.validateItem(type[i], name, value, false)) {
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
-					logger.error("Invalid value '" + value + "' received for param: '" + name + "', expected among " + JSON.stringify(type));
+					logger.errorIf(logError, "Invalid value '" + value + "' received for param: '" + name + "', expected among " + JSON.stringify(type));
 					return false;
 				}
 			}
 		} else if (type == "id") {
 			if (!shortid.isValid(value)) {
-				logger.error("Invalid ID '" + value + "' received for param: '" + name + "'");
+				logger.errorIf(logError, "Invalid ID '" + value + "' received for param: '" + name + "'");
 				return false;
 			}
 		} else if (type == "imageType") {
 			if (!(value == "image/png" || value == "image/jpeg" || value == "image/gif")) {
-				logger.error("Invalid Image Type '" + value + "' received for param: '" + name + "'");
+				logger.errorIf(logError, "Invalid Image Type '" + value + "' received for param: '" + name + "'");
 				return false;
 			}
 		} else if (type == "imageData") {
 			if (!value.startsWith("data:image/")) {
-				logger.error("Invalid Image Data received for param: " + name + " - does not start with 'data:image/'");
+				logger.errorIf(logError, "Invalid Image Data received for param: " + name + " - does not start with 'data:image/'");
 				return false;
 			}
 
 			var imageBlob; //actual image data in base64 encoding
 			var index = value.indexOf("base64,");
 			if (index == -1) {
-				logger.error("Invalid Image Data received - does not contain 'base64,'");
+				logger.errorIf(logError, "Invalid Image Data received - does not contain 'base64,'");
 				return false; //expected the format to include base64
 			}
 
@@ -181,58 +181,58 @@ module.exports = {
 				Refer: https://stackoverflow.com/questions/3312607/php-binary-image-data-checking-the-image-type
 			*/
 			if (!(imageBlob.startsWith("/9j/") || imageBlob.startsWith("iVBORw0KGgo") || imageBlob.startsWith("R0lG"))) {
-				logger.error("Invalid Image Data received - Starting bytes don't match PNG, JPEG or GIF");
+				logger.errorIf(logError, "Invalid Image Data received - Starting bytes don't match PNG, JPEG or GIF");
 				return false;
 			}
 		} else if (type == "string") {
 			if (value.length > 1000) {
-				logger.error("Invalid value '" + value + "' received for param '" + name + "' - Character Length > 1000");
+				logger.errorIf(logError, "Invalid value '" + value + "' received for param '" + name + "' - Character Length > 1000");
 				return false;
 			}
 		} else if (type == "number") {
 			if (isNaN(parseFloat(value))) {
-				logger.error("Invalid value '" + value + "' received for param '" + name + "' - Not a number");
+				logger.errorIf(logError, "Invalid value '" + value + "' received for param '" + name + "' - Not a number");
 				//throw new Error("");
 				return false;
 			}
 		} else if (type == "url") {
 			if (!validUrl.isUri(value)) {
-				logger.error("Invalid URL '" + value + "' received for param '" + name + "'");
+				logger.errorIf(logError, "Invalid URL '" + value + "' received for param '" + name + "'");
 				return false;
 			}
 		} else if (type == "myURL") {
 			if (!(value.startsWith("/") || url.parse(value).hostname == global.hostname)) {
-				logger.error("Invalid URL '" + value + "' received for param '" + name + "'");
+				logger.errorIf(logError, "Invalid URL '" + value + "' received for param '" + name + "'");
 				return false;
 			}
 		} else if (type == "category") {
 			var categories = require("./categories");
 			if (!categories.hasOwnProperty(value)) {
-				logger.error("Invalid Category '" + value + "' received for param '" + name + "'");
+				logger.errorIf(logError, "Invalid Category '" + value + "' received for param '" + name + "'");
 				return false;
 			}
 		} else if (type == "filter") {
 			var filters = require("./presets").presetFilter;
 			if (!filters.hasOwnProperty(value)) {
-				logger.error("Invalid Filter '" + value + "' received for param '" + name + "'");
+				logger.errorIf(logError, "Invalid Filter '" + value + "' received for param '" + name + "'");
 				return false;
 			}
 		} else if (type == "layout") {
 			var layouts = require("./presets").presetLayout;
 			if (!layouts.hasOwnProperty(value)) {
-				logger.error("Invalid Layout '" + value + "' received for param '" + name + "'");
+				logger.errorIf(logError, "Invalid Layout '" + value + "' received for param '" + name + "'");
 				return false;
 			}
 		} else if (type == "artifact") {
 			var artifacts = require("./presets").presetArtifact;
 			if (!artifacts.hasOwnProperty(value)) {
-				logger.error("Invalid Artifact '" + value + "' received for param '" + name + "'");
+				logger.errorIf(logError, "Invalid Artifact '" + value + "' received for param '" + name + "'");
 				return false;
 			}
 		} else if (type == "decoration") {
 			var decorations = require("./presets").presetDecoration;
 			if (!decorations.hasOwnProperty(value)) {
-				logger.error("Invalid Decoration '" + value + "' received for param '" + name + "'");
+				logger.errorIf(logError, "Invalid Decoration '" + value + "' received for param '" + name + "'");
 				return false;
 			}
 		}

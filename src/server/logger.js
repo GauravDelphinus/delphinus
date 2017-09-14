@@ -59,4 +59,11 @@ logger.dbDebug = function(query) {
 logger.dbResultError = function(query, expectedCount, actualCount) {
 	this.error("Ran Cypher Query: " + query + ", Expected Count of Result: " + expectedCount + ", but Actual Count: " + actualCount);
 }
+
+logger.errorIf = function(logError, message) {
+	if (logError) {
+		this.error(message);
+	}
+}
+
 module.exports = logger;
