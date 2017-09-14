@@ -94,7 +94,6 @@ function handleFileSelected(data, path, title, type) {
 	//show the image, and hide the drag/drop view
 	$("#challengeImage").prop("src", path);
 	$("#challengeImage").prop("title", title);
-	$("#challengeImage").data("imageType", type);
 	$("#selectImage").hide();
 
 	//move to next step, which is the Challenge Message
@@ -110,7 +109,6 @@ function postChallenge() {
 	//construct the json object to be posted
 	var jsonObj = {};
 	jsonObj.imageDataURI = $("#challengeImage").attr("src"); //image data
-	jsonObj.imageType = $("#challengeImage").data("imageType"); //image type (used to store in server, for later use)
 	jsonObj.caption = $("#caption").val(); //challenge message
 	jsonObj.created = (new Date()).getTime(); //created time
 	jsonObj.category = $("#categoryList option:selected").val(); //category id

@@ -107,11 +107,6 @@ var routes = function(db) {
 					type: "imageData"
 				},
 				{
-					name: "imageType",
-					type: "imageType",
-					required: "yes"
-				},
-				{
 					name: "category",
 					type: "category",
 					required: "yes"
@@ -134,15 +129,11 @@ var routes = function(db) {
 
 			// Store the incoming base64 encoded image into a local image file first
 			var fs = require('fs');
+			var parseDataURI = require("parse-data-uri");
+			var parsed = parseDataURI(req.body.imageDataURI);
+
 			var imageDataURI = req.body.imageDataURI;
-			var imageType = req.body.imageType;
-			var index = imageDataURI.indexOf("base64,");
-			var data;
-			if (index != -1) {
-				data = imageDataURI.slice(index + 7);
-			} else {
-				data = imageDataURI;
-			}
+			var imageType = parsed.mimeType;
 
 			//generate path name for challenge image
 			var baseDir = global.appRoot + config.path.challengeImages;
@@ -151,7 +142,7 @@ var routes = function(db) {
 			var fullpath = baseDir + name;
 			
 			//write the data to a file
-			var buffer = new Buffer(data, 'base64');
+			var buffer = parsed.data;
 			fs.writeFileSync(fullpath, buffer);
 			imageProcessor.findImageSize(fullpath, function(size) {
 				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) MATCH (category:Category {id: '" + req.body.category + "'}) CREATE (n:Challenge {" +
