@@ -255,18 +255,25 @@ var routes = function(db) {
 
 				var fs = require('fs');
 
-				fs.writeFileSync(targetImagePath, buffer);
-              
-				user.image = config.url.userImages + req.params.userId + mime.extension(parsed.mimeType);
-
-				updateUserInDB(res, user, function(err) {
+				fs.writeFile(targetImagePath, buffer, function(err) {
 					if (err) {
-						logger.error("Failed to save user in DB: " + err);
+						logger.error("Failed to write file: " + targetImagePath);
 						return res.sendStatus(500);
 					}
+					
+					user.image = config.url.userImages + req.params.userId + mime.extension(parsed.mimeType);
 
-					return res.status(200).json({image: user.image});
+					updateUserInDB(res, user, function(err) {
+						if (err) {
+							logger.error("Failed to save user in DB: " + err);
+							return res.sendStatus(500);
+						}
+
+						return res.status(200).json({image: user.image});
+					});
 				});
+              
+				
 			});
 		});
 

@@ -143,50 +143,56 @@ var routes = function(db) {
 			
 			//write the data to a file
 			var buffer = parsed.data;
-			fs.writeFileSync(fullpath, buffer);
-			imageProcessor.findImageSize(fullpath, function(size) {
-				var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) MATCH (category:Category {id: '" + req.body.category + "'}) CREATE (n:Challenge {" +
-					"id: '" + id + "'," +
-					"image : '" + name + "'," +
-					"image_type : '" + imageType + "'," + 
-					"image_width : '" + size.width + "'," +
-					"image_height : '" + size.height + "'," +
-					"created : '" + req.body.created + "'," + 
-					"title : '" + dataUtils.escapeSingleQuotes(req.body.caption) + "'" +
-					"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
-			
-				db.cypherQuery(cypherQuery, function(err, result){
-					if(err) {
-						logger.dbError(err, cypherQuery);
-						return res.sendStatus(500);
-					} else if (result.data.length != 1) {
-						logger.dbResultError(cypherQuery, 1, result.data.length);
-						return res.sendStatus(500);
-					}
+			fs.writeFile(fullpath, buffer, function(err) {
+				if (err) {
+					logger.error("Failed to write file: " + fullpath);
+					return res.sendStatus(500);
+				}
 
-					var output = {id: result.data[0].id};
-					if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
-    					return res.sendStatus(500);
-    				}
+				imageProcessor.findImageSize(fullpath, function(size) {
+					var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) MATCH (category:Category {id: '" + req.body.category + "'}) CREATE (n:Challenge {" +
+						"id: '" + id + "'," +
+						"image : '" + name + "'," +
+						"image_type : '" + imageType + "'," + 
+						"image_width : '" + size.width + "'," +
+						"image_height : '" + size.height + "'," +
+						"created : '" + req.body.created + "'," + 
+						"title : '" + dataUtils.escapeSingleQuotes(req.body.caption) + "'" +
+						"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
+				
+					db.cypherQuery(cypherQuery, function(err, result){
+						if(err) {
+							logger.dbError(err, cypherQuery);
+							return res.sendStatus(500);
+						} else if (result.data.length != 1) {
+							logger.dbResultError(cypherQuery, 1, result.data.length);
+							return res.sendStatus(500);
+						}
 
-					//now, check if the user selected to share to social networks
-					if (req.body.socialShare) {
-						if (req.body.socialShare.facebook) {
-							var facebook = require('../services/facebook')();
-							facebook.postUpdate(config.social.share.newChallengeMessage, config.hostname + config.url.challenges + id, req.user.facebook.token, function(error, data) {
-								//do nothing
-							});
+						var output = {id: result.data[0].id};
+						if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+	    					return res.sendStatus(500);
+	    				}
+
+						//now, check if the user selected to share to social networks
+						if (req.body.socialShare) {
+							if (req.body.socialShare.facebook) {
+								var facebook = require('../services/facebook')();
+								facebook.postUpdate(config.social.share.newChallengeMessage, config.hostname + config.url.challenges + id, req.user.facebook.token, function(error, data) {
+									//do nothing
+								});
+							}
+							if (req.body.socialShare.twitter) {
+								var twitter = require('../services/twitter')();
+						        twitter.postUpdate(config.social.share.newChallengeMessage + " " + config.hostname + config.url.challenges + id, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
+						        	//do nothing
+						        });
+							}
 						}
-						if (req.body.socialShare.twitter) {
-							var twitter = require('../services/twitter')();
-					        twitter.postUpdate(config.social.share.newChallengeMessage + " " + config.hostname + config.url.challenges + id, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
-					        	//do nothing
-					        });
-						}
-					}
-					
-					res.header("Location", "/api/challenges/" + result.data[0].id);
-					return res.status(201).json(output);
+						
+						res.header("Location", "/api/challenges/" + result.data[0].id);
+						return res.status(201).json(output);
+					});
 				});
 			});
 		});
