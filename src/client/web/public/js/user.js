@@ -74,13 +74,11 @@ function setupImageHandlers(profileType) {
         //upload the image, get a url in response, and set that as the profile link
 
 		var jsonObj = {};
-		jsonObj.user = {};
-		jsonObj.user.id = userInfo.id;
-		jsonObj.user.image = selectedImageSrc;
+		jsonObj.imageData = selectedImageSrc;
 
 		$.ajax({
-			type: "PUT",
-			url: "/api/users/",
+			type: "PATCH",
+			url: "/api/users/" + userInfo.id,
 			dataType: "json", // return data type
 			contentType: "application/json; charset=UTF-8",
 			data: JSON.stringify(jsonObj)
@@ -111,13 +109,11 @@ function setupImageHandlers(profileType) {
 		var selectedImage = $("#imageCarousel .item.active img").prop("src");
 
 		var jsonObj = {};
-		jsonObj.user = {};
-		jsonObj.user.id = userInfo.id;
-		jsonObj.user.image = selectedImage;
+		jsonObj.imageData = selectedImage;
 
 		$.ajax({
-			type: "PUT",
-			url: "/api/users/",
+			type: "PATCH",
+			url: "/api/users/" + userInfo.id,
           dataType: "json", // return data type
           contentType: "application/json; charset=UTF-8",
           data: JSON.stringify(jsonObj)

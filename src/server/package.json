@@ -31,6 +31,7 @@
     "node-neo4j": "^2.0.3",
     "node-uuid": "^1.4.8",
     "oauth": "^0.9.14",
+    "parse-data-uri": "^0.2.0",
     "passport": "^0.3.2",
     "passport-facebook": "^2.1.1",
     "passport-google-oauth": "^1.0.0",

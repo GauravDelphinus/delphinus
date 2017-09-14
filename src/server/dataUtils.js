@@ -1402,10 +1402,7 @@ module.exports = {
 		}
 		
 		return data;
-	},
-
-	
-	
+	}
 }
 
 function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {

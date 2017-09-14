@@ -5,6 +5,7 @@ var path = require("path");
 var config = require("../config");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
+var mime = require("mime");
 
 var routes = function(db) {
 	var userRouter = express.Router();
@@ -97,76 +98,6 @@ var routes = function(db) {
                 }
                 return res.json(output);
 			});
-		});
-
-	userRouter.route("/")
-
-		.put(function(req, res) {
-            
-            logger.debug("PUT received on /api/users, body: " + JSON.stringify(req.body));
-
-			var validationParams = [
-				{
-					name: "user",
-					type: "id",
-					required: "yes"
-				}
-			];
-
-			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
-				return res.sendStatus(400);
-			}
-
-            var user = req.body.user;
-
-            var index = -1;
-            var imageDataURI;
-
-            if (user.image) {
-            	imageDataURI = user.image;
-           		index = imageDataURI.indexOf("base64,");
-            }
-            
-            var data;
-            if (index != -1) { // data URI
-  				data = imageDataURI.slice(index + 7);
-            
-				var buffer = new Buffer(data, 'base64');
-				var baseDir = global.appRoot + config.path.userImages;
-
-				var fs = require('fs');
-				//Create random name for new image file
-				tmp.tmpName({ dir: baseDir }, function _tempNameGenerated(err, fullpath) {
-					if (err) {
-						logger.error("Error with creating a temporary path: " + err);
-						return res.sendStatus(500);
-					}
-
-					var name = path.parse(fullpath).base;
-
-					fs.writeFileSync(fullpath, buffer);
-                  
-					user.image = config.url.userImages + name;
-
-					updateUserInDB(res, user, function(err) {
-						if (err) {
-							logger.error("Failed to save user in DB: " + err);
-							return res.sendStatus(500);
-						}
-					});
-
-					return res.sendStatus(200);
-				});
-            } else { // URL
-				updateUserInDB(res, user, function(err) {
-					if (err) {
-						logger.error("Failed to save user in DB: " + err);
-						return res.sendStatus(500);
-					}
-				});
-
-				return res.sendStatus(200);
-            }
 		});
 
 	userRouter.route("/:followedId/follow") //api/users/follow
@@ -283,6 +214,59 @@ var routes = function(db) {
 					return res.sendStatus(500);
 				}
 				return res.json(data);
+			});
+		})
+
+		.patch(function(req, res) {
+            
+            logger.debug("PATCH received on /api/users/" + req.params.userId);
+
+			var validationParams = [
+				{
+					name: "imageData",
+					type: "imageData",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
+			if (req.user.id != req.params.userId) {
+				//forbidden.  We only allow the current logged-in user to update his info
+				logger.warn("Forbidden. Request to update user '" + req.params.userId + "' received from a different user: '" + req.user.id + "'");
+				return res.sendStatus(403);
+			}
+
+			var findUserQuery = {userID: req.params.userId};
+			dataUtils.findUser(findUserQuery, function(err, user) {
+				if (err) {
+					//user not found
+					logger.warn("Trying to update a user '" + req.params.userId + "' that doesn't exist. " + err);
+					return res.sendStatus(404);
+				}
+
+				var parseDataURI = require("parse-data-uri");
+				var parsed = parseDataURI(req.body.imageData);
+	        
+				var buffer = parsed.data;
+				var targetImagePath = global.appRoot + config.path.userImages + req.params.userId + mime.extension(parsed.mimeType);
+
+				var fs = require('fs');
+
+				fs.writeFileSync(targetImagePath, buffer);
+              
+				user.image = config.url.userImages + req.params.userId + mime.extension(parsed.mimeType);
+
+				updateUserInDB(res, user, function(err) {
+					if (err) {
+						logger.error("Failed to save user in DB: " + err);
+						return res.sendStatus(500);
+					}
+
+					return res.status(200).json({image: user.image});
+				});
 			});
 		});
 

@@ -180,7 +180,7 @@ module.exports = {
 				Now, check that the starting few bytes match either jpeg, png or gif
 				Refer: https://stackoverflow.com/questions/3312607/php-binary-image-data-checking-the-image-type
 			*/
-			if (!(imageBlob.startsWith("/9j/") || imageBlob.startsWith("iVBORw0KGgo=") || imageBlob.startsWith("R0lG"))) {
+			if (!(imageBlob.startsWith("/9j/") || imageBlob.startsWith("iVBORw0KGgo") || imageBlob.startsWith("R0lG"))) {
 				logger.error("Invalid Image Data received - Starting bytes don't match PNG, JPEG or GIF");
 				return false;
 			}
