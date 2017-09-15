@@ -603,13 +603,13 @@ function stopTimelapse(entityId, data) {
 
 
 function createEntityImageElement(data) {
-	var entityImage = $("<img>", {id: data.id + "EntityImage"});
+	var entityImage = $("<img>", {id: data.id + "EntityImage", class: "mainImage"});
 	entityImage.prop("src", data.image);
 	return entityImage;
 }
 
 function createMainImageElement(data) {
-	var mainImage = $("<img>", {id: "mainImage"});
+	var mainImage = $("<img>", {id: "mainImage", class: "mainImage"});
 	mainImage.prop("src", data.image);
 	return mainImage;
 }

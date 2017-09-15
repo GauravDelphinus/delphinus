@@ -435,6 +435,14 @@ img {
 }
 
 /*
+	Main image (e.g. entity image or images in the FilmStrip view)
+	Expand to fit width of container.
+*/
+.mainImage {
+	width: 100%;
+}
+
+/*
 	Image of the Poster
 */
 .postedByImage {
