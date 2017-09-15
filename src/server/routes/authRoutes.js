@@ -4,7 +4,7 @@ var config = require("../config");
 var dataUtils = require("../dataUtils");
 var logger = require("../logger");
 
-var routes = function(db) {
+var routes = function() {
 	var authRouter = express.Router();
 
     authRouter.route("/")

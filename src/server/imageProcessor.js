@@ -1,6 +1,5 @@
 var tmp = require("tmp");
 var fs = require("fs");
-var config = require('./config');
 var execFile = require('child_process').execFile;
 
 module.exports = {
@@ -672,7 +671,7 @@ function applyBorder(imArgs, borderWidth, borderColor) {
 **/
 function writeImage(sourceImage, targetImage, imArgs, next) {
 	if (imArgs.length > 0) {
-		var child = execFile("convert", imArgs, (error, stdout, stderr) => {
+		execFile("convert", imArgs, (error, stdout, stderr) => {
 			if (error) {
 		    	next(error, null);
 		  	} else {
@@ -688,7 +687,7 @@ function writeImage(sourceImage, targetImage, imArgs, next) {
 	Find the size of the provided image
 **/
 function findImageSize(imagePath, next) {
-	var child = execFile('identify', ["-format", "%Wx%H", imagePath], (error, stdout, stderr) => {
+	execFile('identify', ["-format", "%Wx%H", imagePath], (error, stdout, stderr) => {
 	  	if (error) {
 	    	return next(error, 0);
 	  	}
@@ -717,6 +716,7 @@ function absoluteToPercentageChangeSigned(absoluteValue) {
 	return percentageChange;
 }
 
+/*
 function absoluteToMultiplierSigned(absoluteValue) {
 	if (absoluteValue < -100) {
 		absoluteValue = -100;
@@ -728,6 +728,7 @@ function absoluteToMultiplierSigned(absoluteValue) {
 
 	return multiplierValue;
 }
+*/
 
 /*
 	Convert color coming in from client to a format that ImageMagick
@@ -740,7 +741,7 @@ function normalizeColorToIM(color) {
 	if (color == null || color == undefined || color == "transparent") {
 		normalizedColor = "none";
 	} else {
-		var color = color.toLowerCase();
+		color = color.toLowerCase();
 
 		if (/#[a-f0-9]+/.test(color)) {
 			normalizedColor = color.match(/#[a-f0-9]+/);

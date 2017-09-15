@@ -11,71 +11,61 @@ module.exports = {
 
 	myDB: null,
 
-	initializeDB : function(db) {
-		myDB = db;
+	initializeDB : function(db, callback) {
+		this.myDB = db;
+
+		var functions = [];
 
 		//enumerate preset filters and create the nodes if not present
 
-		for (var key in presets.presetLayout) {
-			var id = key;
-			var presetLayoutName = presets.presetLayout[key];
+		for (let key in presets.presetLayout) {
+			let id = key;
+			let presetLayoutName = presets.presetLayout[key];
 
-			var cypherQuery = "MERGE (l:Layout {id: '" + id + "'}) ON CREATE SET l.name = '" + presetLayoutName + "', l.layout_type = 'preset' RETURN l;";
+			let cypherQuery = "MERGE (l:Layout {id: '" + id + "'}) ON CREATE SET l.name = '" + presetLayoutName + "', l.layout_type = 'preset' RETURN l;";
 
-			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) {
-					logger.dbError(err, cypherQuery);
-				}
-			});
+			functions.push(async.apply(runQuery, this.myDB, cypherQuery));
 		}
-		for (var key in presets.presetFilter) {
-			var id = key;
-			var presetFilterName = presets.presetFilter[key];
+		for (let key in presets.presetFilter) {
+			let id = key;
+			let presetFilterName = presets.presetFilter[key];
 
-			var cypherQuery = "MERGE (f:Filter {id: '" + id + "'}) ON CREATE SET f.name = '" + presetFilterName + "', f.filter_type = 'preset' RETURN f;";
+			let cypherQuery = "MERGE (f:Filter {id: '" + id + "'}) ON CREATE SET f.name = '" + presetFilterName + "', f.filter_type = 'preset' RETURN f;";
 
-			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) {
-					logger.dbError(err, cypherQuery);
-				}
-			});
+			functions.push(async.apply(runQuery, this.myDB, cypherQuery));
 		}
-		for (var key in presets.presetArtifact) {
-			var id = key;
-			var presetArtifactName = presets.presetArtifact[key];
+		for (let key in presets.presetArtifact) {
+			let id = key;
+			let presetArtifactName = presets.presetArtifact[key];
 
-			var cypherQuery = "MERGE (a:Artifact {id: '" + id + "'}) ON CREATE SET a.name = '" + presetArtifactName + "', a.artifact_type = 'preset' RETURN a;";
+			let cypherQuery = "MERGE (a:Artifact {id: '" + id + "'}) ON CREATE SET a.name = '" + presetArtifactName + "', a.artifact_type = 'preset' RETURN a;";
 
-			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) {
-					logger.dbError(err, cypherQuery);
-				}
-			});
+			functions.push(async.apply(runQuery, this.myDB, cypherQuery));
 		}
-		for (var key in presets.presetDecoration) {
-			var id = key;
-			var presetDecorationName = presets.presetDecoration[key];
+		for (let key in presets.presetDecoration) {
+			let id = key;
+			let presetDecorationName = presets.presetDecoration[key];
 
-			var cypherQuery = "MERGE (d:Decoration {id: '" + id + "'}) ON CREATE SET d.name = '" + presetDecorationName + "', d.decoration_type = 'preset' RETURN d;";
+			let cypherQuery = "MERGE (d:Decoration {id: '" + id + "'}) ON CREATE SET d.name = '" + presetDecorationName + "', d.decoration_type = 'preset' RETURN d;";
 			
-			db.cypherQuery(cypherQuery, function(err, result){
-				if(err) {
-					logger.dbError(err, cypherQuery);
-				}
-			});
+			functions.push(async.apply(runQuery, this.myDB, cypherQuery));
 		}
 
 		//enumerate and create nodes for the categories and subcategories
-		for (var key in categories) {
-			var id = key;
-			var categoryValue = categories[key];
+		for (let key in categories) {
+			let id = key;
+			let categoryValue = categories[key];
 
-			createNodesForCategory(null, key, categories[key]);
+			functions.push(async.apply(createNodesForCategory, this.myDB, null, id, categoryValue));
 		}
+
+		async.series(functions, function(err) {
+			return callback(err);
+		});
 	},
 
 	getDB : function() {
-		return myDB;
+		return this.myDB;
 	},
 
 	initializeDBWithData: function(data, callback) {
@@ -85,73 +75,24 @@ module.exports = {
 		for (var i = 0; i < data.users.length; i++) {
 			var user = data.users[i];
 
-			functions.push(async.apply(createUserNode, myDB, user));
+			functions.push(async.apply(createUserNode, this.myDB, user));
 		}
 
 		//Create challenges
-		for (var i = 0; i < data.challenges.length; i++) {
+		for (let i = 0; i < data.challenges.length; i++) {
 			var challenge = data.challenges[i];
 
-			functions.push(async.apply(createChallengeNode, myDB, challenge));
+			functions.push(async.apply(createChallengeNode, this.myDB, challenge));
 		}
 
 		//Create entries
-		for (var i = 0; i < data.entries.length; i++) {
+		for (let i = 0; i < data.entries.length; i++) {
 			var entry = data.entries[i];
 
-			functions.push(async.apply(createEntryNode, myDB, entry));
+			functions.push(async.apply(createEntryNode, this.myDB, entry));
 		}
 
-		async.series(functions, function(err, array) {
-
-			//////////////
-			/*
-			var cypherQueryU = "MATCH (u:User) RETURN u;";
-			logger.dbDebug(cypherQueryU);
-			myDB.cypherQuery(cypherQueryU, function(err, result){
-				if(err) {
-					logger.dbError(err, cypherQueryU);
-				}
-
-				logger.debug("Plain Users: result.data from query: " + JSON.stringify(result.data));
-			});
-
-			var cypherQueryC = "MATCH (c:Challenge) RETURN c;";
-			logger.dbDebug(cypherQueryC);
-			myDB.cypherQuery(cypherQueryC, function(err, result){
-				if(err) {
-					logger.dbError(err, cypherQueryC);
-				}
-
-				logger.debug("Plain Challenges: result.data from query: " + JSON.stringify(result.data));
-			});
-
-
-			var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
-			cypherQuery +=
-							" WITH c, category, poster " +
-							" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
-							" WITH c, category, poster, COUNT(u2) AS like_count " + 
-							" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
-							" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
-							" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-							" WITH c, category, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
-							" OPTIONAL MATCH (me:User {id: '" + 0 + "'})-[like:LIKES]->(c) " +
-							" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), (like_count + comment_count + entry_count) AS popularity_count, category ";
-
-			cypherQuery += " ORDER BY c.created DESC;";
-
-			logger.dbDebug(cypherQuery);
-			myDB.cypherQuery(cypherQuery, function(err, result){
-				if(err) {
-					logger.dbError(err, cypherQuery);
-				}
-
-				logger.debug("after building: result.data from query: " + JSON.stringify(result.data));
-			});
-			*/
-			//////////////
-
+		async.series(functions, function(err) {
 			callback(err);
 		});
 	},
@@ -164,7 +105,7 @@ module.exports = {
 	**/
 	getChallengeForEntry : function(entryId, next) {
 		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id;"
-		myDB.cypherQuery(fetchChallengeQuery, function(err, result){
+		this.myDB.cypherQuery(fetchChallengeQuery, function(err, result){
 	    		if (err) {
 	    			next(err, -1);
 	    			return;
@@ -184,7 +125,7 @@ module.exports = {
 		
 		var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'})-[:POSTED_BY]->(poster:User) RETURN c, poster;";
 
-		myDB.cypherQuery(cypherQuery, function(err, result){
+		this.myDB.cypherQuery(cypherQuery, function(err, result){
 	    	if(err) {
 	    		return next(err, null);
 	    	} else if (result.data.length <= 0) {
@@ -206,7 +147,7 @@ module.exports = {
 		if (categoryId != undefined) {
 			var cypherQuery = "MATCH (c:Category {id: '" + categoryId + "'}) RETURN c;";
 
-			myDB.cypherQuery(cypherQuery, function(err, result){
+			this.myDB.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 		    		return next(err, null);
 		    	} else if (result.data.length <= 0) {
@@ -230,7 +171,7 @@ module.exports = {
 		var constructMetaData = this.constructMetaData;
 		var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) MATCH (c:Challenge)<-[:PART_OF]-(e)-[:POSTED_BY]->(poster:User) RETURN e, poster, c;";
 
-		myDB.cypherQuery(cypherQuery, function(err, result){
+		this.myDB.cypherQuery(cypherQuery, function(err, result){
 			if(err) {
 	    		return next(err, null);
 	    	} else if (result.data.length <= 0) {
@@ -307,7 +248,7 @@ module.exports = {
 
 	getImageDataForChallenge : function(challengeId, next) {
 		var fetchChallengeQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) RETURN c;"
-		myDB.cypherQuery(fetchChallengeQuery, function(err, output){
+		this.myDB.cypherQuery(fetchChallengeQuery, function(err, output){
 	    	if (err) {
 	    		return next(err, null);
 	    	}
@@ -338,7 +279,7 @@ module.exports = {
 
 		// First get the original image from the challenge
 		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id, c.image_type;"
-		myDB.cypherQuery(fetchChallengeQuery, function(err, output){
+		this.myDB.cypherQuery(fetchChallengeQuery, function(err, output){
 	    		if (err) {
 	    			return next(err, null);
 	    		}
@@ -355,7 +296,7 @@ module.exports = {
 				var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[u:USES]->(s) RETURN LABELS(s),s, e.caption ORDER BY u.order;";
 
 
-				myDB.cypherQuery(cypherQuery, function(err, result){
+				this.myDB.cypherQuery(cypherQuery, function(err, result){
 	    			if(err) {
 	    				return next(err, null);
 	    			}
@@ -703,7 +644,7 @@ module.exports = {
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 					
-			myDB.cypherQuery(cypherQuery, function(err, result){
+			this.myDB.cypherQuery(cypherQuery, function(err){
 	    		if(err) {
 	    			return callback(err, 0);
 	    		}
@@ -737,7 +678,7 @@ module.exports = {
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 
-			myDB.cypherQuery(cypherQuery, function(err, result) {
+			this.myDB.cypherQuery(cypherQuery, function(err) {
 				if (err) {
 					return callback(err, 0);
 				}
@@ -752,18 +693,10 @@ module.exports = {
 	},
 
 	escapeSingleQuotes : function(str) {
-		//console.log("escapeSingleQuotes called");
 		return str.replace(/'/g, "\\'");
-		//str.replace(/h/g, "v");
-		//console.log("str is now " + str);
-
-		return str;
 	},
 
 	createArtifactNode : function(artifact, callback) {
-		//console.log("createArtifactNode: artifact = " + JSON.stringify(artifact));
-		
-
 		if (artifact.type == "preset") {
 			return callback(null, artifact.preset);
 		} else if (artifact.type == "custom") {
@@ -787,9 +720,7 @@ module.exports = {
 
 			cypherQuery += "}) RETURN a;";
 
-			//console.log("Running cypherQuery: " + cypherQuery);
-
-			myDB.cypherQuery(cypherQuery, function(err, result) {
+			this.myDB.cypherQuery(cypherQuery, function(err) {
 				if (err) {
 					return callback(err, 0);
 				}
@@ -845,10 +776,8 @@ module.exports = {
 			}
 
 			cypherQuery += "}) RETURN l;";
-
-			//console.log("Running cypherQuery: " + cypherQuery);
 					
-			myDB.cypherQuery(cypherQuery, function(err, result){
+			this.myDB.cypherQuery(cypherQuery, function(err){
 	    		if(err) {
 	    			return callback(err, 0);
 	    		}
@@ -910,7 +839,7 @@ module.exports = {
 
 		findUserQuery += " RETURN u;";
 
-		myDB.cypherQuery(findUserQuery, function(err, result) {
+		this.myDB.cypherQuery(findUserQuery, function(err, result) {
 			if (err) {
 				logger.dbError(err, findUserQuery);
 				return callback(err, null);
@@ -1271,7 +1200,7 @@ module.exports = {
 				cypherQuery += "});";
 			}
 
-			myDB.cypherQuery(cypherQuery, function(err, result) {
+			this.myDB.cypherQuery(cypherQuery, function(err) {
 				if (err) {
 					logger.dbError(err, cypherQuery);
 					return next(err, null);
@@ -1287,6 +1216,7 @@ module.exports = {
 	},
 
 	removeAccessForUser: function(userId, provider, callback) {
+		var removeQuery;
 		if (provider == "facebook") {
 			removeQuery = " REMOVE u.facebook_id, u.facebook_profile_link, u.facebook_token, u.facebook_displayName, u.facebook_emails, u.facebook_image ";
 		} else if (provider == "twitter") {
@@ -1297,14 +1227,14 @@ module.exports = {
 		cypherQuery += removeQuery;
 		cypherQuery += " RETURN u;";
 
-		myDB.cypherQuery(cypherQuery, function(err, result) {
+		this.myDB.cypherQuery(cypherQuery, function(err) {
 			callback(err);
 		});
 
 	},
 
 	checkCachedFile : function(cachePath, callback) {
-		fs.stat(cachePath, function(err, stats) {
+		fs.stat(cachePath, function(err) {
 			callback(err);
 		});
 	},
@@ -1405,7 +1335,7 @@ module.exports = {
 	}
 }
 
-function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {
+function createNodesForCategory(db, parentCategoryId, categoryId, categoryObj, callback) {
 	if (categoryObj && categoryObj.displayName) {
 		var cypherQuery = "";
 		if (parentCategoryId != null) {
@@ -1416,18 +1346,20 @@ function createNodesForCategory(parentCategoryId, categoryId, categoryObj) {
 
 		cypherQuery += " ON CREATE SET c.name = '" + categoryObj.displayName + "' RETURN c;";
 			
-		myDB.cypherQuery(cypherQuery, function(err, result){
+		db.cypherQuery(cypherQuery, function(err, result){
 			if(err) {
-				logger.dbError(err, cypherQuery);
-				return;
+				return callback(err, 0);
 			}
 
+			return callback(0, result);
+			/*
 			//now, look for any subcategories
 			if (categoryObj.subCategories) {
 				for (var key in categoryObj.subCategories) {
 					createNodesForCategory(db, categoryId, key, categoryObj.subCategories[key]);
 				}
 			}
+			*/
 		});
 	}
 }
@@ -1439,7 +1371,7 @@ function createUserNode(db, user, next) {
 		"u.last_seen = '" + user.lastSeen + "' RETURN u;";
 
 	logger.dbDebug(cypherQuery);
-	myDB.cypherQuery(cypherQuery, function(err, result) {
+	db.cypherQuery(cypherQuery, function(err) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
 			next(err, 0);
@@ -1461,7 +1393,7 @@ function createChallengeNode(db, challenge, next) {
 		" RETURN n;";
 
 	logger.dbDebug(cypherQuery);
-	db.cypherQuery(cypherQuery, function(err, result) {
+	db.cypherQuery(cypherQuery, function(err) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
 			next(err, 0);
@@ -1483,7 +1415,7 @@ function createEntryNode(db, entry, next) {
 		" RETURN e;";
 
 	logger.dbDebug(cypherQuery);
-	db.cypherQuery(cypherQuery, function(err, result) {
+	db.cypherQuery(cypherQuery, function(err) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
 			next(err, 0);
@@ -1493,3 +1425,12 @@ function createEntryNode(db, entry, next) {
 	});
 }
 
+function runQuery(db, cypherQuery, callback) {
+	db.cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			return callback(err, 0);
+		}
+		return callback(0, result);
+	});
+}

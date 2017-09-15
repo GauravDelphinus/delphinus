@@ -310,8 +310,8 @@ module.exports = {
 	  wr.on("error", function(err) {
 	    done(err);
 	  });
-	  wr.on("close", function(ex) {
-	    done(0);
+	  wr.on("close", function(err) {
+	    done(err);
 	  });
 	  rd.pipe(wr);
 
@@ -356,7 +356,7 @@ module.exports = {
 			"caption": "string",
 			"link" : "myURL",
 			"categoryName" : "string",
-			"categoryID" : "id",
+			"categoryID" : "category",
 			"activity" : "activity"
 		},
 		"postedByUser" : {

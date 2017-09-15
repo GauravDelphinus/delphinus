@@ -7,7 +7,7 @@ module.exports = {
 
 		if (steps.layouts) {
 			step.layouts = [];
-			for (var i = 0; i < steps.layouts.length; i++) {
+			for (let i = 0; i < steps.layouts.length; i++) {
 				var layout = {};
 				step.layouts.push(layout);
 
@@ -49,7 +49,7 @@ module.exports = {
 		if (steps.filters) {
 			step.filters = [];
 
-			for (var i = 0; i < steps.filters.length; i++) {
+			for (let i = 0; i < steps.filters.length; i++) {
 				var filter = {};
 				step.filters.push(filter);
 
@@ -126,7 +126,7 @@ module.exports = {
 		if (steps.artifacts) {
 			step.artifacts = [];
 
-			for (var i = 0; i < steps.artifacts.length; i++) {
+			for (let i = 0; i < steps.artifacts.length; i++) {
 				var artifact = {};
 				step.artifacts.push(artifact);
 
@@ -148,7 +148,7 @@ module.exports = {
 		if (steps.decorations) {
 			step.decorations = [];
 
-			for (var i = 0; i < steps.decorations.length; i++) {
+			for (let i = 0; i < steps.decorations.length; i++) {
 				var decoration = {};
 				step.decorations.push(decoration);
 
@@ -177,8 +177,8 @@ module.exports = {
 	generateHash: function(string) {
 		var hash = 0;
 		if (string.length == 0) return hash;
-		for (i = 0; i < string.length; i++) {
-			char = string.charCodeAt(i);
+		for (let i = 0; i < string.length; i++) {
+			let char = string.charCodeAt(i);
 			hash = ((hash<<5)-hash)+char;
 			hash = hash & hash; // Convert to 32bit integer
 		}

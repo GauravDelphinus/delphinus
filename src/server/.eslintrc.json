@@ -10,8 +10,9 @@
 	"rules" : {
 		"no-empty" : "error",
 		"no-multiple-empty-lines" : "warn",
-		"no-var" : "error",
-		"prefer-const" : "error"
+		"no-var" : "warn",
+		"prefer-const" : "warn",
+		"no-mixed-spaces-and-tabs" : "off"
 	},
 	"extends" : "eslint:recommended"
 }
