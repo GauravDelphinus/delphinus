@@ -4,6 +4,7 @@ var shortid = require("shortid");
 var config = require("../config");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
+var dataUtils = require("../dataUtils");
 
 var routes = function(db) {
 
@@ -45,6 +46,8 @@ var routes = function(db) {
 
 			var cypherQuery;
 
+			var meId = (req.user) ? (req.user.id) : (0);
+
 			if (req.query.entityId && req.query.user) {
 				cypherQuery = "MATCH (c:Comment)-[:POSTED_BY]->(u:User {id: '" + req.query.user + "'}), (c)-[:POSTED_IN]->({id: '" + req.query.entityId + "'}) ";
 			} else if (req.query.entityId) {
@@ -56,7 +59,10 @@ var routes = function(db) {
 			}
 			
 			// add social count check
-			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(c) RETURN c, u, COUNT(u2)";
+			cypherQuery += " OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " +
+				" WITH c, u, COUNT(u2) AS numLikes " +
+				" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
+				" RETURN c, u, numLikes, COUNT(like)";
 			
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "popularity") {
@@ -82,27 +88,9 @@ var routes = function(db) {
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
-    				var c = result.data[i][0];
-    				var u = result.data[i][1];
-    				var numLikes = result.data[i][2];
+					data = dataUtils.constructEntityData("comment", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], null, null, null, null, null, null, result.data[i][3] > 0, null, null, null, null, null, null, null);
 
-    				var data = {};
-    				data.type = "comment";
-    				data.id = c.id;
-    				
-					data.postedDate = c.created;
-					data.postedByUser = {};
-					data.postedByUser.id = u.id;
-					data.postedByUser.displayName = u.displayName;
-					data.postedByUser.image = u.image;
-					data.postedByUser.lastSeen = u.lastSeen;
-
-					data.socialStatus = {};
-					data.socialStatus.numLikes = numLikes;
-
-					data.text = c.text;
-
-					return output.push(data);
+					output.push(data);
     			}
 
     			if (!serverUtils.validateData(output, serverUtils.prototypes.comment)) {
@@ -148,7 +136,7 @@ var routes = function(db) {
 							"id: '" + id + "', " + 
 							"created : '" + req.body.created + "', " + 
 							"text : '" + req.body.text + "'" + 
-							"})-[:POSTED_IN]->(e), (u)<-[r:POSTED_BY]-(c) RETURN c;";
+							"})-[:POSTED_IN]->(e), (u)<-[r:POSTED_BY]-(c) RETURN c, u;";
 
 			
 			db.cypherQuery(cypherQuery, function(err, result){
@@ -160,8 +148,9 @@ var routes = function(db) {
 					return res.sendStatus(500);
 				}
 
-				var output = {id: result.data[0].id};
-				if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+				var output = dataUtils.constructEntityData("comment", result.data[0][0], result.data[0][1], result.data[0][0].created, 0, null, null, null, null, null, null, false, null, null, null, null, null, null, null);
+
+				if (!serverUtils.validateData(output, serverUtils.prototypes.comment)) {
 					return res.sendStatus(500);
 				}
 				

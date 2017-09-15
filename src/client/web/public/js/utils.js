@@ -243,7 +243,6 @@ function deleteItem(data) {
 }
 
 function alreadyExists(element) {
-	console.log("alreadyExists: element.id = " + element.id + ", this = " + this);	
 	return (element.id == this);
 }
 
@@ -349,8 +348,14 @@ function createCaptionSectionElement(data) {
 function createSocialStatusSectionComment(data, parentId, isReply) {
 	var socialStatusSection = $("<div>", {class: "socialStatusSectionSimple"});
 	var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "likeButtonSimple"}).append("Like");
+	if (data.socialStatus.likes.amLiking) {
+		likeButton.addClass("active");
+	}
 	socialStatusSection.append(likeButton);
+
+	
 	var restURL = "/api/comments/" + data.id + "/like";
+	/*
 	if (user) {
 		$.getJSON(restURL, function(result) {
 			if (result.likeStatus == "on") {
@@ -362,6 +367,7 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 			//eat this
 		});
 	}
+	*/
 
 	likeButton.click(function(e) {
 		if (user) {
@@ -409,7 +415,7 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 	var likeIcon = $("<span>", {id: data.id + "LikeIcon", class: "glyphicon glyphicon-thumbs-up"});
 	socialStatusSection.append(likeIcon);
 
-	var numLikes = $("<span>", {id: data.id + "NumLikes"}).append(" " + data.socialStatus.numLikes);
+	var numLikes = $("<span>", {id: data.id + "NumLikes"}).append(" " + data.socialStatus.likes.numLikes);
 	socialStatusSection.append(numLikes);
 
 	var postedDate = $("<span>", {class: "commentPostedDate", text: "" + formatDate(data.postedDate)});
@@ -1261,7 +1267,6 @@ function createNewCommentElement(isReply, parentId) {
 				data: JSON.stringify(jsonObj)
 			})
 			.done(function(data, textStatus, jqXHR) {
-				//alert("Challenge posted successfully, challenge id = " + data._id);
 		    	//appendCommentElement("comments", data);
 		    	var commentElement = createCommentElement(data, parentId, isReply);
 		    	var atEnd = (!isReply);

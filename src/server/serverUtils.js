@@ -375,10 +375,14 @@ module.exports = {
 		"comment" : {
 			"type" : ["comment"],
 			"id" : "id",
-			"postedByDate" : "number",
+			"compareDate" : "number",
+			"postedDate" : "number",
 			"postedByUser" : "postedByUser",
 			"socialStatus" : {
-				"numLikes" : "number"
+				"likes" : {
+					"numLikes" : "number",
+					"amLiking" : [true , false]
+				},
 			},
 			"text" : "string"
 		},

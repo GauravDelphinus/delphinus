@@ -919,6 +919,7 @@ module.exports = {
 	},
 
 	saveUser : function (user, next) {
+		let myDB = this.myDB;
 		var query = {
 		};
 
@@ -1200,7 +1201,7 @@ module.exports = {
 				cypherQuery += "});";
 			}
 
-			this.myDB.cypherQuery(cypherQuery, function(err) {
+			myDB.cypherQuery(cypherQuery, function(err) {
 				if (err) {
 					logger.dbError(err, cypherQuery);
 					return next(err, null);
@@ -1263,7 +1264,7 @@ module.exports = {
 		}
 		
 
-		if (entityType == "challenge" || entityType == "entry") {
+		if (entityType == "challenge" || entityType == "entry" || entityType == "comment") {
 			data.postedDate = entity.created;
 			data.postedByUser = {};
 			data.postedByUser.id = poster.id;
@@ -1303,6 +1304,8 @@ module.exports = {
 			if (numPosts != null) {
 				data.socialStatus.posts = {numPosts: numPosts};
 			}
+		} else if (entityType == "comment") {
+			data.text = entity.text;
 		}
 
 		if (activityType != null && activityType != "none") {
