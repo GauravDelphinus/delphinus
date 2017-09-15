@@ -1,6 +1,4 @@
 var express = require("express");
-var tmp = require("tmp");
-var path = require("path");
 var config = require("../config");
 var shortid = require("shortid");
 var dataUtils = require("../dataUtils");
@@ -132,7 +130,6 @@ var routes = function(db) {
 			var parseDataURI = require("parse-data-uri");
 			var parsed = parseDataURI(req.body.imageDataURI);
 
-			var imageDataURI = req.body.imageDataURI;
 			var imageType = parsed.mimeType;
 
 			//generate path name for challenge image
