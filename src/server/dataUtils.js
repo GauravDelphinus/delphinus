@@ -1315,24 +1315,37 @@ module.exports = {
 
 			if (activityType == "recentlyCommented") {
 				if (lastComment) {
-					data.activity.comment = lastComment;
+					data.activity.comment = {};
 					data.activity.comment.postedDate = lastComment.created;
 				
 					if (lastCommenter) {
-						data.activity.comment.postedByUser = lastCommenter;
+						data.activity.comment.postedByUser = {};
+						data.activity.comment.postedByUser.id = lastCommenter.id;
+						data.activity.comment.postedByUser.displayName = lastCommenter.displayName;
+						data.activity.comment.postedByUser.image = lastCommenter.image;
+						data.activity.comment.postedByUser.lastSeen = lastCommenter.last_seen;
 					}
 				
-					data.activity.comment.socialStatus = {numLikes: 0};
+					data.activity.comment.socialStatus = {
+						likes: {
+							numLikes: 0
+						}
+					};
 				}
 			} else if (activityType == "recentlyLiked") {
 				if (likeTime && liker) {
 					data.activity.like = {};
-					data.activity.like.postedByUser = liker;
 					data.activity.like.postedDate = likeTime;
+
+					if (liker) {
+						data.activity.like.postedByUser = {};
+						data.activity.like.postedByUser.id = liker.id;
+						data.activity.like.postedByUser.displayName = liker.displayName;
+						data.activity.like.postedByUser.image = liker.image;
+						data.activity.like.postedByUser.lastSeen = liker.last_seen;
+					}
 				}
 			}
-			
-			
 		}
 		
 		return data;

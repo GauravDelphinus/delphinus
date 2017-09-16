@@ -250,6 +250,8 @@ module.exports = {
 		for (var key in object) {
 			if (!prototype.hasOwnProperty(key)) {
 				logger.error("prototype doesn't have the key: " + key);
+				logger.debug("object is: " + JSON.stringify(object));
+				logger.debug("prototype is: " + JSON.stringify(prototype));
 				return false;
 			}
 
@@ -441,7 +443,9 @@ module.exports = {
 				"postedDate" : "number",
 				"postedByUser" : "postedByUser",
 				"socialStatus" : {
-					"numLikes" : "number"
+					"likes" : {
+						"numLikes" : "number"
+					}
 				}
 			},
 			"like" : {
