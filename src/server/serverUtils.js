@@ -250,8 +250,11 @@ module.exports = {
 		for (var key in object) {
 			if (!prototype.hasOwnProperty(key)) {
 				logger.error("prototype doesn't have the key: " + key);
-				logger.debug("object is: " + JSON.stringify(object));
-				logger.debug("prototype is: " + JSON.stringify(prototype));
+				return false;
+			}
+
+			if (object[key] == undefined) {
+				logger.error("object[key] is undefined, for key = " + key + ", object = " + JSON.stringify(object));
 				return false;
 			}
 
@@ -285,16 +288,35 @@ module.exports = {
 		it will *not* catch it, but if it is present it will make sure to match and validate
 		it using the prototype.
 	*/
-	validateData: function(data, prototype) {
+	validateData: function(data, prototype, strict = true) {
 		if (data.constructor === Object) { //object
 			if (!this.validateObjectWithPrototype(data, prototype)) {
 				return false;
 			}
 		} else if (data.constructor === Array) { //array
+			var invalidIndexes = [];
 			for (var i = 0; i < data.length; i++) {
 				if (!this.validateObjectWithPrototype(data[i], prototype)) {
-					return false;
+					if (strict) {
+						return false;
+					} else {
+						invalidIndexes.push(i);
+					}
 				}
+			}
+			if (data.length > 0 && !strict) {
+				if (invalidIndexes.length == data.length) {
+					//not even a single object in the array is valid, so just return false
+					logger.error("validateData, non-strict mode, but entire array is invalid");
+					return false;
+				} else {
+					//at least one valid object found in the array
+					for (let j = invalidIndexes.length - 1; j >= 0; j--) {
+						data.splice(invalidIndexes[j], 1);
+					}
+					logger.error("validateData, non-strict mode, some objects found to be valid");
+				}
+				
 			}
 		}
 

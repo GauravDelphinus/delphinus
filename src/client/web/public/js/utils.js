@@ -788,7 +788,13 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 		}
 
 		entriesButton.click(function(e) {
-			$('#' + data.id + 'Tabs a[href="#entries"]').tab('show');
+			//if we're already in the challenge page, then just open the entries tab
+			if ($('#' + data.id + 'Tabs a[href="#entries"]').length !== 0) {
+				$('#' + data.id + 'Tabs a[href="#entries"]').tab('show');
+			} else {
+				//otherwise, redirect to the challenge page and open the entries tab by default
+				window.open("/challenge/" + data.id + "#entries", "_self");
+			}
 		});
 
 		socialStatus.append(entriesButton);
