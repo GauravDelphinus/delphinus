@@ -118,7 +118,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -150,7 +150,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -191,7 +191,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -229,7 +229,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -268,7 +268,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -305,7 +305,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -351,7 +351,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -397,7 +397,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -443,7 +443,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -486,7 +486,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -530,7 +530,7 @@ var routes = function(db) {
 		    			}
 
 		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-		    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
 		    			}
 						resultArrays.push(output);
 						return callback(null, 0);
@@ -675,7 +675,7 @@ var routes = function(db) {
 	    			}
 
 	    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-	    				return callback(new DataValidationError(output, serverUtils.prototypes.challenge), 0);
+	    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
 	    			}
 					resultArrays.push(output);
 					return callback(null, 0);
@@ -708,7 +708,7 @@ var routes = function(db) {
 	    			}
 
 	    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-	    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+	    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
 	    			}
 					resultArrays.push(output);
 					return callback(null, 0);
@@ -741,7 +741,7 @@ var routes = function(db) {
 	    			}
 
 	    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-	    				return callback(new DataValidationError(output, serverUtils.prototypes.entry), 0);
+	    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
 	    			}
 					resultArrays.push(output);
 					return callback(null, 0);

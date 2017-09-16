@@ -1281,7 +1281,6 @@ function createNewCommentElement(isReply, parentId) {
 
 	var input = $("<input>", {type: "text", id: parentId + "NewCommentText", class:"form-control", placeholder: "Add your comment here"});
 
-
 	tdRight.append(input);
 
 	//set up submit logic
@@ -1625,12 +1624,19 @@ function createCommentsList(id, list) { //id is the entity id
 		var newCommentElement = createNewCommentElement(false, id);
 		appendNewCommentElement(newCommentElement, id, container, false);
 	} else {
-		var newCommentLink = $("<a>", {href: "/auth/", class: "btn btn-link", text: "Sign in to add a new comment"});
-		container.append(newCommentLink);
+		var signInToCommentElement = createSignInToCommentElement();
+		container.append(signInToCommentElement);
 	}
 	
 
 	return container;
+}
+
+function createSignInToCommentElement() {
+	var signInToCommentElement = $("<div>", {class: "full-width-center-content"});
+	var newCommentLink = $("<a>", {href: "/auth/", class: "btn btn-link", text: "Sign in to add a new comment"});
+	signInToCommentElement.append(newCommentLink);
+	return signInToCommentElement;
 }
 
 function refreshThumbnailView(contentTag) {

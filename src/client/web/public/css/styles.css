@@ -255,6 +255,16 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	font-size: 1.1em;
 }
 
+/********************************** GENERAL - CONTAINERS ***********************/
+
+/*
+	Full Width container, in which content (such as text) 
+	will be centered horizontally
+*/
+.full-width-center-content {
+	width: 100%;
+	text-align: center;
+}
 /********************************** GENERAL - SEPARATORS ***********************/
 
 .separator-small {
