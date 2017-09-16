@@ -1707,11 +1707,11 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 		for (var i = 0; i < viewOptions.length; i++) {
 			var viewOption = viewOptions[i];
 			if (viewOption.type == "thumbnail") {
-				viewGroup.append($("<button>", {id: "thumbnailViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-th"})).append(" Thumbnail View"));
+				viewGroup.append($("<button>", {id: "thumbnailViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-th"})).append(" Thumbnails"));
 			} else if (viewOption.type == "filmstrip") {
-				viewGroup.append($("<button>", {id: "scrollableViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-film"})).append(" Filmstrip View"));
+				viewGroup.append($("<button>", {id: "scrollableViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-film"})).append(" Filmstrip"));
 			} else if (viewOption.type == "comments") {
-				viewGroup.append($("<button>", {id: "commentsViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-film"})).append(" Comments View"));
+				viewGroup.append($("<button>", {id: "commentsViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-film"})).append(" Comments"));
 			}
 		}
 		container.append(viewGroup);
@@ -1719,12 +1719,13 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 
 	if (sortOptions && sortOptions.length > 1) {
 		var sortGroup = $("<div>", {id: contentTag + "SortGroup", class: "btn-group pull-right"});
+		sortGroup.append($("<a>", {href: "#", role: "button", class: "btn btn-default disabled", "aria-disabled" : "true"}).append("Sort by"));
 		for (var i = 0; i < sortOptions.length; i++) {
 			var sortOption = sortOptions[i];
 			if (sortOption.type == "date") {
-				sortGroup.append($("<button>", {id: "postedDateSortButton", type: "button", class: "btn btn-default", "data-getURL": sortOption.url}).append($("<span>", {class: "glyphicon glyphicon glyphicon-time"})).append(" Sort by Date"));
+				sortGroup.append($("<button>", {id: "postedDateSortButton", type: "button", class: "btn btn-default", "data-getURL": sortOption.url}).append($("<span>", {class: "glyphicon glyphicon glyphicon-time"})).append(" Date"));
 			} else if (sortOption.type == "popularity") {
-				sortGroup.append($("<button>", {id: "popularitySortButton", type: "button", class: "btn btn-default", "data-getURL": sortOption.url}).append($("<span>", {class: "glyphicon glyphicon glyphicon-thumbs-up"})).append(" Sort by Popularity"));
+				sortGroup.append($("<button>", {id: "popularitySortButton", type: "button", class: "btn btn-default", "data-getURL": sortOption.url}).append($("<span>", {class: "glyphicon glyphicon glyphicon-thumbs-up"})).append(" Popularity"));
 			}
 		}
 		container.append(sortGroup);
