@@ -19,14 +19,6 @@ var routes = function(db) {
 
 			var validationParams = [
 				{
-					name: "challengeId",
-					type: "id"
-				},
-				{
-					name: "entryId",
-					type: "id",
-				},
-				{
 					name: "followedId",
 					type: "id",
 				},
@@ -49,16 +41,15 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			if (req.query.challengeId) {
-				cypherQuery = "MATCH (c:Challenge) WHERE (id(c) = " + req.query.challengeId + ") MATCH (c)-[POSTED_BY]->(u:User) ";
-			} else if (req.query.entryId) { // filter by user who posted the entry
-                cypherQuery = "MATCH (e:Entry) WHERE (id(e) = " + req.query.entryId + ") MATCH (e)-[POSTED_BY]->(u:User) ";
- 			} else if (req.query.followedId) {
+			if (req.query.followedId) {
           		cypherQuery = "MATCH (followed:User {id: '" + req.query.followedId + "'})<-[:FOLLOWING]-(u:User)";
 			} else if (req.query.followingId) {
           		cypherQuery = "MATCH (following:User {id: '" + req.query.followingId + "'})-[:FOLLOWING]->(u:User)";
 			} else if (req.query.likedEntityId) {
           		cypherQuery = "MATCH ({id: '" + req.query.likedEntityId + "'})<-[:LIKES]-(u:User)";
+			} else if (req.user) {
+				//exclude the logged in user
+				cypherQuery = "MATCH (u:User) WHERE u.id <> '" + req.user.id + "' ";
 			} else { // return all users
                 cypherQuery = "MATCH (u:User) ";
 			}
