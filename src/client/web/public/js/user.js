@@ -213,7 +213,7 @@ function setupSocialSection(profileType) {
 }
 
 function setupTabs(profileType) {
-	var tabGroup = createNewTabGroup("mainTabGroup");
+	var tabGroup = createNewTabGroup(userInfo.id);
 	$("#user").append(tabGroup);
 
 	//set up profile tab
@@ -222,24 +222,18 @@ function setupTabs(profileType) {
 	//the server side code is already in place
 	//setupProfileTab(profileType);
 
-	//challenges are shown irrespective of who is viewing, as long as there are challenges
-	setupChallengesTab();
-
-	//entries are shown irrespective of who is viewing, as long as there are entries
-	setupEntriesTab();
+	setupPostsTab();
 
 	setupFollowersTab();
 
-	setupFollowingTab();
-
-	setupTabRedirection();
+	//setupTabRedirection();
 }
 
 
 function setupProfileTab(profileType) {
 	//if it's my profile, show the "Profile" tab
 	if (profileType == "mine") {
-		var tabDiv = appendNewTab("mainTabGroup", "profile", "Profile");
+		var tabDiv = appendNewTab(userInfo.id, "profile", "Profile");
 		var title = $("<div>", {class: "sectionTitle"}).append("Manage your social networks");
 		tabDiv.append(title);
 
@@ -283,23 +277,18 @@ function setupProfileTab(profileType) {
 	}
 }
 
-function setupChallengesTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "challenges", "Challenges");
-	createAndAppendContentContainer(tabDiv, 0, "challenges", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/challenges/?postedBy=" + userInfo.id + "&sortBy=dateCreated"}, {type: "popularity", url: "/api/challenges/?postedBy=" + userInfo.id + "&sortBy=popularity"}]);
-}
-
-function setupEntriesTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
-	createAndAppendContentContainer(tabDiv, 0, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?postedBy=" + userInfo.id + "&sortBy=dateCreated"}, {type: "popularity", url: "/api/entries/?postedBy=" + userInfo.id + "&sortBy=popularity"}]);
+function setupPostsTab() {
+	var tabDiv = appendNewTab(userInfo.id, "posts", "Posts");
+	createAndAppendContentContainer(tabDiv, 0, "posts", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/posts/?postedBy=" + userInfo.id + "&sortBy=dateCreated"}, {type: "popularity", url: "/api/posts/?postedBy=" + userInfo.id + "&sortBy=popularity"}]);
 }
 
 function setupFollowersTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "followers", "Followers");
+	var tabDiv = appendNewTab(userInfo.id, "followers", "Followers");
 	createAndAppendContentContainer(tabDiv, 0, "followers", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followedId=" + userInfo.id + "&sortBy=lastSeen"}]);
 }
 
 function setupFollowingTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "following", "Following");
+	var tabDiv = appendNewTab(userInfo.id, "following", "Following");
 	createAndAppendContentContainer(tabDiv, 0, "following", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followingId=" + userInfo.id + "&sortBy=lastSeen"}]);
 }
 

@@ -20,22 +20,22 @@ function setupMainItem() {
 }
 
 function setupTabs() {
-	var tabGroup = createNewTabGroup("mainTabGroup");
+	var tabGroup = createNewTabGroup(challengeId);
 	$("#tabs").append(tabGroup);
 
 	setupEntriesTab();
 
 	setupCommentsTab();
 
-	setupTabRedirection();
+	//setupTabRedirection();
 }
 
 function setupEntriesTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "entries", "Entries");
+	var tabDiv = appendNewTab(challengeId, "entries", "Entries");
 	createAndAppendContentContainer(tabDiv, challengeId, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=dateCreated"}, {type: "popularity", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=popularity"}]);
 }
 
 function setupCommentsTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "comments", "Comments");
+	var tabDiv = appendNewTab(challengeId, "comments", "Comments");
 	createAndAppendContentContainer(tabDiv, challengeId, "comments", [{type: "comments"}], [{type: "date", url: "/api/comments/?entityId=" + challengeId + "&sortBy=reverseDate"}]);
 }

@@ -78,6 +78,9 @@ module.exports = function(callback) {
 		
 		const socialRouter = require("./routes/socialRoutes")(db);
 		app.use("/api/social", socialRouter);
+
+		const postRouter = require("./routes/postRoutes")(db);
+		app.use("/api/posts", postRouter);
 		
 		/**
 			FILE ROUTERS

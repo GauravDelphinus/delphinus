@@ -96,7 +96,7 @@ function numDaysBetween (d1, d2) {
 
 function createNewTabGroup(id) {
 	var tabGroup = $("<div>", {id: id});
-	tabGroup.append($("<ul>", {class: "nav nav-tabs"}));
+	tabGroup.append($("<ul>", {class: "nav nav-tabs", id: id + "Tabs"}));
 	tabGroup.append($("<div>", {class: "tab-content"}));
 
 	return tabGroup;
@@ -616,9 +616,6 @@ function nextTimelapse(entityId, data) {
 }
 
 function stopTimelapse(entityId, data) {
-	console.log("stopTimelapse, entityId is " + entityId);
-	
-
 	//change the look to that of a theatre
 	$("#" + entityId + "MainElement").css("background", "");
 	$("#" + entityId + "PostedBySection").css("visibility", "");
@@ -775,8 +772,8 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 		}
 		socialStatus.append(commentButton);
 
-		commentButton.click(function() {
-			showHideCommentsList(data.id);
+		commentButton.click(function() {			
+			showHideCommentsList(data.id, true);
 		});
 	}
 	
@@ -791,7 +788,7 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 		}
 
 		entriesButton.click(function(e) {
-			window.open(data.link + "#entries", "_self");
+			$('#' + data.id + 'Tabs a[href="#entries"]').tab('show');
 		});
 
 		socialStatus.append(entriesButton);
@@ -808,6 +805,10 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 			if (data.socialStatus.follows.numFollowers <= 0) {
 				followersButton.hide();
 			}
+
+			followersButton.click(function(e) {
+				$('#' + data.id + 'Tabs a[href="#followers"]').tab('show');
+			});
 			socialStatus.append(followersButton);
 		}
 		
@@ -819,6 +820,10 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 			if (data.socialStatus.follows.numFollowing <= 0) {
 				followingButton.hide();
 			}
+
+			followingButton.click(function(e) {
+				$('#' + data.id + 'Tabs a[href="#following"]').tab('show');
+			});
 			socialStatus.append(followingButton);
 		}
 	}
@@ -832,6 +837,10 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 			if (data.socialStatus.posts.numPosts <= 0) {
 				postsButton.hide();
 			}
+
+			postsButton.click(function(e) {
+				$('#' + data.id + 'Tabs a[href="#posts"]').tab('show');
+			});
 			socialStatus.append(postsButton);
 		}
 	}
@@ -869,30 +878,35 @@ function showHideLikersList(parentId) {
 	Show or Hide the Comments List associated with the given Entity.
 	parentId - Entity id to which the list is attached (eg. Challenge, Entry, etc.)
 **/
-function showHideCommentsList(parentId) {
+function showHideCommentsList(parentId, show) {
 	//comments list is currently hidden, so fetch comments and show the list
-	if ($("#" + parentId + "CommentsContainer").is(":empty")) { 
-		$.getJSON("/api/comments/?entityId=" + parentId + "&sortBy=reverseDate", function(list) {
-			var commentsList = createCommentsList(parentId, list);
-			$("#" + parentId + "CommentsContainer").empty().append(commentsList);
-			$("#" + parentId + "NewCommentText").focus(); // set focus in the input field
-		})
-		.fail(function() {
-			//eat this
-		});
+	if (show) {
+		if ($("#" + parentId + "CommentsContainer").is(":empty")) { 
+			$.getJSON("/api/comments/?entityId=" + parentId + "&sortBy=reverseDate", function(list) {
+				var commentsList = createCommentsList(parentId, list);
+				$("#" + parentId + "CommentsContainer").empty().append(commentsList);
+				$("#" + parentId + "NewCommentText").focus(); // set focus in the input field
+			})
+			.fail(function() {
+				//eat this
+			});
 
-		//if we're showing the comments list on a popup, then show the popup
-		if ($("#" + parentId + "CommentsPopup").length) {
-			$("#" + parentId + "CommentsPopup").show();
+			//if we're showing the comments list on a popup, then show the popup
+			if ($("#" + parentId + "CommentsPopup").length) {
+				$("#" + parentId + "CommentsPopup").show();
+			}
 		}
 
-	//comments list is already show, so empty the container and hide it
+		//make sure the tab is 'active', not just 'shown'
+		$('#' + parentId + 'Tabs a[href="#comments"]').tab('show');
 	} else {
-		$("#" + parentId + "CommentsContainer").empty();
+		if (!$("#" + parentId + "CommentsContainer").is(":empty")) {
+			$("#" + parentId + "CommentsContainer").empty();
 
-		//if we're showing the comments list on a popup, then hide the popup
-		if ($("#" + parentId + "CommentsPopup").length) {
-			$("#" + parentId + "CommentsPopup").hide();
+			//if we're showing the comments list on a popup, then hide the popup
+			if ($("#" + parentId + "CommentsPopup").length) {
+				$("#" + parentId + "CommentsPopup").hide();
+			}
 		}
 	}
 }
@@ -980,7 +994,7 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 		socialActionsSection.append(commentButton);
 		
 		commentButton.click(function(e) {
-			showHideCommentsList(data.id);	
+			showHideCommentsList(data.id, true);	
 		});
 	}
 	
@@ -1424,7 +1438,7 @@ function createThumbnailElement(data, createLink) {
 	var commentPopupHeader = $("<h2>").append("Comments");
 	var commentPopupBody = createCommentsContainer(data);
 	element.append(createPopupElement(data.id + "CommentsPopup", commentPopupHeader, null, commentPopupBody, function() {
-		showHideCommentsList(data.id);
+		showHideCommentsList(data.id, false);
 	}));
 
 	//container for likers list, if any
@@ -1800,6 +1814,7 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 	});
 }
 
+/*
 function setupTabRedirection() {
 	// Javascript to enable link to tab
 	var url = document.location.toString();
@@ -1813,9 +1828,13 @@ function setupTabRedirection() {
 	});
 
 	//var element = $(".nav-tabs").get(0);
+
+	
 	var element = document.getElementById("mainTabGroup");
 	element.scrollIntoView(true);
+
 }
+*/
 
 /**
 	Update the given sidebar with the given list of items

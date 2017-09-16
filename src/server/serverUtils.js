@@ -323,6 +323,31 @@ module.exports = {
 	  }
 	},
 
+	mergeFeeds: function(feedsArray, mergedFeed) {
+		var indices = [];
+		for (var i = 0; i < feedsArray.length; i++) {
+			indices.push(-1);
+			//console.log("feedsArray " + i + ":");
+			var feed = feedsArray[i];
+			if (feed.length > 0) {
+				indices[i] = 0;
+			}
+		}
+
+		while (true) {
+			var found = indices.find(checkIndexRemaining);
+			//console.log("found is " + found);
+			if (found === undefined) {
+				break;
+			}
+			var smallestDataObject = findAndIncrementSmallest(indices, feedsArray);
+			if (smallestDataObject !== null && (mergedFeed.findIndex(alreadyExists, smallestDataObject) == -1)) {
+				mergedFeed.push(smallestDataObject);
+			}
+			
+		}
+	},
+
 	/*
 		Prototypes used for validating output sent back to client from server.
 		Note that this acts like a filter - if a property is not present in the actual data
@@ -470,3 +495,54 @@ module.exports = {
 		}
 	}
 }
+
+function checkIndexRemaining(index) {
+	return (index != -1);
+}
+
+function objectLessThan(data1, data2) {
+	if (data2 === null) {
+		return true;
+	}
+
+	if (data1.compareDate > data2.compareDate) {
+		return true;
+	}
+
+	return false;
+}
+
+function alreadyExists(element) {
+	//console.log("alreadyExists: element.id = " + element.id + ", this.id = " + this.id);	
+	return (element.id == this.id);
+}
+
+function findAndIncrementSmallest(indices, feedsArray) {
+	var smallest = null;
+	var smallestIndex = -1;
+
+	for (var i = 0 ; i < indices.length; i++) {
+		var index = indices[i];
+		var feed = feedsArray[i];
+
+		//console.log("in for loop, i = " + i + ", index = " + index + ", feed[index]  = " + feed[index]);
+		if (index != -1) {
+			//console.log("calling objectLessThan with feed[index].created = " + feed[index].postedDate + ", ")
+			if (objectLessThan(feed[index], smallest)) {
+				smallest = feed[index];
+				smallestIndex = i;
+			}
+		}
+		
+	}
+
+	indices[smallestIndex]++;
+	if (indices[smallestIndex] == feedsArray[smallestIndex].length) {
+		indices[smallestIndex] = -1;
+	}
+
+	//console.log("returning smallest as " + smallest.id + ", created = " + smallest.compareDate);
+	return smallest;
+}
+
+
