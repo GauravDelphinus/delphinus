@@ -567,6 +567,7 @@ module.exports = {
 			}
 	**/
 	createFilterNode : function(filter, callback) {
+		var myDB = this.myDB;
 		if (filter.type == "preset") {
 			return callback(null, filter.preset);
 		} else if (filter.type == "custom") {
@@ -644,7 +645,7 @@ module.exports = {
 
 			//console.log("Running cypherQuery: " + cypherQuery);
 					
-			this.myDB.cypherQuery(cypherQuery, function(err){
+			myDB.cypherQuery(cypherQuery, function(err){
 	    		if(err) {
 	    			return callback(err, 0);
 	    		}

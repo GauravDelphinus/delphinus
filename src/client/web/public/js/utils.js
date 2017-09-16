@@ -394,10 +394,14 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 	var replyButton = $("<button>", {id: data.id + "ReplyButton", type: "button", class: "likeButtonSimple"}).append("Reply");
 	socialStatusSection.append(replyButton);
 	replyButton.click(function(e) {
-		//for reply of reply, the parent is still the top comment
-		var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id));
-		appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), null, true);
-
+		if (user) {
+			//for reply of reply, the parent is still the top comment
+			var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id));
+			appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), null, true);
+		} else {
+			window.open("/auth", "_self");
+		}
+		
 	});
 
 	// Allow delete for comments posted by currently logged-in user
