@@ -150,7 +150,7 @@ function createPostHeaderElement(data) {
 	// Posted By Section
 	var postedBy = $("<div>");
 	var postedByName = $("<span>", {id: "postedByName"});
-	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName, class: "text-plain-small text-bold link-black"}));
+	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName, class: "text-plain-small text-bold link-gray"}));
 	var postedByImage = $("<img>", {id: "postedByImage", class: "postedByImage"});
 	postedByImage.prop("src", data.postedByUser.image);
 	postedBy.append(postedByName);
@@ -345,14 +345,28 @@ function createCaptionSectionElement(data) {
 	return captionSection;
 }
 
+function createSeparatorElement(type, separatorClass) {
+	var separator = $("<span>", {class: separatorClass});
+
+	if (type == "dot") {
+		separator.append('\u00B7');
+	} else if (type == "bar") {
+		separator.append('\u007C');
+	}
+	
+	return separator;
+}
+
 function createSocialStatusSectionComment(data, parentId, isReply) {
 	var socialStatusSection = $("<div>", {class: "socialStatusSectionSimple"});
-	var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "likeButtonSimple"}).append("Like");
+	var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "button-link text-plain-small separator"}).append("Like");
 	if (data.socialStatus.likes.amLiking) {
 		likeButton.addClass("active");
 	}
 	socialStatusSection.append(likeButton);
 
+	
+	socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 	
 	var restURL = "/api/comments/" + data.id + "/like";
 	/*
@@ -391,7 +405,7 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 	
 	});
 
-	var replyButton = $("<button>", {id: data.id + "ReplyButton", type: "button", class: "likeButtonSimple"}).append("Reply");
+	var replyButton = $("<button>", {id: data.id + "ReplyButton", type: "button", class: "button-link text-plain-small separator-small"}).append("Reply");
 	socialStatusSection.append(replyButton);
 	replyButton.click(function(e) {
 		if (user) {
@@ -404,9 +418,13 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 		
 	});
 
+
+
 	// Allow delete for comments posted by currently logged-in user
 	if (user && user.id == data.postedByUser.id) {
-		var deleteButton = $("<button>", {id: data.id + "DeleteButton", type: "button", class: "likeButtonSimple"}).append("Delete");
+		socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
+
+		var deleteButton = $("<button>", {id: data.id + "DeleteButton", type: "button", class: "button-link text-plain-small separator-small"}).append("Delete");
 		socialStatusSection.append(deleteButton);
 		deleteButton.click(function(e) {
 			var result = confirm("Are you sure you want to delete this comment permanently?");
@@ -414,15 +432,20 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 			    deleteItem(data);
 			}
 		});
+
+		
 	}
 
-	var likeIcon = $("<span>", {id: data.id + "LikeIcon", class: "glyphicon glyphicon-thumbs-up"});
-	socialStatusSection.append(likeIcon);
+	socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 
-	var numLikes = $("<span>", {id: data.id + "NumLikes"}).append(" " + data.socialStatus.likes.numLikes);
+	var numLikes = $("<span>", {id: data.id + "NumLikes", class: "text-plain-small separator-small gray-light"}).append(data.socialStatus.likes.numLikes);
 	socialStatusSection.append(numLikes);
 
-	var postedDate = $("<span>", {class: "commentPostedDate", text: "" + formatDate(data.postedDate)});
+	socialStatusSection.append($("<span>", {text: " Likes", class: "text-plain-small gray-light"}));
+
+	socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
+
+	var postedDate = $("<span>", {class: "commentPostedDate separator-small text-plain-small gray-light", text: "" + formatDate(data.postedDate)});
 	socialStatusSection.append("     ");
 	socialStatusSection.append(postedDate);
 
@@ -431,8 +454,8 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 
 function createCommentsSectionTrimmed(data) {
 	var socialStatusSection = $("<div>", {class: "commentsSectionTrimmed"});
-	var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "likeButtonSimple"}).append("Like");
-	var replyButton = $("<button>", {id: data.id + "ReplyButton", type: "button", class: "likeButtonSimple"}).append("Reply");
+	var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "buttonSimple"}).append("Like");
+	var replyButton = $("<button>", {id: data.id + "ReplyButton", type: "button", class: "buttonSimple"}).append("Reply");
 	var likeIcon = $("<span>", {id: data.id + "LikeIcon", class: "glyphicon glyphicon-thumbs-up"});
 	var numLikes = $("<span>", {id: data.id + "NumLikes"}).append(" " + data.socialStatus.numLikes);
 
@@ -619,7 +642,7 @@ function createMainImageElement(data) {
 }
 
 function createTextElement(data) {
-	var textElement = $("<div>", {class: "commentText"});
+	var textElement = $("<div>", {class: "commentText text-plain-small"});
 	textElement.text(data.text);
 	return textElement;
 }
@@ -718,7 +741,7 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 
 	// For Challenges and Entries
 	if (data.socialStatus.likes) {
-		var likeButton = $("<button>", {id: data.id + "LikesButton", type: "button", class: "button-link text-plain-small"});
+		var likeButton = $("<button>", {id: data.id + "LikesButton", type: "button", class: "button-link text-plain-small separator-medium"});
 		likeButton.append($("<span>", {id: data.id + "NumLikes", text: data.socialStatus.likes.numLikes}));
 		likeButton.append($("<span>", {text: " Likes"}));
 		if (data.socialStatus.likes.numLikes <= 0) {
@@ -732,7 +755,8 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 	}
 	
 	if (data.socialStatus.shares) {
-		var shareButton = $("<button>", {id: data.id + "SharesButton", type: "button", class: "button-link text-plain-small"});
+
+		var shareButton = $("<button>", {id: data.id + "SharesButton", type: "button", class: "button-link text-plain-small separator-medium"});
 		shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.shares.numShares}));
 		shareButton.append($("<span>", {text: " Shares"}));
 		if (data.socialStatus.shares.numShares <= 0) {
@@ -742,7 +766,8 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 	}
 	
 	if (data.socialStatus.comments) {
-		var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "button-link text-plain-small"});
+
+		var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "button-link text-plain-small separator-medium"});
 		commentButton.append($("<span>", {id: data.id + "NumComments", text: data.socialStatus.comments.numComments}));
 		commentButton.append($("<span>", {text: " Comments"}));
 		if (data.socialStatus.comments.numComments <= 0) {
@@ -757,7 +782,8 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 	
 	// For challenges only
 	if (data.socialStatus.entries) {
-		var entriesButton = $("<button>", {id: data.id + "EntriesButton", type: "button", class: "button-link text-plain-small"});
+
+		var entriesButton = $("<button>", {id: data.id + "EntriesButton", type: "button", class: "button-link text-plain-small separator-medium"});
 		entriesButton.append($("<span>", {id: data.id + "NumEntries", text: data.socialStatus.entries.numEntries}));
 		entriesButton.append($("<span>", {text: " Entries"}));
 		if (data.socialStatus.entries.numEntries <= 0) {
@@ -773,8 +799,10 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 
 	// For Users
 	if (data.socialStatus.follows) {
+
 		if (data.socialStatus.follows.numFollowers) {
-			var followersButton = $("<button>", {id: data.id + "FollowersButton", type: "button", class: "button-link text-plain-small"});
+
+			var followersButton = $("<button>", {id: data.id + "FollowersButton", type: "button", class: "button-link text-plain-small separator-medium"});
 			followersButton.append($("<span>", {id: data.id + "NumFollowers", text: data.socialStatus.follows.numFollowers}));
 			followersButton.append($("<span>", {text: " Followers"}));
 			if (data.socialStatus.follows.numFollowers <= 0) {
@@ -784,7 +812,8 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 		}
 		
 		if (data.socialStatus.follows.numFollowing) {
-			var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "button-link text-plain-small"});
+
+			var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "button-link text-plain-small separator-medium"});
 			followingButton.append($("<span>", {id: data.id + "NumFollowing", text: data.socialStatus.follows.numFollowing}));
 			followingButton.append($("<span>", {text: " Following"}));
 			if (data.socialStatus.follows.numFollowing <= 0) {
@@ -796,7 +825,8 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 
 	if (data.socialStatus.posts) {
 		if (data.socialStatus.posts.numPosts) {
-			var postsButton = $("<button>", {id: data.id + "PostsButton", type: "button", class: "button-link text-plain-small"});
+
+			var postsButton = $("<button>", {id: data.id + "PostsButton", type: "button", class: "button-link text-plain-small separator-medium"});
 			postsButton.append($("<span>", {id: data.id + "NumPosts", text: data.socialStatus.posts.numPosts}));
 			postsButton.append($("<span>", {text: " Posts"}));
 			if (data.socialStatus.posts.numPosts <= 0) {
@@ -1210,13 +1240,13 @@ function createCommentElement(data, parentId, isReply) {
 	tr.append(tdLeft);
 
 	var tdRight = $("<td>", {class: "commentsRightColumn"});
-	var postedByName = $("<span>", {id: "postedByName", class: "postedByName"});
-	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName}));
+	var postedByName = $("<span>", {id: "postedByName", class: "postedByName text-plain-small text-bold"});
+	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName, class: "link-gray"}));
 	tdRight.append(postedByName);
 
 	tdRight.append("  ");
 
-	var commentText = $("<span>", {class: "commentText", text: data.text});
+	var commentText = $("<span>", {class: "commentText text-plain-small", text: data.text});
 	tdRight.append(commentText);
 
 	tdRight.append("<br>");

@@ -1,7 +1,4 @@
-/****
-Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
-Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
-****/
+
 
 /********************************* CENTER DISPLAY **************************/
 /*
@@ -79,6 +76,44 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	float: right;
 }
 
+/********************************** GENERAL - THEME COLORS *****************************/
+/****
+Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
+Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
+****/
+
+.color-ultra-light {
+	color: #fbeaf3;
+}
+
+.color-light: {
+	color: #c81e7e;
+}
+
+.color-standard {
+	color: #9E1F63;
+}
+
+.color-dark {
+	color: #6B1044;
+}
+
+.gray-ultra-light {
+	color: #d9d9d9;
+}
+
+.gray-light {
+	color: #a6a6a6;
+}
+
+.gray-standard {
+	color: #808080;
+}
+
+.gray-dark {
+	color: #595959;
+}
+
 /********************************** GENERAL - INPUT ELEMENTS *****************************/
 
 /*
@@ -154,6 +189,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	/* padding: 8px; */
 	/* font-size: 1em; */
 	border: none;
+	padding: 0px;
 }
 
 .button-link:hover {
@@ -164,6 +200,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 .button-link.active {
 	color: #9E1F63;
 	font-weight: bold;
+	padding: 0px;
 }
 
 /* 
@@ -218,18 +255,44 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	font-size: 1.1em;
 }
 
+/********************************** GENERAL - SEPARATORS ***********************/
+
+.separator-small {
+	margin-left: 5px;
+}
+
+.separator-small:first-child {
+	margin-left: 0px;
+}
+
+.separator-medium {
+	margin-left: 10px;
+}
+
+.separator-medium:first-child {
+	margin-left: 0px;
+}
+
+.separator-large {
+	margin-left: 15px;
+}
+
+.separator-large:first-child {
+	margin-left: 0px;
+}
+
 /********************************** GENERAL - TEXT ***********************/
 
 .text-plain-small {
-	font-size: 1.1em;
+	font-size: 13px;
 }
 
 .text-plain-medium {
-	font-size: 1.4em;
+	font-size: 15px;
 }
 
 .text-plain-large {
-	font-size: 1.6em;
+	font-size: 17px;
 }
 
 .text-italic {
@@ -277,6 +340,14 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 .link-plain {
 	/* dummy - use standard links */
+}
+
+.link-gray {
+	color: #595959;
+}
+
+.link-gray:hover {
+	color: #6B1044;
 }
 
 .link-black {
@@ -637,9 +708,9 @@ input[type=range]  {
 /*********************** COMMENTS LIST ************************/
 
 .commentsList {
-	width: 80%;
+	width: 100%;
 	margin: 0 auto;
-	background-color: #e6f9ff;
+	background-color: #f6f7f9;
 }
 
 .commentsTable {
@@ -647,14 +718,18 @@ input[type=range]  {
 }
 
 .commentsRow {
+}
 
+.commentElement {
+	margin: 0 15px;
+	padding-top: 5px;
 }
 
 .commentsLeftColumn {
-	width: 150px;
+	width: 45px;
 	text-align: right;
 	vertical-align: top;
-	padding: 10px;
+	padding: 10px 2px 2px 2px;
 }
 
 .commentsRightColumn {
@@ -665,29 +740,35 @@ input[type=range]  {
 
 }
 
+.socialStatusSectionSimple {
+	padding-top: 5px;
+}
+
 .replyElement {
 	margin-left: 40px;
 }
 
-.likeButtonSimple {
+.buttonSimple {
 	background: none;
 	color: #1155cc;
 	font-weight: normal;
 	border: none;
-	padding: 0;
 	cursor: pointer;
-	padding: 5px;
+	padding: 0px;
 }
 
-.likeButtonSimple.active {
+.buttonSimple.active {
 	background: none;
 	color: #1155cc;
 	font-weight: bold;
 	border: none;
 	padding: 0;
 	cursor: pointer;
-	padding: 5px;
+	padding: 0px;
 }
+
+
+
 
 /* STEP WIZARD - see https://bootsnipp.com/snippets/e3MBM */
 
@@ -810,7 +891,7 @@ input[type=range]  {
     margin: auto;
     padding: 0;
     border: 1px solid #888;
-    width: 80%;
+    width: 50%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
@@ -846,8 +927,12 @@ input[type=range]  {
 
 .modal-header {
     padding: 2px 16px;
-    background-color: #5cb85c;
+    background-color: #595959;
     color: white;
+}
+
+.modal-header h2 {
+	font-size: 15px;
 }
 
 .modal-body {padding: 2px 16px;}
@@ -909,14 +994,18 @@ input[type=range]  {
 }
 
 .sidebarHeading {
-	font-size: 1.6em;
-	font-weight: bold;
+	font-size: 17px;
 	color: #9E1F63;
 }
 
 .sidebarLink {
-	font-size: 1.4em;
+	font-size: 15px;
 	display: block;
+	color: #676969;
+}
+
+.sidebarLink:hover {
+	color: #9E1F63;
 }
 
 .sidebarSeparator {
@@ -1019,6 +1108,6 @@ ul.nav li.dropdown.open > a {
 
 /* Overload bootstrap */
 .form-control {
-	font-size: 1.4em;
-	height: 50px;
+	/* font-size: 1.4em; */
+	/* height: 50px; */
 }
