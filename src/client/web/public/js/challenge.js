@@ -27,7 +27,7 @@ function setupTabs() {
 
 	setupCommentsTab();
 
-	//setupTabRedirection();
+	setupTabRedirection(challengeId);
 }
 
 function setupEntriesTab() {

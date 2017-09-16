@@ -22,12 +22,12 @@ function setupMainItem() {
 }
 
 function setupTabs() {
-	var tabGroup = createNewTabGroup("mainTabGroup");
+	var tabGroup = createNewTabGroup(entryId);
 	$("#tabs").append(tabGroup);
 
 	setupCommentsTab();
 
-	setupTabRedirection();
+	setupTabRedirection(entryId);
 }
 
 function setupChallengeSidebar() {
@@ -40,6 +40,6 @@ function setupChallengeSidebar() {
 }
 
 function setupCommentsTab() {
-	var tabDiv = appendNewTab("mainTabGroup", "comments", "Comments");
+	var tabDiv = appendNewTab(entryId, "comments", "Comments");
 	createAndAppendContentContainer(tabDiv, entryId, "comments", [{type: "comments"}], [{type: "date", url: "/api/comments/?entityId=" + entryId + "&sortBy=reverseDate"}]);
 }

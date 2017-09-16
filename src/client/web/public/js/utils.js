@@ -1814,12 +1814,13 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 	});
 }
 
-/*
-function setupTabRedirection() {
+//$('#' + parentId + 'Tabs a[href="#comments"]').tab('show');
+function setupTabRedirection(id) {
 	// Javascript to enable link to tab
 	var url = document.location.toString();
 	if (url.match('#')) {
-	    $('.nav-tabs a[href="#' + url.split('#')[1] + '"]').tab('show');
+		var hash = url.split('#')[1];
+	    $('#' + id + 'Tabs a[href="#' + hash + '"]').tab('show');
 	} //add a suffix
 
 	// Change hash for page-reload
@@ -1827,14 +1828,10 @@ function setupTabRedirection() {
 	    window.location.hash = e.target.hash;
 	});
 
-	//var element = $(".nav-tabs").get(0);
-
-	
-	var element = document.getElementById("mainTabGroup");
+	var element = document.getElementById(id + "Tabs");
 	element.scrollIntoView(true);
-
 }
-*/
+
 
 /**
 	Update the given sidebar with the given list of items

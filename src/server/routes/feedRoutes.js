@@ -755,7 +755,7 @@ var routes = function(db) {
 				}
 
 				var mergedOutput = [];
-				mergeFeeds(resultArrays, mergedOutput);
+				serverUtils.mergeFeeds(resultArrays, mergedOutput);
 				return res.json(mergedOutput);
 			});
 		});

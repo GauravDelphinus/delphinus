@@ -226,7 +226,7 @@ function setupTabs(profileType) {
 
 	setupFollowersTab();
 
-	//setupTabRedirection();
+	setupTabRedirection(userInfo.id);
 }
 
 
