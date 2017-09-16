@@ -211,7 +211,7 @@ var routes = function(db) {
 
 		.patch(function(req, res) {
             
-            logger.debug("PATCH received on /api/users/" + req.params.userId);
+            logger.debug("PATCH received on /api/users/" + req.params.userId + ", req.body: " + serverUtils.makePrintFriendly(req.body));
 
 			var validationParams = [
 				{

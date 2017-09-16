@@ -96,7 +96,7 @@ var routes = function(db) {
 				POST a new challenge node.
 			**/
 
-			logger.debug("POST received on /api/challenges, body: " + JSON.stringify(req.body));
+			logger.debug("POST received on /api/challenges, body: " + serverUtils.makePrintFriendly(req.body));
 
 			var validationParams = [
 				{

@@ -372,6 +372,35 @@ module.exports = {
 		}
 	},
 
+	makePrintFriendly: function(data) {
+		if (data.constructor === Object) { //object
+			return JSON.stringify(this.makeObjectPrintFriendly(data));
+		} else if (data.constructor === Array) { //array
+			var newarray = [];
+			for (let i = 0; i < data.length; i++) {
+				newarray.push(this.makeObjectPrintFriendly(data[i]));
+			}
+			return JSON.stringify(newarray);
+		}
+
+		return null;
+	},
+
+	makeObjectPrintFriendly: function(object) {
+		var newobj = {};
+		for (key in object) {
+			if (object[key] == undefined) {
+				newobj[key] = "undefined";
+			} else if ((typeof object[key] === 'string') && object[key].startsWith("data:image")) {
+				newobj[key] = "data:image-truncated";
+			} else {
+				newobj[key] = object[key];
+			}
+		}
+
+		return newobj;
+	},
+
 	/*
 		Prototypes used for validating output sent back to client from server.
 		Note that this acts like a filter - if a property is not present in the actual data
