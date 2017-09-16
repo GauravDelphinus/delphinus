@@ -535,7 +535,7 @@ img {
     position:absolute;
     background: rgba(0, 0, 0, 0);
     border: 0px;
-   	color: gray;
+   	color: #c81e7e;
     display:none;
 }
 
@@ -553,7 +553,7 @@ img {
 
 /* User's profile name */
 .profileName {
-	/* position: relative; */
+	position: relative;
 	width: 90%;
 	display: inline-block;
   	margin:0 auto;
@@ -570,6 +570,7 @@ img {
 	text-align: center;
 	border-style: dotted;
 	border-color: rgba(0, 0, 0, 0);
+	border-width: 0.25px;
 	background-color: rgba(0, 0, 0, 0);
 }
 

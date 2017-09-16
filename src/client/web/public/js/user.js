@@ -174,13 +174,11 @@ function setupNameSection(profileType) {
 
 	$("#saveName").click(function() {
 		var jsonObj = {};
-		jsonObj.user = {};
-		jsonObj.user.id = userInfo.id;
-		jsonObj.user.displayName = $("#displayName").val();
+		jsonObj.displayName = $("#displayName").val();
 
 		$.ajax({
-			type: "PUT",
-			url: "/api/users/",
+			type: "PATCH",
+			url: "/api/users/" + userInfo.id,
           dataType: "json", // return data type
           contentType: "application/json; charset=UTF-8",
           data: JSON.stringify(jsonObj)

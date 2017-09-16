@@ -6,6 +6,7 @@ var config = require("../config");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 var mime = require("mime");
+var async = require("async");
 
 var routes = function(db) {
 	var userRouter = express.Router();
@@ -224,8 +225,11 @@ var routes = function(db) {
 			var validationParams = [
 				{
 					name: "imageData",
-					type: "imageData",
-					required: "yes"
+					type: "imageData"
+				},
+				{
+					name: "displayName",
+					type: "string"
 				}
 			];
 
@@ -247,33 +251,52 @@ var routes = function(db) {
 					return res.sendStatus(404);
 				}
 
-				var parseDataURI = require("parse-data-uri");
-				var parsed = parseDataURI(req.body.imageData);
-	        
-				var buffer = parsed.data;
-				var targetImagePath = global.appRoot + config.path.userImages + req.params.userId + mime.extension(parsed.mimeType);
+				async.waterfall([
+				    function(callback) {
+				    	if (req.body.imageData) {
+				    		var parseDataURI = require("parse-data-uri");
+							var parsed = parseDataURI(req.body.imageData);
+				        
+							var buffer = parsed.data;
+							var targetImagePath = global.appRoot + config.path.userImages + req.params.userId + mime.extension(parsed.mimeType);
 
-				var fs = require('fs');
+							var fs = require('fs');
 
-				fs.writeFile(targetImagePath, buffer, function(err) {
+							fs.writeFile(targetImagePath, buffer, function(err) {
+								if (err) {
+									logger.error("Failed to write file: " + targetImagePath);
+									callback(new Error("Failed to write file: " + targetImagePath), null);
+								}
+								
+								user.image = config.url.userImages + req.params.userId + mime.extension(parsed.mimeType);
+
+								callback(null, user);
+							});
+				    	} else {
+				    		callback(null, user);
+				    	}
+				    },
+				    function(user, callback) {
+				        if (req.body.displayName) {
+				        	user.displayName = req.body.displayName;
+				        }
+				        callback(null, user);
+				    }
+				], function (err, user) {
 					if (err) {
-						logger.error("Failed to write file: " + targetImagePath);
-						return res.sendStatus(500);
+						logger.error("Some error encountered: " + err);
+						res.sendStatus(500);
 					}
-					
-					user.image = config.url.userImages + req.params.userId + mime.extension(parsed.mimeType);
 
-					updateUserInDB(res, user, function(err) {
+				    updateUserInDB(res, user, function(err) {
 						if (err) {
 							logger.error("Failed to save user in DB: " + err);
 							return res.sendStatus(500);
 						}
 
-						return res.status(200).json({image: user.image});
+						return res.status(200).json({image: user.image, displayName: user.displayName});
 					});
 				});
-              
-				
 			});
 		});
 
