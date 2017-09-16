@@ -1,4 +1,4 @@
-	var config = require('./config');
+var config = require('./config');
 var presets = require("./presets");
 var categories = require("./categories");
 var shortid = require("shortid");
@@ -695,6 +695,12 @@ module.exports = {
 
 	escapeSingleQuotes : function(str) {
 		return str.replace(/'/g, "\\'");
+	},
+
+	sanitizeStringForCypher: function(str) {
+		var out = str.replace(/\\/g, "\\\\");
+		out = out.replace(/'/g, "\\'");
+		return out;
 	},
 
 	createArtifactNode : function(artifact, callback) {

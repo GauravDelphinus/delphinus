@@ -154,7 +154,7 @@ var routes = function(db) {
 			var cypherQuery = "MATCH (c:Challenge {id: '" + req.body.challengeId + "'}) " + 
 							" MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
 							"id: '" + id + "', " + 
-							"caption: '" + dataUtils.escapeSingleQuotes(req.body.caption) + "', " + 
+							"caption: '" + dataUtils.sanitizeStringForCypher(req.body.caption) + "', " + 
 							"image_height: '" + req.body.imageHeight + "', " +
 							"image_width: '" + req.body.imageWidth + "', " +
 							"image_type: '" + req.body.imageType + "', " +

@@ -154,7 +154,7 @@ var routes = function(db) {
 						"image_width : '" + size.width + "'," +
 						"image_height : '" + size.height + "'," +
 						"created : '" + req.body.created + "'," + 
-						"title : '" + dataUtils.escapeSingleQuotes(req.body.caption) + "'" +
+						"title : '" + dataUtils.sanitizeStringForCypher(req.body.caption) + "'" +
 						"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
 				
 					db.cypherQuery(cypherQuery, function(err, result){

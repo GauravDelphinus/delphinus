@@ -135,10 +135,9 @@ var routes = function(db) {
 							" MATCH (u:User {id: '" + req.user.id + "'}) CREATE (c:Comment {" +
 							"id: '" + id + "', " + 
 							"created : '" + req.body.created + "', " + 
-							"text : '" + req.body.text + "'" + 
+							"text : '" + dataUtils.sanitizeStringForCypher(req.body.text) + "'" + 
 							"})-[:POSTED_IN]->(e), (u)<-[r:POSTED_BY]-(c) RETURN c, u;";
 
-			
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
