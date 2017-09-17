@@ -20,34 +20,6 @@ function setupHandlers() {
 
 	// Post challenge button
 	$("#postChallenge").click(postChallenge);
-
-	// Challenge Message text box
-	$("textarea").keypress(function(e) {
-		var code = e.keyCode ? e.keyCode : e.which;
-		if (code == 13) {  // Enter keycode
-			$("#categorySection").show();
-			return false;
-		}
-	});
-
-	// Category List handler
-	$("#categoryList").on("change", function() {
-	  	if (user.facebook || user.twitter) {
-	  		$("#shareSection").show();
-	  		if (user.facebook) {
-	  			$("#shareFacebookSection").show();
-	  		}
-	  		if (user.twitter) {
-	  			$("#shareTwitterSection").show();
-	  		}	
-	  	} else {
-	  		$("#shareSection").hide();
-	  	}
-
-	  	$("#postSection").show();
-	  	$("#titleMessage").hide();
-	  	$("#challengeCategory").text("Category: " + $("#categoryList option:selected").text())
-	});
 }
 
 /**
@@ -96,9 +68,24 @@ function handleFileSelected(data, path, title, type) {
 	$("#challengeImage").prop("title", title);
 	$("#selectImage").hide();
 
-	//move to next step, which is the Challenge Message
+	//show the remaining sections
 	$("#descriptionSection").show();
+	$("#categorySection").show();
+	$("#postSection").show();
 	$("#caption").blur().focus(); //make sure to set focus into the challenge message text area
+
+	//show the share section
+	if (user.facebook || user.twitter) {
+  		$("#shareSection").show();
+  		if (user.facebook) {
+  			$("#shareFacebookSection").show();
+  		}
+  		if (user.twitter) {
+  			$("#shareTwitterSection").show();
+  		}	
+  	} else {
+  		$("#shareSection").hide();
+  	}
 }
 
 /**
