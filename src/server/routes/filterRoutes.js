@@ -155,7 +155,7 @@ var routes = function(db) {
 
 		.get(function(req, res){
 
-			logger.debug("GET received on api/filters/timelapse/" + req.params.entryId + ", query: " + JSON.stringify(req.query));
+			logger.debug("GET received on /api/filters/timelapse/" + req.params.entryId + ", query: " + JSON.stringify(req.query));
 			
 			var validationParams = [
 				{
@@ -208,22 +208,21 @@ var routes = function(db) {
 	    					return res.sendStatus(500);
 	    				}
 
-	    				var jsonObj = {};
-	    				jsonObj.timelapseData = [];
+	    				var output = [];
 
 	    				//first item is the base challenge image
 	    				var sourceImagePublicPath = config.url.challengeImages + imageData.image;
-	    				jsonObj.timelapseData.push({"imageType" : "url", "imageData" : sourceImagePublicPath});
+	    				output.push({"imageType" : "url", "imageData" : sourceImagePublicPath});
 
 	    				//for the rest of the items, add the target image url
 	    				for (var j = 0; j < imagePaths.length; j++) {
-							jsonObj.timelapseData.push({"imageType" : "url", "imageData" : imageUrlPaths[j]});
+							output.push({"imageType" : "url", "imageData" : imageUrlPaths[j]});
 	    				}
 
-	    				if (!validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
+	    				if (!serverUtils.validateData(output, serverUtils.prototypes.imageInfo)) {
 	    					return res.sendStatus(500);
 	    				}
-						return res.json(jsonObj);
+						return res.json(output	);
 	    			});
 	    		});
 			});

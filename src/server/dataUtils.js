@@ -276,10 +276,11 @@ module.exports = {
 		}
 	**/
 	getImageDataForEntry : function(entryId, next) {
+		let myDB = this.myDB;
 
 		// First get the original image from the challenge
 		var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id, c.image_type;"
-		this.myDB.cypherQuery(fetchChallengeQuery, function(err, output){
+		myDB.cypherQuery(fetchChallengeQuery, function(err, output){
 	    		if (err) {
 	    			return next(err, null);
 	    		}
@@ -296,7 +297,7 @@ module.exports = {
 				var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[u:USES]->(s) RETURN LABELS(s),s, e.caption ORDER BY u.order;";
 
 
-				this.myDB.cypherQuery(cypherQuery, function(err, result){
+				myDB.cypherQuery(cypherQuery, function(err, result){
 	    			if(err) {
 	    				return next(err, null);
 	    			}

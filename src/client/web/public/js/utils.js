@@ -338,7 +338,7 @@ function refreshContainerViewAfterDelete(id, contentTag) {
 
 function createCaptionSectionElement(data) {
 	// Caption (if available)
-	var captionSection = $("<div>", {class: "captionSection"});
+	var captionSection = $("<div>", {class: "captionSection", id: data.id + "CaptionSection"});
 	var caption = $("<span>", {class: "text-plain-large", text: data.caption});
 	captionSection.append(caption);
 
@@ -540,90 +540,106 @@ function sendLikeAction(restURL, likeAction, callback) {
 	});
 }
 
-function createTimelapseView(data) {
-	var timelapseStartButtonSection = $("<div>", {id: data.id + "TimelapseSection", class: "timelapseSection"});
-	var startTimelapseIcon = $("<span>", {class: "glyphicon glyphicon-play-circle"});
-	var startTimelapseButton = $("<button>", {id: data.id + "StartTimeLapseButton", type: "button", class: "btn btn-primary btn-lg timelapseButton"});
-	startTimelapseButton.append(startTimelapseIcon).append("  ").append("Timelapse View");
-	timelapseStartButtonSection.append(startTimelapseButton);
+/**************************** TIME LAPSE VIEW ***************************/
 
-	startTimelapseButton.click(function() {
-		$.getJSON('/api/filters/timelapse/' + entityId, function(data) {
-			startTimelapse(entityId, data.timelapseData);
-		})
-		.fail(function() {
-			window.location.replace("/error?reload=yes"); //reload the page to see if it works the next time
-		});
-	});
-
-	return timelapseStartButtonSection;
+function createTimeLapseProgressSectionElement(data) {
+	var timelapseProgressSection = $("<div>", {id: data.id + "TimeLapseProgressSection", class: "timelapseProgressSection"});
+	var rangeSelector = $("<input>", {id: data.id + "TimelapseRange", class: "timelapseRange", type: "range", min:"0", max:""})
+	rangeSelector.prop("disabled", true);
+	timelapseProgressSection.append(rangeSelector);
+	timelapseProgressSection.hide();
+	return timelapseProgressSection;
 }
 
-var timelapseIndex = 0;
-var timelapseTimer;
-var rangeUpdateTimer;
-var rangeUpdateCount = 0;
+var timelapseIndexMap = {}; //indeces of the frames, mapped by entity id
+var timelapseTimerMap = {}; //timer that advances the frames, mapped by entity id
+var rangeUpdateTimerMap = {}; //timer that updates the range (progress) indicator, mapped by entity id
+var rangeUpdateCountMap = {}; //counter to keep track of range updates, mapped by entity id
 
+/*
+	Start the Time Lapse view (usually at the click of a button)
+	entityId: ID of entry, etc. that the timelapse view is associated with
+	data: data containing the list of images that need to be played
+	format of data:
+	[
+		{
+			"imageType" : "url" or "imageData",
+			"imageData" : actual url or base64 encoded image data
+		}
+	]
+*/
 function startTimelapse(entityId, data) {
-	//change the look to that of a theatre
-	$("#" + entityId + "MainElement").css("background", "black");
-	$("#" + entityId + "PostedBySection").css("visibility", "hidden");
-	$("#" + entityId + "TimelapseSection").css("visibility", "hidden");
-	$("#" + entityId + "SocialStatus").css("visibility", "hidden");
+	$("#" + entityId + "TimelapseButton").prop("disabled", true);
+
+	timelapseIndexMap[entityId] = 0;
+	rangeUpdateCountMap[entityId] = 0;
 
 	//show the slider view
-	var rangeSelector = $("<input>", {id: entityId + "TimelapseRange", class: "timelapseRange", type: "range", min:"0", max:"" + (data.length - 1) * 2000})
-	$("#" + entityId + "BottomBar").append(rangeSelector);
+	$("#" + entityId + "TimeLapseProgressSection").show();
+	$("#" + entityId + "TimelapseRange").attr("max", "" + (data.length - 1) * 2000)
 
+	//start the ball rolling
 	nextTimelapse(entityId, data);
-	timelapseTimer = window.setInterval(function() {nextTimelapse(entityId, data);}, 2000);
-	rangeUpdateTimer = window.setInterval(updateTimelapseRange, 10);
+
+	timelapseTimerMap[entityId] = window.setInterval(function() {nextTimelapse(entityId, data);}, 2000); //progress frames every 2 seconds
+	rangeUpdateTimerMap[entityId] = window.setInterval(function() {updateTimelapseRange(entityId)}, 10); //update range progress every 10 milliseconds (for smoother movement)
 }
 
-function updateTimelapseRange() {
-	rangeUpdateCount += 10;
-	$("#" + entityId + "TimelapseRange").val(rangeUpdateCount);
+/*
+	Timer callback that updates the progress / range
+*/
+function updateTimelapseRange(entityId) {
+	rangeUpdateCountMap[entityId] += 10;
+	$("#" + entityId + "TimelapseRange").val(rangeUpdateCountMap[entityId]);
 }
 
+/*
+	Utility function to show a "fade in" effect when moving from frame to frame
+*/
 function fadeToImage(imageId, newSrc) {
 	$("#" + imageId).attr("src", newSrc);
-
-	/*
-	$("#" + imageId).fadeTo(1000,0.30, function() {
-		$("#" + imageId).attr("src", newSrc);
-  	}).fadeTo(500,1);
-  	*/
 }
 
+/*
+	Timer callback that updates the frames, and keeps a track of the range progress
+*/
 function nextTimelapse(entityId, data) {
-	if (data[timelapseIndex].imageType == "url") {
-		//$("#mainImage").attr("src", data[timelapseIndex].imageData);
-		fadeToImage("mainImage", data[timelapseIndex].imageData);
+	console.log("nextTimeLapse: timelapseIndexMap: " + JSON.stringify(timelapseIndexMap));
+	if (data[timelapseIndexMap[entityId]].imageType == "url") {
+		fadeToImage(entityId + "EntityImage", data[timelapseIndexMap[entityId]].imageData);
 	} else {
-		//$("#mainImage").attr("src", "data:image/jpeg;base64," + data[timelapseIndex].imageData);
-		fadeToImage("mainImage", "data:image/jpeg;base64," + data[timelapseIndex].imageData);
+		fadeToImage(entityId + "EntityImage", "data:image/jpeg;base64," + data[timelapseIndexMap[entityId]].imageData);
 	}
 	
 	//set the range input
-	$("#" + entityId + "TimelapseRange").val(timelapseIndex * 2000);
-	timelapseIndex++;
+	$("#" + entityId + "TimelapseRange").val(timelapseIndexMap[entityId] * 2000);
+	timelapseIndexMap[entityId] ++;
 
-	if (timelapseIndex == data.length) {
-		window.clearInterval(timelapseTimer);	 
-		window.clearInterval(rangeUpdateTimer);
+	if (timelapseIndexMap[entityId] == data.length) {
+		window.clearInterval(timelapseTimerMap[entityId]);
+		delete timelapseTimerMap[entityId];
+		window.clearInterval(rangeUpdateTimerMap[entityId]);
+		delete rangeUpdateTimerMap[entityId];
+
+		//let the last frame play before hiding the controls
 		window.setTimeout(function() {stopTimelapse(entityId, data);}, 2000);
 	}
 }
 
+/*
+	Stop the timelapse timers, and reset counters, etc.
+*/
 function stopTimelapse(entityId, data) {
-	//change the look to that of a theatre
-	$("#" + entityId + "MainElement").css("background", "");
-	$("#" + entityId + "PostedBySection").css("visibility", "");
-	$("#" + entityId + "TimelapseSection").css("visibility", "");
-	$("#" + entityId + "SocialStatus").css("visibility", "");
-	$("#" + entityId + "TimelapseRange").css("visibility", "hidden");
+	$("#" + entityId + "TimeLapseProgressSection").hide();
+
+	//reset values
+	delete timelapseIndexMap[entityId];
+	delete rangeUpdateCountMap[entityId];
+
+	$("#" + entityId + "TimelapseButton").prop("disabled", false);
 }
 
+/*************************************************************************/
 
 
 function createEntityImageElement(data) {
@@ -633,7 +649,7 @@ function createEntityImageElement(data) {
 }
 
 function createMainImageElement(data) {
-	var mainImage = $("<img>", {id: "mainImage", class: "mainImage"});
+	var mainImage = $("<img>", {id: data.id + "EntityImage", class: "mainImage"});
 	mainImage.prop("src", data.image);
 	return mainImage;
 }
@@ -644,23 +660,23 @@ function createTextElement(data) {
 	return textElement;
 }
 
-function createMainElement(data, setupTimelapseView) {
+function createMainElement(data) {
 	var element = $("<div>", {id: data.id + "MainElement", class: "mainElement"});
 
 	element.append(createPostHeaderElement(data));
 	element.append(createMainImageElement(data));
 
-	if (data.caption) {
+	if (data.caption && data.type != "entry") {
 		element.append(createCaptionSectionElement(data));
 	}
 	
+	if (data.type == "entry") {
+		element.append(createTimeLapseProgressSectionElement(data));
+	}
+
 	if (data.socialStatus) {
 		element.append(createSocialStatusSectionElement(data));
 		element.append(createSocialActionsSectionElement(data));
-	}
-
-	if (setupTimelapseView) {
-		element.append(createTimelapseView(data));
 	}
 
 	//container for likers list, if any
@@ -677,8 +693,12 @@ function createScrollableElement(data) {
 	var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data));
 	element.append(imageLink);
 
-	if (data.caption) {
+	if (data.caption && data.type != "entry") {
 		element.append(createCaptionSectionElement(data));
+	}
+
+	if (data.type == "entry") {
+		element.append(createTimeLapseProgressSectionElement(data));
 	}
 
 	if (data.socialStatus) {
@@ -726,7 +746,7 @@ function createTextSection(data) {
 }
 
 function createSocialStatusSectionElement(data, full /* Show all content */) {
-	var socialStatus = $("<div>", {id: data.id + "SocialStatus", class: "socialStatusSection"});
+	var socialStatus = $("<div>", {class: "socialStatusSection", id: data.id + "SocialStatusSection"});
 
 	// For Challenges and Entries
 	if (data.socialStatus.likes) {
@@ -1071,6 +1091,23 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 			});
 		}
 	}
+
+	// TIME LAPSE BUTTON
+	if (data.type == "entry") {
+		var timelapseButton = $("<button>", {id: data.id + "TimelapseButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+		timelapseButton.append($("<span>", {class: "glyphicon glyphicon-play-circle glyphiconAlign"})).append(" Timelapse");
+		socialActionsSection.append(timelapseButton);
+
+		console.log("click, id: " + data.id);
+		timelapseButton.click(function(e) {
+			$.getJSON('/api/filters/timelapse/' + data.id, function(imageData) {
+				startTimelapse(data.id, imageData);
+			})
+			.fail(function() {
+				window.location.replace("/error?reload=yes"); //reload the page to see if it works the next time
+			});
+		});
+	}
 	
 	// ADD ENTRY BUTTON ---------------------------------
 	if (data.socialStatus.entries) {
@@ -1254,8 +1291,12 @@ function createFeedElement(data) {
 		element.append(imageElement);
 	}
 
-	if (data.caption) {
+	if (data.caption && data.type != "entry") {
 		element.append(createCaptionSectionElement(data));
+	}
+
+	if (data.type == "entry") {
+		element.append(createTimeLapseProgressSectionElement(data));
 	}
 
 	if (data.socialStatus) {
@@ -1482,9 +1523,13 @@ function createThumbnailElement(data, createLink) {
 		element.append(createEntityImageElement(data));
 	}
 
-	if (data.caption) {
+	if (data.caption && data.type != "entry") {
 		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
 		element.append(link);
+	}
+
+	if (data.type == "entry") {
+		element.append(createTimeLapseProgressSectionElement(data));
 	}
 
 	if (data.socialStatus) {
