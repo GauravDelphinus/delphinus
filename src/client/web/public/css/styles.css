@@ -434,16 +434,17 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	color: gray;
 	font: 24px/200px arial;
 	height: 300px;
-	margin: 30px auto;
+	margin: 0 auto;
 	text-align: center;
 	line-height: 1;
-	width: 300px;
-	padding: 30px;
+	/* padding: 30px; */
+	width: 100%;
 }
 
 .dropZoneContent {
 	display: table-cell;
 	vertical-align: middle;
+	width: 100%;
 }
 
 /********************************** BRAND RELATED ************************/

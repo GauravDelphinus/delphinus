@@ -19,21 +19,27 @@
 	<div class="centerDisplayContent">
 		<div id="selectImage">
 			<div id="dropzone" class="dropZone">
+			
 				<div class="dropZoneContent">
+				
 					<p>Drop Image here</p><br>
 					<p>OR</p><br>
 					<label for="files" class="btn button-line">
 	    				<i class="fa fa-cloud-upload"></i> Browse
 					</label>
+				
 				</div>
-				<input id="files" type="file"/>
+			
+				 <input id="files" type="file" style="display:none;"/> 
+			
+			
 			</div>	
 		</div>
 		<img id="challengeImage" class="centerDisplayImage">
 		<br>
 		<div id="descriptionSection" style="display:none;">
 			<p class="centerDisplayCaption">Challenge message:</p>
-			<textarea rows="2" class="form-control" id="caption" placeholder="Enter your challenge message here."></textarea>
+			<input type="text" id="caption" class="form-control" placeholder="Enter your challenge message here." required>
 		</div>
 		<br>
 		<div id="categorySection" style="display:none;">
