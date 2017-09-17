@@ -26,6 +26,11 @@
 	padding: 20px;
 }
 
+.centerDisplayTitle {
+	font-size: 17px;
+	font-weight: bold;
+}
+
 .centerDisplayFull {
 	margin: 10px auto;
 }
@@ -38,12 +43,12 @@
 
 .centerDisplayHeader {
 	text-align: center;
-	font-size: 1.4em;
+	font-size: 17px;
 	font-weight: bold;
 }
 
 .centerDisplayFooter {
-	font-size: 1.3em;
+	font-size: 13px;
 	text-align: center;
 }
 
@@ -76,7 +81,9 @@
 	float: right;
 }
 
-/********************************** GENERAL - THEME COLORS *****************************/
+/********************************** MODIFIERS *****************************/
+
+/********************************** COLOR MODIFIERS *****************************/
 /****
 Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
 Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
@@ -112,6 +119,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 .gray-dark {
 	color: #595959;
+}
+
+/********************************** BUTTON MODIFIERS *****************************/
+
+.button-full-width {
+	width: 100%;
 }
 
 /********************************** GENERAL - INPUT ELEMENTS *****************************/
@@ -346,6 +359,41 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
         z-index: -1;
     }
 
+/********************************* USER IMAGES ***********************/
+
+/*
+	Image of the user (rounded)
+*/
+.user-image-large {
+	max-height: 60px;
+	margin-right: 10px;
+	border-radius: 50%;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+/*
+	Image of the user (rounded)
+*/
+.user-image-medium {
+	max-height: 50px;
+	margin-right: 10px;
+	border-radius: 50%;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
+/*
+	Image of the user (rounded)
+*/
+.user-image-tiny {
+	max-height: 40px;
+	margin-right: 10px;
+	border-radius: 50%;
+	padding-top: 2px;
+	padding-bottom: 2px;
+}
+
 /********************************* GENERAL - LINKS ***********************/
 
 .link-plain {
@@ -523,14 +571,7 @@ img {
 	width: 100%;
 }
 
-/*
-	Image of the Poster
-*/
-.postedByImage {
-	max-height: 50px;
-	margin-right: 10px;
-	border-radius: 50%;
-}
+
 
 /*
 	Time Lapse Button Section - Needs refinement
@@ -894,6 +935,18 @@ input[type=range]  {
     background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 }
 
+.modal-wide {
+	width: 60%;
+}
+
+.modal-medium {
+	width: 50%;
+}
+
+.modal-narrow {
+	width: 40%;
+}
+
 /* Modal Content */
 .modal-content {
     position: relative;
@@ -901,7 +954,6 @@ input[type=range]  {
     margin: auto;
     padding: 0;
     border: 1px solid #888;
-    width: 50%;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2),0 6px 20px 0 rgba(0,0,0,0.19);
     -webkit-animation-name: animatetop;
     -webkit-animation-duration: 0.4s;
@@ -949,7 +1001,7 @@ input[type=range]  {
 
 .modal-footer {
     padding: 2px 16px;
-    background-color: #5cb85c;
+    background-color: #595959;
     color: white;
 }
 
@@ -978,12 +1030,16 @@ input[type=range]  {
 	border: 0px;
 }
 
-/************************* Likers Popup *************************/
+/************************* Popup with list of people *************************/
 
-.likerImage {
-	height: 50px;
-	margin-right: 10px;
-	border-radius: 10%;
+.user-image-column {
+	width: 70px;
+	text-align: right;
+}
+
+.user-name-column {
+	padding-left: 10px;
+	padding-right: 10px;
 }
 
 /************************ Social ***************************/
