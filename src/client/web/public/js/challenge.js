@@ -8,6 +8,10 @@ $(document).ready(function(){
 	setupTabs();
 
 	keepSidebarVisible();
+
+	$("#createCaption").click(function(e) {
+		showAlert("Sample message", 3);
+	});
 });
 
 function setupMainItem() {

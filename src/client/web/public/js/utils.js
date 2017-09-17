@@ -5,7 +5,7 @@ function extractImage(files, callback) {
     for (var i = 0, f; f = files[i]; i++) {
     	// Only process image files.
       if (!f.type.match('image.*')) {
-      	alert("not an image");
+      	//alert("not an image");
         continue;
       }
 
@@ -238,7 +238,7 @@ function deleteItem(data) {
 		refreshAfterDelete(data.id, data.type);
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
-		showAlert("There appears to be a problem deleting that item.  Please try again.", 2);
+		showAlert("There appears to be a problem deleting that item.  Please try again.", 3);
 	});
 }
 
@@ -387,7 +387,7 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 		if (user) {
 			sendLikeAction(restURL, !$("#" + this.id).hasClass("active"), function(err, likeStatus) {
 				if (err) {
-					alert("some error was found, " + jsonData.error);
+					// eat this
 				} else {
 					var numLikes = parseInt($("#" + data.id + "NumLikes").text());
 					if (likeStatus) {
@@ -485,7 +485,7 @@ function createCommentsSectionTrimmed(data) {
 		if (user) {
 			sendLikeAction(restURL, !$("#" + this.id).hasClass("active"), function(err, likeStatus) {
 				if (err) {
-					alert("some error was found, " + jsonData.error);
+					// eat this
 				} else {
 					var numLikes = parseInt($("#" + data.id + "NumLikes").text());
 					if (likeStatus) {
@@ -1106,7 +1106,7 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 
 				sendFollow(dataId, follow, function (err, followResult) {
 					if (err) {
-						alert("some error was found " + err);
+						// eat this
 					} else {
 						var numFollowers = parseInt($("#" + dataId + "NumFollowers").text());
 			          	if (followResult) {
@@ -1179,10 +1179,10 @@ function sendShare(provider, data) {
       	data: JSON.stringify(jsonObj)
   	})
 	.done(function(data, textStatus, jqXHR) {
-      	showAlert("Posted successfully!", 2);
+      	showAlert("Posted successfully!", 3);
   	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
-		showAlert("There appears to be a problem posting.  Please try again later.", 2);
+		showAlert("There appears to be a problem posting.  Please try again later.", 3);
 	});	
 }
 
@@ -1190,7 +1190,19 @@ function sendShare(provider, data) {
 	Good looking alert box that fades away after a certain number of seconds
 */
 function showAlert(message, secondsToFade) {
-	alert(message);
+	var popupHeader = $("<h2>").append("Alert");
+	var popupBody = $("<p>", {class: "alert-message"}).append(message);
+	var element = createPopupElement("AlertPopup", "modal-narrow", null, null, popupBody, function() {
+		$("#AlertPopup").remove();
+	});
+	$("body").append(element);
+	$("#AlertPopup").show();
+	setTimeout(function() {
+		$("#AlertPopup").fadeOut(2000, function() {
+			$("#AlertPopup").hide();
+			$("#AlertPopup").remove();
+		});
+	}, secondsToFade * 1000);
 }
 
 function sendFollow(userId, follow, callback) {
@@ -1377,7 +1389,7 @@ function createNewCommentElement(isReply, parentId) {
 		    	}
 			})
 			.fail(function(jqXHR, textStatus, errorThrown) {
-				showAlert("There appears to be a problem posting your comment.  Please try again.", 2);
+				showAlert("There appears to be a problem posting your comment.  Please try again.", 3);
 			});
 	    }
 	});
@@ -1518,33 +1530,36 @@ function createFollowersPopupElement(data) {
 function createPopupElement(id, classes, headerContent, footerContent, bodyContent, closeCallback) {
 	var element = $("<div>", {id: id, class: "modal"});
 	
+	var content = $("<div>", {class: "modal-content"});
+	if (classes) {
+		content.addClass(classes);
+	}
+
 	var closeButton = $("<span>", {id: id + "PopupClose", class: "close"}).append("&times;");
 	closeButton.click(function() {
 		closeCallback();
 	});
 
-	var header = $("<div>", {class: "modal-header"}).append(closeButton);
+	
 	if (headerContent) {
+		var header = $("<div>", {class: "modal-header"}).append(closeButton);
 		header.append(headerContent);
+		content.append(header);
 	}
 
-	var body = $("<div>", {class: "modal-body"});
+	
 	if (bodyContent) {
+		var body = $("<div>", {class: "modal-body"});
 		body.append(bodyContent);
+		content.append(body);
 	}
 
-	var footer = $("<div>", {class: "modal-footer"});
+	
 	if (footerContent) {
+		var footer = $("<div>", {class: "modal-footer"});
 		footer.append(footerContent);
+		content.append(footer);
 	}
-
-	var content = $("<div>", {class: "modal-content"});
-	if (classes) {
-		content.addClass(classes);
-	}
-	content.append(header);
-	content.append(body);
-	content.append(footer);
 
 	element.append(content);
 

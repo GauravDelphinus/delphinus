@@ -604,6 +604,13 @@ img {
 	padding: 10px 0px;
 }
 
+/****************************** Alert / Popup *************************/
+
+.alert-message {
+	font-size: 15px;
+	padding: 10px;
+}
+
 /****************************** USER PROFILE PAGE *************************/
 
 /* User's profile image */
