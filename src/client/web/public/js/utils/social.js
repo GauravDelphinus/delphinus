@@ -424,7 +424,6 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 		timelapseButton.append($("<span>", {class: "glyphicon glyphicon-play-circle glyphiconAlign"})).append(" Timelapse");
 		socialActionsSection.append(timelapseButton);
 
-		console.log("click, id: " + data.id);
 		timelapseButton.click(function(e) {
 			$.getJSON('/api/filters/timelapse/' + data.id, function(imageData) {
 				startTimelapse(data.id, imageData);

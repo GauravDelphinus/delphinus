@@ -62,7 +62,6 @@ function fadeToImage(imageId, newSrc) {
 	Timer callback that updates the frames, and keeps a track of the range progress
 */
 function nextTimelapse(entityId, data) {
-	console.log("nextTimeLapse: timelapseIndexMap: " + JSON.stringify(timelapseIndexMap));
 	if (data[timelapseIndexMap[entityId]].imageType == "url") {
 		fadeToImage(entityId + "EntityImage", data[timelapseIndexMap[entityId]].imageData);
 	} else {
