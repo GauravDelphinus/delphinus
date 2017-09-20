@@ -1,9 +1,12 @@
 var tmp = require("tmp");
 var fs = require("fs");
 var execFile = require('child_process').execFile;
+var logger = require("./logger");
+var mime = require("mime");
 
 module.exports = {
-	applyStepsToImage : function(sourceImage, targetImage, steps, caption, next) {
+	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
+		logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
 		if (targetImage) {
 			if (fs.existsSync(targetImage)) {
 				return next(0, targetImage);
@@ -16,7 +19,7 @@ module.exports = {
     				return next(err, 0);
     			}
     			
-    			applySteps(sourceImage, path, steps, caption, next);
+    			applySteps(sourceImage, path + "." + mime.extension(imageType), steps, caption, next);
 			});
 		}
 	},
@@ -26,6 +29,7 @@ module.exports = {
 
 
 function applySteps(sourceImage, targetImage, steps, caption, next) {
+	logger.debug("applySteps: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps) + ", caption: " + caption);
 	//if there are any steps, then apply them one after the other
 	if ((steps.layouts && steps.layouts.length > 0) || (steps.filters && steps.filters.length > 0) || 
 		(steps.artifacts && steps.artifacts.length > 0) || (steps.decorations && steps.decorations.length > 0)) {

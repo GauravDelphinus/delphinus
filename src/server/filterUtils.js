@@ -183,7 +183,137 @@ module.exports = {
 			hash = hash & hash; // Convert to 32bit integer
 		}
 	return hash;
-}
+	},
+
+	processImageDataForEntry: function(entryData, next) {
+		async.waterfall([
+		    function(callback) {
+		    	if (entryData.source == "challengeId") {
+					if (!entryData.challengeId) {
+						logger.error("Challenge ID missing.");
+						return callback(new Error("Challenge ID Missing."));
+					}
+
+					dataUtils.getImageDataForChallenge(entryData.challengeId, function(err, imageData){
+						if (err) {
+							return callback(err);
+						}
+
+						var sourceImagePath = global.appRoot + config.path.challengeImages + entryData.challengeId + "." + mime.extension(imageData.imageType);
+						var hash = filterUtils.generateHash(JSON.stringify(steps));
+						var targetImageName = entryData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
+						var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+						var targetImageUrl = config.url.cacheImages + targetImageName;
+
+    					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, imageType: imageData.imageType});
+					});
+				} else {
+					return callback(null, null);
+				}
+		    },
+		    function(info, callback) {
+		    	if (info == null && entryData.source == "imageURL") {
+		    		if (!entryData.imageData) {
+		    			logger.error("Missing Image URL.");
+		    			return callback(new Error("Missing Image URL"));
+		    		}
+
+		    		var extension = entryData.imageData.split('.').pop();
+		    		var imageType = mime.lookup(extension);
+		    		if (!serverUtils.validateItem("imageType", "imageType", imageType)) {
+		    			return callback(new Error("Invalid Image Type: " + imageType));
+		    		}
+
+		    		var tmp = require('tmp');
+
+					tmp.file({ dir: config.tmpDir, prefix: 'apply-filter-', postfix: '.' + extension}, function _tempFileCreated(err, sourceImagePath, fd) {
+						if (err) {
+							return callback(err);
+						}
+
+						serverUtils.downloadImage(entryData.imageData, sourceImagePath, function(err) {
+			    			if (err) {
+			    				return callback(err);
+			    			}
+
+			   				return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: true, targetImagePath: null, targetImageUrl: null, imageType: imageType});
+						});
+		    		});
+		    	} else {
+		    		return callback(null, info);
+		    	}
+		    },
+		    function(info, callback) {
+		    	if (info == null && entryData.source == "dataURI") {
+		    		if (!entryData.imageData) {
+		    			logger.error("Missing Image URI");
+		    			return callback(new Error("Missing Image URI"));
+		    		}
+
+		    		var parseDataURI = require("parse-data-uri");
+					var parsed = parseDataURI(entryData.imageData);
+					
+					var buffer = parsed.data;
+
+					var tmp = require('tmp');
+
+					logger.debug("going to create tmp file");
+					tmp.file({ dir: config.tmpDir, prefix: 'apply-filter-', postfix: '.' + mime.extension(parsed.mimeType)}, function _tempFileCreated(err, sourceImagePath, fd) {
+						if (err) {
+							return callback(err);
+						}
+
+						logger.debug("going to write to tmp file: " + sourceImagePath);
+						fs.writeFile(sourceImagePath, buffer, function(err) {
+							if (err) {
+								logger.error("Failed to write file: " + sourceImagePath + ": " + err);
+								return callback(err);
+							}
+
+							return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: true, targetImagePath: null, targetImageUrl: null, imageType: parsed.mimeType});
+							
+						});
+		    		});
+		    	} else {
+		    		return callback(null, info);
+		    	}
+		    },
+		    function(info, callback) {
+		    	if (info == null && entryData.source == "designId") {
+		    		if (!entryData.designId ) {
+		    			logger.error("Missing Design ID");
+		    			return callback(new Error("Missing Design ID"));
+		    		}
+
+		    		dataUtils.getImageDataForDesign(entryData.designId, function(err, imageData){
+						if (err) {
+							return callback(err);
+						}
+
+						var sourceImagePath = global.appRoot + config.path.designImages + entryData.designId + "." + mime.extension(imageData.imageType);
+			    		var hash = filterUtils.generateHash(JSON.stringify(steps));
+			    		var targetImageName = entryData.designId + "-" + hash + "." + mime.extension(imageData.imageType);
+						var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+						var targetImageUrl = config.url.cacheImages + targetImageName;
+
+						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, imageType: imageData.imageType});
+					});
+		    	} else {
+		    		return callback(null, info);
+		    	}
+		    }
+		], function (err, info) {
+			if (err) {
+				logger.error("Some error encountered: " + err);
+				return next(err, null);
+			} else if (info == null) {
+				logger.error("Info is null, meaning none of the inputs were valid.");
+				return next(new Error("Info is null, meaning none of the inputs were valid."), null);
+			}
+
+			return next(0, info);
+		});
+	}
 };
 
 function cloneObject(input) {

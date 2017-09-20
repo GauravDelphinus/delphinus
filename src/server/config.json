@@ -29,7 +29,8 @@
 		"brandImages" : "src/client/web/public/images/static/branding/",
 		"logDir" : "../data/log/",
 		"publicDir" : "../public/",
-		"cacheImages" : "../data/cacheImages/"
+		"cacheImages" : "../data/cacheImages/",
+		"tmpDir" : "../data/tmp/"
 	},
 	"social" : {
 		"facebook" : {

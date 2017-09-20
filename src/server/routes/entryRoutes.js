@@ -112,9 +112,17 @@ var routes = function(db) {
 
 			var validationParams = [
 				{
-					name: "challengeId",
-					type: "id",
+					name: "source",
+					type: ["challengeId", "designId", "dataURI", "imageURL"],
 					required: "yes"
+				},
+				{
+					name: "challengeId",
+					type: "id"
+				},
+				{
+					name: "designId",
+					type: "id"
 				},
 				{
 					name: "caption",
@@ -122,19 +130,8 @@ var routes = function(db) {
 					required: "yes"
 				},
 				{
-					name: "imageHeight",
-					type: "number",
-					required: "yes"
-				},
-				{
-					name: "imageWidth",
-					type: "number",
-					required: "yes"
-				},
-				{
-					name: "imageType",
-					type: "imageType",
-					required: "yes"
+					name: "imageData",
+					type: ["oneoftypes", "myURL", "dataURI"]
 				},
 				{
 					name: "created",
@@ -147,19 +144,44 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
+			if (req.body.source == "challengeId" && !req.body.challengeId) {
+				logger.error("Challenge ID missing.");
+				return res.sendStatus(400);
+			} else if (req.body.source == "designId" && !req.body.designId) {
+				logger.error("Design ID missing.");
+				return res.sendStatus(400);
+			} else if (req.body.source == "dataURI" && !serverUtils.validateItem("dataURI", "imageData", req.body.imageData)) {
+				logger.error("Invalid dataURI received.");
+				return res.sendStatus(400);
+			} else if (req.body.source == "imageURL" && !serverUtils.validateItem("myURL", "imageData", req.body.imageData)) {
+				logger.error("Invalid Image URL received.");
+				return res.sendStatus(400);
+			}
+
 			var id = shortid.generate();
 			/**
 				First create the entry node.  Then later, link them to Filter nodes.
 			**/
-			var cypherQuery = "MATCH (c:Challenge {id: '" + req.body.challengeId + "'}) " + 
-							" MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
+			var cypherQuery = " MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
 							"id: '" + id + "', " + 
 							"caption: '" + dataUtils.sanitizeStringForCypher(req.body.caption) + "', " + 
 							"image_height: '" + req.body.imageHeight + "', " +
 							"image_width: '" + req.body.imageWidth + "', " +
 							"image_type: '" + req.body.imageType + "', " +
 							"created : '" + req.body.created + "'" + 
-							"})-[:PART_OF]->(c), (u)<-[r:POSTED_BY]-(e) RETURN e;";
+							"})-[r:POSTED_BY]->(u) ";
+
+			if (req.body.source == "challengeId") { //link to challenge
+				cypherQuery = "MATCH (c:Challenge {id: '" + req.body.challengeId + "'}) " +
+							cypherQuery +
+							", (c)<-[:PART_OF]-(e) RETURN e;";
+			} else if (req.body.source == "designId") {// link to design
+				cypherQuery += "MATCH (d:Design {id: '" + req.body.designId + "'}) " +
+							cypherQuery +
+							", (d)<-[:BASED_ON]-(e) RETURN e;";
+			} else { //independent entry
+				cypherQuery += " RETURN e;";
+			}
 			
 			db.cypherQuery(cypherQuery, function(err, result){
 				if(err) {
@@ -261,6 +283,58 @@ var routes = function(db) {
 							return res.sendStatus(500);
 						}
 
+
+						/*
+
+						source: challenge id:
+						---------------------
+
+						input file: /challengeImages/challengeid.jpeg
+						output file: /entryImages/entryid.jpeg
+
+						step files:
+
+						/cacheImages/challengeid-fkdfhd.jpeg
+						/cacheImages/challengeid-dffdfs.jpeg
+						/cacheImages/challengeid-sddfds.jpeg
+
+
+						source: design id:
+						---------------------
+
+						input file: /designImages/designid.jpeg
+						output file: /entryImages/entryid.jpeg
+
+						step files:
+
+						/cacheImages/designid-fkdfhd.jpeg
+						/cacheImages/designid-dffdfs.jpeg
+						/cacheImages/designid-sddfds.jpeg
+
+
+						source: dataURI:
+						---------------------
+
+						input file: /independentEntryImages/independententryid.jpeg
+						output file: /entryImages/entryid.jpeg
+
+						step files:
+
+						/cacheImages/independententryid-kdfsdkhfd.jpeg
+						/cacheImages/independententryid-dffdfs.jpeg
+						/cacheImages/independententryid-sddfds.jpeg
+
+
+						*/
+
+
+
+
+
+
+
+
+
 						//now, generate the image(s)
 						var singleStepList = filterUtils.extractSingleStepList(req.body.steps);
 						var applySingleStepToImageFunctions = [];
@@ -270,7 +344,7 @@ var routes = function(db) {
 							var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
 							var targetImage = global.appRoot + config.path.cacheImages + req.body.challengeId + "-" + hash + "." + mime.extension(req.body.imageType);
 
-							applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
+							applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, req.body.imageType, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
 						}
 
 						var imagePaths = []; //list of image paths for each sub step

@@ -8,17 +8,74 @@ $(document).ready(function(){
 	$("#apply").click(postEntry);
 
 	createLoginHeader();
+
+	setupHandlers();
 });
 
-function setupMainItem() {
-	$.getJSON('/api/challenges/' + challengeId, function(result) {
-		$("#newentryimage").prop("src", result.image);
-		$("#newentryimage").data("imageType", result.imageType);
-	})
-	.fail(function() {
-		window.location.replace("/error");
-	});
+/**
+	Set up event handlers
+**/
+function setupHandlers() {
+	// Setup the dnd listeners.
+	var dropZone = document.getElementById('dropzone');
+	dropZone.addEventListener('dragover', handleDragOver, false);
+	dropZone.addEventListener('drop', handleFileDropped, false);
 
+	//handler for file Browse button
+	document.getElementById('files').addEventListener('change', handleFileSelect, false);
+}
+
+/****** Drag / Drop Handlers ********/
+
+function handleFileDropped(evt) {
+	evt.stopPropagation();
+    evt.preventDefault();
+
+    extractImage(evt.dataTransfer.files, handleFileSelected);
+}
+
+function handleFileSelect(evt) {
+  	extractImage(evt.target.files, handleFileSelected); // FileList object
+}
+
+
+function handleDragOver(evt) {
+    evt.stopPropagation();
+    evt.preventDefault();
+    evt.dataTransfer.dropEffect = 'copy'; // Explicitly show this is a copy.
+}
+
+/**
+	An image was selected, whether by drag/drop or by Browse button
+	Show the image and switch to next step 
+**/
+function handleFileSelected(data, path, title, type) {
+	//show the image, and hide the drag/drop view
+	$("#newentryimage").prop("src", path);
+	$("#newentryimage").prop("title", title);
+	$("#selectImageSection").hide();
+	$("#stepsSection").show();
+}
+
+
+function setupMainItem() {
+	if (challengeId != 0) {
+		//since we have the challenge Id, this is a Challenge Entry workflow
+		$.getJSON('/api/challenges/' + challengeId, function(result) {
+			$("#newentryimage").prop("src", result.image);
+			$("#newentryimage").data("imageType", result.imageType);
+			$("#selectImageSection").hide();
+			$("#stepsSection").show();
+		})
+		.fail(function() {
+			window.location.replace("/error");
+		});
+	} else {
+		//prompt user to select image that needs to be "captionified"
+		$("#selectImageSection").show();
+		$("#stepsSection").hide();
+	}
+	
 	$("#newentryimage").on("load", function() {
 		$("#newentryimage").data("naturalWidth", this.naturalWidth);
 		$("#newentryimage").data("naturalHeight", this.naturalHeight);
@@ -162,8 +219,8 @@ function showArtifactStep() {
 					jsonObj.steps.artifacts[0].type = "preset";
 					jsonObj.steps.artifacts[0].preset = a.id;
 					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
-					generateChanges(a.id, jsonObj, function(id, imgPath) {
-						$("#" + id + "EntityImage").prop("src", imgPath);
+					generateChanges(a.id, jsonObj, function(id, data) {
+						$("#" + id + "EntityImage").prop("src", data.imageData);
 					});
 
 					list.push(data);
@@ -256,8 +313,8 @@ function showLayoutStep() {
 					}
 					jsonObj.steps.layouts[0].type = "preset";
 					jsonObj.steps.layouts[0].preset = l.id;
-					generateChanges(l.id, jsonObj, function(id, imgPath) {
-						$("#" + id + "EntityImage").prop("src", imgPath);
+					generateChanges(l.id, jsonObj, function(id, data) {
+						$("#" + id + "EntityImage").prop("src", data.imageData);
 					});
 
 					list.push(data);
@@ -479,8 +536,8 @@ function showFilterStep() {
 					}
 					jsonObj.steps.filters[0].type = "preset";
 					jsonObj.steps.filters[0].preset = f.id;
-					generateChanges(f.id, jsonObj, function(id, imgPath) {
-						$("#" + id + "EntityImage").prop("src", imgPath);
+					generateChanges(f.id, jsonObj, function(id, data) {
+						$("#" + id + "EntityImage").prop("src", data.imageData);
 					});
 
 					list.push(data);
@@ -675,8 +732,8 @@ function showDecorationStep() {
 					}
 					jsonObj.steps.decorations[0].type = "preset";
 					jsonObj.steps.decorations[0].preset = d.id;
-					generateChanges(d.id, jsonObj, function(id, imgPath) {
-						$("#" + id + "EntityImage").prop("src", imgPath);
+					generateChanges(d.id, jsonObj, function(id, data) {
+						$("#" + id + "EntityImage").prop("src", data.imageData);
 					});
 
 					list.push(data);
@@ -977,7 +1034,24 @@ function parseEntry(entry) {
 
 function constructJSONObject(jsonObj) {
 
-	jsonObj.challengeId = challengeId;
+	if (challengeId != 0) {
+		jsonObj.source = "challenge";
+		jsonObj.challengeId = challengeId;
+	} else if (designId != 0) {
+		jsonObj.source = "design";
+		jsonObj.designId = designId;
+	} else {
+		var imageSrc = $("#newentryimage").prop("src");
+		if (imageSrc.startsWith("data:image")) {
+			//data uri
+			jsonObj.source = "dataURI";
+		} else {
+			//assume URL
+			jsonObj.source = "imageURL";
+		}
+		jsonObj.imageData = imageSrc;
+	}
+
 	jsonObj.created = (new Date()).getTime();
 	jsonObj.caption = $("#bannerText").prop("value");
 
@@ -1196,6 +1270,7 @@ function constructJSONObject(jsonObj) {
 */
 var generateFailCount = 0;
 function generateChanges(id, jsonObj, done) {
+	//console.log("generateChanges, calling POST on /api/filters/apply, jsonObj = " + JSON.stringify(jsonObj));
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -1203,11 +1278,9 @@ function generateChanges(id, jsonObj, done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			if (jsonData.imageType == "url") {
-				done(id, jsonData.imageData);
-			} else if (jsonData.imageType == "blob") {
-				done(id, "data:image/jpeg;base64," + jsonData.imageData);
-			}			
+				done(id, jsonData);
+				//$("#newentryimage").data("captionId", jsonData.id);
+				//$("#newentryimage").data("imageType", jsonData.imageType);
 		},
 		error: function(jsonData) {
 			generateFailCount ++;
@@ -1237,13 +1310,9 @@ function applyChanges(done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			if (jsonData.imageType == "url") {
-				$("#newentryimage").attr("src", jsonData.imageData);
-			} else if (jsonData.imageType == "data") {
-				$("#newentryimage").attr("src", "data:image/jpeg;base64," + jsonData.imageData);
-				if (done) {
-					done();
-				}
+			$("#newentryimage").attr("src", jsonData.imageData);
+			if (done) {
+				done();
 			}
 		},
 		error: function(jsonData) {

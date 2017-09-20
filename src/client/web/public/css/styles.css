@@ -127,6 +127,15 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	width: 100%;
 }
 
+/********************************** ALIGNMENT MODIFIERS *****************************/
+
+.vertical-center {
+	vertical-align: middle;
+}
+
+.horizontal-center {
+	text-align: center;
+}
 /********************************** GENERAL - INPUT ELEMENTS *****************************/
 
 /*
@@ -712,6 +721,17 @@ input[type=range] .timelapseRange  {
 	display:block;
 }
 
+/****************** New Caption ***********************/
+
+.selectImageSection {
+	width: 70%;
+	margin: 0 auto;
+}
+
+.selectDesignSection {
+	width: 30%;
+	display: inline-block;
+}
 /****************** New Entry ***********************/
 
 .stepContent {

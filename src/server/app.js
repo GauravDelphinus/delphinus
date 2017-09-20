@@ -202,9 +202,24 @@ module.exports = function(callback) {
 			res.render("newentry", {challengeId: req.params.challengeId, user: normalizeUser(req.user)});
 		});
 
+		app.get("/newentry", ensureLoggedIn, function(req, res) {
+			var jsonObj = {challengeId: 0, designId: 0, user: normalizeUser(req.user)};
+			if (req.query && req.query.challengeId) {
+				jsonObj.challengeId = req.query.challengeId;
+			} else if (req.query && req.query.designId) {
+				jsonObj.designId = req.query.designId;
+			}
+
+			res.render("newentry", jsonObj);
+		});
+
 		// 6 - New Challenge
 		app.get("/newChallenge", ensureLoggedIn, function(req, res) {
 			res.render("newchallenge", {user: normalizeUser(req.user)});
+		});
+
+		app.get("/newcaption", ensureLoggedIn, function(req, res) {
+			res.render("newcaption", {user: normalizeUser(req.user)});
 		});
 
 		app.get("/user", ensureLoggedIn, function(req, res) {

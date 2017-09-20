@@ -263,6 +263,23 @@ module.exports = {
 	    });
 	},
 
+	getImageDataForDesign : function(designId, next) {
+		var cypherQuery = "MATCH (d:Design {id: '" + designId + "'}) RETURN d;"
+		this.myDB.cypherQuery(cypherQuery, function(err, output){
+	    	if (err) {
+	    		return next(err, null);
+	    	}
+
+	    	var d = output.data[0];
+	    	var imageData = {};
+	    	imageData.imageType = d.image_type;
+	    	imageData.imageWidth = d.image_width;
+	    	imageData.imageHeight = d.image_height;
+
+	    	return next(0, imageData);
+	    });
+	},
+
 	/**
 		Given an Entry ID, fetch the details of the image
 		that forms this entry.  This includes:

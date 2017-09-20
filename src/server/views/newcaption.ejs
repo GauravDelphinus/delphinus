@@ -1,0 +1,87 @@
+<html>
+<head>
+<title>Delphinus - New Caption</title>
+<link rel="stylesheet" href="/third-party/bootstrap/css/bootstrap.min.css">
+<link ref="stylesheet" href="/third-party/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="/css/styles.css"
+</head>
+<body>
+
+<div class="centerDisplay">
+	<!-- HEADER -->
+	<div class="centerDisplayHeader">
+		<img src="/images/branding/captionify_logo_small.png">
+		<p id="titleMessage">Let's get ready to post an exciting new caption!</p>
+	</div>
+	<hr>
+
+	<!-- CONTENT -->
+	<div class="centerDisplayContent">
+		<table>
+			<tr>
+				<td width="40%">
+					<div id="dropzone" class="dropZone">
+			
+						<div class="dropZoneContent">
+						
+							<p>Drop Image here</p><br>
+							<p>OR</p><br>
+							<label for="files" class="btn button-line">
+			    				<i class="fa fa-cloud-upload"></i> Browse
+							</label>
+						
+						</div>
+					
+					
+					
+					</div>	
+				</td>
+				<td class="vertical-center horizontal-center">
+					OR
+				</td>
+				<td width="40%">
+					<div id="designSelection" class="designSelection">
+						<p class="text-plain-large text-bold horizontal-center">Select a design</p>
+						<img src="/images/static/designSelection.jpg">
+					</div>	
+				</td>
+			</tr>
+		</table>
+		
+		<img id="challengeImage" class="centerDisplayImage">
+		<br>
+		<div id="descriptionSection" style="display:none;">
+			<p class="centerDisplayCaption">Challenge message:</p>
+			<input type="text" id="caption" class="form-control" placeholder="Enter your challenge message here." required>
+		</div>
+		<br>
+		<div id="categorySection" style="display:none;">
+			<p class="centerDisplayCaption">Category:</p>
+			<select class="form-control" id="categoryList">
+				<option selected disabled>Choose category</option>
+  			</select>
+		</div>
+	</div>
+
+	<!-- FOOTER -->
+	<div id="postSection" class="centerDisplayFooter" style="display:none;">
+		<hr>
+		<button type="button" class="btn btn-lg button-full" value="Post Challenge!" id="postChallenge">Post Challenge!</button>
+		<div id="shareSection">
+			<span>Also share on: </span>
+			<span id="shareFacebookSection"><input type="checkbox" id="checkboxFacebook">Facebook</span>
+			<span id="shareTwitterSection"><input type="checkbox" id="checkboxTwitter">Twitter</span>
+		</div>
+	</div>
+</div>
+
+<script>
+	var user = <%- JSON.stringify(user) %>;
+</script>
+<script src="/third-party/jquery/js/jquery.min.js"></script>
+<script src="/third-party/bootstrap/js/bootstrap.min.js"></script>
+<script src="/js/utils.js"></script>
+<script src="/js/newchallenge.js"></script>
+<script src="/js/header.js"></script>
+</body>
+</html>

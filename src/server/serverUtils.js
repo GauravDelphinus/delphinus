@@ -139,15 +139,31 @@ module.exports = {
 	validateItem: function(type, name, value, logError = true) {
 		//logger.debug("validateItem: type: " + JSON.stringify(type) + ", name: " + name + ", value: " + value);
 		if (type.constructor === Array) {
-			if (type.indexOf(value) == -1) {
+			if (type.length < 1) {
+				//must have at least 1 element.  
+				logger.errorIf("ValidateItem: Invalid type array received: " + JSON.stringify(type));
+				return false;
+			}
+
+			//extract the first element
+			if (type[0] == "oneoftypes") {
+				//value must be one of the types of remaining elements in the array
+				var typeList = type.slice(1);
+
 				var found = false;
-				for (var i = 0; i < type.length; i++) {
-					if (this.validateItem(type[i], name, value, false)) {
+				for (var i = 0; i < typeList.length; i++) {
+					if (this.validateItem(typeList[i], name, value, false)) {
 						found = true;
 						break;
 					}
 				}
 				if (!found) {
+					logger.errorIf(logError, "Invalid value '" + value + "' received for param: '" + name + "', expected among these types " + JSON.stringify(typeList));
+					return false;
+				}
+			} else {
+				//if "oneoftypes" is not the first array element, then interpret all elements as values that need to be matched directly
+				if (type.indexOf(value) == -1) {
 					logger.errorIf(logError, "Invalid value '" + value + "' received for param: '" + name + "', expected among " + JSON.stringify(type));
 					return false;
 				}
@@ -162,7 +178,7 @@ module.exports = {
 				logger.errorIf(logError, "Invalid Image Type '" + value + "' received for param: '" + name + "'");
 				return false;
 			}
-		} else if (type == "imageData") {
+		} else if (type == "dataURI") {
 			if (!value.startsWith("data:image/")) {
 				logger.errorIf(logError, "Invalid Image Data received for param: " + name + " - does not start with 'data:image/'");
 				return false;
@@ -181,7 +197,7 @@ module.exports = {
 				Refer: https://stackoverflow.com/questions/3312607/php-binary-image-data-checking-the-image-type
 			*/
 			if (!(imageBlob.startsWith("/9j/") || imageBlob.startsWith("iVBORw0KGgo") || imageBlob.startsWith("R0lG"))) {
-				logger.errorIf(logError, "Invalid Image Data received - Starting bytes don't match PNG, JPEG or GIF");
+				logger.errorIf(logError, "Invalid Image Data received - Starting bytes received: " + imageBlob.substring(0, 4) + " don't match PNG, JPEG or GIF");
 				return false;
 			}
 		} else if (type == "string") {
@@ -401,6 +417,17 @@ module.exports = {
 		return newobj;
 	},
 
+	downloadImage: function(uri, filename, callback){
+
+		var request = require("request");
+		  request.head(uri, function(err, res, body){
+		    console.log('content-type:', res.headers['content-type']);
+		    console.log('content-length:', res.headers['content-length']);
+
+		    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+		  });
+	},
+
 	/*
 		Prototypes used for validating output sent back to client from server.
 		Note that this acts like a filter - if a property is not present in the actual data
@@ -440,7 +467,7 @@ module.exports = {
 		"postedByUser" : {
 			"id" : "id",
 			"displayName" : "string",
-			"image" : ["url", "myURL"],
+			"image" : ["oneoftypes", "url", "myURL"],
 			"lastSeen" : "number"
 		},
 		"onlyId" : {
@@ -473,7 +500,7 @@ module.exports = {
 					"numLikes" : "number",
 					"amLiking" : [true , false]
 				},
-				"shares" : {
+				"sha s" : {
 					"numShares" : "number"
 				},
 				"comments" : {
@@ -489,7 +516,7 @@ module.exports = {
 			"activity" : "activity"
 		},
 		"activity" : {
-			"type" : ["recentlyPosted", "recentlyLiked", "recentlyCommented"],
+			"type" : ["recentlyPosted", "recentlyLiked", "recentlyCommented", "highLikeCount", "highCommentCount"],
 			"comment": {
 				"postedDate" : "number",
 				"postedByUser" : "postedByUser",
@@ -521,14 +548,14 @@ module.exports = {
 			"name" : "string"
 		},
 		"imageInfo" :  {
-			"imageType" : ["url"],
-			"imageData" : "myURL"
+			"type" : ["dataURI", "imageURL"],
+			"imageData" : ["oneoftypes", "imageData", "myURL"]
 		},
 		"user" : {
 			"type" : ["user"],
 			"id" : "id",
 			"compareDate" : "number",
-			"image": ["url", "myURL"],
+			"image": ["oneoftypes", "url", "myURL"],
 			"caption": "string",
 			"link" : "myURL",
 			"lastSeen" : "number",

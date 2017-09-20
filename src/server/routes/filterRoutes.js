@@ -93,18 +93,33 @@ var routes = function(db) {
 
 		.post(function(req, res){
 
-			logger.debug("POST received on /api/filters/apply, body: " + JSON.stringify(req.body));
+			logger.debug("POST received on /api/filters/apply, body: " + serverUtils.makePrintFriendly(req.body));
 
 			var validationParams = [
 				{
+					name: "source",
+					type: ["challengeId", "imageURL", "dataURI", "designId"],
+					required: "yes"
+				},
+				{
 					name: "challengeId",
-					required: "yes",
 					type: "id"
 				},
 				{
-					name: "caption",
-					type: "string",
-					required: "yes"
+					name: "designId",
+					type: "id",
+				},
+				{
+					name: "imageType",
+					type: "imageType"
+				},
+				{
+					name: "imageURL",
+					type: "url"
+				},
+				{
+					name: "dataURI",
+					type: "imageData"
 				}
 			];
 
@@ -116,38 +131,197 @@ var routes = function(db) {
 				logger.error("Steps validation failed, steps: " + JSON.stringify(req.body.steps));
 				return res.sendStatus(400);
 			}
-				
-			dataUtils.getImageDataForChallenge(req.body.challengeId, function(err, imageData){
-				if (err) {
-					return res.sendStatus(500);
-				}
 
-				var image = req.body.challengeId;
-				var sourceImagePath = global.appRoot + config.path.challengeImages + image + "." + mime.extension(imageData.imageType);
-	    		dataUtils.normalizeSteps(req.body.steps, function(err, steps){
-	    			if (err) {
-	    				return res.sendStatus(500);
-	    			}
+			dataUtils.normalizeSteps(req.body.steps, function(err, steps){
+    			if (err) {
+    				return res.sendStatus(500);
+    			}
 
-	    			var hash = filterUtils.generateHash(JSON.stringify(steps));
-					var targetImageName = req.body.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
-					var targetImage = global.appRoot + config.path.cacheImages + targetImageName;
-	    				
-	    			imageProcessor.applyStepsToImage(sourceImagePath, targetImage, steps, req.body.caption, function(err, imagePath){
+    			async.waterfall([
+				    function(callback) {
+				    	if (req.body.source == "challengeId") {
+							if (!req.body.challengeId) {
+								logger.error("Challenge ID missing.");
+								return callback(new Error("Challenge ID Missing."));
+							}
+
+							dataUtils.getImageDataForChallenge(req.body.challengeId, function(err, imageData){
+								if (err) {
+									return callback(err);
+								}
+
+								var sourceImagePath = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(imageData.imageType);
+								var hash = filterUtils.generateHash(JSON.stringify(steps));
+								var targetImageName = req.body.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
+								var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+								var targetImageUrl = config.url.cacheImages + targetImageName;
+
+		    					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, imageType: imageData.imageType});
+							});
+						} else {
+							return callback(null, null);
+						}
+				    },
+				    function(info, callback) {
+				    	if (info == null && req.body.source == "imageURL") {
+				    		if (!req.body.imageData) {
+				    			logger.error("Missing Image URL.");
+				    			return callback(new Error("Missing Image URL"));
+				    		}
+
+				    		var extension = req.body.imageData.split('.').pop();
+				    		var imageType = mime.lookup(extension);
+				    		if (!serverUtils.validateItem("imageType", "imageType", imageType)) {
+				    			return callback(new Error("Invalid Image Type: " + imageType));
+				    		}
+
+				    		var tmp = require('tmp');
+
+							tmp.file({ dir: config.tmpDir, prefix: 'apply-filter-', postfix: '.' + extension}, function _tempFileCreated(err, sourceImagePath, fd) {
+								if (err) {
+									return callback(err);
+								}
+
+								serverUtils.downloadImage(req.body.imageData, sourceImagePath, function(err) {
+					    			if (err) {
+					    				return callback(err);
+					    			}
+
+					   				return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: true, targetImagePath: null, targetImageUrl: null, imageType: imageType});
+								});
+				    		});
+				    	} else {
+				    		return callback(null, info);
+				    	}
+				    },
+				    function(info, callback) {
+				    	if (info == null && req.body.source == "dataURI") {
+				    		if (!req.body.imageData) {
+				    			logger.error("Missing Image URI");
+				    			return callback(new Error("Missing Image URI"));
+				    		}
+
+				    		var parseDataURI = require("parse-data-uri");
+							var parsed = parseDataURI(req.body.imageData);
+							
+							var buffer = parsed.data;
+
+							var tmp = require('tmp');
+
+							logger.debug("going to create tmp file");
+							tmp.file({ dir: config.tmpDir, prefix: 'apply-filter-', postfix: '.' + mime.extension(parsed.mimeType)}, function _tempFileCreated(err, sourceImagePath, fd) {
+								if (err) {
+									return callback(err);
+								}
+
+								logger.debug("going to write to tmp file: " + sourceImagePath);
+								fs.writeFile(sourceImagePath, buffer, function(err) {
+									if (err) {
+										logger.error("Failed to write file: " + sourceImagePath + ": " + err);
+										return callback(err);
+									}
+
+									return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: true, targetImagePath: null, targetImageUrl: null, imageType: parsed.mimeType});
+									
+								});
+				    		});
+				    	} else {
+				    		return callback(null, info);
+				    	}
+				    },
+				    function(info, callback) {
+				    	if (info == null && req.body.source == "designId") {
+				    		if (!req.body.designId ) {
+				    			logger.error("Missing Design ID");
+				    			return callback(new Error("Missing Design ID"));
+				    		}
+
+				    		dataUtils.getImageDataForDesign(req.body.designId, function(err, imageData){
+								if (err) {
+									return callback(err);
+								}
+
+								var sourceImagePath = global.appRoot + config.path.designImages + req.body.designId + "." + mime.extension(imageData.imageType);
+					    		var hash = filterUtils.generateHash(JSON.stringify(steps));
+					    		var targetImageName = req.body.designId + "-" + hash + "." + mime.extension(imageData.imageType);
+								var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+								var targetImageUrl = config.url.cacheImages + targetImageName;
+
+								return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, imageType: imageData.imageType});
+							});
+				    	} else {
+				    		return callback(null, info);
+				    	}
+				    }
+				], function (err, info) {
+					if (err) {
+						logger.error("Some error encountered: " + err);
+						return res.sendStatus(500);
+					} else if (info == null) {
+						logger.error("Info is null, meaning none of the inputs were valid.");
+						return res.sendStatus(500);
+					}
+
+	    			imageProcessor.applyStepsToImage(info.sourceImagePath, info.targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePath){
 						if (err) {
+							fs.unlink(info.targetImagePath, function(err) {
+								if (err) {
+									logger.error("Failed to delete file: " + err);
+								}
+							});
+
+							logger.error("applyStepsToImage failed: " + err);
 							return res.sendStatus(500);
 						}
 
-						var imageUrlPath = config.url.cacheImages + targetImageName;
-
-						var jsonObj = {"imageType" : "url", "imageData" : imageUrlPath};
-
-						if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
-							return res.sendStatus(500);
+						if (info.sourceFileIsTemp) {
+							//get rid of the source file since it was temporary
+							fs.unlink(info.sourceImagePath, function(err) {
+								if (err) {
+									logger.error("Failed to delete source image file: " + err);
+								}
+							});
 						}
-						return res.json(jsonObj);
+
+						if (info.targetImagePath == null) {
+							//we generated a temp path.  make sure to send the file as blob and delete the temp file
+							const DataURI = require('datauri');
+							const datauri = new DataURI();
+							datauri.encode(imagePath, function(err, content) {
+								if (err) {
+									throw err;
+								}
+
+								
+								/*
+								fs.unlink(imagePath, function(err) {
+									if (err) {
+										logger.error("Failed to delete temp file: " + err);
+									}
+								});
+								*/
+
+								var jsonObj = {"type" : "dataURI", "imageData" : content};
+
+								if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
+									return res.sendStatus(500);
+								}
+
+								return res.json(jsonObj);
+							});
+						} else {
+							//we saved to the provided target image path.  send the link
+							var jsonObj = {"type" : "imageURL", "imageData" : info.targetImageUrl};
+
+							if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
+								return res.sendStatus(500);
+							}
+							
+							return res.json(jsonObj);
+						}
 					});
-	    		});
+		    		
+				});
     		});
 		});
 
@@ -198,7 +372,7 @@ var routes = function(db) {
 						imageUrlPaths.push(config.url.cacheImages + targetImageName);
 
 						//apply steps - note that applyStepsToImage first checks for existance of cache image
-	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, targetImage, singleStepList[i], imageData.caption));
+	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, targetImage, imageData.imageType, singleStepList[i], imageData.caption));
 	    			}
 
 	    			var imagePaths = []; //list of image paths for each sub step
