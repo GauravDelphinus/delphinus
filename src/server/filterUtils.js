@@ -299,7 +299,7 @@ module.exports = {
 						//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
 						//var targetImageUrl = config.url.cacheImages + targetImageName;
 
-						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, /* targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, */ imageType: imageData.imageType, sourceId: entryData.designId});
+						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, /* targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, */ imageType: "image/jpeg", sourceId: imageData.id});
 					});
 		    	} else {
 		    		return callback(null, info);

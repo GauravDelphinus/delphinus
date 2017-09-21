@@ -301,10 +301,7 @@ module.exports = {
 	    	}
 
 	    	var d = output.data[0];
-	    	var imageData = {};
-	    	imageData.imageType = d.image_type;
-	    	imageData.imageWidth = d.image_width;
-	    	imageData.imageHeight = d.image_height;
+	    	var imageData = {id: output.data[0].id};
 
 	    	return next(0, imageData);
 	    });
