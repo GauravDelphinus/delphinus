@@ -1102,7 +1102,12 @@ function constructJSONObject(jsonObj) {
 		jsonObj.source = "designId";
 		jsonObj.designId = designId;
 	} else {
-		var imageSrc = $("#newentryimage").prop("src");
+		var imageSrc = $("#newentryimage").data("originalSrc");
+		if (imageSrc == undefined) {
+			imageSrc = $("#newentryimage").prop("src");
+			$("#newentryimage").data("originalSrc", imageSrc);
+		}
+		
 		if (imageSrc.startsWith("data:image")) {
 			//data uri
 			jsonObj.source = "dataURI";
