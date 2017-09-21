@@ -5,6 +5,7 @@
 <link rel="stylesheet" href="/third-party/bootstrap-colorpicker/css/bootstrap-colorpicker.min.css">
 <link ref="stylesheet" href="/third-party/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" href="/third-party/cropper/css/cropper.min.css">
+<link rel="stylesheet" href="/third-party/chosen/chosen.min.css">
 <link rel="stylesheet" href="/css/styles.css">
 <script src="https://use.fontawesome.com/6ce6a7bf69.js"></script>
 </head>
@@ -20,7 +21,7 @@
 	<hr>
 
 	<div id="selectImageSection" class="selectImageSection">
-		<table>
+		<table width="100%">
 			<tr>
 				<td width="40%">
 					<div id="dropzone" class="dropZone">
@@ -47,11 +48,20 @@
 				<td width="40%">
 					<div id="designSelection" class="designSelection">
 						<p class="text-plain-large text-bold horizontal-center">Select a design</p>
-						<img src="/images/static/designSelection.jpg">
+						<button type="button" id="selectDesignButton" class="selectDesignButton"></button>
 					</div>	
 				</td>
 			</tr>
 		</table>
+	</div>
+
+	<div id="selectDesignSection" class="selectDesignSection" style="display:none;">
+		<p class="text-plain-large text-bold horizontal-center">Select a design</p>
+		<select id="designCategories" class="chosen-select" multiple>
+		</select>
+		<div id="presetDesignList">
+
+		</div>
 	</div>
 
 
@@ -474,6 +484,8 @@
 <script src="/third-party/bootstrap/js/bootstrap.min.js"></script>
 <script src="/third-party/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 <script src="/third-party/cropper/js/cropper.min.js"></script>
+<script src="/third-party/chosen/chosen.jquery.min.js"></script>
+<script src="/third-party/chosen/chosen.proto.min.js"></script>
 <script src="/js/newentry.js"></script>
 <script src="/js/header.js"></script>
 <script src="/js/utils/sidebar.js"></script>

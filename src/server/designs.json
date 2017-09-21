@@ -1,0 +1,17 @@
+{
+	"texture" : ["Textures", 
+		{
+			"aqua" : "Aqua Blue",
+			"redBricks": "Red Brick Wall",
+			"waterDrops" : "Water Drops on Window"
+		}
+	],
+	"nature" : ["Nature / Landscapes",
+		{
+			"autumnLeaves" : "Autumn Leaves",
+			"greenLeaf" : "Green Leaf with Water Drops",
+			"sea" : "Fishing in Sea",
+			"whiteFlowers" : "White Flowers"
+		}
+	]
+}

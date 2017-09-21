@@ -163,6 +163,18 @@ module.exports = {
 					logger.errorIf(logError, "Invalid value '" + value + "' received for param: '" + name + "', expected among these types " + JSON.stringify(typeList));
 					return false;
 				}
+			} else if (type[0] == "arrayoftype") {
+				//value must be an array of the type of the second array element
+				if (value.constructor !== Array) {
+					logger.errorIf(logError, "Array expected, but found: " + JSON.stringify(value));
+					return false;
+				}
+
+				for (let i = 0; i < value.length; i++) {
+					if (!this.validateItem(type[1], name, value[i])) {
+						return false;
+					}
+				}
 			} else {
 				//if "oneoftypes" is not the first array element, then interpret all elements as values that need to be matched directly
 				if (type.indexOf(value) == -1) {
@@ -226,6 +238,15 @@ module.exports = {
 		} else if (type == "category") {
 			var categories = require("./categories");
 			if (!categories.hasOwnProperty(value)) {
+				logger.errorIf(logError, "Invalid Category '" + value + "' received for param '" + name + "'");
+				return false;
+			}
+		} else if (type == "design") {
+			var designs = require("./designs");
+			for (key in designs) {
+
+			}
+			if (!designs.hasOwnProperty(value)) {
 				logger.errorIf(logError, "Invalid Category '" + value + "' received for param '" + name + "'");
 				return false;
 			}
@@ -461,6 +482,36 @@ module.exports = {
 		});
 	},
 
+	directoryExists: function(directory, callback) {
+		fs.stat(directory, function (err, stats){
+		  if (err) {
+		    // Directory doesn't exist or something.
+		    return callback(err);
+		  }
+		  if (!stats.isDirectory()) {
+		    // This isn't a directory!
+		    return callback(new Error(directory + ' is not a directory!'));
+		  } else {
+		    return callback(0);
+		  }
+		});
+	},
+
+	fileExists: function(file, callback) {
+		fs.stat(file, function (err, stats){
+		  if (err) {
+		    // File doesn't exist or something.
+		    return callback(err);
+		  }
+		  if (!stats.isFile()) {
+		    // This isn't a file!
+		    return callback(new Error(file + ' is not a file!'));
+		  } else {
+		    return callback(0);
+		  }
+		});
+	},
+
 	//download from a url to an image.  if filename is null
 	//it will automatically write to a temp file and return the
 	//temp path
@@ -669,6 +720,14 @@ module.exports = {
 					"numPosts" : "number"
 				}
 			}
+		},
+		"designCategory" : {
+			"name" : "string",
+			"designList" : ["arrayoftype", "design"]
+		},
+		"design" : {
+			"name" : "string",
+			"id" : "design"
 		}
 	}
 }

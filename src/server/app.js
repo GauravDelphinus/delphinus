@@ -84,6 +84,9 @@ module.exports = function(callback) {
 
 		const postRouter = require("./routes/postRoutes")(db);
 		app.use("/api/posts", postRouter);
+
+		const designRouter = require("./routes/designRoutes")(db);
+		app.use("/api/designs", designRouter);
 		
 		/**
 			FILE ROUTERS

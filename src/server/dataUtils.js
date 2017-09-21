@@ -60,6 +60,24 @@ module.exports = {
 			functions.push(async.apply(createNodesForCategory, this.myDB, null, id, categoryValue));
 		}
 
+		let designCategories = require("./designs");
+		for (let key in designCategories) {
+			let categoryId = key;
+			let designList = designCategories[key];
+			let categoryName = designList[0]; //first array element is the display name of the category
+
+			functions.push(async.apply(createNodeForDesignCategory, this.myDB, categoryId, categoryName));
+			
+			
+			let designObj = designList[1]; //second array element is the object containing the designs in that category
+			for (let key in designObj) {
+				let designId = key;
+				let designName = designObj[key];
+
+				functions.push(async.apply(createNodeForDesign, this.myDB, designId, designName, categoryId));
+			}
+		}
+
 		async.series(functions, function(err) {
 			return callback(err);
 		});
@@ -1477,6 +1495,51 @@ function createNodesForCategory(db, parentCategoryId, categoryId, categoryObj, c
 		});
 	}
 }
+
+function createNodeForDesignCategory(db, categoryId, categoryName, callback) {
+	if (categoryId && categoryName) {
+
+		//before we create the node, check that the category folder exists
+		serverUtils.directoryExists(global.appRoot + config.path.designImages + categoryId, function(err) {
+			if (err) {
+				return callback(err, 0);
+			}
+
+			var cypherQuery = "MERGE (c:DesignCategory {id: '" + categoryId + "'}) ON CREATE SET c.name = '" + categoryName + "' RETURN c;";
+
+			db.cypherQuery(cypherQuery, function(err, result) {
+				if (err) {
+					return callback(err, 0);
+				}
+
+				return callback(0, result);
+			});
+		});
+	}
+}
+
+function createNodeForDesign(db, designId, designName, categoryId, callback) {
+	if (designId && designName) {
+		//first check to make sure the image file exists
+		serverUtils.fileExists(global.appRoot + config.path.designImages + categoryId + "/" + designId + ".jpg", function(err) {
+			if (err) {
+				return callback(err, 0);
+			}
+
+			var cypherQuery = "MATCH (c:DesignCategory {id: '" + categoryId + "'}) MERGE (d:Design {id: '" + designId + "'})-[:BELONGS_TO]->(c) ON CREATE SET d.name = '" + designName + "' RETURN d;";
+
+			db.cypherQuery(cypherQuery, function(err, result) {
+				if (err) {
+					return callback(err, 0);
+				}
+
+				return callback(0, result);
+			});
+		});
+		
+	}
+}
+
 
 function createUserNode(db, user, next) {
 	var cypherQuery = "MERGE (u:User {id: '" + user.id + "'}) ON CREATE SET " +

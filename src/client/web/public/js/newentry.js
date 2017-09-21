@@ -12,6 +12,60 @@ $(document).ready(function(){
 	setupHandlers();
 });
 
+function setupDesignSection() {
+	
+	$.getJSON('/api/designs/', function(result) {
+		$("#designCategories").data("designData", result);
+		for (key in result) {
+			if (result[key].name) {
+				$("#designCategories").append($("<option>", {value: key, text: result[key].name, selected: true}));
+			}
+		}
+		$(".chosen-select").chosen({width: "95%"}); //use an ergonomic selection dropdown.  Refer https://harvesthq.github.io/chosen/
+
+		refreshDesignView();
+	})
+	.fail(function() {
+		window.location.replace("/error");
+	});
+
+	$("#designCategories").change(function() {
+		refreshDesignView();
+	});
+}
+
+function checkDesign(designObj) {
+	return (designObj.id == this);
+}
+
+function refreshDesignView() {
+	//first, find the select categories
+	var selectedDesignList = [];
+	var designData = $("#designCategories").data("designData");
+	var selectedCategories = $("#designCategories").val();
+
+	//build the list of all designs that are part of the selected categories
+	for (var i = 0; i < selectedCategories.length; i++) {
+		if (designData.hasOwnProperty(selectedCategories[i])) {
+			selectedDesignList.push.apply(selectedDesignList, designData[selectedCategories[i]].designList);
+		}
+	}
+
+	//create the grid view with these designs
+	var grid = createGrid("presetDesignGrid", selectedDesignList, 3, true, true, null, function(selectedDesignId) {
+
+		//find the selected design, and use that image to pass to the new caption workflow
+		var selectedDesignObj = selectedDesignList.find(checkDesign, selectedDesignId);
+		$("#newentryimage").prop("src", selectedDesignObj.image);
+		$("#newentryimage").prop("title", selectedDesignObj.name);
+		$("#selectDesignSection").hide();
+		$("#stepsSection").show();
+	});
+
+	//refresh the grid list
+	$("#presetDesignList").empty().append(grid);
+}
+
 /**
 	Set up event handlers
 **/
@@ -23,6 +77,13 @@ function setupHandlers() {
 
 	//handler for file Browse button
 	document.getElementById('files').addEventListener('change', handleFileSelect, false);
+
+	$("#selectDesignButton").click(function() {
+		setupDesignSection();
+
+		$("#selectDesignSection").show();
+		$("#selectImageSection").hide();
+	});
 }
 
 /****** Drag / Drop Handlers ********/

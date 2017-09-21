@@ -335,6 +335,10 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	font-weight: bold;
 }
 
+/********************************* GENERAL / SELECT LISTS (CHOSEN) *********************/
+
+
+
 /********************************* TITLES / HEADINGS *********************/
 
 .subHeading {
@@ -729,8 +733,8 @@ input[type=range] .timelapseRange  {
 }
 
 .selectDesignSection {
-	width: 30%;
-	display: inline-block;
+	width: 80%;
+	margin: 0 auto;
 }
 /****************** New Entry ***********************/
 
@@ -738,6 +742,14 @@ input[type=range] .timelapseRange  {
 	padding: 10px;
 	width: 100%;
 	margin: 0 auto;
+}
+
+.selectDesignButton {
+	background: url("/images/static/designSelection.jpg") no-repeat;
+	cursor: pointer;
+	border: none;
+	width: 100%;
+	height: 100%;
 }
 
 /****************** SETTINGS **************************/

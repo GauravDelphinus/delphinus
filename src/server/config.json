@@ -30,7 +30,8 @@
 		"logDir" : "../data/log/",
 		"publicDir" : "../public/",
 		"cacheImages" : "../data/cacheImages/",
-		"tmpDir" : "../data/tmp/"
+		"tmpDir" : "../data/tmp/",
+		"designImages" : "../data/contentImages/designs/"
 	},
 	"social" : {
 		"facebook" : {
@@ -62,7 +63,8 @@
 		"staticImages" : "/images/static/",
 		"user" : "/user/",
 		"brandImages" : "/images/static/branding/",
-		"cacheImages" : "/cacheImages/"
+		"cacheImages" : "/cacheImages/",
+		"designImages" : "/contentImages/designs/"
 	},
 	"name" : {
 		"defaultProfileImageName" : "default.png"
