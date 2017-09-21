@@ -10,6 +10,49 @@ var fs = require("fs");
 var imageProcessor = require("../imageProcessor");
 var serverUtils = require("../serverUtils");
 
+/*
+
+						source: challenge id:
+						---------------------
+
+						input file: /challengeImages/challengeid.jpeg
+						output file: /entryImages/entryid.jpeg
+
+						step files:
+
+						/cacheImages/challengeid-fkdfhd.jpeg
+						/cacheImages/challengeid-dffdfs.jpeg
+						/cacheImages/challengeid-sddfds.jpeg
+
+
+						source: design id:
+						---------------------
+
+						input file: /designImages/designid.jpeg
+						output file: /entryImages/entryid.jpeg
+
+						step files:
+
+						/cacheImages/designid-fkdfhd.jpeg
+						/cacheImages/designid-dffdfs.jpeg
+						/cacheImages/designid-sddfds.jpeg
+
+
+						source: dataURI:
+						---------------------
+
+						input file: /independentEntryImages/independententryid.jpeg
+						output file: /entryImages/entryid.jpeg
+
+						step files:
+
+						/cacheImages/independententryid-kdfsdkhfd.jpeg
+						/cacheImages/independententryid-dffdfs.jpeg
+						/cacheImages/independententryid-sddfds.jpeg
+
+
+						*/
+
 var routes = function(db) {
 
 	var entryRouter = express.Router();
@@ -158,10 +201,11 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
+			
 			var id = shortid.generate();
-			/**
-				First create the entry node.  Then later, link them to Filter nodes.
-			**/
+			
+			//First create the entry node.  Then later, link them to Filter nodes.
+			
 			var cypherQuery = " MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
 							"id: '" + id + "', " + 
 							"caption: '" + dataUtils.sanitizeStringForCypher(req.body.caption) + "', " + 
@@ -194,10 +238,10 @@ var routes = function(db) {
 
 				var newEntryId = result.data[0].id;
 
-				/**
-					Next extract all the filters, decorations, layouts and artifacts, and create the
-					respective nodes, and link them to the entry node.
-				**/
+				
+					//Next extract all the filters, decorations, layouts and artifacts, and create the
+					//respective nodes, and link them to the entry node.
+				
 
 				var createFilterNodesFunctions = []; // array of functions that will create the Filter Nodes
 
@@ -283,97 +327,68 @@ var routes = function(db) {
 							return res.sendStatus(500);
 						}
 
-
-						/*
-
-						source: challenge id:
-						---------------------
-
-						input file: /challengeImages/challengeid.jpeg
-						output file: /entryImages/entryid.jpeg
-
-						step files:
-
-						/cacheImages/challengeid-fkdfhd.jpeg
-						/cacheImages/challengeid-dffdfs.jpeg
-						/cacheImages/challengeid-sddfds.jpeg
-
-
-						source: design id:
-						---------------------
-
-						input file: /designImages/designid.jpeg
-						output file: /entryImages/entryid.jpeg
-
-						step files:
-
-						/cacheImages/designid-fkdfhd.jpeg
-						/cacheImages/designid-dffdfs.jpeg
-						/cacheImages/designid-sddfds.jpeg
-
-
-						source: dataURI:
-						---------------------
-
-						input file: /independentEntryImages/independententryid.jpeg
-						output file: /entryImages/entryid.jpeg
-
-						step files:
-
-						/cacheImages/independententryid-kdfsdkhfd.jpeg
-						/cacheImages/independententryid-dffdfs.jpeg
-						/cacheImages/independententryid-sddfds.jpeg
-
-
-						*/
-
-
-
-
-
-
-
-
-
-						//now, generate the image(s)
-						var singleStepList = filterUtils.extractSingleStepList(req.body.steps);
-						var applySingleStepToImageFunctions = [];
-						var sourceImage = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(req.body.imageType);
-
-						for (var i = 0; i < singleStepList.length; i++) {
-							var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
-							var targetImage = global.appRoot + config.path.cacheImages + req.body.challengeId + "-" + hash + "." + mime.extension(req.body.imageType);
-
-							applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImage, targetImage, req.body.imageType, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
-						}
-
-						var imagePaths = []; //list of image paths for each sub step
-    					async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
+						var entryData = req.body;
+						entryData.userId = req.user.id;
+    					filterUtils.processImageDataForEntry(entryData, true, function(err, info) {
     						if (err) {
-    							logger.error("Error creating Images for the Entry Steps: " + err);
+    							logger.error("Error in processImageDataForEntry: " + err);
     							return res.sendStatus(500);
     						}
 
-    						//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
-    						var targetEntryImage = global.appRoot + config.path.entryImages + id + "." + mime.extension(req.body.imageType);
-    						serverUtils.copyFile(imagePaths[imagePaths.length - 1], targetEntryImage, function(err) {
-    							if (err) {
-    								logger.error("Error creating the final Entry Image: " + err);
-    								return res.sendStatus(500);
-    							}
+		    				//now, generate the image(s)
+							var singleStepList = filterUtils.extractSingleStepList(req.body.steps);
+							var applySingleStepToImageFunctions = [];
 
-    							var output = {id: result.data[0].id};
-								if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
-			    					return res.sendStatus(500);
-			    				}
+							for (var i = 0; i < singleStepList.length; i++) {
+								var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
+								var targetImagePath = global.appRoot + config.path.cacheImages + info.sourceId + "-" + hash + "." + mime.extension(info.imageType);
 
-			    				res.header("Location", "/api/entries/" + result.data[0].id);
-    							return res.status(201).json(output);
-    						});
-    					});	
+								applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, info.sourceImagePath, targetImagePath, info.imageType, singleStepList[i], dataUtils.escapeSingleQuotes(req.body.caption)));
+							}
+
+							var imagePaths = []; //list of image paths for each sub step
+	    					async.series(applySingleStepToImageFunctions, function(err, imagePaths) {
+	    						if (err) {
+	    							logger.error("Error creating Images for the Entry Steps: " + err);
+	    							return res.sendStatus(500);
+	    						}
+
+	    						//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
+	    						var entryImagePath = global.appRoot + config.path.entryImages + id + "." + mime.extension(info.imageType);
+	    						serverUtils.copyFile(imagePaths[imagePaths.length - 1], entryImagePath, function(err) {
+	    							if (err) {
+	    								logger.error("Error creating the final Entry Image: " + err);
+	    								return res.sendStatus(500);
+	    							}
+
+	    							//set image type in the db node
+	    							var cypherQuery = "MATCH (e:Entry {id: '" + id + "'}) SET e.image_type = '" + info.imageType + "' RETURN e;";
+	    							db.cypherQuery(cypherQuery, function(err, result){
+						    			if(err) {
+						    				logger.dbError(err, cypherQuery);
+						    				return res.sendStatus(500);
+						    			} else if (result.data.length != 1) {
+						    				logger.dbResultError(cypherQuery, 1, result.data.length);
+						    				return res.sendStatus(404); //not found
+						    			}
+
+						    			//finally, prepare the output to send back to client
+						    			var output = {id: id};
+										if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+					    					return res.sendStatus(500);
+					    				}
+
+					    				res.header("Location", "/api/entries/" + id);
+		    							return res.status(201).json(output);
+						    		});
+	    						});
+	    					});	
+    					});
 					});
 				});
+
 			});
+
 		});
 
 	entryRouter.route("/:entryId")

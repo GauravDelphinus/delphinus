@@ -441,7 +441,7 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 		socialActionsSection.append(addEntryButton);
 
 		addEntryButton.click(function(e) {
-			window.open("/challenge/" + data.id + "/newentry", "_self");
+			window.open("/newentry?challengeId=" + data.id, "_self");
 		});
 	}
 	

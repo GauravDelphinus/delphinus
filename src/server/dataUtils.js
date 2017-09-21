@@ -6,6 +6,7 @@ var fs = require("fs");
 var mime = require("mime");
 var logger = require("./logger");
 var async = require("async");
+var serverUtils = require("./serverUtils");
 
 module.exports = {
 
@@ -169,7 +170,7 @@ module.exports = {
 	**/
 	getMetaDataForEntry : function(entryId, next) {
 		var constructMetaData = this.constructMetaData;
-		var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) MATCH (c:Challenge)<-[:PART_OF]-(e)-[:POSTED_BY]->(poster:User) RETURN e, poster, c;";
+		var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[:POSTED_BY]->(poster:User) OPTIONAL MATCH (c:Challenge)<-[:PART_OF]-(e) RETURN e, poster, c;";
 
 		this.myDB.cypherQuery(cypherQuery, function(err, result){
 			if(err) {
@@ -185,7 +186,7 @@ module.exports = {
 
 	},
 
-	constructMetaData: function(entityType, entity, poster, challenge) {
+	constructMetaData: function(entityType, entity, poster, challenge, design) {
 
 		var data = {
 			fbAppId: config.social.facebook.clientID,
@@ -208,8 +209,19 @@ module.exports = {
 			data.pageTitle = entity.caption + " - " + config.branding.siteName;
 			data.pageURL = config.hostname + config.url.entry + entity.id;
 			data.pageDescription = "Entry posted";
-			data.challengeId = challenge.id;
-			data.imageType = challenge.image_type; //entry retains format of the challenge
+			if (challenge && challenge.id) {
+				data.challengeId = challenge.id;
+			} else {
+				data.challengeId = 0;
+			}
+
+			if (design && design.id) {
+				data.designId = design.id;
+			} else {
+				data.designId = 0;
+			}
+			
+			data.imageType = entity.image_type; //entry retains format of the challenge
 			data.imageWidth = entity.image_width;
 			data.imageHeight = entity.image_height;
 			data.authorName = poster.displayName;
@@ -528,6 +540,67 @@ module.exports = {
 
 		});
 
+	},
+
+	createIndependentImageNode: function(source, imageData, userId, callback) {
+		//create a new independent image node
+		var id = shortid.generate();
+		var created = (new Date()).getTime();
+		var imageType;
+
+		if (source == "dataURI") {
+			var parseDataURI = require("parse-data-uri");
+			var parsed = parseDataURI(imageData);
+			imageType = parsed.mimeType;
+		} else if (source == "imageURL") {
+			var extension = entryData.imageData.split('.').pop();
+		   	imageType = mime.lookup(extension);
+		}
+
+		var cypherQuery = "MATCH(u:User {id: '" + userId + "'}) CREATE (i:IndependentImage {" +
+			"id: '" + id + "'," +
+			"image_type : '" + imageType + "'," + 
+			"created : '" + created + "' " + 
+			"})-[r:POSTED_BY]->(u) RETURN i;";
+	
+		var output = {
+			id: id,
+			imageType: imageType,
+			created: created
+		};
+
+		this.myDB.cypherQuery(cypherQuery, function(err, result){
+			if(err) {
+				logger.dbError(err, cypherQuery);
+				return callback(err);
+			} else if (result.data.length != 1) {
+				logger.dbResultError(cypherQuery, 1, result.data.length);
+				return callback(new Error("cypherQuery returned invalid response."));
+			}
+
+			//now create the image
+			var sourceImagePath = config.path.independentImages + id + "." + mime.extension(imageType);
+
+			if (source == "imageURL") {
+				serverUtils.downloadImage(imageData, sourceImagePath, function(err, outputFile) {
+					if (err) {
+						return callback(err);
+					}
+
+					return callback(0, output);
+				});
+			} else if (source == "dataURI") {
+				serverUtils.writeImageFromDataURI(imageData, sourceImagePath, function(err, outputFile) {
+					if (err) {
+						return callback(err);
+					}
+
+					return callback(0, output);
+				});
+			} else {
+				return callback(new Error("Invalid Image Source: " + source));
+			}
+		});
 	},
 
 	/**

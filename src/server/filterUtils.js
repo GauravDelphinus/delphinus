@@ -1,3 +1,11 @@
+var async = require("async");
+var logger = require("./logger");
+var config = require("./config");
+var mime = require("mime");
+var fs = require("fs");
+var serverUtils = require("./serverUtils");
+var shortid = require("shortid");
+var dataUtils = require("./dataUtils");
 
 module.exports = {
 	extractSingleStepList : function(steps) {
@@ -185,7 +193,7 @@ module.exports = {
 	return hash;
 	},
 
-	processImageDataForEntry: function(entryData, next) {
+	processImageDataForEntry: function(entryData, createNodesIfNotFound, next) {
 		async.waterfall([
 		    function(callback) {
 		    	if (entryData.source == "challengeId") {
@@ -200,12 +208,12 @@ module.exports = {
 						}
 
 						var sourceImagePath = global.appRoot + config.path.challengeImages + entryData.challengeId + "." + mime.extension(imageData.imageType);
-						var hash = filterUtils.generateHash(JSON.stringify(steps));
-						var targetImageName = entryData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
-						var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
-						var targetImageUrl = config.url.cacheImages + targetImageName;
+						//var hash = this.generateHash(JSON.stringify(steps));
+						//var targetImageName = entryData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
+						//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+						//var targetImageUrl = config.url.cacheImages + targetImageName;
 
-    					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, imageType: imageData.imageType});
+    					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, /* targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, */ imageType: imageData.imageType, sourceId: entryData.challengeId});
 					});
 				} else {
 					return callback(null, null);
@@ -218,27 +226,26 @@ module.exports = {
 		    			return callback(new Error("Missing Image URL"));
 		    		}
 
-		    		var extension = entryData.imageData.split('.').pop();
-		    		var imageType = mime.lookup(extension);
-		    		if (!serverUtils.validateItem("imageType", "imageType", imageType)) {
-		    			return callback(new Error("Invalid Image Type: " + imageType));
-		    		}
-
-		    		var tmp = require('tmp');
-
-					tmp.file({ dir: config.tmpDir, prefix: 'apply-filter-', postfix: '.' + extension}, function _tempFileCreated(err, sourceImagePath, fd) {
-						if (err) {
-							return callback(err);
-						}
-
-						serverUtils.downloadImage(entryData.imageData, sourceImagePath, function(err) {
+		    		if (createNodesIfNotFound) {
+		    			dataUtils.createIndependentImageNode(entryData.source, entryData.imageData, entryData.userId, function(err, data) {
 			    			if (err) {
 			    				return callback(err);
 			    			}
 
-			   				return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: true, targetImagePath: null, targetImageUrl: null, imageType: imageType});
-						});
-		    		});
+			    			var sourceImagePath = config.path.independentImages + data.id + "." + mime.extension(data.imageType);
+			    			return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: null, targetImageUrl: null, imageType: data.imageType, sourceId: data.id});
+			    		});
+		    		} else {
+		    			serverUtils.downloadImage(entryData.imageData, null, function(err, outputPath) {
+		    				if (err) {
+		    					return callback(err);
+		    				}
+
+		    				var extension = entryData.imageData.split('.').pop();
+		    				var imageType = mime.lookup(extension);
+		    				return callback(null, {sourceImagePath: outputPath, sourceFileIsTemp: true, /* targetImagePath: null, targetImageUrl: null, */ imageType: imageType, sourceId: 0});
+		    			});
+		    		}
 		    	} else {
 		    		return callback(null, info);
 		    	}
@@ -250,30 +257,26 @@ module.exports = {
 		    			return callback(new Error("Missing Image URI"));
 		    		}
 
-		    		var parseDataURI = require("parse-data-uri");
-					var parsed = parseDataURI(entryData.imageData);
-					
-					var buffer = parsed.data;
+					if (createNodesIfNotFound) {
+		    			dataUtils.createIndependentImageNode(entryData.source, entryData.imageData, entryData.userId, function(err, data) {
+			    			if (err) {
+			    				return callback(err);
+			    			}
 
-					var tmp = require('tmp');
+			    			var sourceImagePath = config.path.independentImages + data.id + "." + mime.extension(data.imageType);
+			    			return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: null, targetImageUrl: null, imageType: data.imageType, sourceId: data.id});
+			    		});
+		    		} else {
+		    			serverUtils.writeImageFromDataURI(entryData.imageData, null, function(err, outputPath) {
+		    				if (err) {
+		    					return callback(err);
+		    				}
 
-					logger.debug("going to create tmp file");
-					tmp.file({ dir: config.tmpDir, prefix: 'apply-filter-', postfix: '.' + mime.extension(parsed.mimeType)}, function _tempFileCreated(err, sourceImagePath, fd) {
-						if (err) {
-							return callback(err);
-						}
-
-						logger.debug("going to write to tmp file: " + sourceImagePath);
-						fs.writeFile(sourceImagePath, buffer, function(err) {
-							if (err) {
-								logger.error("Failed to write file: " + sourceImagePath + ": " + err);
-								return callback(err);
-							}
-
-							return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: true, targetImagePath: null, targetImageUrl: null, imageType: parsed.mimeType});
-							
-						});
-		    		});
+		    				var parseDataURI = require("parse-data-uri");
+							var parsed = parseDataURI(entryData.imageData);
+		    				return callback(null, {sourceImagePath: outputPath, sourceFileIsTemp: true, /* targetImagePath: null, targetImageUrl: null, */ imageType: parsed.mimeType, sourceId: 0});
+		    			});
+		    		}
 		    	} else {
 		    		return callback(null, info);
 		    	}
@@ -291,12 +294,12 @@ module.exports = {
 						}
 
 						var sourceImagePath = global.appRoot + config.path.designImages + entryData.designId + "." + mime.extension(imageData.imageType);
-			    		var hash = filterUtils.generateHash(JSON.stringify(steps));
-			    		var targetImageName = entryData.designId + "-" + hash + "." + mime.extension(imageData.imageType);
-						var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
-						var targetImageUrl = config.url.cacheImages + targetImageName;
+			    		//var hash = filterUtils.generateHash(JSON.stringify(steps));
+			    		//var targetImageName = entryData.designId + "-" + hash + "." + mime.extension(imageData.imageType);
+						//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+						//var targetImageUrl = config.url.cacheImages + targetImageName;
 
-						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, imageType: imageData.imageType});
+						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, /* targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, */ imageType: imageData.imageType, sourceId: entryData.designId});
 					});
 		    	} else {
 		    		return callback(null, info);

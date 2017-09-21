@@ -3,6 +3,8 @@ var logger = require("./logger");
 var shortid = require("shortid");
 var validUrl = require("valid-url");
 var url = require("url");
+var tmp = require("tmp");
+var config = require("./config");
 
 module.exports = {
 	/**
@@ -257,7 +259,7 @@ module.exports = {
 	},
 
 	validateObjectWithPrototype: function(object, prototype) {
-		//logger.debug("validateObjectWithPrototype: object: " + JSON.stringify(object) + ", prototype: " + JSON.stringify(prototype));
+		logger.debug("validateObjectWithPrototype: object: " + JSON.stringify(object) + ", prototype: " + JSON.stringify(prototype));
 		if (typeof object !== 'object' || typeof prototype !== 'object') {
 			logger.error("validateObjectWithPrototype: either one of object or prototype are not a valid object");
 			return false;
@@ -340,6 +342,7 @@ module.exports = {
 	},
 
 	copyFile: function(source, target, cb) {
+		logger.debug("copyFile: source: " + source + ", target: " + target);
 	  var cbCalled = false;
 
 	  var rd = fs.createReadStream(source);
@@ -417,15 +420,107 @@ module.exports = {
 		return newobj;
 	},
 
-	downloadImage: function(uri, filename, callback){
+	//core routine to generate a new temp file name
+	//callback returns either an err, or 0 along with the created path name
+	createTempFilename: function(callback, prefix = "") {
+		tmp.tmpName({ dir: global.appRoot + config.path.tmpDir, prefix: prefix }, function _tempNameGenerated(err, tmpPath) {
+		    if (err) {
+		    	return callback(err);
+		    }
+		 	
+		 	return callback(0, tmpPath);
+		});
+	},
 
+	//core download file routine, filename must be valid
+	//callback returns 0 or err
+	downloadFile: function(url, filename, callback) {
 		var request = require("request");
-		  request.head(uri, function(err, res, body){
-		    console.log('content-type:', res.headers['content-type']);
-		    console.log('content-length:', res.headers['content-length']);
 
-		    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
-		  });
+		request
+		  	.get(url)
+		  	.on('error', function(err) {
+		    	return callback(err);
+		  	})
+		  	.pipe(fs.createWriteStream(filename))
+		  	.on('close', function(err) {
+        		return callback(err);
+      		});
+	},
+
+	//core routine that writes from a dataURI to a provided
+	//file, and fails if the file doesn't exist
+	dataURItoFile: function(dataURI, filename, callback) {
+		var parseDataURI = require("parse-data-uri");
+		var parsed = parseDataURI(dataURI);
+					
+		var buffer = parsed.data;
+
+		fs.writeFile(filename, buffer, function(err) {
+			return callback(err);
+		});
+	},
+
+	//download from a url to an image.  if filename is null
+	//it will automatically write to a temp file and return the
+	//temp path
+	downloadImage: function(url, filename, callback){
+		var downloadFile = this.downloadFile;
+		if (filename) {
+			downloadFile(url, filename, function(err) {
+				if (err) {
+					return callback(err);
+				}
+
+				return callback(0, filename);
+			});
+		} else {
+			//create temp path
+			this.createTempFilename(function(err, tmpPath) {
+				if (err) {
+					return callback(err);
+				}
+
+				downloadFile(url, tmpPath, function(err) {
+					if (err) {
+						return callback(err);
+					}
+
+					return callback(0, tmpPath);
+				});
+			});
+		}
+	},
+
+	//write from a dataURI to an image.  If filename is null
+	//it will automatically write to a temp file and return the
+	//temp path
+	writeImageFromDataURI: function(dataURI, filename, callback) {
+		var dataURItoFile = this.dataURItoFile;
+		if (filename) {
+			dataURItoFile(dataURI, filename, function(err) {
+				if (err) {
+					return callback(err);
+				}
+
+				return callback(0, filename);
+			});
+		} else {
+			//create temp path
+			this.createTempFilename(function(err, tmpPath) {
+				if (err) {
+					return callback(err);
+				}
+
+				dataURItoFile(dataURI, tmpPath, function(err) {
+					if (err) {
+						return callback(err);
+					}
+
+					return callback(0, tmpPath);
+				});
+			});
+		}
 	},
 
 	/*
@@ -500,7 +595,7 @@ module.exports = {
 					"numLikes" : "number",
 					"amLiking" : [true , false]
 				},
-				"sha s" : {
+				"shares" : {
 					"numShares" : "number"
 				},
 				"comments" : {

@@ -392,7 +392,7 @@ var routes = function(db) {
 
 						var output = [];
 		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][7], "recentlyLiked", null, null, result.data[i][5], result.data[i][6], result.data[i][8]);
+		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][5], result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][7] > 0, "recentlyLiked", null, null, result.data[i][5], result.data[i][6], result.data[i][8]);
 							output.push(data);
 		    			}
 

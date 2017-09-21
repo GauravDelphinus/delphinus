@@ -2,6 +2,7 @@
 
 const config = require('./config');
 const path = require("path");
+const querystring = require("querystring");
 
 // Set up application root directory
 global.appRoot = path.normalize(path.resolve(__dirname) + "/../../");
@@ -296,7 +297,7 @@ module.exports = function(callback) {
 
 function ensureLoggedIn(req, res, next) {
 	if (!req.user) {
-		req.session.redirectTo = req.path;
+		req.session.redirectTo = req.path + "?" + querystring.stringify(req.query);
 		res.redirect("/auth");
 	} else {
 		next();

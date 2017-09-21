@@ -31,12 +31,15 @@ function setupTabs() {
 }
 
 function setupChallengeSidebar() {
-	$.getJSON('/api/challenges/' + challengeId, function(data) {
-		var element = createThumbnailElement(data);
-		$("#challenge").append(element);
-	}).fail(function() {
-		window.location.replace("/error");
-	});
+	if (challengeId != 0) {
+		$.getJSON('/api/challenges/' + challengeId, function(data) {
+			var element = createThumbnailElement(data);
+			$("#challenge").append(element);
+		}).fail(function() {
+			window.location.replace("/error");
+		});
+	}
+	
 }
 
 function setupCommentsTab() {

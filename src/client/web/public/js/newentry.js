@@ -1035,10 +1035,10 @@ function parseEntry(entry) {
 function constructJSONObject(jsonObj) {
 
 	if (challengeId != 0) {
-		jsonObj.source = "challenge";
+		jsonObj.source = "challengeId";
 		jsonObj.challengeId = challengeId;
 	} else if (designId != 0) {
-		jsonObj.source = "design";
+		jsonObj.source = "designId";
 		jsonObj.designId = designId;
 	} else {
 		var imageSrc = $("#newentryimage").prop("src");

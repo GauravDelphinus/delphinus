@@ -137,139 +137,27 @@ var routes = function(db) {
     				return res.sendStatus(500);
     			}
 
-    			async.waterfall([
-				    function(callback) {
-				    	if (req.body.source == "challengeId") {
-							if (!req.body.challengeId) {
-								logger.error("Challenge ID missing.");
-								return callback(new Error("Challenge ID Missing."));
-							}
+    			var entryData = req.body;
+    			entryData.userId = req.user.id;
+    			filterUtils.processImageDataForEntry(entryData, false, function(err, info) {
+    				if (err) {
+    					logger.error("processImageDataForEntry: some error occurred: " + err);
+    					return res.sendStatus(500);
+    				}
 
-							dataUtils.getImageDataForChallenge(req.body.challengeId, function(err, imageData){
-								if (err) {
-									return callback(err);
-								}
+    				var targetImagePath = null;
+    				var targetImageUrl = null;
+    				if (info.sourceId) {
+    					//sourceId would be set for challenges and designs, but not for independent entries
+    					//since we passed 'false' above to the processImageDataForEntry call
+    					var hash = filterUtils.generateHash(JSON.stringify(steps));
+						var targetImageName = info.sourceId + "-" + hash + "." + mime.extension(info.imageType);
+						var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+						var targetImageUrl = config.url.cacheImages + targetImageName;
+    				}
 
-								var sourceImagePath = global.appRoot + config.path.challengeImages + req.body.challengeId + "." + mime.extension(imageData.imageType);
-								var hash = filterUtils.generateHash(JSON.stringify(steps));
-								var targetImageName = req.body.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
-								var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
-								var targetImageUrl = config.url.cacheImages + targetImageName;
-
-		    					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, imageType: imageData.imageType});
-							});
-						} else {
-							return callback(null, null);
-						}
-				    },
-				    function(info, callback) {
-				    	if (info == null && req.body.source == "imageURL") {
-				    		if (!req.body.imageData) {
-				    			logger.error("Missing Image URL.");
-				    			return callback(new Error("Missing Image URL"));
-				    		}
-
-				    		var extension = req.body.imageData.split('.').pop();
-				    		var imageType = mime.lookup(extension);
-				    		if (!serverUtils.validateItem("imageType", "imageType", imageType)) {
-				    			return callback(new Error("Invalid Image Type: " + imageType));
-				    		}
-
-				    		var tmp = require('tmp');
-
-							tmp.file({ dir: config.tmpDir, prefix: 'apply-filter-', postfix: '.' + extension}, function _tempFileCreated(err, sourceImagePath, fd) {
-								if (err) {
-									return callback(err);
-								}
-
-								serverUtils.downloadImage(req.body.imageData, sourceImagePath, function(err) {
-					    			if (err) {
-					    				return callback(err);
-					    			}
-
-					   				return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: true, targetImagePath: null, targetImageUrl: null, imageType: imageType});
-								});
-				    		});
-				    	} else {
-				    		return callback(null, info);
-				    	}
-				    },
-				    function(info, callback) {
-				    	if (info == null && req.body.source == "dataURI") {
-				    		if (!req.body.imageData) {
-				    			logger.error("Missing Image URI");
-				    			return callback(new Error("Missing Image URI"));
-				    		}
-
-				    		var parseDataURI = require("parse-data-uri");
-							var parsed = parseDataURI(req.body.imageData);
-							
-							var buffer = parsed.data;
-
-							var tmp = require('tmp');
-
-							logger.debug("going to create tmp file");
-							tmp.file({ dir: config.tmpDir, prefix: 'apply-filter-', postfix: '.' + mime.extension(parsed.mimeType)}, function _tempFileCreated(err, sourceImagePath, fd) {
-								if (err) {
-									return callback(err);
-								}
-
-								logger.debug("going to write to tmp file: " + sourceImagePath);
-								fs.writeFile(sourceImagePath, buffer, function(err) {
-									if (err) {
-										logger.error("Failed to write file: " + sourceImagePath + ": " + err);
-										return callback(err);
-									}
-
-									return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: true, targetImagePath: null, targetImageUrl: null, imageType: parsed.mimeType});
-									
-								});
-				    		});
-				    	} else {
-				    		return callback(null, info);
-				    	}
-				    },
-				    function(info, callback) {
-				    	if (info == null && req.body.source == "designId") {
-				    		if (!req.body.designId ) {
-				    			logger.error("Missing Design ID");
-				    			return callback(new Error("Missing Design ID"));
-				    		}
-
-				    		dataUtils.getImageDataForDesign(req.body.designId, function(err, imageData){
-								if (err) {
-									return callback(err);
-								}
-
-								var sourceImagePath = global.appRoot + config.path.designImages + req.body.designId + "." + mime.extension(imageData.imageType);
-					    		var hash = filterUtils.generateHash(JSON.stringify(steps));
-					    		var targetImageName = req.body.designId + "-" + hash + "." + mime.extension(imageData.imageType);
-								var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
-								var targetImageUrl = config.url.cacheImages + targetImageName;
-
-								return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, imageType: imageData.imageType});
-							});
-				    	} else {
-				    		return callback(null, info);
-				    	}
-				    }
-				], function (err, info) {
-					if (err) {
-						logger.error("Some error encountered: " + err);
-						return res.sendStatus(500);
-					} else if (info == null) {
-						logger.error("Info is null, meaning none of the inputs were valid.");
-						return res.sendStatus(500);
-					}
-
-	    			imageProcessor.applyStepsToImage(info.sourceImagePath, info.targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePath){
+    				imageProcessor.applyStepsToImage(info.sourceImagePath, targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePath){
 						if (err) {
-							fs.unlink(info.targetImagePath, function(err) {
-								if (err) {
-									logger.error("Failed to delete file: " + err);
-								}
-							});
-
 							logger.error("applyStepsToImage failed: " + err);
 							return res.sendStatus(500);
 						}
@@ -283,7 +171,7 @@ var routes = function(db) {
 							});
 						}
 
-						if (info.targetImagePath == null) {
+						if (targetImageUrl == null) {
 							//we generated a temp path.  make sure to send the file as blob and delete the temp file
 							const DataURI = require('datauri');
 							const datauri = new DataURI();
@@ -292,14 +180,12 @@ var routes = function(db) {
 									throw err;
 								}
 
-								
-								/*
 								fs.unlink(imagePath, function(err) {
 									if (err) {
 										logger.error("Failed to delete temp file: " + err);
 									}
 								});
-								*/
+								
 
 								var jsonObj = {"type" : "dataURI", "imageData" : content};
 
@@ -311,7 +197,7 @@ var routes = function(db) {
 							});
 						} else {
 							//we saved to the provided target image path.  send the link
-							var jsonObj = {"type" : "imageURL", "imageData" : info.targetImageUrl};
+							var jsonObj = {"type" : "imageURL", "imageData" : targetImageUrl};
 
 							if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
 								return res.sendStatus(500);
@@ -320,9 +206,8 @@ var routes = function(db) {
 							return res.json(jsonObj);
 						}
 					});
-		    		
-				});
-    		});
+    			});
+			});
 		});
 
 	filterRouter.route("/timelapse/:entryId") // /api/filters/timelapse ROUTE
