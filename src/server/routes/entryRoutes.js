@@ -209,9 +209,6 @@ var routes = function(db) {
 			var cypherQuery = " MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
 							"id: '" + id + "', " + 
 							"caption: '" + dataUtils.sanitizeStringForCypher(req.body.caption) + "', " + 
-							"image_height: '" + req.body.imageHeight + "', " +
-							"image_width: '" + req.body.imageWidth + "', " +
-							"image_type: '" + req.body.imageType + "', " +
 							"created : '" + req.body.created + "'" + 
 							"})-[r:POSTED_BY]->(u) ";
 

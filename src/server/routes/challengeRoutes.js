@@ -151,8 +151,6 @@ var routes = function(db) {
 						"id: '" + id + "'," +
 						"image : '" + name + "'," +
 						"image_type : '" + imageType + "'," + 
-						"image_width : '" + size.width + "'," +
-						"image_height : '" + size.height + "'," +
 						"created : '" + req.body.created + "'," + 
 						"title : '" + dataUtils.sanitizeStringForCypher(req.body.caption) + "'" +
 						"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";

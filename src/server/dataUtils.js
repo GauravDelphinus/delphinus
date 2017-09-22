@@ -218,8 +218,6 @@ module.exports = {
 			data.pageURL = config.hostname + config.url.challenge + entity.id;
 			data.pageDescription = "Challenge posted";
 			data.imageType = entity.image_type;
-			data.imageWidth = entity.image_width;
-			data.imageHeight = entity.image_height;
 			data.authorName = poster.displayName;
 		} else if (entityType == "entry") {
 			data.id = entity.id;
@@ -240,8 +238,6 @@ module.exports = {
 			}
 			
 			data.imageType = entity.image_type; //entry retains format of the challenge
-			data.imageWidth = entity.image_width;
-			data.imageHeight = entity.image_height;
 			data.authorName = poster.displayName;
 		} else if (entityType == "category") {
 			data.imageURL = config.hostname + config.url.brandImages + config.branding.shareImage.imageName;
