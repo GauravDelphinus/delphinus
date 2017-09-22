@@ -582,6 +582,7 @@ var routes = function(db) {
 						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
 						" RETURN e, poster, like_count, comment_count ORDER BY e.created DESC;";
 
+					logger.dbDebug(cypherQuery);
 					db.cypherQuery(cypherQuery, function(err, result) {
 						if (err) {
 							logger.dbError(err, cypherQuery);

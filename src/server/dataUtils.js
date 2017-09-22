@@ -290,14 +290,15 @@ module.exports = {
 	},
 
 	getImageDataForDesign : function(designId, next) {
-		var cypherQuery = "MATCH (d:Design {id: '" + designId + "'}) RETURN d;"
+		var cypherQuery = "MATCH (d:Design {id: '" + designId + "'})-[:BELONGS_TO]->(c:DesignCategory) RETURN d, c;"
 		this.myDB.cypherQuery(cypherQuery, function(err, output){
 	    	if (err) {
 	    		return next(err, null);
 	    	}
 
-	    	var d = output.data[0];
-	    	var imageData = {id: output.data[0].id};
+	    	var d = output.data[0][0];
+	    	var c = output.data[0][1];
+	    	var imageData = {id: output.data[0].id, imageType: "image/jpeg", categoryId: c.id};
 
 	    	return next(0, imageData);
 	    });
@@ -564,7 +565,7 @@ module.exports = {
 			var parsed = parseDataURI(imageData);
 			imageType = parsed.mimeType;
 		} else if (source == "imageURL") {
-			var extension = entryData.imageData.split('.').pop();
+			var extension = imageData.split('.').pop();
 		   	imageType = mime.lookup(extension);
 		}
 
@@ -1514,7 +1515,7 @@ function createNodeForDesignCategory(db, categoryId, categoryName, callback) {
 function createNodeForDesign(db, designId, designName, categoryId, callback) {
 	if (designId && designName) {
 		//first check to make sure the image file exists
-		serverUtils.fileExists(global.appRoot + config.path.designImages + categoryId + "/" + designId + ".jpg", function(err) {
+		serverUtils.fileExists(global.appRoot + config.path.designImages + categoryId + "/" + designId + ".jpeg", function(err) {
 			if (err) {
 				return callback(err, 0);
 			}

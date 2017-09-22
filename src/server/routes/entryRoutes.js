@@ -217,7 +217,7 @@ var routes = function(db) {
 							cypherQuery +
 							", (c)<-[:PART_OF]-(e) RETURN e;";
 			} else if (req.body.source == "designId") {// link to design
-				cypherQuery += "MATCH (d:Design {id: '" + req.body.designId + "'}) " +
+				cypherQuery = "MATCH (d:Design {id: '" + req.body.designId + "'}) " +
 							cypherQuery +
 							", (d)<-[:BASED_ON]-(e) RETURN e;";
 			} else { //independent entry
@@ -359,7 +359,16 @@ var routes = function(db) {
 	    							}
 
 	    							//set image type in the db node
-	    							var cypherQuery = "MATCH (e:Entry {id: '" + id + "'}) SET e.image_type = '" + info.imageType + "' RETURN e;";
+	    							//if we created an independent entry, link that back up to the independent entry node
+	    							var cypherQuery = "MATCH (e:Entry {id: '" + id + "'}) SET e.image_type = '" + info.imageType + "' ";
+	    							if (req.body.source == "dataURI" || req.body.source == "imageURL") {
+	    								//we must have created an indepenent image node.  mkae sure to link up the newly created entyr with that
+	    								cypherQuery += " MERGE (i:IndependentImage {id: '" + info.sourceId + "'}) ";
+	    								cypherQuery += " MERGE (e)-[:BASED_ON]->(i) ";
+	    							}
+	    							cypherQuery += " RETURN e;";
+
+	    							logger.dbDebug(cypherQuery);
 	    							db.cypherQuery(cypherQuery, function(err, result){
 						    			if(err) {
 						    				logger.dbError(err, cypherQuery);
@@ -370,12 +379,12 @@ var routes = function(db) {
 						    			}
 
 						    			//finally, prepare the output to send back to client
-						    			var output = {id: id};
+						    			var output = {id: result.data[0].id};
 										if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
 					    					return res.sendStatus(500);
 					    				}
 
-					    				res.header("Location", "/api/entries/" + id);
+					    				res.header("Location", "/api/entries/" + result.data[0].id);
 		    							return res.status(201).json(output);
 						    		});
 	    						});

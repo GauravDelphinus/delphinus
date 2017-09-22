@@ -293,7 +293,8 @@ module.exports = {
 							return callback(err);
 						}
 
-						var sourceImagePath = global.appRoot + config.path.designImages + entryData.designId + "." + mime.extension(imageData.imageType);
+						var sourceImagePath = global.appRoot + config.path.designImages + imageData.categoryId + "/" + entryData.designId + "." + mime.extension(imageData.imageType);
+						logger.debug("####### sourceImagePath for design is: " + sourceImagePath);
 			    		//var hash = filterUtils.generateHash(JSON.stringify(steps));
 			    		//var targetImageName = entryData.designId + "-" + hash + "." + mime.extension(imageData.imageType);
 						//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;

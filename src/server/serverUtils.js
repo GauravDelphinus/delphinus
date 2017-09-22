@@ -241,12 +241,8 @@ module.exports = {
 				logger.errorIf(logError, "Invalid Category '" + value + "' received for param '" + name + "'");
 				return false;
 			}
-		} else if (type == "design") {
-			var designs = require("./designs");
-			for (key in designs) {
-
-			}
-			if (!designs.hasOwnProperty(value)) {
+		} else if (type == "idStr") {
+			if (value.match(/[A-Z]/gi) == null) {
 				logger.errorIf(logError, "Invalid Category '" + value + "' received for param '" + name + "'");
 				return false;
 			}
@@ -280,7 +276,7 @@ module.exports = {
 	},
 
 	validateObjectWithPrototype: function(object, prototype) {
-		logger.debug("validateObjectWithPrototype: object: " + JSON.stringify(object) + ", prototype: " + JSON.stringify(prototype));
+		//logger.debug("validateObjectWithPrototype: object: " + JSON.stringify(object) + ", prototype: " + JSON.stringify(prototype));
 		if (typeof object !== 'object' || typeof prototype !== 'object') {
 			logger.error("validateObjectWithPrototype: either one of object or prototype are not a valid object");
 			return false;

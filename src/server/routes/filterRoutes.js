@@ -107,7 +107,7 @@ var routes = function(db) {
 				},
 				{
 					name: "designId",
-					type: "id",
+					type: "idStr",
 				},
 				{
 					name: "imageType",

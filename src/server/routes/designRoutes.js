@@ -52,7 +52,7 @@ var routes = function(db) {
     				if (!output.hasOwnProperty(categoryId)) {
     					output[categoryId] = {name: categoryName, designList: []};
     				}
-    				output[categoryId].designList.push({name: designName, id: designId, image: config.url.designImages + categoryId + "/" + designId + ".jpg"});
+    				output[categoryId].designList.push({name: designName, id: designId, image: config.url.designImages + categoryId + "/" + designId + ".jpeg"});
     			}
 
     			return res.json(output);

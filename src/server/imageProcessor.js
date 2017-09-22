@@ -6,7 +6,7 @@ var mime = require("mime");
 
 module.exports = {
 	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
-		logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
+		//logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
 		if (targetImage) {
 			if (fs.existsSync(targetImage)) {
 				return next(0, targetImage);
@@ -29,7 +29,7 @@ module.exports = {
 
 
 function applySteps(sourceImage, targetImage, steps, caption, next) {
-	logger.debug("applySteps: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps) + ", caption: " + caption);
+	//logger.debug("applySteps: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps) + ", caption: " + caption);
 	//if there are any steps, then apply them one after the other
 	if ((steps.layouts && steps.layouts.length > 0) || (steps.filters && steps.filters.length > 0) || 
 		(steps.artifacts && steps.artifacts.length > 0) || (steps.decorations && steps.decorations.length > 0)) {

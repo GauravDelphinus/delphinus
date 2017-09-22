@@ -56,6 +56,7 @@ function refreshDesignView() {
 
 		//find the selected design, and use that image to pass to the new caption workflow
 		var selectedDesignObj = selectedDesignList.find(checkDesign, selectedDesignId);
+		designId = selectedDesignId; //set design Id to the selected design (see constructJSONObject)
 		$("#newentryimage").prop("src", selectedDesignObj.image);
 		$("#newentryimage").prop("title", selectedDesignObj.name);
 		$("#selectDesignSection").hide();
