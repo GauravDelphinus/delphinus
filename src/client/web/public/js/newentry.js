@@ -21,7 +21,7 @@ function setupDesignSection() {
 				$("#designCategories").append($("<option>", {value: key, text: result[key].name, selected: true}));
 			}
 		}
-		$(".chosen-select").chosen({width: "95%"}); //use an ergonomic selection dropdown.  Refer https://harvesthq.github.io/chosen/
+		$("#designCategories").chosen({width: "95%"}); //use an ergonomic selection dropdown.  Refer https://harvesthq.github.io/chosen/
 
 		refreshDesignView();
 	})
@@ -204,6 +204,7 @@ function showStep(stepId) {
 		$("#nextButton").css("visibility", "visible");
 		$("#prevButton").css("visibility", "hidden");
 	} else if (stepId == "artifactSection") {
+		$("#postSection").show();
 		showArtifactStep();
 		$("#nextButton").css("visibility", "visible");
 		$("#prevButton").css("visibility", "visible");
@@ -838,7 +839,7 @@ function setupBorderToggleSection() {
 /**************************** (6) POST STEP **********************************************/
 
 function showPostStep() {
-	$("#stepTitle").text("You're now ready to post!")
+	$("#stepTitle").text("You're all set!")
 }
 
 /*****************************************************************************************/
@@ -949,6 +950,7 @@ function createRangeSection(caption, rangeInputID, min, max, value, step) {
 	return rangeSection;
 }
 
+/*
 function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 	for (var i = 0; i < listOfValuesAndSectionIds.length; i++) {
 		if (valueToMatch == listOfValuesAndSectionIds[i].value) {
@@ -958,6 +960,7 @@ function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
 		}
 	}
 }
+*/
 
 /*
 	Setup general rules for a custom section that has a main feature
