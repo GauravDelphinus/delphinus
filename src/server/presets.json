@@ -17,7 +17,10 @@
 		"bannerBottomBlack" : "Banner at Bottom",
 		"bannerTopBlack" : "Banner at Top",
 		"bannerBottomTransparent" : "Banner at Bottom",
-		"bannerTopTransparent" : "Banner at Top"
+		"bannerTopTransparent" : "Banner at Top",
+		"bannerCenterWhite" : "Banner at Center",
+		"bannerCenterBlack" : "Banner at Center",
+		"bannerCenterTransparent" : "Banner at Center"
 	},
 	"presetDecoration" : {
 		"whiteBorder10" : "10 Pixels wide White Border",

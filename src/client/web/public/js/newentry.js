@@ -243,6 +243,9 @@ function setupCaptionStep() {
 /**************************** (2) ARTIFACT STEP **********************************************/
 
 var defaultArtifactPresetSelectionID = "bannerBottomBlack";
+if (designId) {
+	defaultArtifactPresetSelectionID = "bannerCenterTransparent";
+}
 
 /*
 	Show the Artifact Step - either by navitating using the Next/Previous buttons,

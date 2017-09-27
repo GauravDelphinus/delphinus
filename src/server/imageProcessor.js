@@ -528,6 +528,15 @@ function applyPresetArtifact(size, presetArtifact, bannerText, imArgs) {
 		case "bannerTopTransparent":
 			applyCaption(imArgs, size, "#0000", "black", bannerText, "north");
 			break;
+		case "bannerCenterWhite":
+			applyCaption(imArgs, size, "#FFF8", "black", bannerText, "center");
+			break;
+		case "bannerCenterBlack":
+			applyCaption(imArgs, size, "#0008", "white", bannerText, "center");
+			break;
+		case "bannerCenterTransparent":
+			applyCaption(imArgs, size, "#0000", "black", bannerText, "center");
+			break;
 		default:
 			break;
 	}
