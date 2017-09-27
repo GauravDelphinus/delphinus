@@ -1,17 +1,44 @@
 {
-	"texture" : ["Textures", 
+	"abstract" : ["Abstract", 
 		{
-			"aqua" : "Aqua Blue",
-			"redBricks": "Red Brick Wall",
-			"waterDrops" : "Water Drops on Window"
+			"blueMarine" : "Blue Marine",
+			"coloredRows": "Colored Rows",
+			"colorWaterMix" : "Color Water Mix",
+			"darkPurpleLight" : "Dark Purple Light",
+			"goldenLight" : "Golden Light",
+			"goldSparkle" : "Gold Sparkle",
+			"pinkWhirlpool" : "Pink Whirlpool",
+			"colorWaves" : "Color Waves",
+			"goldenCircles" : "Golden Circles",
+			"goldenDrops" : "Golden Drops",
+			"pinkWaves" : "Pink Waves",
+			"smokeBlue" : "Smoke Blue"
 		}
 	],
-	"nature" : ["Nature / Landscapes",
+	"nature" : ["Nature",
 		{
+			"ocean" : "Ocean",
 			"autumnLeaves" : "Autumn Leaves",
-			"greenLeaf" : "Green Leaf with Water Drops",
-			"sea" : "Fishing in Sea",
-			"whiteFlowers" : "White Flowers"
+			"autumnLeavesGold" : "Autumn Leaves Gold",
+			"clouds" : "Clouds",
+			"goldLeaves" : "Gold Leaves",
+			"greenLeaves" : "Green Leaves",
+			"waterDrops" : "Water Drops"
+		}
+	],
+	"texture" : ["Texture", 
+		{
+			"creamTexture" : "Cream Texture",
+			"redTexture" : "Red Texture",
+			"brownFabric" : "Brown Fabric",
+			"colorTexture" : "Color Texture",
+			"plasterPattern" : "Plaster Pattern",
+			"redFabric" : "Red Fabric",
+			"textileGold" : "Textile Gold",
+			"waterColor" : "Water Color",
+			"whiteFur" : "White Fur",
+			"whiteSand" : "White Sand",
+			"woodCracks" : "Wood Cracks"
 		}
 	]
 }
