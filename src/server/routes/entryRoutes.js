@@ -118,7 +118,7 @@ var routes = function(db) {
 						" RETURN e, poster, like_count, comment_count, COUNT(like), (like_count + comment_count) AS popularity_count ";
 
 			if (req.query.sortBy) {
-				if (req.query.sortBy == "date") {
+				if (req.query.sortBy == "dateCreated") {
 					cypherQuery += " ORDER BY e.created DESC;";
 				} else if (req.query.sortBy == "popularity") {
 					cypherQuery += " ORDER BY popularity_count DESC;";

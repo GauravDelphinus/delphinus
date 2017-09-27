@@ -745,11 +745,9 @@ input[type=range] .timelapseRange  {
 }
 
 .selectDesignButton {
-	background: url("/images/static/designSelection.jpg") no-repeat;
 	cursor: pointer;
 	border: none;
 	width: 100%;
-	height: 100%;
 }
 
 /****************** SETTINGS **************************/
