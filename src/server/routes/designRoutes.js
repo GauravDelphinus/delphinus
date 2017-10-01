@@ -33,6 +33,7 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN d, c;";
 
+			logger.dbDebug(cypherQuery);
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) {
     				logger.dbError(err, cypherQuery);
@@ -46,13 +47,15 @@ var routes = function(db) {
     			for (var i = 0; i < result.data.length; i++) {
     				let designName = result.data[i][0].name;
     				let designId = result.data[i][0].id;
+    				let presetArtifactId = result.data[i][0].presetArtifactId;
     				let categoryName = result.data[i][1].name;
     				let categoryId = result.data[i][1].id;
+
 
     				if (!output.hasOwnProperty(categoryId)) {
     					output[categoryId] = {name: categoryName, designList: []};
     				}
-    				output[categoryId].designList.push({name: designName, id: designId, image: config.url.designImages + categoryId + "/" + designId + ".jpeg"});
+    				output[categoryId].designList.push({name: designName, id: designId, image: config.url.designImages + categoryId + "/" + designId + ".jpeg", presetArtifactId: presetArtifactId});
     			}
 
     			return res.json(output);

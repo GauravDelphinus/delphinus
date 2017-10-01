@@ -15,13 +15,14 @@ $(document).ready(function(){
 function setupDesignSection() {
 	
 	$.getJSON('/api/designs/', function(result) {
+		console.log("got designData: " + JSON.stringify(result));
 		$("#designCategories").data("designData", result);
 		for (key in result) {
 			if (result[key].name) {
 				$("#designCategories").append($("<option>", {value: key, text: result[key].name, selected: true}));
 			}
 		}
-		$("#designCategories").chosen({width: "95%"}); //use an ergonomic selection dropdown.  Refer https://harvesthq.github.io/chosen/
+		$("#designCategories").chosen({width: "100%"}); //use an ergonomic selection dropdown.  Refer https://harvesthq.github.io/chosen/
 
 		refreshDesignView();
 	})
@@ -59,6 +60,9 @@ function refreshDesignView() {
 		designId = selectedDesignId; //set design Id to the selected design (see constructJSONObject)
 		$("#newentryimage").prop("src", selectedDesignObj.image);
 		$("#newentryimage").prop("title", selectedDesignObj.name);
+		defaultArtifactPresetSelectionID = selectedDesignObj.presetArtifactId;
+		console.log('set the defaultArtifactPresetSelectionID to ' + defaultArtifactPresetSelectionID);
+
 		$("#selectDesignSection").hide();
 		$("#stepsSection").show();
 	});
@@ -244,9 +248,6 @@ function setupCaptionStep() {
 /**************************** (2) ARTIFACT STEP **********************************************/
 
 var defaultArtifactPresetSelectionID = "bannerBottomBlack";
-if (designId) {
-	defaultArtifactPresetSelectionID = "bannerCenterTransparent";
-}
 
 /*
 	Show the Artifact Step - either by navitating using the Next/Previous buttons,

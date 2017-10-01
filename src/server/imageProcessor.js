@@ -516,8 +516,11 @@ function applyPresetArtifact(size, presetArtifact, bannerText, imArgs) {
 		case "bannerBottomBlack":
 			applyCaption(imArgs, size, "#0008", "white", bannerText, "south");
 			break;
-		case "bannerBottomTransparent":
+		case "bannerBottomBlackTransparent":
 			applyCaption(imArgs, size, "#0000", "black", bannerText, "south");
+			break;
+		case "bannerBottomWhiteTransparent":
+			applyCaption(imArgs, size, "#0000", "white", bannerText, "south");
 			break;
 		case "bannerTopWhite":
 			applyCaption(imArgs, size, "#FFF8", "black", bannerText, "north");
@@ -525,8 +528,11 @@ function applyPresetArtifact(size, presetArtifact, bannerText, imArgs) {
 		case "bannerTopBlack":
 			applyCaption(imArgs, size, "#0008", "white", bannerText, "north");
 			break;
-		case "bannerTopTransparent":
+		case "bannerTopBlackTransparent":
 			applyCaption(imArgs, size, "#0000", "black", bannerText, "north");
+			break;
+		case "bannerTopWhiteTransparent":
+			applyCaption(imArgs, size, "#0000", "white", bannerText, "north");
 			break;
 		case "bannerCenterWhite":
 			applyCaption(imArgs, size, "#FFF8", "black", bannerText, "center");
@@ -534,8 +540,11 @@ function applyPresetArtifact(size, presetArtifact, bannerText, imArgs) {
 		case "bannerCenterBlack":
 			applyCaption(imArgs, size, "#0008", "white", bannerText, "center");
 			break;
-		case "bannerCenterTransparent":
+		case "bannerCenterBlackTransparent":
 			applyCaption(imArgs, size, "#0000", "black", bannerText, "center");
+			break;
+		case "bannerCenterWhiteTransparent":
+			applyCaption(imArgs, size, "#0000", "white", bannerText, "center");
 			break;
 		default:
 			break;

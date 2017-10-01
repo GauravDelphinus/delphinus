@@ -72,9 +72,12 @@ module.exports = {
 			let designObj = designList[1]; //second array element is the object containing the designs in that category
 			for (let key in designObj) {
 				let designId = key;
-				let designName = designObj[key];
 
-				functions.push(async.apply(createNodeForDesign, this.myDB, designId, designName, categoryId));
+				//value is an array with two elements.  First element is the design name, and second is an object of the form {"defaultPresetArtifactId" : "presetArtifactName"}.  Refer designs.json
+				let designName = designObj[key][0];
+				let presetArtifactId = designObj[key][1].defaultPresetArtifactId;
+
+				functions.push(async.apply(createNodeForDesign, this.myDB, designId, designName, categoryId, presetArtifactId));
 			}
 		}
 
@@ -1512,7 +1515,7 @@ function createNodeForDesignCategory(db, categoryId, categoryName, callback) {
 	}
 }
 
-function createNodeForDesign(db, designId, designName, categoryId, callback) {
+function createNodeForDesign(db, designId, designName, categoryId, presetArtifactId, callback) {
 	if (designId && designName) {
 		//first check to make sure the image file exists
 		serverUtils.fileExists(global.appRoot + config.path.designImages + categoryId + "/" + designId + ".jpeg", function(err) {
@@ -1520,7 +1523,7 @@ function createNodeForDesign(db, designId, designName, categoryId, callback) {
 				return callback(err, 0);
 			}
 
-			var cypherQuery = "MATCH (c:DesignCategory {id: '" + categoryId + "'}) MERGE (d:Design {id: '" + designId + "'})-[:BELONGS_TO]->(c) ON CREATE SET d.name = '" + designName + "' RETURN d;";
+			var cypherQuery = "MATCH (c:DesignCategory {id: '" + categoryId + "'}) MERGE (d:Design {id: '" + designId + "'})-[:BELONGS_TO]->(c) SET d.name = '" + designName + "' , d.presetArtifactId = '" + presetArtifactId + "' RETURN d;";
 
 			db.cypherQuery(cypherQuery, function(err, result) {
 				if (err) {

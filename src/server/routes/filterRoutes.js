@@ -85,6 +85,7 @@ var routes = function(db) {
 				if (!serverUtils.validateData(output, prototype)) {
     				return res.sendStatus(500);
     			}
+
 				return res.json(output);
 			});
 		});

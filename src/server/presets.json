@@ -16,11 +16,14 @@
 		"bannerTopWhite" : "Banner at Top",
 		"bannerBottomBlack" : "Banner at Bottom",
 		"bannerTopBlack" : "Banner at Top",
-		"bannerBottomTransparent" : "Banner at Bottom",
-		"bannerTopTransparent" : "Banner at Top",
+		"bannerBottomBlackTransparent" : "Banner at Bottom",
+		"bannerBottomWhiteTransparent" : "Banner at Bottom",
+		"bannerTopBlackTransparent" : "Banner at Top",
+		"bannerTopWhiteTransparent" : "Banner at Top",
 		"bannerCenterWhite" : "Banner at Center",
 		"bannerCenterBlack" : "Banner at Center",
-		"bannerCenterTransparent" : "Banner at Center"
+		"bannerCenterBlackTransparent" : "Banner at Center",
+		"bannerCenterWhiteTransparent" : "Banner at Center"
 	},
 	"presetDecoration" : {
 		"whiteBorder10" : "10 Pixels wide White Border",
