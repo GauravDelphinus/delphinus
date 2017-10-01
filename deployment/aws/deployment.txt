@@ -39,6 +39,9 @@
 (8) Install ImageMagick Library
 (a) $sudo apt install imagemagick #Intall ImageMagick
 
+(9) Install 'less' procompiler
+(a) $sudo npm install -g less
+
 ####################################################################
 # PREPARE DEPLOYMENT SPACE
 ####################################################################
