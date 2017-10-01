@@ -1,44 +1,43 @@
 {
 	"abstract" : ["Abstract", 
 		{
-			"blueMarine" : "Blue Marine",
-			"coloredRows": "Colored Rows",
-			"colorWaterMix" : "Color Water Mix",
-			"darkPurpleLight" : "Dark Purple Light",
-			"goldenLight" : "Golden Light",
-			"goldSparkle" : "Gold Sparkle",
-			"pinkWhirlpool" : "Pink Whirlpool",
-			"colorWaves" : "Color Waves",
-			"goldenCircles" : "Golden Circles",
-			"goldenDrops" : "Golden Drops",
-			"pinkWaves" : "Pink Waves",
-			"smokeBlue" : "Smoke Blue"
+			"blueMarine" : ["Blue Marine", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"coloredRows": ["Colored Rows", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"colorWaterMix" : ["Color Water Mix", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"darkPurpleLight" : ["Dark Purple Light", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"goldenLight" : ["Golden Light", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"goldSparkle" : ["Gold Sparkle", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"pinkWhirlpool" : ["Pink Whirlpool", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"colorWaves" : ["Color Waves", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"goldenCircles" : ["Golden Circles", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"goldenDrops" : ["Golden Drops", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"smokeBlue" : ["Smoke Blue", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}]
 		}
 	],
 	"nature" : ["Nature",
 		{
-			"ocean" : "Ocean",
-			"autumnLeaves" : "Autumn Leaves",
-			"autumnLeavesGold" : "Autumn Leaves Gold",
-			"clouds" : "Clouds",
-			"goldLeaves" : "Gold Leaves",
-			"greenLeaves" : "Green Leaves",
-			"waterDrops" : "Water Drops"
+			"ocean" : ["Ocean", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"autumnLeaves" : ["Autumn Leaves", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"autumnLeavesGold" : ["Autumn Leaves Gold", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"clouds" : ["Clouds", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"goldLeaves" : ["Gold Leaves", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"greenLeaves" : ["Green Leaves", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"waterDrops" : ["Water Drops", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}]
 		}
 	],
 	"texture" : ["Texture", 
 		{
-			"creamTexture" : "Cream Texture",
-			"redTexture" : "Red Texture",
-			"brownFabric" : "Brown Fabric",
-			"colorTexture" : "Color Texture",
-			"plasterPattern" : "Plaster Pattern",
-			"redFabric" : "Red Fabric",
-			"textileGold" : "Textile Gold",
-			"waterColor" : "Water Color",
-			"whiteFur" : "White Fur",
-			"whiteSand" : "White Sand",
-			"woodCracks" : "Wood Cracks"
+			"creamTexture" : ["Cream Texture", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"redTexture" : ["Red Texture", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"brownFabric" : ["Brown Fabric", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"colorTexture" : ["Color Texture", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"plasterPattern" : ["Plaster Pattern", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"redFabric" : ["Red Fabric", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"textileGold" : ["Textile Gold", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"waterColor" : ["Water Color", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"whiteFur" : ["White Fur", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"whiteSand" : ["White Sand", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
+			"woodCracks" : ["Wood Cracks", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}]
 		}
 	]
 }
