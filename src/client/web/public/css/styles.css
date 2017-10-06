@@ -73,17 +73,63 @@
 Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
 Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
 ****/
+/* GUIDELINES */
+/*
+
+@theme-dominant-color: Dominant color of theme
+- Main logo
+
+@theme-dominant-color-dark: Darker shade of dominant color
+- Hover text color for links
+- Headings/titles text color, or inverted background color (with white text)
+
+@theme-contrast-color: Triad color of dominant color
+- Action buttons (Post Entry, Share entry, etc.)
+
+@theme-contrast-color-dark: Darker shade of triad color
+
+@theme-neutral-color: Light triad color
+- Background color for header/footer, etc.
+- Background color for panels, sidebars, etc.
+- Background color for elements with hover effect, etc.
+
+*/
+/* Animal Planet - Shades */
+/*
+@theme-accent-color-1: #465E1B;
+@theme-accent-color-2: #AEEA44;
+@theme-dominant-color: #759E2E;
+@theme-accent-color-3: #7EAB32;
+@theme-accent-color-4: #628427;
+*/
+/* Tropicana - Shades */
+/*
+@theme-accent-color-1: #013518;
+@theme-accent-color-2: #05C156;
+@theme-dominant-color: #037534;
+@theme-accent-color-3: #03823A;
+@theme-accent-color-4: #025B29;
+*/
+/* http://www.colourlovers.com/palette/580974/Adrift_in_Dreams */
+/*
+@theme-accent-color-1: #CFF09E;
+@theme-accent-color-2: #A8DBA8;
+@theme-dominant-color: #3B8686;
+@theme-accent-color-3: #79BD9A;
+@theme-accent-color-4: #0B486B;
+*/
+/* Testing */
 .color-ultra-light {
-  color: #fbeaf3;
+  color: #38D0F2;
 }
 .color-light {
-  color: #c81e7e;
+  color: #38D0F2;
 }
 .color-standard {
-  color: #9E1F63;
+  color: #024959;
 }
 .color-dark {
-  color: #6B1044;
+  color: #092140;
 }
 .gray-ultra-light {
   color: #d9d9d9;
@@ -113,12 +159,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	Button that has full background color.
 */
 .button-full {
-  background-color: #9E1F63;
+  background-color: #F24738;
   color: white;
   font-size: 16px;
 }
 .button-full:hover {
-  background-color: #6B1044;
+  background-color: #F24738;
   color: white;
   font-size: 16px;
 }
@@ -126,25 +172,25 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	Button that has no background, but a border.
 */
 .button-line {
-  color: #9E1F63;
+  color: #F24738;
   border: 1px;
-  border-color: #9E1F63;
+  border-color: #F24738;
   border-style: solid;
   background: transparent;
   font-size: 15px;
 }
 .button-line:hover {
-  color: #6B1044;
+  color: #F24738;
   border: 1px;
-  border-color: #6B1044;
+  border-color: #F24738;
   border-style: solid;
   background: transparent;
   font-size: 15px;
 }
 .button-line.active {
-  color: #6B1044;
+  color: #F24738;
   border: 1px;
-  border-color: #6B1044;
+  border-color: #F24738;
   background: transparent;
   font-size: 15px;
 }
@@ -158,12 +204,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   border: 0px;
 }
 .button-empty hover {
-  color: #9E1F63;
-  background-color: #fbeaf3;
+  color: #F24738;
+  background-color: #F24738;
   font-size: 15px;
 }
 .button-empty.active {
-  color: #9E1F63;
+  color: #F24738;
 }
 /*
 	Button that looks like a link.
@@ -177,11 +223,11 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   padding: 0px;
 }
 .button-link:hover {
-  color: #9E1F63;
+  color: #F24738;
   text-decoration: underline;
 }
 .button-link.active {
-  color: #9E1F63;
+  color: #F24738;
   font-weight: bold;
   padding: 0px;
 }
@@ -196,11 +242,11 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   padding: 8px;
 }
 .button-active-link:hover {
-  color: #9E1F63;
-  background-color: #fbeaf3;
+  color: #F24738;
+  /* background-color: @theme-contrast-color; */
 }
 .button-active-link.active {
-  color: #9E1F63;
+  color: #F24738;
   font-weight: bold;
 }
 /*
@@ -214,15 +260,15 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 .button-setting:hover {
   color: white;
-  background: #9E1F63;
+  background: #F24738;
   font-size: 1.1em;
-  border: 1px solid #6B1044;
+  border: 1px solid #F24738;
 }
 .button-setting.active {
   color: white;
-  background: #9E1F63;
+  background: #F24738;
   font-size: 1.1em;
-  border: 1px solid #6B1044;
+  border: 1px solid #F24738;
 }
 .button-setting.disabled {
   color: #a6a6a6;
@@ -347,7 +393,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   color: #595959;
 }
 .link-gray:hover {
-  color: #6B1044;
+  color: #092140;
 }
 .link-black {
   color: black;
@@ -356,16 +402,16 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   color: black;
 }
 .link-theme {
-  color: #9E1F63;
+  color: black;
 }
 .link-theme:hover {
-  color: #6B1044;
+  color: #092140;
 }
 /********************************** DRAG / DROP RELATED ******************/
 .dropZone {
   /* position: relative; */
   display: table;
-  border: 5px dotted #9E1F63;
+  border: 5px dotted #F24738;
   border-radius: 20px;
   color: gray;
   font: 24px/200px arial;
@@ -391,6 +437,7 @@ body {
   font-family: Source Sans Pro, Helvetica, Arial, sans-serif;
   padding-top: 50px;
   /* Push content below the navbar */
+  background-color: #f5f5f5;
 }
 /*
 td {
@@ -412,55 +459,66 @@ td {
 img {
   max-width: 100%;
 }
+.floatingElement {
+  background-color: white;
+  border-style: solid;
+  border-width: 0.1px;
+  border-color: #D3D3D3;
+  box-shadow: 0px 0px 2px 0px #D3D3D3;
+}
 /***************************** Challenge / Entry / Entity Related *********************/
 /*
 	Main Element - e.g., Challenge on the /challenge page, and Entry on the /entry page
 */
 .mainElement {
-  border-right: 2px;
+  margin: 20px 5px;
+  background-color: white;
   border-style: solid;
   border-width: 0.1px;
-  border-color: gray;
-  margin: 20px 5px;
+  border-color: #D3D3D3;
+  box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
 /*
 	Feed Element - e.g., one of the elements in the Home Feed View.
 */
 .feedElement {
-  border-right: 2px;
+  margin: 20px 5px;
+  background-color: white;
   border-style: solid;
   border-width: 0.1px;
-  border-color: gray;
-  margin: 20px 5px;
+  border-color: #D3D3D3;
+  box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
 /*
 	Scrollable Element - when you click on the FilmStrip view
 */
 .scrollableElement {
-  border-right: 2px;
+  margin: 20px 5px;
+  background-color: white;
   border-style: solid;
   border-width: 0.1px;
-  border-color: gray;
-  margin: 20px 5px;
+  border-color: #D3D3D3;
+  box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
 /*
 	Thumbnail Element - when you click on the Grid / Thumbnail view
 */
 .thumbnailElement {
-  border-right: 2px;
+  margin: 5px 5px;
+  background-color: white;
   border-style: solid;
   border-width: 0.1px;
-  border-color: gray;
-  margin: 5px 5px;
+  border-color: #D3D3D3;
+  box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
 .thumbnailElement.active {
-  background-color: #fbeaf3;
+  background-color: #F2A199;
 }
 /*
 	Hover effect on thumbnail elements
 */
 .elementHover:hover {
-  background-color: #fbeaf3;
+  background-color: #F2A199;
   cursor: pointer;
 }
 /*
@@ -567,7 +625,7 @@ input[type=range] .timelapseRange {
   position: absolute;
   background: rgba(0, 0, 0, 0);
   border: 0px;
-  color: #c81e7e;
+  color: #F24738;
   display: none;
 }
 /* Hover the button towards the right */
@@ -929,14 +987,21 @@ input[type=range] .range-setting {
 /************************** Side bar ***************************/
 .sidebar {
   width: 100%;
-  border: 1px dotted gray;
-  border-radius: 5px;
+  /*
+	border: 1px dotted gray;
+	border-radius: 5px;
+	*/
   padding: 10px;
   margin: 10px 0px;
+  background-color: white;
+  border-style: solid;
+  border-width: 0.1px;
+  border-color: #D3D3D3;
+  box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
 .sidebarHeading {
   font-size: 17px;
-  color: #9E1F63;
+  color: #092140;
 }
 .sidebarLink {
   font-size: 15px;
@@ -944,7 +1009,7 @@ input[type=range] .range-setting {
   color: #676969;
 }
 .sidebarLink:hover {
-  color: #9E1F63;
+  color: #BF2A2A;
 }
 .sidebarItem {
   background: #F8F8F8;
@@ -964,7 +1029,7 @@ input[type=range] .range-setting {
 /************************** Nav Bar (Top) ***************************/
 /* Override bootstrap nav bar */
 .navbar-fixed-top {
-  background: #9E1F63;
+  background: #024959;
 }
 /* Override bootstrap color.  Custom color for all links in navbar */
 .navbar-nav a {
