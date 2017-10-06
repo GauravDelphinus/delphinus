@@ -13,6 +13,7 @@
   border: 2px dotted gray;
   border-radius: 20px;
   padding: 20px;
+  background-color: white;
 }
 .centerDisplayWide {
   width: 90%;
@@ -120,16 +121,16 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 */
 /* Testing */
 .color-ultra-light {
-  color: #38D0F2;
+  color: #679FC5;
 }
 .color-light {
-  color: #38D0F2;
+  color: #679FC5;
 }
 .color-standard {
-  color: #024959;
+  color: #2980B9;
 }
 .color-dark {
-  color: #092140;
+  color: #1E5D86;
 }
 .gray-ultra-light {
   color: #d9d9d9;
@@ -159,12 +160,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	Button that has full background color.
 */
 .button-full {
-  background-color: #F24738;
+  background-color: #8E2800;
   color: white;
   font-size: 16px;
 }
 .button-full:hover {
-  background-color: #F24738;
+  background-color: #8E2800;
   color: white;
   font-size: 16px;
 }
@@ -172,25 +173,25 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	Button that has no background, but a border.
 */
 .button-line {
-  color: #F24738;
+  color: #8E2800;
   border: 1px;
-  border-color: #F24738;
+  border-color: #8E2800;
   border-style: solid;
   background: transparent;
   font-size: 15px;
 }
 .button-line:hover {
-  color: #F24738;
+  color: #8E2800;
   border: 1px;
-  border-color: #F24738;
+  border-color: #8E2800;
   border-style: solid;
   background: transparent;
   font-size: 15px;
 }
 .button-line.active {
-  color: #F24738;
+  color: #8E2800;
   border: 1px;
-  border-color: #F24738;
+  border-color: #8E2800;
   background: transparent;
   font-size: 15px;
 }
@@ -204,12 +205,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   border: 0px;
 }
 .button-empty hover {
-  color: #F24738;
-  background-color: #F24738;
+  color: #8E2800;
+  background-color: #8E2800;
   font-size: 15px;
 }
 .button-empty.active {
-  color: #F24738;
+  color: #8E2800;
 }
 /*
 	Button that looks like a link.
@@ -223,11 +224,11 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   padding: 0px;
 }
 .button-link:hover {
-  color: #F24738;
+  color: #8E2800;
   text-decoration: underline;
 }
 .button-link.active {
-  color: #F24738;
+  color: #8E2800;
   font-weight: bold;
   padding: 0px;
 }
@@ -237,16 +238,16 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 */
 .button-active-link {
   background-color: transparent;
-  color: #676969;
+  color: #595959;
   border: none;
   padding: 8px;
 }
 .button-active-link:hover {
-  color: #F24738;
-  /* background-color: @theme-contrast-color; */
+  background-color: #CDE7F9;
+  /* background-color: @theme-dominant-color; */
 }
 .button-active-link.active {
-  color: #F24738;
+  color: #2980B9;
   font-weight: bold;
 }
 /*
@@ -260,15 +261,15 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 .button-setting:hover {
   color: white;
-  background: #F24738;
+  background: #8E2800;
   font-size: 1.1em;
-  border: 1px solid #F24738;
+  border: 1px solid #8E2800;
 }
 .button-setting.active {
   color: white;
-  background: #F24738;
+  background: #8E2800;
   font-size: 1.1em;
-  border: 1px solid #F24738;
+  border: 1px solid #8E2800;
 }
 .button-setting.disabled {
   color: #a6a6a6;
@@ -319,6 +320,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 .text-bold {
   font-weight: bold;
+}
+.text-small-caps {
+  font-variant: small-caps;
+}
+.text-all-caps {
+  text-transform: uppercase;
 }
 /********************************* GENERAL / SELECT LISTS (CHOSEN) *********************/
 /********************************* TITLES / HEADINGS *********************/
@@ -393,7 +400,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   color: #595959;
 }
 .link-gray:hover {
-  color: #092140;
+  color: #1E5D86;
 }
 .link-black {
   color: black;
@@ -405,13 +412,13 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   color: black;
 }
 .link-theme:hover {
-  color: #092140;
+  color: #1E5D86;
 }
 /********************************** DRAG / DROP RELATED ******************/
 .dropZone {
   /* position: relative; */
   display: table;
-  border: 5px dotted #F24738;
+  border: 5px dotted #8E2800;
   border-radius: 20px;
   color: gray;
   font: 24px/200px arial;
@@ -512,13 +519,13 @@ img {
   box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
 .thumbnailElement.active {
-  background-color: #F2A199;
+  background-color: #5B1A00;
 }
 /*
 	Hover effect on thumbnail elements
 */
 .elementHover:hover {
-  background-color: #F2A199;
+  background-color: #5B1A00;
   cursor: pointer;
 }
 /*
@@ -625,7 +632,7 @@ input[type=range] .timelapseRange {
   position: absolute;
   background: rgba(0, 0, 0, 0);
   border: 0px;
-  color: #F24738;
+  color: #8E2800;
   display: none;
 }
 /* Hover the button towards the right */
@@ -991,7 +998,7 @@ input[type=range] .range-setting {
 	border: 1px dotted gray;
 	border-radius: 5px;
 	*/
-  padding: 10px;
+  /* padding: 10px; */
   margin: 10px 0px;
   background-color: white;
   border-style: solid;
@@ -1000,13 +1007,19 @@ input[type=range] .range-setting {
   box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
 .sidebarHeading {
-  font-size: 17px;
-  color: #092140;
+  width: 100%;
+  padding: 5px 10px 5px 10px;
+  background-color: #679FC5;
+  color: white;
+  font-size: 15px;
+}
+.sidebarContent {
+  padding: 10px;
 }
 .sidebarLink {
-  font-size: 15px;
   display: block;
-  color: #676969;
+  font-size: 15px;
+  color: #595959;
 }
 .sidebarLink:hover {
   color: #BF2A2A;
@@ -1029,23 +1042,25 @@ input[type=range] .range-setting {
 /************************** Nav Bar (Top) ***************************/
 /* Override bootstrap nav bar */
 .navbar-fixed-top {
-  background: #024959;
+  background: #f5f5f5;
 }
 /* Override bootstrap color.  Custom color for all links in navbar */
 .navbar-nav a {
-  color: white;
-  font-size: 1.4em;
+  color: #8E2800;
 }
 /* Override bootstrap value of padding.  The brand image on navbar should start at top as the height
 already matches the navbar height */
 .navbar-brand {
   padding-top: 0px;
 }
+.navbar-link {
+  color: #8E2800;
+}
 ul.nav > li > a:hover {
-  background: black;
+  background: #F6B093;
 }
 ul.nav li.dropdown.open > a {
-  background: black;
+  background: #F6B093;
   padding-top: 0px;
   padding-bottom: 0px;
 }

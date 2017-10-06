@@ -1,4 +1,29 @@
+/********************************** COLORS AND THEMES *****************************/
+/****
+Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
+Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
+****/
 
+/** THEME COLORS **/
+@theme-dominant-color: #2980B9; /* Dominant color of theme, main logo */
+@theme-dominant-color-dark: #1E5D86;
+@theme-dominant-color-light: #679FC5;
+@theme-dominant-color-ultra-light: #CDE7F9;
+
+@theme-contrast-color: #8E2800; /* Contrast color for theme */
+@theme-contrast-color-dark: #BF2A2A;
+@theme-contrast-color-light: #5B1A00;
+@theme-contrast-color-ultra-light: #F6B093; 
+
+@theme-neutral-color: #f5f5f5; /* Light, neutral color.  Typically page background. */
+
+/** GRAYS **/
+
+@gray-standard: #808080;
+@gray-dark: #595959;
+@gray-ultra-dark: #303030;
+@gray-light: #a6a6a6;
+@gray-ultra-light: #d9d9d9;
 
 /********************************* CENTER DISPLAY **************************/
 /*
@@ -16,6 +41,7 @@
 	border: 2px dotted gray;
 	border-radius: 20px;
 	padding: 20px;
+	background-color: white;
 }
 
 .centerDisplayWide {
@@ -27,8 +53,8 @@
 }
 
 .centerDisplayTitle {
-	font-size: 17px;
-	font-weight: bold;
+	.text-plain-large;
+	.text-bold;
 }
 
 .centerDisplayFull {
@@ -48,7 +74,7 @@
 }
 
 .centerDisplayFooter {
-	font-size: 13px;
+	.text-plain-small;
 	text-align: center;
 }
 
@@ -83,104 +109,7 @@
 
 /********************************** MODIFIERS *****************************/
 
-/********************************** COLOR MODIFIERS *****************************/
-/****
-Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
-Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
-****/
 
-/* GUIDELINES */
-/*
-
-@theme-dominant-color: Dominant color of theme
-- Main logo
-
-@theme-dominant-color-dark: Darker shade of dominant color
-- Hover text color for links
-- Headings/titles text color, or inverted background color (with white text)
-
-@theme-contrast-color: Triad color of dominant color
-- Action buttons (Post Entry, Share entry, etc.)
-
-@theme-contrast-color-dark: Darker shade of triad color
-
-@theme-neutral-color: Light triad color
-- Background color for header/footer, etc.
-- Background color for panels, sidebars, etc.
-- Background color for elements with hover effect, etc.
-
-*/
-
-/* Animal Planet - Shades */
-/*
-@theme-accent-color-1: #465E1B;
-@theme-accent-color-2: #AEEA44;
-@theme-dominant-color: #759E2E;
-@theme-accent-color-3: #7EAB32;
-@theme-accent-color-4: #628427;
-*/
-
-/* Tropicana - Shades */
-/*
-@theme-accent-color-1: #013518;
-@theme-accent-color-2: #05C156;
-@theme-dominant-color: #037534;
-@theme-accent-color-3: #03823A;
-@theme-accent-color-4: #025B29;
-*/
-
-/* http://www.colourlovers.com/palette/580974/Adrift_in_Dreams */
-/*
-@theme-accent-color-1: #CFF09E;
-@theme-accent-color-2: #A8DBA8;
-@theme-dominant-color: #3B8686;
-@theme-accent-color-3: #79BD9A;
-@theme-accent-color-4: #0B486B;
-*/
-
-/* Testing */
-
-@theme-dominant-color: #024959;
-@theme-dominant-color-dark: #092140;
-@theme-dominant-color-light: #38D0F2;
-
-@theme-contrast-color: #F24738;
-@theme-contrast-color-dark: #BF2A2A;
-@theme-contrast-color-light: #F2A199;
-
-@theme-neutral-color: #F2C777 ;
-
-.color-ultra-light {
-	color: @theme-dominant-color-light;
-}
-
-.color-light {
-	color: @theme-dominant-color-light;
-}
-
-.color-standard {
-	color: @theme-dominant-color;
-}
-
-.color-dark {
-	color: @theme-dominant-color-dark;
-}
-
-.gray-ultra-light {
-	color: #d9d9d9;
-}
-
-.gray-light {
-	color: #a6a6a6;
-}
-
-.gray-standard {
-	color: #808080;
-}
-
-.gray-dark {
-	color: #595959;
-}
 
 /********************************** BUTTON MODIFIERS *****************************/
 
@@ -292,18 +221,18 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 */
 .button-active-link {
 	background-color: transparent;
-	color: #676969;
+	color: @gray-dark;
 	border: none;
 	padding: 8px;
 }
 
 .button-active-link:hover {
-	color: @theme-contrast-color;
-	/* background-color: @theme-contrast-color; */
+	background-color: @theme-dominant-color-ultra-light;
+	/* background-color: @theme-dominant-color; */
 }
 
 .button-active-link.active {
-	color: @theme-contrast-color;
+	color: @theme-dominant-color;
 	font-weight: bold;
 }
 
@@ -394,6 +323,14 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 .text-bold {
 	font-weight: bold;
+}
+
+.text-small-caps {
+	font-variant: small-caps;
+}
+
+.text-all-caps {
+	text-transform: uppercase;
 }
 
 /********************************* GENERAL / SELECT LISTS (CHOSEN) *********************/
@@ -532,7 +469,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 body {
 	font-family: Source Sans Pro,Helvetica,Arial,sans-serif;
 	padding-top: 50px; /* Push content below the navbar */
-	background-color: #f5f5f5;
+	background-color: @theme-neutral-color;
 }
 
 /*
@@ -1153,20 +1090,28 @@ input[type=range] .range-setting {
 	border: 1px dotted gray;
 	border-radius: 5px;
 	*/
-	padding: 10px;
+
+	/* padding: 10px; */
 	margin: 10px 0px;
 	.floatingElement;
 }
 
 .sidebarHeading {
-	font-size: 17px;
-	color: @theme-dominant-color-dark;
+	width: 100%;
+	padding: 5px 10px 5px 10px;
+	background-color: @theme-dominant-color-light;
+	color: white;
+	.text-plain-medium;
+}
+
+.sidebarContent {
+	padding: 10px;
 }
 
 .sidebarLink {
-	font-size: 15px;
 	display: block;
-	color: #676969;
+	.text-plain-medium;
+	color: @gray-dark;
 }
 
 .sidebarLink:hover {
@@ -1200,13 +1145,12 @@ input[type=range] .range-setting {
 
 /* Override bootstrap nav bar */
 .navbar-fixed-top {
-	background: @theme-dominant-color;
+	background: @theme-neutral-color;
 }
 
 /* Override bootstrap color.  Custom color for all links in navbar */
 .navbar-nav a {
-	color: white;
-	font-size: 1.4em;
+	.navbar-link;
 }
 
 /* Override bootstrap value of padding.  The brand image on navbar should start at top as the height
@@ -1215,12 +1159,16 @@ already matches the navbar height */
 	padding-top: 0px;
 }
 
+.navbar-link {
+	color: @theme-contrast-color;
+}
+
 ul.nav > li > a:hover {
-	background: black;
+	background: @theme-contrast-color-ultra-light;
 }
 
 ul.nav li.dropdown.open > a {
-	background: black;
+	background: @theme-contrast-color-ultra-light;
 	padding-top: 0px;
 	padding-bottom: 0px;
 }

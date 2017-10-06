@@ -8,13 +8,15 @@ function updateSidebar(id, heading, list) {
 	$(sidebar).empty();
 
 	//set the title
-	$(sidebar).append($("<span>", {class: "sidebarHeading"}).append(heading));
+	$(sidebar).append($("<div>", {class: "sidebarHeading"}).append(heading));
+
+	var sidebarContent = $("<div>", {class: "sidebarContent"}).appendTo($(sidebar));
 
 	//now insert items
 	for (var i = 0; i < list.length; i++) {
 		var item = list[i];
 		if (item.type && item.type == "link") {
-			$(sidebar).append($("<a>", {class: "sidebarLink", href: item.link}).append(item.name));
+			$(sidebarContent).append($("<a>", {class: "sidebarLink", href: item.link}).append(item.name));
 		}
 	}
 }
