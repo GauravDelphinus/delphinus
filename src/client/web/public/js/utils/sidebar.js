@@ -3,7 +3,7 @@
 	Update the given sidebar with the given list of items
 	Each item in the list is an object of form {type: "link or button or separator", name: "Name", link: "some link"}
 **/
-function updateSidebar(id, heading, list) {
+function updateSidebar(id, heading, content) {
 	var sidebar = $("#" + id);
 	$(sidebar).empty();
 
@@ -11,14 +11,20 @@ function updateSidebar(id, heading, list) {
 	$(sidebar).append($("<div>", {class: "sidebarHeading"}).append(heading));
 
 	var sidebarContent = $("<div>", {class: "sidebarContent"}).appendTo($(sidebar));
+	sidebarContent.append(content);
+}
 
+function createSimpleLinkList(list) {
+	var listContent = $("<div>");
 	//now insert items
 	for (var i = 0; i < list.length; i++) {
 		var item = list[i];
 		if (item.type && item.type == "link") {
-			$(sidebarContent).append($("<a>", {class: "sidebarLink", href: item.link}).append(item.name));
+			listContent.append($("<a>", {class: "sidebarLink", href: item.link}).append(item.name));
 		}
 	}
+
+	return listContent;
 }
 
 function createCategorySidebar() {
@@ -28,7 +34,7 @@ function createCategorySidebar() {
 			list.push({type: "link", name: result[i].name, link: "/challenges/?category=" + result[i].id});
 		}
 
-		updateSidebar("categoriesSidebar", "Categories", list);
+		updateSidebar("categoriesSidebar", "Categories", createSimpleLinkList(list));
 	})
 	.fail(function() {
 		//eat this
@@ -73,7 +79,8 @@ function updateRichSidebar(id, heading, list, singleColumn) {
 
 function createPopularChallengesSidebar() {
 	var list = [];
-	$.getJSON("/api/challenges?sortBy=popularity", function(result) {
+	$.getJSON("/api/challenges?sortBy=popularity", function(list) {
+		/*
 		for (var i = 0; i < result.length; i++) {
 			var data = result[i];
 			var description = "";
@@ -97,6 +104,10 @@ function createPopularChallengesSidebar() {
 		}
 
 		updateRichSidebar("popularChallengesSidebar", "Popular Challenges", list, true);
+		*/
+
+		var scrollableList = createScrollableList("popularChallengesScrollableList", list);
+		updateSidebar("popularChallengesSidebar", "Popular Challenges", scrollableList);
 	})
 	.fail(function() {
 		//eat this

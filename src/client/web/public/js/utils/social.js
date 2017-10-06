@@ -1,6 +1,6 @@
-function createSocialStatusSectionComment(data, parentId, isReply) {
+function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 	var socialStatusSection = $("<div>", {class: "socialStatusSectionSimple"});
-	var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "button-link text-plain-small separator"}).append("Like");
+	var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "button-link text-plain-small separator"}).append("Like");
 	if (data.socialStatus.likes.amLiking) {
 		likeButton.addClass("active");
 	}
@@ -30,13 +30,13 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 				if (err) {
 					// eat this
 				} else {
-					var numLikes = parseInt($("#" + data.id + "NumLikes").text());
+					var numLikes = parseInt($("#" + contentTag + data.id + "NumLikes").text());
 					if (likeStatus) {
-						$("#" + data.id + "LikeButton").addClass("active");
-						$("#" + data.id + "NumLikes").text(" " + (numLikes + 1));
+						$("#" + contentTag + data.id + "LikeButton").addClass("active");
+						$("#" + contentTag + data.id + "NumLikes").text(" " + (numLikes + 1));
 					} else {
-						$("#" + data.id + "LikeButton").removeClass("active");
-						$("#" + data.id + "NumLikes").text(" " + (numLikes - 1));
+						$("#" + contentTag + data.id + "LikeButton").removeClass("active");
+						$("#" + contentTag + data.id + "NumLikes").text(" " + (numLikes - 1));
 					}
 				}
 			});
@@ -46,13 +46,13 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 	
 	});
 
-	var replyButton = $("<button>", {id: data.id + "ReplyButton", type: "button", class: "button-link text-plain-small separator-small"}).append("Reply");
+	var replyButton = $("<button>", {id: contentTag + data.id + "ReplyButton", type: "button", class: "button-link text-plain-small separator-small"}).append("Reply");
 	socialStatusSection.append(replyButton);
 	replyButton.click(function(e) {
 		if (user) {
 			//for reply of reply, the parent is still the top comment
-			var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id));
-			appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), null, true);
+			var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id), contentTag);
+			appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), contentTag, null, true);
 		} else {
 			window.open("/auth", "_self");
 		}
@@ -65,7 +65,7 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 	if (user && user.id == data.postedByUser.id) {
 		socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 
-		var deleteButton = $("<button>", {id: data.id + "DeleteButton", type: "button", class: "button-link text-plain-small separator-small"}).append("Delete");
+		var deleteButton = $("<button>", {id: contentTag + data.id + "DeleteButton", type: "button", class: "button-link text-plain-small separator-small"}).append("Delete");
 		socialStatusSection.append(deleteButton);
 		deleteButton.click(function(e) {
 			var result = confirm("Are you sure you want to delete this comment permanently?");
@@ -79,7 +79,7 @@ function createSocialStatusSectionComment(data, parentId, isReply) {
 
 	socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 
-	var numLikes = $("<span>", {id: data.id + "NumLikes", class: "text-plain-small separator-small gray-light"}).append(data.socialStatus.likes.numLikes);
+	var numLikes = $("<span>", {id: contentTag + data.id + "NumLikes", class: "text-plain-small separator-small gray-light"}).append(data.socialStatus.likes.numLikes);
 	socialStatusSection.append(numLikes);
 
 	socialStatusSection.append($("<span>", {text: " Likes", class: "text-plain-small gray-light"}));
@@ -123,13 +123,13 @@ function sendLikeAction(restURL, likeAction, callback) {
 	});
 }
 
-function createSocialStatusSectionElement(data, full /* Show all content */) {
-	var socialStatus = $("<div>", {class: "socialStatusSection", id: data.id + "SocialStatusSection"});
+function createSocialStatusSectionElement(data, contentTag, full /* Show all content */) {
+	var socialStatus = $("<div>", {class: "socialStatusSection", id: contentTag + data.id + "SocialStatusSection"});
 
 	// For Challenges and Entries
 	if (data.socialStatus.likes) {
-		var likeButton = $("<button>", {id: data.id + "LikesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		likeButton.append($("<span>", {id: data.id + "NumLikes", text: data.socialStatus.likes.numLikes}));
+		var likeButton = $("<button>", {id: contentTag + data.id + "LikesButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		likeButton.append($("<span>", {id: contentTag + data.id + "NumLikes", text: data.socialStatus.likes.numLikes}));
 		likeButton.append($("<span>", {text: " Likes"}));
 		if (data.socialStatus.likes.numLikes <= 0) {
 			likeButton.hide();
@@ -137,14 +137,15 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 		socialStatus.append(likeButton);
 
 		likeButton.click(function() {
-			showHideLikersList(data.id);
+			console.log("likes button clicked, contentTag = " + contentTag);
+			showHideLikersList(data.id, contentTag);
 		});
 	}
 	
 	if (data.socialStatus.shares) {
 
-		var shareButton = $("<button>", {id: data.id + "SharesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		shareButton.append($("<span>", {id: data.id + "NumShares", text: data.socialStatus.shares.numShares}));
+		var shareButton = $("<button>", {id: contentTag + data.id + "SharesButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		shareButton.append($("<span>", {id: contentTag + data.id + "NumShares", text: data.socialStatus.shares.numShares}));
 		shareButton.append($("<span>", {text: " Shares"}));
 		if (data.socialStatus.shares.numShares <= 0) {
 			shareButton.hide();
@@ -154,8 +155,8 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 	
 	if (data.socialStatus.comments) {
 
-		var commentButton = $("<button>", {id: data.id + "CommentsButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		commentButton.append($("<span>", {id: data.id + "NumComments", text: data.socialStatus.comments.numComments}));
+		var commentButton = $("<button>", {id: contentTag + data.id + "CommentsButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		commentButton.append($("<span>", {id: contentTag + data.id + "NumComments", text: data.socialStatus.comments.numComments}));
 		commentButton.append($("<span>", {text: " Comments"}));
 		if (data.socialStatus.comments.numComments <= 0) {
 			commentButton.hide();
@@ -163,15 +164,15 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 		socialStatus.append(commentButton);
 
 		commentButton.click(function() {			
-			showHideCommentsList(data.id, true);
+			showHideCommentsList(data.id, contentTag, true);
 		});
 	}
 	
 	// For challenges only
 	if (data.socialStatus.entries) {
 
-		var entriesButton = $("<button>", {id: data.id + "EntriesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		entriesButton.append($("<span>", {id: data.id + "NumEntries", text: data.socialStatus.entries.numEntries}));
+		var entriesButton = $("<button>", {id: contentTag + data.id + "EntriesButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		entriesButton.append($("<span>", {id: contentTag + data.id + "NumEntries", text: data.socialStatus.entries.numEntries}));
 		entriesButton.append($("<span>", {text: " Entries"}));
 		if (data.socialStatus.entries.numEntries <= 0) {
 			entriesButton.hide();
@@ -195,16 +196,16 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 
 		if (data.socialStatus.follows.numFollowers) {
 
-			var followersButton = $("<button>", {id: data.id + "FollowersButton", type: "button", class: "button-link text-plain-small separator-medium"});
-			followersButton.append($("<span>", {id: data.id + "NumFollowers", text: data.socialStatus.follows.numFollowers}));
+			var followersButton = $("<button>", {id: contentTag + data.id + "FollowersButton", type: "button", class: "button-link text-plain-small separator-medium"});
+			followersButton.append($("<span>", {id: contentTag + data.id + "NumFollowers", text: data.socialStatus.follows.numFollowers}));
 			followersButton.append($("<span>", {text: " Followers"}));
 			if (data.socialStatus.follows.numFollowers <= 0) {
 				followersButton.hide();
 			}
 
 			followersButton.click(function(e) {
-				//$('#' + data.id + 'Tabs a[href="#followers"]').tab('show');
-				showHideFollowersList(data.id, true);
+				console.log("followers button clicked, contentTag = " + contentTag);
+				showHideFollowersList(data.id, contentTag, true);
 			});
 			socialStatus.append(followersButton);
 		}
@@ -230,8 +231,8 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 	if (data.socialStatus.posts) {
 		if (data.socialStatus.posts.numPosts) {
 
-			var postsButton = $("<button>", {id: data.id + "PostsButton", type: "button", class: "button-link text-plain-small separator-medium"});
-			postsButton.append($("<span>", {id: data.id + "NumPosts", text: data.socialStatus.posts.numPosts}));
+			var postsButton = $("<button>", {id: contentTag + data.id + "PostsButton", type: "button", class: "button-link text-plain-small separator-medium"});
+			postsButton.append($("<span>", {id: contentTag + data.id + "NumPosts", text: data.socialStatus.posts.numPosts}));
 			postsButton.append($("<span>", {text: " Posts"}));
 			if (data.socialStatus.posts.numPosts <= 0) {
 				postsButton.hide();
@@ -257,24 +258,24 @@ function createSocialStatusSectionElement(data, full /* Show all content */) {
 	Show the list of likes for this parentId, along with names of users and their 'Follow' status
 	w.r.t. to currently logged-in user
 **/
-function showHideLikersList(parentId) {
-	if ($("#" + parentId + "LikersContainer").is(":empty")) {
-		$.getJSON("/api/users/?likedEntityId=" + parentId + "&sortBy=reverseDate", function(list) {
-			var likersList = createLikersList(parentId, list);
-			$("#" + parentId + "LikersContainer").empty().append(likersList);
+function showHideLikersList(parentId, contentTag) {
+	if ($("#" + contentTag + parentId + "LikersContainer").is(":empty")) {
+		$.getJSON("/api/users/?likedEntityId=" + parentId + "&sortBy=popularity", function(list) {
+			var likersList = createLikersList(parentId, contentTag, list);
+			$("#" + contentTag + parentId + "LikersContainer").empty().append(likersList);
 		})
 		.fail(function() {
 			//eat this
 		});
 
-		if ($("#" + parentId + "LikersPopup").length) {
-			$("#" + parentId + "LikersPopup").show();
+		if ($("#" + contentTag + parentId + "LikersPopup").length) {
+			$("#" + contentTag + parentId + "LikersPopup").show();
 		}
 	} else {
-		$("#" + parentId + "LikersContainer").empty();
+		$("#" + contentTag + parentId + "LikersContainer").empty();
 
-		if ($("#" + parentId + "LikersPopup").length) {
-			$("#" + parentId + "LikersPopup").hide();
+		if ($("#" + contentTag + parentId + "LikersPopup").length) {
+			$("#" + contentTag + parentId + "LikersPopup").hide();
 		}
 	}
 }
@@ -284,13 +285,13 @@ function showHideLikersList(parentId) {
 	Show or Hide the Followers List associated with the given user.
 	parentId - User id to which the list is attached
 **/
-function showHideFollowersList(userId, show) {
+function showHideFollowersList(userId, contentTag, show) {
 	//comments list is currently hidden, so fetch comments and show the list
 	if (show) {
-		if ($("#" + userId + "FollowersContainer").is(":empty")) { 
+		if ($("#" + contentTag + userId + "FollowersContainer").is(":empty")) { 
 			$.getJSON("/api/users/?followedId=" + userId + "&sortBy=lastSeen", function(list) {
-				var followersList = createFollowersList(userId, list);
-				$("#" + userId + "FollowersContainer").empty().append(followersList);
+				var followersList = createFollowersList(userId, contentTag, list);
+				$("#" + contentTag + userId + "FollowersContainer").empty().append(followersList);
 			})
 			.fail(function() {
 				//eat this
@@ -299,19 +300,19 @@ function showHideFollowersList(userId, show) {
 		}
 
 		//if we're showing the followers list on a popup, then show the popup
-		if ($("#" + userId + "FollowersPopup").length) {
-			$("#" + userId + "FollowersPopup").show();
+		if ($("#" + contentTag + userId + "FollowersPopup").length) {
+			$("#" + contentTag + userId + "FollowersPopup").show();
 		}
 
 		//make sure the tab is 'active', not just 'shown'
-		$('#' + userId + 'Tabs a[href="#followers"]').tab('show');
+		$('#' + contentTag + userId + 'Tabs a[href="#followers"]').tab('show');
 	} else {
-		if (!$("#" + userId + "FollowersContainer").is(":empty")) {
-			$("#" + userId + "FollowersContainer").empty();
+		if (!$("#" + contentTag + userId + "FollowersContainer").is(":empty")) {
+			$("#" + contentTag + userId + "FollowersContainer").empty();
 
 			//if we're showing the followers list on a popup, then hide the popup
-			if ($("#" + userId + "FollowersPopup").length) {
-				$("#" + userId + "FollowersPopup").hide();
+			if ($("#" + contentTag + userId + "FollowersPopup").length) {
+				$("#" + contentTag + userId + "FollowersPopup").hide();
 			}
 		}
 	}
@@ -319,12 +320,12 @@ function showHideFollowersList(userId, show) {
 
 
 
-function createSocialActionsSectionElement(data, full /* show full status */) {
-	var socialActionsSection = $("<div>", {id: data.id + "SocialActionsSection", class: "socialActionsSection"});
+function createSocialActionsSectionElement(data, contentTag, full /* show full status */) {
+	var socialActionsSection = $("<div>", {id: contentTag + data.id + "SocialActionsSection", class: "socialActionsSection"});
 
 	// LIKE BUTTON ---------------------------------
 	if (data.socialStatus.likes) {
-		var likeButton = $("<button>", {id: data.id + "LikeButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+		var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		likeButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Like");
 		socialActionsSection.append(likeButton);
 
@@ -354,18 +355,18 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 					if (err) {
 						// eat this
 					} else {
-						var numLikes = parseInt($("#" + data.id + "NumLikes").text());
+						var numLikes = parseInt($("#" + contentTag + data.id + "NumLikes").text());
 						if (likeStatus) {
 							numLikes ++;
-							$("#" + data.id + "LikeButton").addClass("active");
-							$("#" + data.id + "NumLikes").text(numLikes);
-							$("#" + data.id + "LikesButton").show();
+							$("#" + contentTag + data.id + "LikeButton").addClass("active");
+							$("#" + contentTag + data.id + "NumLikes").text(numLikes);
+							$("#" + contentTag + data.id + "LikesButton").show();
 						} else {
 							numLikes --;
-							$("#" + data.id + "LikeButton").removeClass("active");
-							$("#" + data.id + "NumLikes").text(numLikes);
+							$("#" + contentTag + data.id + "LikeButton").removeClass("active");
+							$("#" + contentTag + data.id + "NumLikes").text(numLikes);
 							if (numLikes == 0) {
-								$("#" + data.id + "LikesButton").hide();
+								$("#" + contentTag + data.id + "LikesButton").hide();
 							}
 						}
 					}
@@ -379,19 +380,20 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 
 	// COMMENT BUTTON ---------------------------------
 	if (data.socialStatus.comments) {
-		var commentButton = $("<button>", {id: data.id + "CommentButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+		var commentButton = $("<button>", {id: contentTag + data.id + "CommentButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		commentButton.append($("<span>", {class: "glyphicon glyphicon-comment glyphiconAlign"})).append(" Comment");
 		socialActionsSection.append(commentButton);
 		
 		commentButton.click(function(e) {
-			showHideCommentsList(data.id, true);	
+			console.log("comment button clicked");
+			showHideCommentsList(data.id, contentTag, true);	
 		});
 	}
 	
 
 	// SHARE BUTTON ---------------------------------
 	if (data.socialStatus.shares) {
-		var shareButton = $("<button>", {id: data.id + "ShareButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+		var shareButton = $("<button>", {id: contentTag + data.id + "ShareButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		shareButton.append($("<span>", {class: "glyphicon glyphicon-share-alt glyphiconAlign"})).append(" Share");
 		
 		if (user.facebook || user.twitter || user.google) {
@@ -420,13 +422,13 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 
 	// TIME LAPSE BUTTON
 	if (data.type == "entry") {
-		var timelapseButton = $("<button>", {id: data.id + "TimelapseButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+		var timelapseButton = $("<button>", {id: contentTag + data.id + "TimelapseButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		timelapseButton.append($("<span>", {class: "glyphicon glyphicon-play-circle glyphiconAlign"})).append(" Timelapse");
 		socialActionsSection.append(timelapseButton);
 
 		timelapseButton.click(function(e) {
 			$.getJSON('/api/filters/timelapse/' + data.id, function(imageData) {
-				startTimelapse(data.id, imageData);
+				startTimelapse(data.id, contentTag, imageData);
 			})
 			.fail(function() {
 				window.location.replace("/error?reload=yes"); //reload the page to see if it works the next time
@@ -436,7 +438,7 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 	
 	// ADD ENTRY BUTTON ---------------------------------
 	if (data.socialStatus.entries) {
-		var addEntryButton = $("<button>", {id: data.id + "AddEntryButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+		var addEntryButton = $("<button>", {id: contentTag + data.id + "AddEntryButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		addEntryButton.append($("<span>", {class: "glyphicon glyphicon-flag glyphiconAlign"})).append(" Captionify");
 		socialActionsSection.append(addEntryButton);
 
@@ -447,15 +449,15 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 	
 	// FOLLOW BUTTON ---------------------------------
 	if (data.socialStatus.follows && (!user || user.id != data.id)) {
-		var followButton = $("<button>", {id: data.id + "FollowButton", type: "button", class: "button-active-link text-plain-small text-bold"}).append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append($("<span>", {id: data.id + "FollowText"}));
+		var followButton = $("<button>", {id: contentTag + data.id + "FollowButton", type: "button", class: "button-active-link text-plain-small text-bold"}).append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append($("<span>", {id: data.id + "FollowText"}));
 		
 		socialActionsSection.append(followButton);
 
 		if (data.socialStatus.follows.amFollowing) {
 			followButton.addClass("active");
-			followButton.children("#" + data.id + "FollowText").append(" Following");
+			followButton.children("#" + contentTag + data.id + "FollowText").append(" Following");
 		} else {
-			followButton.children("#" + data.id + "FollowText").append(" Follow");
+			followButton.children("#" + contentTag + data.id + "FollowText").append(" Follow");
 		}
 
 		var dataId = data.id;
@@ -470,20 +472,20 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 					if (err) {
 						// eat this
 					} else {
-						var numFollowers = parseInt($("#" + dataId + "NumFollowers").text());
+						var numFollowers = parseInt($("#" + contentTag + dataId + "NumFollowers").text());
 			          	if (followResult) {
 			          		numFollowers ++;
-			          		$("#" + dataId + "NumFollowers").text(numFollowers);
-			          		$("#" + dataId + "FollowButton").addClass("active");
-			          		$("#" + dataId + "FollowText").empty().append(" Following");
-			          		$("#" + dataId + "FollowersButton").show();
+			          		$("#" + contentTag + dataId + "NumFollowers").text(numFollowers);
+			          		$("#" + contentTag + dataId + "FollowButton").addClass("active");
+			          		$("#" + contentTag + dataId + "FollowText").empty().append(" Following");
+			          		$("#" + contentTag + dataId + "FollowersButton").show();
 			          	} else {
 			          		numFollowers --;
-			          		$("#" + dataId + "NumFollowers").text(numFollowers);
-			          		$("#" + dataId + "FollowButton").removeClass("active");
-			          		$("#" + dataId + "FollowText").empty().append(" Follow");
+			          		$("#" + contentTag + dataId + "NumFollowers").text(numFollowers);
+			          		$("#" + contentTag + dataId + "FollowButton").removeClass("active");
+			          		$("#" + contentTag + dataId + "FollowText").empty().append(" Follow");
 			          		if (numFollowers <= 0) {
-			          			$("#" + dataId + "FollowersButton").hide();
+			          			$("#" + contentTag + dataId + "FollowersButton").hide();
 			          		}
 			          	}
 					}
@@ -496,7 +498,7 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 
 	if (full && data.socialStatus.facebook) {
 		if (data.socialStatus.facebook.profileLink) {
-			var facebookButton = $("<button>", {id: data.id + "FacebookButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+			var facebookButton = $("<button>", {id: contentTag + data.id + "FacebookButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 			facebookButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Facebook");
 			socialActionsSection.append(facebookButton);
 
@@ -508,7 +510,7 @@ function createSocialActionsSectionElement(data, full /* show full status */) {
 
 	if (full && data.socialStatus.twitter) {
 		if (data.socialStatus.twitter.profileLink) {
-			var twitterButton = $("<button>", {id: data.id + "TwitterButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+			var twitterButton = $("<button>", {id: contentTag + data.id + "TwitterButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 			twitterButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Twitter");
 			socialActionsSection.append(twitterButton);
 
@@ -575,40 +577,40 @@ function sendFollow(userId, follow, callback) {
 	});
 }
 
-function createLikersContainer(data) {
-	var container = $("<div>", {id: data.id + "LikersContainer"}).empty();
+function createLikersContainer(data, contentTag) {
+	var container = $("<div>", {id: contentTag + data.id + "LikersContainer"}).empty();
 
 	return container;
 }
 
-function createFollowersContainer(data) {
-	var container = $("<div>", {id: data.id + "FollowersContainer"}).empty();
+function createFollowersContainer(data, contentTag) {
+	var container = $("<div>", {id: contentTag + data.id + "FollowersContainer"}).empty();
 
 	return container;
 }
 
-function createLikersPopupElement(data) {
+function createLikersPopupElement(data, contentTag) {
 	var likersPopupHeader = $("<h2>").append("People who like this");
-	var likersPopupBody = createLikersContainer(data);
-	var element = createPopupElement(data.id + "LikersPopup", "modal-narrow", likersPopupHeader, null, likersPopupBody, function() {
-		showHideLikersList(data.id);
+	var likersPopupBody = createLikersContainer(data, contentTag);
+	var element = createPopupElement(contentTag + data.id + "LikersPopup", "modal-narrow", likersPopupHeader, null, likersPopupBody, function() {
+		showHideLikersList(data.id, contentTag);
 	});
 
 	return element;
 }
 
-function createFollowersPopupElement(data) {
+function createFollowersPopupElement(data, contentTag) {
 	var followersPopupHeader = $("<h2>").append("Followers");
-	var followersPopupBody = createFollowersContainer(data);
-	var element = createPopupElement(data.id + "FollowersPopup", "modal-narrow", followersPopupHeader, null, followersPopupBody, function() {
-		showHideFollowersList(data.id, false);
+	var followersPopupBody = createFollowersContainer(data, contentTag);
+	var element = createPopupElement(contentTag + data.id + "FollowersPopup", "modal-narrow", followersPopupHeader, null, followersPopupBody, function() {
+		showHideFollowersList(data.id, contentTag, false);
 	});
 
 	return element;
 }
 
-function createLikersList(id, list) {
-	var container = $("<div>", {id: id + "LikersList", class: "likersList", "data-id": id});
+function createLikersList(id, contentTag, list) {
+	var container = $("<div>", {id: contentTag + id + "LikersList", class: "likersList", "data-id": id});
 
 	var table = $("<table width='100%'>");
 
@@ -619,7 +621,7 @@ function createLikersList(id, list) {
 		var userImage = $("<img>", {src: data.image, class: "user-image-tiny"});
 
 		var userName = $("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.caption);
-		var followButton = $("<button>", {type: "button", id: data.id + "FollowButton", class: "btn button-full-width "});
+		var followButton = $("<button>", {type: "button", id: contentTag + data.id + "FollowButton", class: "btn button-full-width "});
 		if (data.socialStatus.follows.amFollowing) {
 			//already following
 			followButton.append($("<span>", {class: "glyphicon glyphicon-ok"})).append(" Following");
@@ -645,7 +647,7 @@ function createLikersList(id, list) {
 						} else {
 							if (followResult) {
 								//now following
-								var button = $("#" + id + "FollowButton");
+								var button = $("#" + contentTag + id + "FollowButton");
 								button.empty();
 								button.append($("<span>", {class: "glyphicon glyphicon-ok"})).append(" Following");
 								button.removeClass("button-line");
@@ -675,8 +677,8 @@ function createLikersList(id, list) {
 	return container;
 }
 
-function createFollowersList(id, list) {
-	var container = $("<div>", {id: id + "FollowersList", class: "followersList", "data-id": id});
+function createFollowersList(id, contentTag, list) {
+	var container = $("<div>", {id: contentTag + id + "FollowersList", class: "followersList", "data-id": id});
 
 	var table = $("<table width='100%'>");
 
@@ -687,7 +689,7 @@ function createFollowersList(id, list) {
 		var userImage = $("<img>", {src: data.image, class: "user-image-tiny"});
 
 		var userName = $("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.caption);
-		var followButton = $("<button>", {type: "button", id: data.id + "FollowButton", class: "btn button-full-width "});
+		var followButton = $("<button>", {type: "button", id: contentTag + data.id + "FollowButton", class: "btn button-full-width "});
 		if (data.socialStatus.follows.amFollowing) {
 			//already following
 			followButton.append($("<span>", {class: "glyphicon glyphicon-ok"})).append(" Following");
@@ -713,7 +715,7 @@ function createFollowersList(id, list) {
 						} else {
 							if (followResult) {
 								//now following
-								var button = $("#" + id + "FollowButton");
+								var button = $("#" + contentTag + id + "FollowButton");
 								button.empty();
 								button.append($("<span>", {class: "glyphicon glyphicon-ok"})).append(" Following");
 								button.removeClass("button-line");

@@ -1402,6 +1402,7 @@ module.exports = {
 			data.image = entity.image;
 			data.caption = entity.displayName;
 			data.link = config.url.user + entity.id;
+			data.lastSeen = entity.last_seen;
 			if (socialInfo) {
 				if (socialInfo.facebookLink) {
 					data.socialStatus.facebook = {profileLink: socialInfo.facebookLink};

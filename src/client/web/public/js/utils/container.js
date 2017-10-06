@@ -1,5 +1,5 @@
-function createGrid(id, list, numCols, allowHover, allowSelection, defaultSelectedID, selectionCallback) {
-	var table = $("<table>", {id: id});
+function createGrid(contentTag, list, numCols, allowHover, allowSelection, defaultSelectedID, selectionCallback) {
+	var table = $("<table>", {id: contentTag + "GridTable"});
 
 	var tdWidth = 100 / numCols;
 	if (numCols < 2) {
@@ -14,7 +14,7 @@ function createGrid(id, list, numCols, allowHover, allowSelection, defaultSelect
 			var td = $("<td>", {class: "gridCell", width: tdWidth + "%"});
 			if (i < list.length) {
 				var data = list[i++];
-				var element = createThumbnailElement(data, !allowSelection);
+				var element = createThumbnailElement(data, contentTag, !allowSelection);
 
 				if (allowHover) {
 					element.addClass("elementHover");
@@ -43,26 +43,26 @@ function createGrid(id, list, numCols, allowHover, allowSelection, defaultSelect
 	return table;
 }
 
-function createScrollableList(id, list) {
-	var container = $("<div>", {id: id, class: "scrollabeList"});
+function createScrollableList(contentTag, list) {
+	var container = $("<div>", {id: contentTag + "ScrollableList", class: "scrollabeList"});
 
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
 
-		var scrollableElement = createScrollableElement(data);
+		var scrollableElement = createScrollableElement(data, contentTag);
 		container.append(scrollableElement);
 	}
 
 	return container;
 }
 
-function createFeedList(id, list) {
-	var container = $("<div>", {id: id, class: "feedList"});
+function createFeedList(contentTag, list) {
+	var container = $("<div>", {id: contentTag + "FeedList", class: "feedList"});
 
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
 
-		var feedElement = createFeedElement(data);
+		var feedElement = createFeedElement(data, contentTag);
 		container.append(feedElement);
 	}
 
@@ -142,13 +142,13 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 		var list = jQuery.data(document.body, contentTag + "List");
 		
 		if (buttonID == "thumbnailViewButton") {
-			var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null, null);
+			var grid = createGrid(contentTag, list, 3, false, false, null, null);
 			container.append(grid);
 		} else if (buttonID == "scrollableViewButton") {
-			var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+			var scrollableList = createScrollableList(contentTag, list);
 			container.append(scrollableList);
 		} else if (buttonID == "commentsViewButton") {
-			var commentsList = createCommentsList(entityId, list);
+			var commentsList = createCommentsList(entityId, contentTag, list);
 			var commentsContainer = $("<div>", {id: entityId + "CommentsContainer"}).empty();
 			commentsContainer.append(commentsList);
 			container.append(commentsContainer);
@@ -185,26 +185,26 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 		if ($("#" + contentTag + "ViewGroup button.active").length) {
 			var viewOptionsButtonID = $("#" + contentTag + "ViewGroup button.active").attr("id");
 			if (viewOptionsButtonID == "thumbnailViewButton") {
-				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null, null);
+				var grid = createGrid(contentTag, list, 3, false, false, null, null);
 				$("#" + contentTag + "Container").append(grid);
 			} else if (viewOptionsButtonID == "scrollableViewButton") {
-				var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+				var scrollableList = createScrollableList(contentTag, list);
 				$("#" + contentTag + "Container").append(scrollableList);
 			}
 		} else {
 			if (defaultViewType == "thumbnail") {
-				var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null, null);
+				var grid = createGrid(contentTag, list, 3, false, false, null, null);
 				$("#" + contentTag + "Container").append(grid);
 			} else if (defaultViewType == "filmstrip") {
-				var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+				var scrollableList = createScrollableList(contentTag, list);
 				$("#" + contentTag + "Container").append(scrollableList);
 			} else if (defaultViewType == "comments") {
-				var commentsList = createCommentsList(entityId, list);
+				var commentsList = createCommentsList(entityId, contentTag, list);
 				var commentsContainer = $("<div>", {id: entityId + "CommentsContainer"}).empty();
 				commentsContainer.append(commentsList);
 				$("#" + contentTag + "Container").append(commentsContainer);
 			} else if (defaultViewType == "feed") {
-				var feedList = createFeedList(contentTag + "FeedList", list);
+				var feedList = createFeedList(contentTag, list);
 				$("#" + contentTag + "Container").append(feedList);
 			}
 		}
@@ -269,7 +269,7 @@ function refreshThumbnailView(contentTag) {
 
 	var list = jQuery.data(document.body, contentTag + "List");
 
-	var grid = createGrid(contentTag + "GridTable", list, 3, false, false, null, null);
+	var grid = createGrid(contentTag, list, 3, false, false, null, null);
 	$("#" + contentTag + "Container").append(grid);
 }
 
@@ -278,7 +278,7 @@ function refreshFilmstripView(contentTag) {
 
 	var list = jQuery.data(document.body, contentTag + "List");
 
-	var scrollableList = createScrollableList(contentTag + "ScrollableList", list);
+	var scrollableList = createScrollableList(contentTag, list);
 	$("#" + contentTag + "Container").append(scrollableList);
 }
 

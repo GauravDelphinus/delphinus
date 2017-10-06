@@ -1,8 +1,8 @@
 /**************************** TIME LAPSE VIEW ***************************/
 
-function createTimeLapseProgressSectionElement(data) {
-	var timelapseProgressSection = $("<div>", {id: data.id + "TimeLapseProgressSection", class: "timelapseProgressSection"});
-	var rangeSelector = $("<input>", {id: data.id + "TimelapseRange", class: "timelapseRange", type: "range", min:"0", max:""})
+function createTimeLapseProgressSectionElement(data, contentTag) {
+	var timelapseProgressSection = $("<div>", {id: contentTag + data.id + "TimeLapseProgressSection", class: "timelapseProgressSection"});
+	var rangeSelector = $("<input>", {id: contentTag + data.id + "TimelapseRange", class: "timelapseRange", type: "range", min:"0", max:""})
 	rangeSelector.prop("disabled", true);
 	timelapseProgressSection.append(rangeSelector);
 	timelapseProgressSection.hide();
@@ -26,29 +26,29 @@ var rangeUpdateCountMap = {}; //counter to keep track of range updates, mapped b
 		}
 	]
 */
-function startTimelapse(entityId, data) {
-	$("#" + entityId + "TimelapseButton").prop("disabled", true);
+function startTimelapse(entityId, contentTag, data) {
+	$("#" + contentTag + entityId + "TimelapseButton").prop("disabled", true);
 
 	timelapseIndexMap[entityId] = 0;
 	rangeUpdateCountMap[entityId] = 0;
 
 	//show the slider view
-	$("#" + entityId + "TimeLapseProgressSection").show();
-	$("#" + entityId + "TimelapseRange").attr("max", "" + (data.length - 1) * 2000)
+	$("#" + contentTag + entityId + "TimeLapseProgressSection").show();
+	$("#" + contentTag + entityId + "TimelapseRange").attr("max", "" + (data.length - 1) * 2000)
 
 	//start the ball rolling
 	nextTimelapse(entityId, data);
 
-	timelapseTimerMap[entityId] = window.setInterval(function() {nextTimelapse(entityId, data);}, 2000); //progress frames every 2 seconds
-	rangeUpdateTimerMap[entityId] = window.setInterval(function() {updateTimelapseRange(entityId)}, 10); //update range progress every 10 milliseconds (for smoother movement)
+	timelapseTimerMap[entityId] = window.setInterval(function() {nextTimelapse(entityId, contentTag, data);}, 2000); //progress frames every 2 seconds
+	rangeUpdateTimerMap[entityId] = window.setInterval(function() {updateTimelapseRange(entityId, contentTag)}, 10); //update range progress every 10 milliseconds (for smoother movement)
 }
 
 /*
 	Timer callback that updates the progress / range
 */
-function updateTimelapseRange(entityId) {
+function updateTimelapseRange(entityId, contentTag) {
 	rangeUpdateCountMap[entityId] += 10;
-	$("#" + entityId + "TimelapseRange").val(rangeUpdateCountMap[entityId]);
+	$("#" + contentTag + entityId + "TimelapseRange").val(rangeUpdateCountMap[entityId]);
 }
 
 /*
@@ -61,15 +61,15 @@ function fadeToImage(imageId, newSrc) {
 /*
 	Timer callback that updates the frames, and keeps a track of the range progress
 */
-function nextTimelapse(entityId, data) {
+function nextTimelapse(entityId, contentTag, data) {
 	if (data[timelapseIndexMap[entityId]].imageType == "url") {
-		fadeToImage(entityId + "EntityImage", data[timelapseIndexMap[entityId]].imageData);
+		fadeToImage(contentTag + entityId + "EntityImage", data[timelapseIndexMap[entityId]].imageData);
 	} else {
-		fadeToImage(entityId + "EntityImage", "data:image/jpeg;base64," + data[timelapseIndexMap[entityId]].imageData);
+		fadeToImage(contentTag + entityId + "EntityImage", "data:image/jpeg;base64," + data[timelapseIndexMap[entityId]].imageData);
 	}
 	
 	//set the range input
-	$("#" + entityId + "TimelapseRange").val(timelapseIndexMap[entityId] * 2000);
+	$("#" + contentTag + entityId + "TimelapseRange").val(timelapseIndexMap[entityId] * 2000);
 	timelapseIndexMap[entityId] ++;
 
 	if (timelapseIndexMap[entityId] == data.length) {
@@ -79,19 +79,19 @@ function nextTimelapse(entityId, data) {
 		delete rangeUpdateTimerMap[entityId];
 
 		//let the last frame play before hiding the controls
-		window.setTimeout(function() {stopTimelapse(entityId, data);}, 2000);
+		window.setTimeout(function() {stopTimelapse(entityId, contentTag, data);}, 2000);
 	}
 }
 
 /*
 	Stop the timelapse timers, and reset counters, etc.
 */
-function stopTimelapse(entityId, data) {
-	$("#" + entityId + "TimeLapseProgressSection").hide();
+function stopTimelapse(entityId, contentTag, data) {
+	$("#" + contentTag + entityId + "TimeLapseProgressSection").hide();
 
 	//reset values
 	delete timelapseIndexMap[entityId];
 	delete rangeUpdateCountMap[entityId];
 
-	$("#" + entityId + "TimelapseButton").prop("disabled", false);
+	$("#" + contentTag + entityId + "TimelapseButton").prop("disabled", false);
 }

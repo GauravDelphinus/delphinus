@@ -1,72 +1,72 @@
-function createMainElement(data) {
-	var element = $("<div>", {id: data.id + "MainElement", class: "mainElement"});
+function createMainElement(data, contentTag) {
+	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "mainElement"});
 
-	element.append(createPostHeaderElement(data));
-	element.append(createMainImageElement(data));
+	element.append(createPostHeaderElement(data, contentTag));
+	element.append(createMainImageElement(data, contentTag));
 
 	if (data.caption && data.type != "entry") {
-		element.append(createCaptionSectionElement(data));
+		element.append(createCaptionSectionElement(data, contentTag));
 	}
 	
 	if (data.type == "entry") {
-		element.append(createTimeLapseProgressSectionElement(data));
+		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
 	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data));
-		element.append(createSocialActionsSectionElement(data));
+		element.append(createSocialStatusSectionElement(data, contentTag));
+		element.append(createSocialActionsSectionElement(data, contentTag));
 	}
 
 	//container for likers list, if any
-	element.append(createLikersPopupElement(data));
+	element.append(createLikersPopupElement(data, contentTag));
 
 	return element;
 }
 
-function createScrollableElement(data) {
-	var element = $("<div>", {id: data.id + "ScrollableElement", class: "scrollableElement"});
+function createScrollableElement(data, contentTag) {
+	var element = $("<div>", {id: contentTag + data.id + "ScrollableElement", class: "scrollableElement"});
 
-	element.append(createPostHeaderElement(data));
+	element.append(createPostHeaderElement(data, contentTag));
 
-	var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data));
+	var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data, contentTag));
 	element.append(imageLink);
 
 	if (data.caption && data.type != "entry") {
-		element.append(createCaptionSectionElement(data));
+		element.append(createCaptionSectionElement(data, contentTag));
 	}
 
 	if (data.type == "entry") {
-		element.append(createTimeLapseProgressSectionElement(data));
+		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
 	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data));
-		element.append(createSocialActionsSectionElement(data));
+		element.append(createSocialStatusSectionElement(data, contentTag));
+		element.append(createSocialActionsSectionElement(data, contentTag));
 	}
 	
 	//container for comments, if any
-	element.append(createCommentsContainer(data));
+	element.append(createCommentsContainer(data, contentTag));
 
 	//container for likers list, if any
-	element.append(createLikersPopupElement(data));
+	element.append(createLikersPopupElement(data, contentTag));
 
 	return element;
 }
 
-function createFeedElement(data) {
-	var element = $("<div>", {id: data.id + "FeedElement", class: "feedElement"});
+function createFeedElement(data, contentTag) {
+	var element = $("<div>", {id: contentTag + data.id + "FeedElement", class: "feedElement"});
 
 	if (data.activity && data.activity.type != "recentlyPosted") {
-		element.append(createActivitySectionElement(data));
+		element.append(createActivitySectionElement(data, contentTag));
 	}
 
-	element.append(createPostHeaderElement(data));
+	element.append(createPostHeaderElement(data, contentTag));
 
 	if (data.text) {
-		element.append(createTextSection(data));
+		element.append(createTextSection(data, contentTag));
 	}
 
-	var imageElement = createEntityImageElement(data);
+	var imageElement = createEntityImageElement(data, contentTag);
 
 	if (data.link) {
 		var imageLink = $("<a>", {href: data.link}).append(imageElement);
@@ -76,73 +76,73 @@ function createFeedElement(data) {
 	}
 
 	if (data.caption && data.type != "entry") {
-		element.append(createCaptionSectionElement(data));
+		element.append(createCaptionSectionElement(data, contentTag));
 	}
 
 	if (data.type == "entry") {
-		element.append(createTimeLapseProgressSectionElement(data));
+		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
 	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data));
-		element.append(createSocialActionsSectionElement(data));
+		element.append(createSocialStatusSectionElement(data, contentTag));
+		element.append(createSocialActionsSectionElement(data, contentTag));
 	}
 
 	//container for comments, if any
-	element.append(createCommentsContainer(data));
+	element.append(createCommentsContainer(data, contentTag));
 
 	//container for likers list, if any
-	element.append(createLikersPopupElement(data));
+	element.append(createLikersPopupElement(data, contentTag));
 
 	return element;
 }
 
-function createThumbnailElement(data, createLink) {
+function createThumbnailElement(data, contentTag, createLink) {
 	var element = $("<div>", {class: "thumbnailElement"});
 
 	if (data.postedDate) {
-		element.append(createPostHeaderElement(data));
+		element.append(createPostHeaderElement(data, contentTag));
 	}
 
 
 	if(createLink) {
-		var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data));
+		var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data, contentTag));
 		element.append(imageLink);
 	} else {
-		element.append(createEntityImageElement(data));
+		element.append(createEntityImageElement(data, contentTag));
 	}
 
 	if (data.caption && data.type != "entry") {
-		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data));
+		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data, contentTag));
 		element.append(link);
 	}
 
 	if (data.type == "entry") {
-		element.append(createTimeLapseProgressSectionElement(data));
+		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
 	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data));
-		element.append(createSocialActionsSectionElement(data));
+		element.append(createSocialStatusSectionElement(data, contentTag));
+		element.append(createSocialActionsSectionElement(data, contentTag));
 	}
 
 	//container for comments, if any
 	var commentPopupHeader = $("<h2>").append("Comments");
-	var commentPopupBody = createCommentsContainer(data);
-	element.append(createPopupElement(data.id + "CommentsPopup", "modal-medium", commentPopupHeader, null, commentPopupBody, function() {
-		showHideCommentsList(data.id, false);
+	var commentPopupBody = createCommentsContainer(data, contentTag);
+	element.append(createPopupElement(contentTag + data.id + "CommentsPopup", "modal-medium", commentPopupHeader, null, commentPopupBody, function() {
+		showHideCommentsList(contentTag + data.id, false);
 	}));
 
 	//container for likers list, if any
-	element.append(createLikersPopupElement(data));
+	element.append(createLikersPopupElement(data, contentTag));
 
-	element.append(createFollowersPopupElement(data));
+	element.append(createFollowersPopupElement(data, contentTag));
 
 	return element;
 }
 
-function createPostHeaderElement(data) {
-	var postHeaderElement = $("<div>", {id: data.id + "PostHeader", class: "postHeaderSection"});
+function createPostHeaderElement(data, contentTag) {
+	var postHeaderElement = $("<div>", {id: contentTag + data.id + "PostHeader", class: "postHeaderSection"});
 
 	// IMPORTANT: Menu should be the FIRST Child, because it needs to be displayed at top right
 	// using float: right (see https://stackoverflow.com/a/33503177/7657145)
@@ -152,11 +152,11 @@ function createPostHeaderElement(data) {
 	//if I'm the one who posted this item, show the menu option
 	if (user && user.id == data.postedByUser.id) {
 		var menuIcon = $("<span>", {class: "glyphicon glyphicon-chevron-down"});
-		var menuButton = $("<button>", {id: data.id + "ItemMenuButton", class: "itemDropdownButton"}).append(menuIcon);
+		var menuButton = $("<button>", {id: contentTag + data.id + "ItemMenuButton", class: "itemDropdownButton"}).append(menuIcon);
 		var menu = createMenu(menuButton);
 		menu.addClass("itemDropdownMenu");
 		var deleteIcon = $("<span>", {class: "glyphicon glyphicon-remove"});
-		var deleteButton = $("<button>", {id: data.id + "DeleteButton", class: "btn itemDropdownButton", type: "button"}).append(deleteIcon).append(" Delete Post");
+		var deleteButton = $("<button>", {id: contentTag + data.id + "DeleteButton", class: "btn itemDropdownButton", type: "button"}).append(deleteIcon).append(" Delete Post");
 		
 		appendMenuItemButton(menu, deleteButton);
 
@@ -214,9 +214,9 @@ function createPostHeaderElement(data) {
 }
 
 
-function createCaptionSectionElement(data) {
+function createCaptionSectionElement(data, contentTag) {
 	// Caption (if available)
-	var captionSection = $("<div>", {class: "captionSection", id: data.id + "CaptionSection"});
+	var captionSection = $("<div>", {class: "captionSection", id: contentTag + data.id + "CaptionSection"});
 	var caption = $("<span>", {class: "text-plain-large", text: data.caption});
 	captionSection.append(caption);
 
@@ -239,8 +239,8 @@ function createSeparatorElement(type, separatorClass) {
 /*************************************************************************/
 
 
-function createEntityImageElement(data) {
-	var entityImage = $("<img>", {id: data.id + "EntityImage", class: "mainImage"});
+function createEntityImageElement(data, contentTag) {
+	var entityImage = $("<img>", {id: contentTag + data.id + "EntityImage", class: "mainImage"});
 	entityImage.prop("src", data.image);
 	return entityImage;
 }
@@ -257,9 +257,9 @@ function createTextElement(data) {
 	return textElement;
 }
 
-function createActivitySectionElement(data) {
-	var activitySection = $("<div>", {id: data.id + "ActivitySection", class: "activitySection"});
-	var activityText = $("<span>", {id: data.id + "ActivityText", class: "text-plain-small"});
+function createActivitySectionElement(data, contentTag) {
+	var activitySection = $("<div>", {id: contentTag + data.id + "ActivitySection", class: "activitySection"});
+	var activityText = $("<span>", {id: contentTag + data.id + "ActivityText", class: "text-plain-small"});
 
 	if (data.activity) {
 		if (data.activity.type == "recentlyLiked") {
@@ -282,7 +282,7 @@ function createActivitySectionElement(data) {
 	return activitySection;
 }
 
-function createTextSection(data) {
-	var textSection = $("<div>", {id: data.id + "TextSection", class: "textSection"});
+function createTextSection(data, contentTag) {
+	var textSection = $("<div>", {id: contentTag + data.id + "TextSection", class: "textSection"});
 	return textSection;
 }
