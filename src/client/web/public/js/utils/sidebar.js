@@ -106,7 +106,8 @@ function createPopularChallengesSidebar() {
 		updateRichSidebar("popularChallengesSidebar", "Popular Challenges", list, true);
 		*/
 
-		var scrollableList = createScrollableList("popularChallengesScrollableList", list);
+		var scrollableList = createScrollableList("popularChallengesScrollableList", list, true);
+
 		updateSidebar("popularChallengesSidebar", "Popular Challenges", scrollableList);
 	})
 	.fail(function() {

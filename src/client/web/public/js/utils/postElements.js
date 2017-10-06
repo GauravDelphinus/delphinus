@@ -23,7 +23,7 @@ function createMainElement(data, contentTag) {
 	return element;
 }
 
-function createScrollableElement(data, contentTag) {
+function createScrollableElement(data, contentTag, compressed = false) {
 	var element = $("<div>", {id: contentTag + data.id + "ScrollableElement", class: "scrollableElement"});
 
 	element.append(createPostHeaderElement(data, contentTag));
@@ -40,8 +40,12 @@ function createScrollableElement(data, contentTag) {
 	}
 
 	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data, contentTag));
-		element.append(createSocialActionsSectionElement(data, contentTag));
+		element.append(createSocialStatusSectionElement(data, contentTag, true, !compressed));
+
+		if (!compressed) {
+			element.append(createSocialActionsSectionElement(data, contentTag));
+		}
+		
 	}
 	
 	//container for comments, if any

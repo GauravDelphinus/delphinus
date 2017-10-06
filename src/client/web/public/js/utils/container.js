@@ -22,7 +22,7 @@ function createGrid(contentTag, list, numCols, allowHover, allowSelection, defau
 
 				if (allowSelection) {
 					element.click({id: data.id, element: element}, function(e) {
-						$("#" + id + " .thumbnailElement").removeClass("active"); //unselect all first
+						$("#" + contentTag + " .thumbnailElement").removeClass("active"); //unselect all first
 						e.data.element.addClass("active"); //now make the selection
 						selectionCallback(e.data.id);
 					});
@@ -43,13 +43,13 @@ function createGrid(contentTag, list, numCols, allowHover, allowSelection, defau
 	return table;
 }
 
-function createScrollableList(contentTag, list) {
+function createScrollableList(contentTag, list, compressed = false) {
 	var container = $("<div>", {id: contentTag + "ScrollableList", class: "scrollabeList"});
 
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
 
-		var scrollableElement = createScrollableElement(data, contentTag);
+		var scrollableElement = createScrollableElement(data, contentTag, compressed);
 		container.append(scrollableElement);
 	}
 

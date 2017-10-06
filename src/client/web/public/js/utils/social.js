@@ -123,8 +123,8 @@ function sendLikeAction(restURL, likeAction, callback) {
 	});
 }
 
-function createSocialStatusSectionElement(data, contentTag, full /* Show all content */) {
-	var socialStatus = $("<div>", {class: "socialStatusSection", id: contentTag + data.id + "SocialStatusSection"});
+function createSocialStatusSectionElement(data, contentTag, full /* Show all content */, showBorder = true) {
+	var socialStatus = $("<div>", {class: "socialStatusSection" + (showBorder ? " bottom-border" : ""), id: contentTag + data.id + "SocialStatusSection"});
 
 	// For Challenges and Entries
 	if (data.socialStatus.likes) {
@@ -137,8 +137,7 @@ function createSocialStatusSectionElement(data, contentTag, full /* Show all con
 		socialStatus.append(likeButton);
 
 		likeButton.click(function() {
-			console.log("likes button clicked, contentTag = " + contentTag);
-			showHideLikersList(data.id, contentTag);
+			showHideLikersList(data.id, contentTag, true);
 		});
 	}
 	
@@ -258,24 +257,28 @@ function createSocialStatusSectionElement(data, contentTag, full /* Show all con
 	Show the list of likes for this parentId, along with names of users and their 'Follow' status
 	w.r.t. to currently logged-in user
 **/
-function showHideLikersList(parentId, contentTag) {
-	if ($("#" + contentTag + parentId + "LikersContainer").is(":empty")) {
-		$.getJSON("/api/users/?likedEntityId=" + parentId + "&sortBy=popularity", function(list) {
-			var likersList = createLikersList(parentId, contentTag, list);
-			$("#" + contentTag + parentId + "LikersContainer").empty().append(likersList);
-		})
-		.fail(function() {
-			//eat this
-		});
+function showHideLikersList(parentId, contentTag, show) {
+	if (show) {
+		if ($("#" + contentTag + parentId + "LikersContainer").is(":empty")) {
+			$.getJSON("/api/users/?likedEntityId=" + parentId + "&sortBy=popularity", function(list) {
+				var likersList = createLikersList(parentId, contentTag, list);
+				$("#" + contentTag + parentId + "LikersContainer").empty().append(likersList);
+			})
+			.fail(function() {
+				//eat this
+			});
 
-		if ($("#" + contentTag + parentId + "LikersPopup").length) {
-			$("#" + contentTag + parentId + "LikersPopup").show();
+			if ($("#" + contentTag + parentId + "LikersPopup").length) {
+				$("#" + contentTag + parentId + "LikersPopup").show();
+			}
 		}
 	} else {
-		$("#" + contentTag + parentId + "LikersContainer").empty();
+		if (!$("#" + contentTag + parentId + "LikersContainer").is(":empty")) {
+			$("#" + contentTag + parentId + "LikersContainer").empty();
 
-		if ($("#" + contentTag + parentId + "LikersPopup").length) {
-			$("#" + contentTag + parentId + "LikersPopup").hide();
+			if ($("#" + contentTag + parentId + "LikersPopup").length) {
+				$("#" + contentTag + parentId + "LikersPopup").hide();
+			}
 		}
 	}
 }
@@ -593,7 +596,7 @@ function createLikersPopupElement(data, contentTag) {
 	var likersPopupHeader = $("<h2>").append("People who like this");
 	var likersPopupBody = createLikersContainer(data, contentTag);
 	var element = createPopupElement(contentTag + data.id + "LikersPopup", "modal-narrow", likersPopupHeader, null, likersPopupBody, function() {
-		showHideLikersList(data.id, contentTag);
+		showHideLikersList(data.id, contentTag, false);
 	});
 
 	return element;
