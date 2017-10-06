@@ -5,15 +5,16 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 ****/
 
 /** THEME COLORS **/
-@theme-dominant-color: #2980B9; /* Dominant color of theme, main logo */
-@theme-dominant-color-dark: #1E5D86;
-@theme-dominant-color-light: #679FC5;
-@theme-dominant-color-ultra-light: #CDE7F9;
 
-@theme-contrast-color: #8E2800; /* Contrast color for theme */
-@theme-contrast-color-dark: #BF2A2A;
-@theme-contrast-color-light: #5B1A00;
-@theme-contrast-color-ultra-light: #F6B093; 
+@theme-dominant-color: #8E2800; /* Contrast color for theme */
+@theme-dominant-color-dark: #BF2A2A;
+@theme-dominant-color-light: #5B1A00;
+@theme-dominant-color-ultra-light: #F6B093; 
+
+@theme-contrast-color: #2980B9; /* Dominant color of theme, main logo */
+@theme-contrast-color-dark: #1E5D86;
+@theme-contrast-color-light: #679FC5;
+@theme-contrast-color-ultra-light: #CDE7F9;
 
 @theme-neutral-color: #f5f5f5; /* Light, neutral color.  Typically page background. */
 
@@ -132,13 +133,13 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	Button that has full background color.
 */
 .button-full {
-	background-color: @theme-contrast-color;
+	background-color: @theme-dominant-color;
 	color: white;
 	font-size: 16px;
 }
 
 .button-full:hover {
-	background-color: @theme-contrast-color;
+	background-color: @theme-dominant-color;
 	color: white;
 	font-size: 16px;
 }
@@ -147,27 +148,27 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	Button that has no background, but a border.
 */
 .button-line {
-	color: @theme-contrast-color;
+	color: @theme-dominant-color;
 	border: 1px;
-	border-color: @theme-contrast-color;
+	border-color: @theme-dominant-color;
 	border-style: solid;
 	background: transparent;
 	font-size: 15px;
 }
 
 .button-line:hover {
-	color: @theme-contrast-color;
+	color: @theme-dominant-color;
 	border: 1px;
-	border-color: @theme-contrast-color;
+	border-color: @theme-dominant-color;
 	border-style: solid;
 	background: transparent;
 	font-size: 15px;
 }
 
 .button-line.active {
-	color: @theme-contrast-color;
+	color: @theme-dominant-color;
 	border: 1px;
-	border-color: @theme-contrast-color;
+	border-color: @theme-dominant-color;
 	background: transparent;
 	font-size: 15px;
 }
@@ -183,13 +184,13 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .button-empty hover {
-	color: @theme-contrast-color;
-	background-color: @theme-contrast-color;
+	color: @theme-dominant-color;
+	background-color: @theme-dominant-color;
 	font-size: 15px;
 }
 
 .button-empty.active {
-	color: @theme-contrast-color;
+	color: @theme-dominant-color;
 }
 
 /*
@@ -205,12 +206,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .button-link:hover {
-	color: @theme-contrast-color;
+	color: @theme-dominant-color;
 	text-decoration: underline;
 }
 
 .button-link.active {
-	color: @theme-contrast-color;
+	color: @theme-dominant-color;
 	font-weight: bold;
 	padding: 0px;
 }
@@ -227,12 +228,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .button-active-link:hover {
-	background-color: @theme-dominant-color-ultra-light;
-	/* background-color: @theme-dominant-color; */
+	background-color: @theme-contrast-color-ultra-light;
+	/* background-color: @theme-contrast-color; */
 }
 
 .button-active-link.active {
-	color: @theme-dominant-color;
+	color: @theme-contrast-color;
 	font-weight: bold;
 }
 
@@ -248,16 +249,16 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 .button-setting:hover {
 	color: white;
-	background: @theme-contrast-color;
+	background: @theme-dominant-color;
 	font-size: 1.1em;
-	border: 1px solid @theme-contrast-color;
+	border: 1px solid @theme-dominant-color;
 }
 
 .button-setting.active {
 	color: white;
-	background: @theme-contrast-color;
+	background: @theme-dominant-color;
 	font-size: 1.1em;
-	border: 1px solid @theme-contrast-color;
+	border: 1px solid @theme-dominant-color;
 }
 
 .button-setting.disabled {
@@ -414,7 +415,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .link-gray:hover {
-	color: @theme-dominant-color-dark;
+	color: @theme-contrast-color-dark;
 }
 
 .link-black {
@@ -430,7 +431,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .link-theme:hover{
-	color: @theme-dominant-color-dark;
+	color: @theme-contrast-color-dark;
 }
 /********************************** DRAG / DROP RELATED ******************/
 
@@ -438,7 +439,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	/* position: relative; */
 	display: table;
 
-	border: 5px dotted @theme-contrast-color;
+	border: 5px dotted @theme-dominant-color;
 	border-radius: 20px;
 	color: gray;
 	font: 24px/200px arial;
@@ -540,14 +541,14 @@ img {
 }
 
 .thumbnailElement.active {
-	background-color: @theme-contrast-color-light;
+	background-color: @theme-dominant-color-light;
 }
 
 /*
 	Hover effect on thumbnail elements
 */
 .elementHover:hover {
-	background-color: @theme-contrast-color-light;
+	background-color: @theme-dominant-color-light;
 	cursor: pointer;
 }
 
@@ -673,7 +674,7 @@ input[type=range] .timelapseRange  {
     position:absolute;
     background: rgba(0, 0, 0, 0);
     border: 0px;
-   	color: @theme-contrast-color;
+   	color: @theme-dominant-color;
     display:none;
 }
 
@@ -1099,7 +1100,7 @@ input[type=range] .range-setting {
 .sidebarHeading {
 	width: 100%;
 	padding: 5px 10px 5px 10px;
-	background-color: @theme-dominant-color-light;
+	background-color: @theme-contrast-color-light;
 	color: white;
 	.text-plain-medium;
 }
@@ -1115,7 +1116,7 @@ input[type=range] .range-setting {
 }
 
 .sidebarLink:hover {
-	color: @theme-contrast-color-dark;
+	color: @theme-dominant-color-dark;
 }
 
 .sidebarSeparator {
@@ -1160,15 +1161,15 @@ already matches the navbar height */
 }
 
 .navbar-link {
-	color: @theme-contrast-color;
+	color: @theme-dominant-color;
 }
 
 ul.nav > li > a:hover {
-	background: @theme-contrast-color-ultra-light;
+	background: @theme-dominant-color-ultra-light;
 }
 
 ul.nav li.dropdown.open > a {
-	background: @theme-contrast-color-ultra-light;
+	background: @theme-dominant-color-ultra-light;
 	padding-top: 0px;
 	padding-bottom: 0px;
 }

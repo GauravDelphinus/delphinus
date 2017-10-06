@@ -1,3 +1,13 @@
+/********************************** COLORS AND THEMES *****************************/
+/****
+Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
+Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
+****/
+/** THEME COLORS **/
+/* Dominant color of theme, main logo */
+/* Contrast color for theme */
+/* Light, neutral color.  Typically page background. */
+/** GRAYS **/
 /********************************* CENTER DISPLAY **************************/
 /*
 	The Center Display shows a centered container with a rounded
@@ -69,81 +79,6 @@
   float: right;
 }
 /********************************** MODIFIERS *****************************/
-/********************************** COLOR MODIFIERS *****************************/
-/****
-Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
-Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
-****/
-/* GUIDELINES */
-/*
-
-@theme-dominant-color: Dominant color of theme
-- Main logo
-
-@theme-dominant-color-dark: Darker shade of dominant color
-- Hover text color for links
-- Headings/titles text color, or inverted background color (with white text)
-
-@theme-contrast-color: Triad color of dominant color
-- Action buttons (Post Entry, Share entry, etc.)
-
-@theme-contrast-color-dark: Darker shade of triad color
-
-@theme-neutral-color: Light triad color
-- Background color for header/footer, etc.
-- Background color for panels, sidebars, etc.
-- Background color for elements with hover effect, etc.
-
-*/
-/* Animal Planet - Shades */
-/*
-@theme-accent-color-1: #465E1B;
-@theme-accent-color-2: #AEEA44;
-@theme-dominant-color: #759E2E;
-@theme-accent-color-3: #7EAB32;
-@theme-accent-color-4: #628427;
-*/
-/* Tropicana - Shades */
-/*
-@theme-accent-color-1: #013518;
-@theme-accent-color-2: #05C156;
-@theme-dominant-color: #037534;
-@theme-accent-color-3: #03823A;
-@theme-accent-color-4: #025B29;
-*/
-/* http://www.colourlovers.com/palette/580974/Adrift_in_Dreams */
-/*
-@theme-accent-color-1: #CFF09E;
-@theme-accent-color-2: #A8DBA8;
-@theme-dominant-color: #3B8686;
-@theme-accent-color-3: #79BD9A;
-@theme-accent-color-4: #0B486B;
-*/
-/* Testing */
-.color-ultra-light {
-  color: #679FC5;
-}
-.color-light {
-  color: #679FC5;
-}
-.color-standard {
-  color: #2980B9;
-}
-.color-dark {
-  color: #1E5D86;
-}
-.gray-ultra-light {
-  color: #d9d9d9;
-}
-.gray-light {
-  color: #a6a6a6;
-}
-.gray-standard {
-  color: #808080;
-}
-.gray-dark {
-  color: #595959;
-}
 /********************************** BUTTON MODIFIERS *****************************/
 .button-full-width {
   width: 100%;
@@ -244,7 +179,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 .button-active-link:hover {
   background-color: #CDE7F9;
-  /* background-color: @theme-dominant-color; */
+  /* background-color: @theme-contrast-color; */
 }
 .button-active-link.active {
   color: #2980B9;
