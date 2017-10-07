@@ -1,5 +1,10 @@
 function createMainElement(data, contentTag) {
 	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "mainElement"});
+	if (data.type == "entry") {
+		element.addClass("entry-element");
+	} else if (data.type == "challenge") {
+		element.addClass("challenge-element");
+	}
 
 	if (data.postedDate) {
 		element.append(createPostHeaderElement(data, contentTag));
@@ -28,6 +33,11 @@ function createMainElement(data, contentTag) {
 
 function createScrollableElement(data, contentTag, compressed = false) {
 	var element = $("<div>", {id: contentTag + data.id + "ScrollableElement", class: "scrollableElement"});
+	if (data.type == "entry") {
+		element.addClass("entry-element");
+	} else if (data.type == "challenge") {
+		element.addClass("challenge-element");
+	}
 
 	if (data.postedDate) {
 		element.append(createPostHeaderElement(data, contentTag));
@@ -64,6 +74,11 @@ function createScrollableElement(data, contentTag, compressed = false) {
 
 function createFeedElement(data, contentTag) {
 	var element = $("<div>", {id: contentTag + data.id + "FeedElement", class: "feedElement"});
+	if (data.type == "entry") {
+		element.addClass("entry-element");
+	} else if (data.type == "challenge") {
+		element.addClass("challenge-element");
+	}
 
 	if (data.activity && data.activity.type != "recentlyPosted") {
 		element.append(createActivitySectionElement(data, contentTag));
@@ -110,6 +125,11 @@ function createFeedElement(data, contentTag) {
 
 function createThumbnailElement(data, contentTag, createLink) {
 	var element = $("<div>", {class: "thumbnailElement"});
+	if (data.type == "entry") {
+		element.addClass("entry-element");
+	} else if (data.type == "challenge") {
+		element.addClass("challenge-element");
+	}
 
 	if (data.postedDate) {
 		element.append(createPostHeaderElement(data, contentTag));

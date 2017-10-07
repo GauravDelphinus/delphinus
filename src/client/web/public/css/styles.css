@@ -8,6 +8,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 /* Contrast color of theme */
 /* Light, neutral color.  Typically page background. */
 /** GRAYS **/
+/** Challenge and Entry colors */
 /********************************* CENTER DISPLAY **************************/
 /*
 	The Center Display shows a centered container with a rounded
@@ -406,7 +407,6 @@ img {
   max-width: 100%;
 }
 .floatingElement {
-  background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
@@ -445,12 +445,20 @@ img {
   height: 10px;
 }
 /***************************** Challenge / Entry / Entity Related *********************/
+.challenge-element {
+  background-color: #fffcf3;
+}
+.entry-element {
+  background-color: #f7fcff;
+}
+.general-element {
+  background-color: white;
+}
 /*
 	Main Element - e.g., Challenge on the /challenge page, and Entry on the /entry page
 */
 .mainElement {
   margin: 0px 0px 20px 0px;
-  background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
@@ -461,7 +469,6 @@ img {
 */
 .feedElement {
   margin: 0px 0px 20px 0px;
-  background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
@@ -472,7 +479,6 @@ img {
 */
 .scrollableElement {
   margin: 0px 0px 20px 0px;
-  background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
@@ -487,7 +493,6 @@ img {
 */
 .thumbnailElement {
   margin: 0px 0px 10px 0px;
-  background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
@@ -995,11 +1000,11 @@ input[type=range] .range-setting {
 .sidebar {
   width: 100%;
   margin: 0px 0px 10px 0px;
-  background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
   box-shadow: 0px 0px 2px 0px #D3D3D3;
+  background-color: white;
 }
 .framelessSidebar {
   width: 100%;

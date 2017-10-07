@@ -203,7 +203,6 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 			}
 
 			followersButton.click(function(e) {
-				console.log("followers button clicked, contentTag = " + contentTag);
 				showHideFollowersList(data.id, contentTag, true);
 			});
 			socialStatus.append(followersButton);
@@ -308,7 +307,7 @@ function showHideFollowersList(userId, contentTag, show) {
 		}
 
 		//make sure the tab is 'active', not just 'shown'
-		$('#' + contentTag + userId + 'Tabs a[href="#followers"]').tab('show');
+		$('#' + userId + 'Tabs a[href="#followers"]').tab('show');
 	} else {
 		if (!$("#" + contentTag + userId + "FollowersContainer").is(":empty")) {
 			$("#" + contentTag + userId + "FollowersContainer").empty();

@@ -83,7 +83,7 @@ function showHideCommentsList(parentId, contentTag, show) {
 		}
 
 		//make sure the tab is 'active', not just 'shown'
-		$('#' + contentTag + parentId + 'Tabs a[href="#comments"]').tab('show');
+		$('#' + parentId + 'Tabs a[href="#comments"]').tab('show');
 	} else {
 		if (!$("#" + contentTag + parentId + "CommentsContainer").is(":empty")) {
 			$("#" + contentTag + parentId + "CommentsContainer").empty();

@@ -26,6 +26,10 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 @gray-light: #888888;
 @gray-ultra-light: #d9d9d9;
 
+/** Challenge and Entry colors */
+@light-gold: #fffcf3;
+@light-blue: #f7fcff;
+
 /********************************* CENTER DISPLAY **************************/
 /*
 	The Center Display shows a centered container with a rounded
@@ -512,7 +516,6 @@ img {
 }
 
 .floatingElement {
-	background-color: white;
 	border-style: solid;
 	border-width: 0.1px;
 	border-color: #D3D3D3;
@@ -558,7 +561,17 @@ img {
 
 /***************************** Challenge / Entry / Entity Related *********************/
 
+.challenge-element {
+	background-color: @light-gold;
+}
 
+.entry-element {
+	background-color: @light-blue;
+}
+
+.general-element {
+	background-color: white;
+}
 
 /*
 	Main Element - e.g., Challenge on the /challenge page, and Entry on the /entry page
@@ -1173,6 +1186,7 @@ input[type=range] .range-setting {
 	width: 100%;
 	margin: 0px 0px 10px 0px;
 	.floatingElement;
+	.general-element;
 }
 
 .framelessSidebar {

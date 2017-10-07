@@ -18,7 +18,7 @@ $(document).ready(function(){
 
 function setupMainItem() {
 	$.getJSON('/api/challenges/' + challengeId, function(data) {
-		var mainElement = createMainElement(data);
+		var mainElement = createMainElement(data, "main");
 		$("#main").append(mainElement);
 	}).fail(function() {
 		window.location.replace("/error");
