@@ -3,15 +3,31 @@
 	Update the given sidebar with the given list of items
 	Each item in the list is an object of form {type: "link or button or separator", name: "Name", link: "some link"}
 **/
-function updateSidebar(id, heading, content) {
-	var sidebar = $("#" + id);
-	$(sidebar).empty();
+function createSidebar(id, heading, content) {
+	var sidebar = $("<div>", {id: id, class: "sidebar"});
 
 	//set the title
 	$(sidebar).append($("<div>", {class: "sidebarHeading"}).append(heading));
 
 	var sidebarContent = $("<div>", {class: "sidebarContent"}).appendTo($(sidebar));
 	sidebarContent.append(content);
+
+	return sidebar;
+}
+
+/**
+	Frameless sidebar.  It only has a title, no background.  You simply append the provided
+	content below the title.
+**/
+function createFramelessSidebar(id, heading, content) {
+	var sidebar = $("<div>", {id: id, class: "framelessSidebar"});
+
+	//set the title
+	$(sidebar).append($("<div>", {class: "sidebarHeading"}).append(heading));
+
+	$(sidebar).append(content);
+
+	return sidebar;
 }
 
 function createSimpleLinkList(list) {
@@ -27,17 +43,18 @@ function createSimpleLinkList(list) {
 	return listContent;
 }
 
-function createCategorySidebar() {
+function createCategorySidebar(callback) {
 	var list = [];
 	$.getJSON("/api/categories/", function(result) {
 		for (var i = 0; i < result.length; i++) {
 			list.push({type: "link", name: result[i].name, link: "/challenges/?category=" + result[i].id});
 		}
 
-		updateSidebar("categoriesSidebar", "Categories", createSimpleLinkList(list));
+		var sidebar = createSidebar("categoriesSidebar", "Categories", createSimpleLinkList(list));
+		return callback(sidebar);
 	})
 	.fail(function() {
-		//eat this
+		return callback(null);
 	});
 }
 
@@ -77,75 +94,36 @@ function updateRichSidebar(id, heading, list, singleColumn) {
 	}
 }
 
-function createPopularChallengesSidebar() {
+function createPopularChallengesSidebar(callback) {
 	var list = [];
 	$.getJSON("/api/challenges?sortBy=popularity", function(list) {
-		/*
-		for (var i = 0; i < result.length; i++) {
-			var data = result[i];
-			var description = "";
-			if (data.socialStatus.likes && data.socialStatus.likes.numLikes > 0) {
-				description += data.socialStatus.likes.numLikes + " Likes";
-			}
-			if (data.socialStatus.shares && data.socialStatus.shares.numShares > 0) {
-				description += (description.length > 0) ? (", ") : ("");
-				description += data.socialStatus.shares.numShares + " Shares";
-			}
-			if (data.socialStatus.comments && data.socialStatus.comments.numComments > 0) {
-				description += (description.length > 0) ? (", ") : ("");
-				description += data.socialStatus.comments.numComments + " Comments";
-			}
-			if (data.socialStatus.entries && data.socialStatus.entries.numEntries > 0) {
-				description += (description.length > 0) ? (", ") : ("");
-				description += data.socialStatus.entries.numEntries + " Entries";
-			}
-
-			list.push({image: data.image, name: data.caption, link: data.link, description: description});
-		}
-
-		updateRichSidebar("popularChallengesSidebar", "Popular Challenges", list, true);
-		*/
-
 		var scrollableList = createScrollableList("popularChallengesScrollableList", list, true);
 
-		updateSidebar("popularChallengesSidebar", "Popular Challenges", scrollableList);
+		var sidebar = createFramelessSidebar("popularChallengesSidebar", "Popular Challenges", scrollableList);
+		return callback(sidebar);
 	})
 	.fail(function() {
-		//eat this
+		return callback(null);
 	});
 }
 
-function createPopularEntriesSidebar() {
+function createPopularEntriesSidebar(callback) {
 	var list = [];
-	$.getJSON("/api/entries?sortBy=popularity", function(result) {
-		for (var i = 0; i < result.length; i++) {
-			var data = result[i];
-			var description = "";
-			if (data.socialStatus.likes && data.socialStatus.likes.numLikes > 0) {
-				description += data.socialStatus.likes.numLikes + " Likes";
-			}
-			if (data.socialStatus.shares && data.socialStatus.shares.numShares > 0) {
-				description += (description.length > 0) ? (", ") : ("");
-				description += data.socialStatus.shares.numShares + " Shares";
-			}
-			if (data.socialStatus.comments && data.socialStatus.comments.numComments > 0) {
-				description += (description.length > 0) ? (", ") : ("");
-				description += data.socialStatus.comments.numComments + " Comments";
-			}
+	$.getJSON("/api/entries?sortBy=popularity", function(list) {
+		var scrollableList = createScrollableList("popularEntriesScrollableList", list, true);
 
-			list.push({image: data.image, name: data.caption, link: data.link, description: description});
-		}
-
-		updateRichSidebar("popularEntriesSidebar", "Popular Entries", list, true);
+		var sidebar = createFramelessSidebar("popularEntriesSidebar", "Popular Entries", scrollableList);
+		return callback(sidebar);
 	})
 	.fail(function() {
-		//eat this
+		return callback(null);
 	});
 }
 
-function createPopularUsersSidebar() {
+function createPopularUsersSidebar(callback) {
 	var list = [];
-	$.getJSON("/api/users?sortBy=popularity", function(result) {
+	$.getJSON("/api/users?sortBy=popularity", function(list) {
+		/*
 		for (var i = 0; i < result.length; i++) {
 			var data = result[i];
 			var description = "";
@@ -159,11 +137,15 @@ function createPopularUsersSidebar() {
 
 			list.push({image: data.image, name: data.caption, link: data.link, description: description});
 		}
+		*/
 
-		updateRichSidebar("popularUsersSidebar", "Popular Users", list, true);
+		var scrollableList = createScrollableList("popularUsersScrollableList", list, true);
+
+		var sidebar = createFramelessSidebar("popularUsersSidebar", "Popular Users", scrollableList);
+		return callback(sidebar);
 	})
 	.fail(function() {
-		//eat this
+		return callback(null);
 	});
 }
 

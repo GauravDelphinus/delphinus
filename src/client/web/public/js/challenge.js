@@ -1,7 +1,9 @@
 $(document).ready(function(){
 	createLoginHeader();
 
-	createCategorySidebar();
+	createCategorySidebar(function(sidebar) {
+		$("#leftMiddleSidebar").append(sidebar);
+	});
 
 	setupMainItem();
 

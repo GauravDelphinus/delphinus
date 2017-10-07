@@ -5,7 +5,9 @@ $(document).ready(function(){
 
   	setupChallengeSidebar();
 
-  	createCategorySidebar();
+  	createCategorySidebar(function(sidebar) {
+		$("#leftMiddleSidebar").append(sidebar);
+	});
 
   	setupTabs();
 

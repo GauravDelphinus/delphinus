@@ -1,10 +1,14 @@
 $(document).ready(function(){
 	createLoginHeader();
 
-	createCategorySidebar();
-
-	createPopularChallengesSidebar();
-
+	createCategorySidebar(function(sidebar) {
+		$("#leftMiddleSidebar").append(sidebar);
+	});
+	
+	createPopularChallengesSidebar(function(sidebar) {
+		$("#rightSidebar").append(sidebar);
+	});
+	
 	setupFeed();
 
 	keepSidebarVisible();

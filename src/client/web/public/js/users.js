@@ -1,9 +1,13 @@
 $(document).ready(function(){
 	createLoginHeader();
 
-	createCategorySidebar();
+	createCategorySidebar(function(sidebar) {
+		$("#leftMiddleSidebar").append(sidebar);
+	});
 
-	createPopularUsersSidebar();
+	createPopularUsersSidebar(function(sidebar) {
+		$("#rightSidebar").append(sidebar);
+	});
 
 	setupMainItem();
 
