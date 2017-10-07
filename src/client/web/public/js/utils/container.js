@@ -129,6 +129,8 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 		container.append(sortGroup);
 	}
 
+	container.append($("<div>", {class: "clear-floats small-vertical-gap"}));
+
 	var getURL = sortOptions[0].url;
 
 	refreshListAndUpdateContent(getURL, entityId, contentTag, viewOptions[0].type);

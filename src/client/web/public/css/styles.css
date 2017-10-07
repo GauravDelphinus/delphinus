@@ -377,7 +377,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 **/
 body {
   font-family: Source Sans Pro, Helvetica, Arial, sans-serif;
-  padding-top: 50px;
+  padding-top: 60px;
   /* Push content below the navbar */
   background-color: #f5f5f5;
 }
@@ -419,12 +419,6 @@ img {
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
 }
-.top-expander {
-  height: 100%;
-}
-.bottom-expander {
-  height: 100%;
-}
 .flex-parent {
   display: -webkit-flex;
   /* Safari */
@@ -437,12 +431,21 @@ img {
   /* IE 10 */
   flex: 1;
 }
+.container-with-floats {
+  overflow: auto;
+}
+.clear-floats {
+  clear: both;
+}
+.small-vertical-gap {
+  height: 10px;
+}
 /***************************** Challenge / Entry / Entity Related *********************/
 /*
 	Main Element - e.g., Challenge on the /challenge page, and Entry on the /entry page
 */
 .mainElement {
-  margin: 10px 0px;
+  margin: 0px 0px 20px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
@@ -453,7 +456,7 @@ img {
 	Feed Element - e.g., one of the elements in the Home Feed View.
 */
 .feedElement {
-  margin: 10px 0px;
+  margin: 0px 0px 20px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
@@ -464,7 +467,7 @@ img {
 	Scrollable Element - when you click on the FilmStrip view
 */
 .scrollableElement {
-  margin: 10px 0px;
+  margin: 0px 0px 20px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
@@ -479,17 +482,12 @@ img {
 	Thumbnail Element - when you click on the Grid / Thumbnail view
 */
 .thumbnailElement {
-  margin: 10px 0px;
+  margin: 0px 0px 10px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
   box-shadow: 0px 0px 2px 0px #D3D3D3;
-  -webkit-flex: 1;
-  /* Safari 6.1+ */
-  -ms-flex: 1;
-  /* IE 10 */
-  flex: 1;
 }
 .thumbnailElement.active {
   background-color: #5B1A00;
@@ -969,7 +967,7 @@ input[type=range] .range-setting {
 /************************** Side bar ***************************/
 .sidebar {
   width: 100%;
-  margin: 10px 0px;
+  margin: 0px 0px 10px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
@@ -978,7 +976,7 @@ input[type=range] .range-setting {
 }
 .framelessSidebar {
   width: 100%;
-  margin: 10px 0px;
+  margin: 0px 0px 10px 0px;
 }
 .sidebarHeading {
   width: 100%;

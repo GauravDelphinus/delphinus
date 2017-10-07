@@ -469,7 +469,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 **/
 body {
 	font-family: Source Sans Pro,Helvetica,Arial,sans-serif;
-	padding-top: 50px; /* Push content below the navbar */
+	padding-top: 60px; /* Push content below the navbar */
 	background-color: @theme-neutral-color;
 }
 
@@ -529,6 +529,18 @@ img {
     flex: 1;
 }
 
+.container-with-floats {
+	overflow: auto;
+}
+
+.clear-floats {
+	clear: both;
+}
+
+.small-vertical-gap {
+	height: 10px;
+}
+
 /***************************** Challenge / Entry / Entity Related *********************/
 
 
@@ -537,7 +549,7 @@ img {
 	Main Element - e.g., Challenge on the /challenge page, and Entry on the /entry page
 */
 .mainElement {
-	margin: 10px 0px;
+	margin: 0px 0px 20px 0px;
 	.floatingElement;
 }
 
@@ -545,7 +557,7 @@ img {
 	Feed Element - e.g., one of the elements in the Home Feed View.
 */
 .feedElement {
-	margin: 10px 0px;
+	margin: 0px 0px 20px 0px;
 	.floatingElement;
 }
 
@@ -553,7 +565,7 @@ img {
 	Scrollable Element - when you click on the FilmStrip view
 */
 .scrollableElement {
-	margin: 10px 0px;
+	margin: 0px 0px 20px 0px;
 	.floatingElement;
 }
 
@@ -566,7 +578,7 @@ img {
 	Thumbnail Element - when you click on the Grid / Thumbnail view
 */
 .thumbnailElement {
-	margin: 10px 0px;
+	margin: 0px 0px 10px 0px;
 	.floatingElement;
 }
 
@@ -1120,13 +1132,13 @@ input[type=range] .range-setting {
 
 .sidebar {
 	width: 100%;
-	margin: 10px 0px;
+	margin: 0px 0px 10px 0px;
 	.floatingElement;
 }
 
 .framelessSidebar {
 	width: 100%;
-	margin: 10px 0px;
+	margin: 0px 0px 10px 0px;
 }
 
 .sidebarHeading {
