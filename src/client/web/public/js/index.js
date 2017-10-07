@@ -1,9 +1,5 @@
 $(document).ready(function(){
 	createLoginHeader();
-
-	createCategorySidebar(function(sidebar) {
-		$("#leftMiddleSidebar").append(sidebar);
-	});
 	
 	createPopularChallengesSidebar(function(sidebar) {
 		$("#rightSidebar").append(sidebar);

@@ -356,16 +356,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	.text-bold;
 }
 
-/********************************* GENERAL - LINKS *********************/
+/********************************* GENERAL - HR *********************/
 
-.primary-link {
-	
+hr {
+	margin-top: 5px;
+	margin-bottom: 5px;
 }
-
-.secondary-link {
-	
-}
-
 
 
 /********************************* TITLES / HEADINGS *********************/
@@ -1211,22 +1207,24 @@ input[type=range] .range-setting {
 .sidebar {
 	width: 100%;
 	margin: 0px 0px 10px 0px;
-	.floatingElement;
+	/* .floatingElement; */
 	.general-element;
+	overflow: hidden;
+	.floatingElement;
 }
 
 .framelessSidebar {
 	width: 100%;
 	margin: 0px 0px 10px 0px;
+	.floatingElement;
 }
 
 .sidebarHeading {
-	width: 100%;
+	width: 100%; 
 	padding: 5px 10px 5px 10px;
-	background-color: @theme-contrast-color-light;
-	color: white;
+	/* background-color: white; */
+	color: @theme-dominant-color;
 	.text-plain-medium;
-	.smallRoundedTopCorners;
 }
 
 .sidebarContent {

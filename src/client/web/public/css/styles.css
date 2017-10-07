@@ -277,7 +277,11 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   font-size: 17px;
   font-weight: bold;
 }
-/********************************* GENERAL - LINKS *********************/
+/********************************* GENERAL - HR *********************/
+hr {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
 /********************************* TITLES / HEADINGS *********************/
 .subHeading {
   background: #fff;
@@ -1020,24 +1024,28 @@ input[type=range] .range-setting {
 .sidebar {
   width: 100%;
   margin: 0px 0px 10px 0px;
+  /* .floatingElement; */
+  background-color: white;
+  overflow: hidden;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
   box-shadow: 0px 0px 2px 0px #D3D3D3;
-  background-color: white;
 }
 .framelessSidebar {
   width: 100%;
   margin: 0px 0px 10px 0px;
+  border-style: solid;
+  border-width: 0.1px;
+  border-color: #D3D3D3;
+  box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
 .sidebarHeading {
   width: 100%;
   padding: 5px 10px 5px 10px;
-  background-color: #679FC5;
-  color: white;
+  /* background-color: white; */
+  color: #8E2800;
   font-size: 15px;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
 }
 .sidebarContent {
   padding: 10px;
