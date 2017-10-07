@@ -4,7 +4,7 @@ function createMainElement(data, contentTag) {
 	if (data.postedDate) {
 		element.append(createPostHeaderElement(data, contentTag));
 	}
-	
+
 	element.append(createMainImageElement(data, contentTag));
 
 	if (data.caption && data.type != "entry") {
@@ -114,7 +114,6 @@ function createThumbnailElement(data, contentTag, createLink) {
 	if (data.postedDate) {
 		element.append(createPostHeaderElement(data, contentTag));
 	}
-
 
 	if(createLink) {
 		var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data, contentTag));

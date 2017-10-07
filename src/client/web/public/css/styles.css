@@ -408,12 +408,41 @@ img {
   border-color: #D3D3D3;
   box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
+.smallRoundedCorners {
+  border-radius: 5px;
+}
+.smallRoundedTopCorners {
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+.smallRoundedBottomCorners {
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+}
+.top-expander {
+  height: 100%;
+}
+.bottom-expander {
+  height: 100%;
+}
+.flex-parent {
+  display: -webkit-flex;
+  /* Safari */
+  display: flex;
+}
+.flex-child {
+  -webkit-flex: 1;
+  /* Safari 6.1+ */
+  -ms-flex: 1;
+  /* IE 10 */
+  flex: 1;
+}
 /***************************** Challenge / Entry / Entity Related *********************/
 /*
 	Main Element - e.g., Challenge on the /challenge page, and Entry on the /entry page
 */
 .mainElement {
-  margin: 20px 5px;
+  margin: 10px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
@@ -424,7 +453,7 @@ img {
 	Feed Element - e.g., one of the elements in the Home Feed View.
 */
 .feedElement {
-  margin: 20px 5px;
+  margin: 10px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
@@ -435,23 +464,32 @@ img {
 	Scrollable Element - when you click on the FilmStrip view
 */
 .scrollableElement {
-  margin: 20px 5px;
+  margin: 10px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
   box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
+/* Add left/right margins around the thumbnail elements */
+.gridCell {
+  padding: 0px 5px;
+}
 /*
 	Thumbnail Element - when you click on the Grid / Thumbnail view
 */
 .thumbnailElement {
-  margin: 5px 5px;
+  margin: 10px 0px;
   background-color: white;
   border-style: solid;
   border-width: 0.1px;
   border-color: #D3D3D3;
   box-shadow: 0px 0px 2px 0px #D3D3D3;
+  -webkit-flex: 1;
+  /* Safari 6.1+ */
+  -ms-flex: 1;
+  /* IE 10 */
+  flex: 1;
 }
 .thumbnailElement.active {
   background-color: #5B1A00;
@@ -931,11 +969,6 @@ input[type=range] .range-setting {
 /************************** Side bar ***************************/
 .sidebar {
   width: 100%;
-  /*
-	border: 1px dotted gray;
-	border-radius: 5px;
-	*/
-  /* padding: 10px; */
   margin: 10px 0px;
   background-color: white;
   border-style: solid;
@@ -943,15 +976,23 @@ input[type=range] .range-setting {
   border-color: #D3D3D3;
   box-shadow: 0px 0px 2px 0px #D3D3D3;
 }
+.framelessSidebar {
+  width: 100%;
+  margin: 10px 0px;
+}
 .sidebarHeading {
   width: 100%;
   padding: 5px 10px 5px 10px;
   background-color: #679FC5;
   color: white;
   font-size: 15px;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
 }
 .sidebarContent {
   padding: 10px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
 }
 .sidebarLink {
   display: block;
