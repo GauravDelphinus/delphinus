@@ -99,7 +99,7 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 	var container = $("<div>", {id: contentTag + "Container"});
 	appendTo.append(container);
 
-
+	var hasViewOrSortOptions = false;
 	if (viewOptions && viewOptions.length > 1) {
 		var viewGroup = $("<div>", {id: contentTag + "ViewGroup", class: "btn-group", "data-toggle": "buttons"});
 		for (var i = 0; i < viewOptions.length; i++) {
@@ -113,6 +113,7 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 			}
 		}
 		container.append(viewGroup);
+		hasViewOrSortOptions = true;
 	}
 
 	if (sortOptions && sortOptions.length > 1) {
@@ -127,9 +128,12 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 			}
 		}
 		container.append(sortGroup);
+		hasViewOrSortOptions = true;
 	}
 
-	container.append($("<div>", {class: "clear-floats small-vertical-gap"}));
+	if (hasViewOrSortOptions) {
+		container.append($("<div>", {class: "clear-floats small-vertical-gap"}));
+	}
 
 	var getURL = sortOptions[0].url;
 

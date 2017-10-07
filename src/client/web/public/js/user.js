@@ -1,7 +1,9 @@
 $(document).ready(function(){
 	createLoginHeader();
 
-	createCategorySidebar();
+	createCategorySidebar(function(sidebar) {
+		$("#leftMiddleSidebar").append(sidebar);
+	});
 
 	// NOTE:
 	// userInfo - whose page we're looking at
@@ -18,8 +20,6 @@ $(document).ready(function(){
 		}
 	}
 
-	console.log("profileType is " + profileType);
-
 	// Profile Image and Name
 	$("#profileImage").attr("src", userInfo.image);
 	$("#displayName").val(userInfo.displayName);
@@ -34,7 +34,9 @@ $(document).ready(function(){
 	// set up the social information
 	setupSocialSection(profileType);
 
-	createPopularUsersSidebar();
+	createPopularUsersSidebar(function(sidebar) {
+		$("#rightSidebar").append(sidebar);
+	});
 
 	setupTabs(profileType);
 });
