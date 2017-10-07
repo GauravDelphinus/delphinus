@@ -123,7 +123,7 @@ function sendLikeAction(restURL, likeAction, callback) {
 	});
 }
 
-function createSocialStatusSectionElement(data, contentTag, full /* Show all content */, showBorder = true) {
+function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	var socialStatus = $("<div>", {class: "socialStatusSection" + (showBorder ? " bottom-border" : ""), id: contentTag + data.id + "SocialStatusSection"});
 
 	// For Challenges and Entries

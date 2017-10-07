@@ -1,7 +1,10 @@
 function createMainElement(data, contentTag) {
 	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "mainElement"});
 
-	element.append(createPostHeaderElement(data, contentTag));
+	if (data.postedDate) {
+		element.append(createPostHeaderElement(data, contentTag));
+	}
+	
 	element.append(createMainImageElement(data, contentTag));
 
 	if (data.caption && data.type != "entry") {
@@ -26,7 +29,9 @@ function createMainElement(data, contentTag) {
 function createScrollableElement(data, contentTag, compressed = false) {
 	var element = $("<div>", {id: contentTag + data.id + "ScrollableElement", class: "scrollableElement"});
 
-	element.append(createPostHeaderElement(data, contentTag));
+	if (data.postedDate) {
+		element.append(createPostHeaderElement(data, contentTag));
+	}
 
 	var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data, contentTag));
 	element.append(imageLink);
@@ -40,7 +45,7 @@ function createScrollableElement(data, contentTag, compressed = false) {
 	}
 
 	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data, contentTag, true, !compressed));
+		element.append(createSocialStatusSectionElement(data, contentTag, !compressed));
 
 		if (!compressed) {
 			element.append(createSocialActionsSectionElement(data, contentTag));
@@ -64,7 +69,9 @@ function createFeedElement(data, contentTag) {
 		element.append(createActivitySectionElement(data, contentTag));
 	}
 
-	element.append(createPostHeaderElement(data, contentTag));
+	if (data.postedDate) {
+		element.append(createPostHeaderElement(data, contentTag));
+	}
 
 	if (data.text) {
 		element.append(createTextSection(data, contentTag));
@@ -126,8 +133,8 @@ function createThumbnailElement(data, contentTag, createLink) {
 	}
 
 	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data, contentTag));
-		element.append(createSocialActionsSectionElement(data, contentTag));
+		element.append(createSocialStatusSectionElement(data, contentTag, false));
+		//element.append(createSocialActionsSectionElement(data, contentTag));
 	}
 
 	//container for comments, if any
