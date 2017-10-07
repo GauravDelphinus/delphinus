@@ -27,8 +27,10 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 @gray-ultra-light: #d9d9d9;
 
 /** Challenge and Entry colors */
-@light-gold: #fffcf3;
-@light-blue: #f7fcff;
+@challenge-color-ultra-light: #fffcf3;
+@challenge-color-light: #fff6da;
+@entry-color-ultra-light: #f7fcff;
+@entry-color-light: #def2ff;
 
 /********************************* CENTER DISPLAY **************************/
 /*
@@ -114,7 +116,13 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 /********************************** MODIFIERS *****************************/
 
+.low-top-margin {
+	margin-top: 0px;
+}
 
+.low-bottom-margin {
+	margin-bottom: 0px;
+}
 
 /********************************** BUTTON MODIFIERS *****************************/
 
@@ -343,6 +351,11 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	color: @gray-light;
 }
 
+.main-title {
+	.text-plain-large;
+	.text-bold;
+}
+
 /********************************* GENERAL - LINKS *********************/
 
 .primary-link {
@@ -562,11 +575,19 @@ img {
 /***************************** Challenge / Entry / Entity Related *********************/
 
 .challenge-element {
-	background-color: @light-gold;
+	background-color: @challenge-color-ultra-light;
+}
+
+.challenge-title {
+	background-color: @challenge-color-light;
 }
 
 .entry-element {
-	background-color: @light-blue;
+	background-color: @entry-color-ultra-light;
+}
+
+.entry-title {
+	background-color: @entry-color-light;
 }
 
 .general-element {
@@ -632,6 +653,11 @@ img {
 	border-bottom-style: solid;
 	border-width: 0.1px;
 	border-color: gray;
+}
+
+.titleSection {
+	padding: 5px 10px;
+	text-align: center;
 }
 
 /*

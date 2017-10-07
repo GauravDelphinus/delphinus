@@ -80,6 +80,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   float: right;
 }
 /********************************** MODIFIERS *****************************/
+.low-top-margin {
+  margin-top: 0px;
+}
+.low-bottom-margin {
+  margin-bottom: 0px;
+}
 /********************************** BUTTON MODIFIERS *****************************/
 .button-full-width {
   width: 100%;
@@ -267,6 +273,10 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
   font-size: 13px;
   color: #888888;
 }
+.main-title {
+  font-size: 17px;
+  font-weight: bold;
+}
 /********************************* GENERAL - LINKS *********************/
 /********************************* TITLES / HEADINGS *********************/
 .subHeading {
@@ -448,8 +458,14 @@ img {
 .challenge-element {
   background-color: #fffcf3;
 }
+.challenge-title {
+  background-color: #fff6da;
+}
 .entry-element {
   background-color: #f7fcff;
+}
+.entry-title {
+  background-color: #def2ff;
 }
 .general-element {
   background-color: white;
@@ -518,6 +534,10 @@ img {
   border-bottom-style: solid;
   border-width: 0.1px;
   border-color: gray;
+}
+.titleSection {
+  padding: 5px 10px;
+  text-align: center;
 }
 /*
 	Header of the Element that includes things like Poster, Posted Date and the Drop-down menu.

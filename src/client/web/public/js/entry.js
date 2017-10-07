@@ -3,7 +3,7 @@ $(document).ready(function(){
 
   	setupMainItem();
 
-  	setupChallengeSidebar();
+  	setupSidebars();
 
   	createCategorySidebar(function(sidebar) {
 		$("#leftMiddleSidebar").append(sidebar);
@@ -32,16 +32,32 @@ function setupTabs() {
 	setupTabRedirection(entryId);
 }
 
-function setupChallengeSidebar() {
+function setupSidebars() {
 	if (challengeId != 0) {
-		$.getJSON('/api/challenges/' + challengeId, function(data) {
-			var element = createThumbnailElement(data);
-			$("#challenge").append(element);
-		}).fail(function() {
-			window.location.replace("/error");
+  		createChallengeSidebar(challengeId, function(sidebar) {
+	  		if (sidebar) {
+	  			$("#rightTopSidebar").append(sidebar);
+
+	  			createChallengeCaptionSidebar(challengeId, function(sidebar) {
+	  				if (sidebar) {
+	  					$("#rightMiddleSidebar").append(sidebar);
+	  				}
+	  			});
+	  		} else {
+	  			createIndependentCaptionSidebar(function(sidebar) {
+	  				if (sidebar) {
+	  					$("#rightTopSidebar").append(sidebar);
+	  				}
+	  			});
+	  		}
+	  	});
+  	} else {
+  		createIndependentCaptionSidebar(function(sidebar) {
+			if (sidebar) {
+				$("#rightTopSidebar").append(sidebar);
+			}
 		});
-	}
-	
+  	}
 }
 
 function setupCommentsTab() {

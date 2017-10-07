@@ -149,6 +149,48 @@ function createPopularUsersSidebar(callback) {
 	});
 }
 
+function createChallengeSidebar(challengeId, callback) {
+	if (challengeId != 0) {
+		$.getJSON('/api/challenges/' + challengeId, function(data) {
+			var element = createThumbnailElement(data, "challenge", true);
+			var sidebar = createFramelessSidebar("challengeSidebar", "Challenge", element);
+			return callback(sidebar);
+		}).fail(function() {
+			return callback(null);
+		});
+	}
+}
+
+function createChallengeCaptionSidebar(challengeId, callback) {
+	var content = $("<div>", {class: "wide-container"});
+	var message = $("<p>", {class: "text-plain-medium"}).append("Up for the challenge? Let your creative juices flow and create your own caption entry for this challenge now!  It takes just a few seconds!");
+	var button = $("<button>", {class: "btn btn-lg button-full"}).append("Create Caption");
+	content.append(message).append(button);
+
+	var sidebar = createSidebar("createChallengeCaptionSidebar", "Create your Caption!", content);
+
+	button.click(function() {
+		window.open("/newentry?challengeId=" + challengeId, "_self");
+	});
+
+	return callback(sidebar);
+}
+
+function createIndependentCaptionSidebar(callback) {
+	var content = $("<div>", {class: "wide-container"});
+	var message = $("<p>", {class: "text-plain-medium"}).append("Let your creative juices flow and create your own caption entry now!  Choose your own image or select among some cool background designs!  It takes just a few seconds!");
+	var button = $("<button>", {class: "btn btn-lg button-full"}).append("Create Caption");
+	content.append(message).append(button);
+
+	var sidebar = createSidebar("createCaptionSidebar", "Create your Caption!", content);
+
+	button.click(function() {
+		window.open("/newentry", "_self");
+	});
+
+	return callback(sidebar);
+}
+
 /*
 	Update the Shortcuts sidebar with the User Profile link, incase the user is signed in
 */

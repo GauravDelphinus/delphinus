@@ -5,6 +5,8 @@ $(document).ready(function(){
 		$("#leftMiddleSidebar").append(sidebar);
 	});
 
+	setupCaptionSidebar();
+
 	setupMainItem();
 
 	setupTabs();
@@ -34,6 +36,14 @@ function setupTabs() {
 	setupCommentsTab();
 
 	setupTabRedirection(challengeId);
+}
+
+function setupCaptionSidebar() {
+	createChallengeCaptionSidebar(challengeId, function(sidebar) {
+		if (sidebar) {
+			$("#rightTopSidebar").append(sidebar);
+		}
+	});
 }
 
 function setupEntriesTab() {
