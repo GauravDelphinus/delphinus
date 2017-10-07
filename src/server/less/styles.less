@@ -6,12 +6,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 /** THEME COLORS **/
 
-@theme-dominant-color: #8E2800; /* Contrast color for theme */
+@theme-dominant-color: #8E2800; /* Dominant color for theme, main logo */
 @theme-dominant-color-dark: #BF2A2A;
 @theme-dominant-color-light: #5B1A00;
 @theme-dominant-color-ultra-light: #F6B093; 
 
-@theme-contrast-color: #2980B9; /* Dominant color of theme, main logo */
+@theme-contrast-color: #2980B9; /* Contrast color of theme */
 @theme-contrast-color-dark: #1E5D86;
 @theme-contrast-color-light: #679FC5;
 @theme-contrast-color-ultra-light: #CDE7F9;
@@ -20,10 +20,10 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 /** GRAYS **/
 
-@gray-standard: #808080;
+@gray-standard: #676969;
 @gray-dark: #595959;
 @gray-ultra-dark: #303030;
-@gray-light: #a6a6a6;
+@gray-light: #888888;
 @gray-ultra-light: #d9d9d9;
 
 /********************************* CENTER DISPLAY **************************/
@@ -198,7 +198,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 */
 .button-link {
 	background-color: transparent;
-	color: #676969;
+	color: @gray-standard;
 	/* padding: 8px; */
 	/* font-size: 1em; */
 	border: none;
@@ -334,7 +334,22 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	text-transform: uppercase;
 }
 
-/********************************* GENERAL / SELECT LISTS (CHOSEN) *********************/
+.secondary-info {
+	.text-plain-small;
+	color: @gray-light;
+}
+
+/********************************* GENERAL - LINKS *********************/
+
+.primary-link {
+	
+}
+
+.secondary-link {
+	
+}
+
+
 
 /********************************* TITLES / HEADINGS *********************/
 
@@ -615,6 +630,34 @@ img {
 	position: relative;
 }
 
+.posted-by {
+	color: @gray-dark;
+	.text-plain-small;
+	.text-bold;
+}
+
+.posted-by:hover {
+	color: @theme-dominant-color;
+	text-decoration: underline;
+}
+
+.posted-date {
+	.text-plain-small;
+	.text-italic;
+	color: @gray-light;
+}
+
+.posted-category {
+	.text-plain-small;
+	.text-italic;
+	color: @gray-light;
+}
+
+.posted-category:hover {
+	color: @theme-dominant-color;
+	text-decoration: underline;
+}
+
 /*
 	Main image (e.g. entity image or images in the FilmStrip view)
 	Expand to fit width of container.
@@ -864,10 +907,6 @@ input[type=range] .range-setting {
 
 .commentsRightColumn {
 	padding: 10px;
-}
-
-.commentPostedDate {
-
 }
 
 .socialStatusSectionSimple {

@@ -79,14 +79,14 @@ function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 
 	socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 
-	var numLikes = $("<span>", {id: contentTag + data.id + "NumLikes", class: "text-plain-small separator-small gray-light"}).append(data.socialStatus.likes.numLikes);
+	var numLikes = $("<span>", {id: contentTag + data.id + "NumLikes", class: "secondary-info separator-small"}).append(data.socialStatus.likes.numLikes);
 	socialStatusSection.append(numLikes);
 
-	socialStatusSection.append($("<span>", {text: " Likes", class: "text-plain-small gray-light"}));
+	socialStatusSection.append($("<span>", {text: " Likes", class: "secondary-info"}));
 
 	socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 
-	var postedDate = $("<span>", {class: "commentPostedDate separator-small text-plain-small gray-light", text: "" + formatDate(data.postedDate)});
+	var postedDate = $("<span>", {class: "secondary-info separator-small", text: "" + formatDate(data.postedDate)});
 	socialStatusSection.append("     ");
 	socialStatusSection.append(postedDate);
 

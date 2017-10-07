@@ -184,7 +184,7 @@ function createPostHeaderElement(data, contentTag) {
 	// Posted By Section
 	var postedBy = $("<div>");
 	var postedByName = $("<span>", {id: "postedByName"});
-	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName, class: "text-plain-small text-bold link-gray"}));
+	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName, class: "posted-by"}));
 	var postedByImage = $("<img>", {id: "postedByImage", class: "user-image-medium"});
 	postedByImage.prop("src", data.postedByUser.image);
 	postedBy.append(postedByName);
@@ -204,11 +204,11 @@ function createPostHeaderElement(data, contentTag) {
 
 	var tr2 = $("<tr>");
 	var postedDateTd = $("<td>");
-	var postedByDate = $("<span>", {id: "postedByDate", class: "text-plain-small text-italic", text: "Posted " + formatDate(data.postedDate)});
+	var postedByDate = $("<span>", {id: "postedByDate", class: "posted-date", text: "Posted " + formatDate(data.postedDate)});
 	postedByDate.append(postedByDate);
 
 	if (data.categoryID && data.categoryName) {
-		var postedCategory = $("<a>", {href: "/challenges?category=" + data.categoryID}).append(data.categoryName);
+		var postedCategory = $("<a>", {href: "/challenges?category=" + data.categoryID, class: "posted-category"}).append(data.categoryName);
 		postedByDate.append(" under ").append(postedCategory);
 	}
 	

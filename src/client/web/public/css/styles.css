@@ -4,8 +4,8 @@ Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B10
 Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
 ****/
 /** THEME COLORS **/
-/* Contrast color for theme */
-/* Dominant color of theme, main logo */
+/* Dominant color for theme, main logo */
+/* Contrast color of theme */
 /* Light, neutral color.  Typically page background. */
 /** GRAYS **/
 /********************************* CENTER DISPLAY **************************/
@@ -262,7 +262,11 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 .text-all-caps {
   text-transform: uppercase;
 }
-/********************************* GENERAL / SELECT LISTS (CHOSEN) *********************/
+.secondary-info {
+  font-size: 13px;
+  color: #888888;
+}
+/********************************* GENERAL - LINKS *********************/
 /********************************* TITLES / HEADINGS *********************/
 .subHeading {
   background: #fff;
@@ -518,6 +522,29 @@ img {
   /* Right margin is less to allow the Drop Down menu (caret) to be as right as possible */
   padding: 10px 0px;
   position: relative;
+}
+.posted-by {
+  color: #595959;
+  font-size: 13px;
+  font-weight: bold;
+}
+.posted-by:hover {
+  color: #8E2800;
+  text-decoration: underline;
+}
+.posted-date {
+  font-size: 13px;
+  font-style: italic;
+  color: #888888;
+}
+.posted-category {
+  font-size: 13px;
+  font-style: italic;
+  color: #888888;
+}
+.posted-category:hover {
+  color: #8E2800;
+  text-decoration: underline;
 }
 /*
 	Main image (e.g. entity image or images in the FilmStrip view)
