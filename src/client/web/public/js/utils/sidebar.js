@@ -50,7 +50,7 @@ function createCategorySidebar(callback) {
 			list.push({type: "link", name: result[i].name, link: "/challenges/?category=" + result[i].id});
 		}
 
-		var sidebar = createSidebar("categoriesSidebar", "Categories", createSimpleLinkList(list));
+		var sidebar = createSidebar("categoriesSidebar", "Challenge Categories", createSimpleLinkList(list));
 		return callback(sidebar);
 	})
 	.fail(function() {

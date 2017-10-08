@@ -5,10 +5,6 @@ $(document).ready(function(){
 
   	setupSidebars();
 
-  	createCategorySidebar(function(sidebar) {
-		$("#leftMiddleSidebar").append(sidebar);
-	});
-
   	setupTabs();
 
   	keepSidebarVisible();
