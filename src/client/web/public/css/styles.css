@@ -595,6 +595,7 @@ input[type=range] .timelapseRange {
 .socialStatusSection {
   margin: 5px 20px;
   padding: 10px 0px;
+  text-align: center;
 }
 .bottom-border {
   border-bottom-style: solid;
@@ -604,6 +605,7 @@ input[type=range] .timelapseRange {
 /* Social Actions section that contains buttons such as Like, Comment, etc. */
 .socialActionsSection {
   margin: 5px 20px;
+  text-align: center;
 }
 /* Caption Section that contains the Caption for the entity */
 .captionSection {

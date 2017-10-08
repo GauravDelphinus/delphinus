@@ -1,4 +1,37 @@
 function createMainElement(data, contentTag) {
+	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "centerDisplayWide"});
+	if (data.type == "entry") {
+		element.addClass("entry-element");
+	} else if (data.type == "challenge") {
+		element.addClass("challenge-element");
+	}
+
+	element.append(createTitleElement(data, contentTag));
+
+
+
+	element.append(createMainImageElement(data, contentTag));
+	
+	if (data.type == "entry") {
+		element.append(createTimeLapseProgressSectionElement(data, contentTag));
+	}
+
+	if (data.postedDate) {
+		element.append(createPostHeaderElement(data, contentTag));
+	}
+
+	if (data.socialStatus) {
+		element.append(createSocialStatusSectionElement(data, contentTag));
+		element.append(createSocialActionsSectionElement(data, contentTag));
+	}
+
+	//container for likers list, if any
+	element.append(createLikersPopupElement(data, contentTag));
+
+	return element;
+}
+
+function createMainElement_Old(data, contentTag) {
 	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "mainElement"});
 	if (data.type == "entry") {
 		element.addClass("entry-element");
@@ -319,7 +352,7 @@ function createTextSection(data, contentTag) {
 Create the header element for the main challenge page.
 */
 function createTitleElement(data, contentTag) {
-	var titleElement = $("<div>", {id: contentTag + data.id + "TitleSection", class: "titleSection"});
+	var titleElement = $("<div>", {id: contentTag + data.id + "TitleSection", class: "centerDisplayHeader"});
 	if (data.type == "challenge") {
 		titleElement.addClass("challenge-title");
 	} else if (data.type == "entry") {
