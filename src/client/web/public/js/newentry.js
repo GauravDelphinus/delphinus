@@ -15,7 +15,6 @@ $(document).ready(function(){
 function setupDesignSection() {
 	
 	$.getJSON('/api/designs/', function(result) {
-		console.log("got designData: " + JSON.stringify(result));
 		$("#designCategories").data("designData", result);
 		for (key in result) {
 			if (result[key].name) {
@@ -61,7 +60,6 @@ function refreshDesignView() {
 		$("#newentryimage").prop("src", selectedDesignObj.image);
 		$("#newentryimage").prop("title", selectedDesignObj.name);
 		defaultArtifactPresetSelectionID = selectedDesignObj.presetArtifactId;
-		console.log('set the defaultArtifactPresetSelectionID to ' + defaultArtifactPresetSelectionID);
 
 		$("#selectDesignSection").hide();
 		$("#stepsSection").show();
@@ -287,7 +285,7 @@ function showArtifactStep() {
 					jsonObj.steps.artifacts[0].preset = a.id;
 					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
 					generateChanges(a.id, jsonObj, function(id, data) {
-						$("#" + id + "EntityImage").prop("src", data.imageData);
+						$("#presetArtifacts" + id + "EntityImage").prop("src", data.imageData);
 					});
 
 					list.push(data);
@@ -381,7 +379,7 @@ function showLayoutStep() {
 					jsonObj.steps.layouts[0].type = "preset";
 					jsonObj.steps.layouts[0].preset = l.id;
 					generateChanges(l.id, jsonObj, function(id, data) {
-						$("#" + id + "EntityImage").prop("src", data.imageData);
+						$("#presetLayouts" + id + "EntityImage").prop("src", data.imageData);
 					});
 
 					list.push(data);
@@ -604,7 +602,7 @@ function showFilterStep() {
 					jsonObj.steps.filters[0].type = "preset";
 					jsonObj.steps.filters[0].preset = f.id;
 					generateChanges(f.id, jsonObj, function(id, data) {
-						$("#" + id + "EntityImage").prop("src", data.imageData);
+						$("#presetFilters" + id + "EntityImage").prop("src", data.imageData);
 					});
 
 					list.push(data);
@@ -800,7 +798,7 @@ function showDecorationStep() {
 					jsonObj.steps.decorations[0].type = "preset";
 					jsonObj.steps.decorations[0].preset = d.id;
 					generateChanges(d.id, jsonObj, function(id, data) {
-						$("#" + id + "EntityImage").prop("src", data.imageData);
+						$("#presetDecorations" + id + "EntityImage").prop("src", data.imageData);
 					});
 
 					list.push(data);
