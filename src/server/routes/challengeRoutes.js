@@ -29,6 +29,10 @@ var routes = function(db) {
 				{
 					name: "category",
 					type: "category"
+				},
+				{
+					name: "limit",
+					type: "number"
 				}
 			];
 
@@ -48,7 +52,6 @@ var routes = function(db) {
 				cypherQuery += "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
 			}
 
-
 			cypherQuery +=
 						" WITH c, category, poster " +
 						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
@@ -62,11 +65,17 @@ var routes = function(db) {
 
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "dateCreated") {
-					cypherQuery += " ORDER BY c.created DESC;";
+					cypherQuery += " ORDER BY c.created DESC";
 				} else if (req.query.sortBy == "popularity") {
-					cypherQuery += " ORDER BY popularity_count DESC;";
+					cypherQuery += " ORDER BY popularity_count DESC";
 				}
 			}
+
+			if (req.query.limit) {
+				cypherQuery += " LIMIT " + req.query.limit;
+			}
+
+			cypherQuery += ";";
 
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) {

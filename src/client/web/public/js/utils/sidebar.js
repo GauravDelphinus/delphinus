@@ -96,7 +96,7 @@ function updateRichSidebar(id, heading, list, singleColumn) {
 
 function createPopularChallengesSidebar(callback) {
 	var list = [];
-	$.getJSON("/api/challenges?sortBy=popularity", function(list) {
+	$.getJSON("/api/challenges?sortBy=popularity&limit=5", function(list) {
 		var scrollableList = createScrollableList("popularChallengesScrollableList", list, true);
 
 		var sidebar = createFramelessSidebar("popularChallengesSidebar", "Popular Challenges", scrollableList);
@@ -109,7 +109,7 @@ function createPopularChallengesSidebar(callback) {
 
 function createPopularEntriesSidebar(callback) {
 	var list = [];
-	$.getJSON("/api/entries?sortBy=popularity", function(list) {
+	$.getJSON("/api/entries?sortBy=popularity&limit=5", function(list) {
 		var scrollableList = createScrollableList("popularEntriesScrollableList", list, true);
 
 		var sidebar = createFramelessSidebar("popularEntriesSidebar", "Popular Entries", scrollableList);
@@ -122,23 +122,7 @@ function createPopularEntriesSidebar(callback) {
 
 function createPopularUsersSidebar(callback) {
 	var list = [];
-	$.getJSON("/api/users?sortBy=popularity", function(list) {
-		/*
-		for (var i = 0; i < result.length; i++) {
-			var data = result[i];
-			var description = "";
-			if (data.socialStatus.follows && data.socialStatus.follows.numFollowers > 0) {
-				description += data.socialStatus.follows.numFollowers + " Followers";
-			}
-			if (data.socialStatus.posts 	 && data.socialStatus.posts.numPosts > 0) {
-				description += (description.length > 0) ? (", ") : ("");
-				description += data.socialStatus.posts.numPosts + " Posts";
-			}
-
-			list.push({image: data.image, name: data.caption, link: data.link, description: description});
-		}
-		*/
-
+	$.getJSON("/api/users?sortBy=popularity&limit=5", function(list) {
 		var scrollableList = createScrollableList("popularUsersScrollableList", list, true);
 
 		var sidebar = createFramelessSidebar("popularUsersSidebar", "Popular Users", scrollableList);

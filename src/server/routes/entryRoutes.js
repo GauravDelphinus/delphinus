@@ -84,6 +84,10 @@ var routes = function(db) {
 				{
 					name: "excludeUser",
 					type: "id"
+				},
+				{
+					name: "limit",
+					type: "number"
 				}
 			];
 
@@ -119,11 +123,17 @@ var routes = function(db) {
 
 			if (req.query.sortBy) {
 				if (req.query.sortBy == "dateCreated") {
-					cypherQuery += " ORDER BY e.created DESC;";
+					cypherQuery += " ORDER BY e.created DESC";
 				} else if (req.query.sortBy == "popularity") {
-					cypherQuery += " ORDER BY popularity_count DESC;";
+					cypherQuery += " ORDER BY popularity_count DESC";
 				}
 			}
+
+			if (req.query.limit) {
+				cypherQuery += " LIMIT " + req.query.limit;
+			}
+
+			cypherQuery += ";";
 
 			db.cypherQuery(cypherQuery, function(err, result){
     			if(err) {

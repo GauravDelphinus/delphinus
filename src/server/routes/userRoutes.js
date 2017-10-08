@@ -34,6 +34,10 @@ var routes = function(db) {
 					name: "sortBy",
 					required: "yes",
 					type: ["lastSeen", "popularity"]
+				},
+				{
+					name: "limit",
+					type: "number"
 				}
 			];
 
@@ -67,10 +71,16 @@ var routes = function(db) {
           		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following), (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
 
 			if (req.query.sortBy == "lastSeen") {
-				cypherQuery += " ORDER BY u.last_seen DESC;";
+				cypherQuery += " ORDER BY u.last_seen DESC";
 			} else if (req.query.sortBy == "popularity") {
-				cypherQuery += " ORDER BY popularity_count DESC;";
+				cypherQuery += " ORDER BY popularity_count DESC";
 			}
+
+			if (req.query.limit) {
+				cypherQuery += " LIMIT " + req.query.limit;
+			}
+
+			cypherQuery += ";";
 
 			db.cypherQuery(cypherQuery, function(err, result){
                 if(err) {
