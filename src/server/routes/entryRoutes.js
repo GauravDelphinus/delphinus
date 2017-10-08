@@ -378,7 +378,6 @@ var routes = function(db) {
 	    							}
 	    							cypherQuery += " RETURN e;";
 
-	    							logger.dbDebug(cypherQuery);
 	    							db.cypherQuery(cypherQuery, function(err, result){
 						    			if(err) {
 						    				logger.dbError(err, cypherQuery);
