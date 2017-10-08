@@ -163,11 +163,11 @@ function createChallengeSidebar(challengeId, callback) {
 
 function createChallengeCaptionSidebar(challengeId, callback) {
 	var content = $("<div>", {class: "wide-container"});
-	var message = $("<p>", {class: "text-plain-medium"}).append("Up for the challenge? Let your creative juices flow and create your own caption entry for this challenge now!  It takes just a few seconds!");
+	var message = $("<p>", {class: "text-plain-medium"}).append("Let your creative juices flow and create your own caption entry for this challenge now!  It's as simple as Get-Set-Go!");
 	var button = $("<button>", {class: "btn btn-lg button-full"}).append("Create Caption");
 	content.append(message).append(button);
 
-	var sidebar = createSidebar("createChallengeCaptionSidebar", "Create your Caption!", content);
+	var sidebar = createSidebar("createChallengeCaptionSidebar", "Up for the challenge?", content);
 
 	button.click(function() {
 		window.open("/newentry?challengeId=" + challengeId, "_self");
@@ -178,11 +178,11 @@ function createChallengeCaptionSidebar(challengeId, callback) {
 
 function createIndependentCaptionSidebar(callback) {
 	var content = $("<div>", {class: "wide-container"});
-	var message = $("<p>", {class: "text-plain-medium"}).append("Let your creative juices flow and create your own caption entry now!  Choose your own image or select among some cool background designs!  It takes just a few seconds!");
+	var message = $("<p>", {class: "text-plain-medium"}).append("Let your creative juices flow and create your own caption entry now!  Choose your own image or select among some cool background designs!");
 	var button = $("<button>", {class: "btn btn-lg button-full"}).append("Create Caption");
 	content.append(message).append(button);
 
-	var sidebar = createSidebar("createCaptionSidebar", "Create your Caption!", content);
+	var sidebar = createSidebar("createCaptionSidebar", "Like this caption?", content);
 
 	button.click(function() {
 		window.open("/newentry", "_self");
