@@ -451,7 +451,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	
 	// FOLLOW BUTTON ---------------------------------
 	if (data.socialStatus.follows && (!user || user.id != data.id)) {
-		var followButton = $("<button>", {id: contentTag + data.id + "FollowButton", type: "button", class: "button-active-link text-plain-small text-bold"}).append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append($("<span>", {id: data.id + "FollowText"}));
+		var followButton = $("<button>", {id: contentTag + data.id + "FollowButton", type: "button", class: "button-active-link text-plain-small text-bold"}).append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append($("<span>", {id: contentTag + data.id + "FollowText"}));
 		
 		socialActionsSection.append(followButton);
 
