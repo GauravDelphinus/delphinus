@@ -324,3 +324,19 @@ function createSignInToCommentElement() {
 	signInToCommentElement.append(newCommentLink);
 	return signInToCommentElement;
 }
+
+/**
+        Refresh the comments list attached to the given entity (parentId)
+        This assumes that the comments list is already showing to the user
+**/
+function refreshCommentsList(parentId, contentTag) {
+	console.log("refreshCommentsList, parentId = " + parentId + ", contentTag = " + contentTag);
+        $.getJSON("/api/comments/?entityId=" + parentId + "&sortBy=reverseDate", function(list) {
+                var commentsList = createCommentsList(parentId, contentTag, list);
+                $("#" + contentTag + parentId + "CommentsContainer").empty().append(commentsList);
+                $("#" + contentTag + parentId + "NewCommentText").focus(); // set focus in the input field
+
+                //also, update the counter
+                $("#" + contentTag + parentId + "NumComments").text(list.length);
+        });
+}

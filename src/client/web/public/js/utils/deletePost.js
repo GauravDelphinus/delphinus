@@ -3,7 +3,7 @@
 	Delete the item from the server permanently.
 	Also, refresh client as required.
 */
-function deleteItem(data) {
+function deleteItem(data, contentTag) {
 	var deleteURL;
 	if (data.type == "challenge") {
 		deleteURL = "/api/challenges/" + data.id;
@@ -26,7 +26,7 @@ function deleteItem(data) {
 		data: JSON.stringify(jsonObj)
 	})
 	.done(function(retdata, textStatus, jqXHR) {
-		refreshAfterDelete(data.id, data.type);
+		refreshAfterDelete(data.id, contentTag, data.type);
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
 		showAlert("There appears to be a problem deleting that item.  Please try again.", 3);
@@ -41,12 +41,12 @@ function alreadyExists(element) {
 	Refresh the client after the specific item has been deleted from the server.
 	Figure out the best way to refresh. 
 **/
-function refreshAfterDelete(id, type) {
+function refreshAfterDelete(id, contentTag, type) {
 	//figure out which page we're on
 	if (type == "comment") {
 		// Find the parent Id, and then refresh the list in place - Tested!
-		var parentId = $("#" + id + "CommentElement").closest(".commentsList").data("id");
-		refreshCommentsList(parentId);
+		var parentId = $("#" + contentTag + id + "CommentElement").closest(".commentsList").data("id");
+		refreshCommentsList(parentId, contentTag);
 		return;
 	}
 

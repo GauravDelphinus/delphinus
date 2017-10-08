@@ -155,7 +155,7 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 			container.append(scrollableList);
 		} else if (buttonID == "commentsViewButton") {
 			var commentsList = createCommentsList(entityId, contentTag, list);
-			var commentsContainer = $("<div>", {id: entityId + "CommentsContainer"}).empty();
+			var commentsContainer = $("<div>", {id: contentTag + entityId + "CommentsContainer"}).empty();
 			commentsContainer.append(commentsList);
 			container.append(commentsContainer);
 		}
@@ -206,7 +206,7 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 				$("#" + contentTag + "Container").append(scrollableList);
 			} else if (defaultViewType == "comments") {
 				var commentsList = createCommentsList(entityId, contentTag, list);
-				var commentsContainer = $("<div>", {id: entityId + "CommentsContainer"}).empty();
+				var commentsContainer = $("<div>", {id: contentTag + entityId + "CommentsContainer"}).empty();
 				commentsContainer.append(commentsList);
 				$("#" + contentTag + "Container").append(commentsContainer);
 			} else if (defaultViewType == "feed") {

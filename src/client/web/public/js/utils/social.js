@@ -70,7 +70,7 @@ function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 		deleteButton.click(function(e) {
 			var result = confirm("Are you sure you want to delete this comment permanently?");
 			if (result) {
-			    deleteItem(data);
+			    deleteItem(data, contentTag);
 			}
 		});
 

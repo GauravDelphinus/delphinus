@@ -224,7 +224,7 @@ function createPostHeaderElement(data, contentTag) {
 		deleteButton.click(function() {
 			var result = confirm("Are you sure you want to delete this post permanently?");
 			if (result) {
-			    deleteItem(data);
+			    deleteItem(data, contentTag);
 			}
 		});
 
