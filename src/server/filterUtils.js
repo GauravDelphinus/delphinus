@@ -294,13 +294,8 @@ module.exports = {
 						}
 
 						var sourceImagePath = global.appRoot + config.path.designImages + imageData.categoryId + "/" + entryData.designId + "." + mime.extension(imageData.imageType);
-						logger.debug("####### sourceImagePath for design is: " + sourceImagePath);
-			    		//var hash = filterUtils.generateHash(JSON.stringify(steps));
-			    		//var targetImageName = entryData.designId + "-" + hash + "." + mime.extension(imageData.imageType);
-						//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
-						//var targetImageUrl = config.url.cacheImages + targetImageName;
 
-						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, /* targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, */ imageType: "image/jpeg", sourceId: imageData.id});
+						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: "image/jpeg", sourceId: imageData.id});
 					});
 		    	} else {
 		    		return callback(null, info);

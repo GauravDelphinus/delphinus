@@ -301,7 +301,7 @@ module.exports = {
 
 	    	var d = output.data[0][0];
 	    	var c = output.data[0][1];
-	    	var imageData = {id: output.data[0].id, imageType: "image/jpeg", categoryId: c.id};
+	    	var imageData = {id: d.id, imageType: "image/jpeg", categoryId: c.id};
 
 	    	return next(0, imageData);
 	    });
