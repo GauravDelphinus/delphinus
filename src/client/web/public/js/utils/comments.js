@@ -100,8 +100,7 @@ function createCommentsContainer(data, contentTag) {
 	var container = $("<div>", {id: contentTag + data.id + "CommentsContainer"}).empty();
 
 	if (data.activity && data.activity.comment) {
-		//data.activity.comment.postedByUser = data.activity.user;
-		container.append(createCommentElement(data.activity.comment, data.id, false));
+		container.append(createCommentElement(data.activity.comment, data.id, contentTag, false));
 	}
 
 	return container;

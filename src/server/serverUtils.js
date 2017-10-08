@@ -660,6 +660,8 @@ module.exports = {
 		"activity" : {
 			"type" : ["recentlyPosted", "recentlyLiked", "recentlyCommented", "highLikeCount", "highCommentCount"],
 			"comment": {
+				"id" : "id",
+				"text" : "string",
 				"postedDate" : "number",
 				"postedByUser" : "postedByUser",
 				"socialStatus" : {

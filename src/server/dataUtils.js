@@ -1430,6 +1430,8 @@ module.exports = {
 				if (lastComment) {
 					data.activity.comment = {};
 					data.activity.comment.postedDate = lastComment.created;
+					data.activity.comment.id = lastComment.id;
+					data.activity.comment.text = lastComment.text;
 				
 					if (lastCommenter) {
 						data.activity.comment.postedByUser = {};
