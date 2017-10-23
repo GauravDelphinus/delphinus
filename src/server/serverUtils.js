@@ -138,7 +138,7 @@ module.exports = {
 		}
 	};
 	*/
-	validateItem: function(type, name, value, logError = true) {
+	validateItem: function(type, name, value) {
 		//logger.debug("validateItem: type: " + JSON.stringify(type) + ", name: " + name + ", value: " + value);
 		if (type.constructor === Array) {
 			if (type.length < 1) {
@@ -154,7 +154,7 @@ module.exports = {
 
 				var found = false;
 				for (var i = 0; i < typeList.length; i++) {
-					if (this.validateItem(typeList[i], name, value, false)) {
+					if (this.validateItem(typeList[i], name, value)) {
 						found = true;
 						break;
 					}

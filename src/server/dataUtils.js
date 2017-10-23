@@ -1591,7 +1591,6 @@ function createUserNode(db, user, next) {
 		"u.image = '" + user.image + "', " +
 		"u.last_seen = '" + user.lastSeen + "' RETURN u;";
 
-	logger.dbDebug(cypherQuery);
 	db.cypherQuery(cypherQuery, function(err) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
@@ -1613,7 +1612,6 @@ function createChallengeNode(db, challenge, next) {
 		"n.title = '" + challenge.title + "'" +
 		" RETURN n;";
 
-	logger.dbDebug(cypherQuery);
 	db.cypherQuery(cypherQuery, function(err) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
@@ -1635,7 +1633,6 @@ function createEntryNode(db, entry, next) {
 		"e.caption = '" + entry.caption + "'" +
 		" RETURN e;";
 
-	logger.dbDebug(cypherQuery);
 	db.cypherQuery(cypherQuery, function(err) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
