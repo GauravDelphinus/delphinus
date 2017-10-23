@@ -387,7 +387,6 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		socialActionsSection.append(commentButton);
 		
 		commentButton.click(function(e) {
-			console.log("comment button clicked");
 			showHideCommentsList(data.id, contentTag, true);	
 		});
 	}
@@ -643,7 +642,6 @@ function createLikersList(id, contentTag, list) {
 						window.open("/auth", "_self");
 					}
 					sendFollow(id, true, function(err, followResult) {
-						console.log("sendFollow result, err = " + err + ", followResult = " + JSON.stringify(followResult));
 						if (err) {
 							//eat this
 						} else {
@@ -711,7 +709,6 @@ function createFollowersList(id, contentTag, list) {
 						window.open("/auth", "_self");
 					}
 					sendFollow(id, true, function(err, followResult) {
-						console.log("sendFollow result, err = " + err + ", followResult = " + JSON.stringify(followResult));
 						if (err) {
 							//eat this
 						} else {

@@ -229,19 +229,24 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
+			logger.debug("about to call getImageDataForEntry");
 			dataUtils.getImageDataForEntry(req.params.entryId, function(err, imageData){
 				if (err) {
 					logger.error("getImageDataForEntry, entry: " + req.params.entryId + ": " + err);
 					return res.sendStatus(500);
 				}
 
-				var sourceImagePath = global.appRoot + config.path.challengeImages + imageData.image;
+				logger.debug("imageData: " + JSON.stringify(imageData));
+
+				var sourceImagePath = imageData.sourceImagePath;
 
 	    		dataUtils.normalizeSteps(imageData.steps, function(err, steps){
 	    			if (err) {
 	    				logger.error("normalizeSteps, steps: " + imageDate.steps + ": " + err);
 	    				return res.sendStatus(500);
 	    			}
+
+	    			logger.debug("steps: " + JSON.stringify(steps));
 
 	    			//extract the steps (cumulative format) and generate the hash to 
 	    			//look for actual step images
@@ -252,7 +257,7 @@ var routes = function(db) {
 	    			for (var i = 0; i < singleStepList.length; i++) {
 	    				var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
 
-						var targetImageName = imageData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
+						var targetImageName = imageData.sourceId + "-" + hash + "." + mime.extension(imageData.imageType);
 						var targetImage = global.appRoot + config.path.cacheImages + targetImageName;
 
 						imageUrlPaths.push(config.url.cacheImages + targetImageName);
@@ -271,18 +276,19 @@ var routes = function(db) {
 	    				var output = [];
 
 	    				//first item is the base challenge image
-	    				var sourceImagePublicPath = config.url.challengeImages + imageData.image;
-	    				output.push({"imageType" : "url", "imageData" : sourceImagePublicPath});
+	    				output.push({"type" : "imageURL", "imageData" : imageData.sourceImageUrl});
 
 	    				//for the rest of the items, add the target image url
 	    				for (var j = 0; j < imagePaths.length; j++) {
-							output.push({"imageType" : "url", "imageData" : imageUrlPaths[j]});
+							output.push({"type" : "imageURL", "imageData" : imageUrlPaths[j]});
 	    				}
 
 	    				if (!serverUtils.validateData(output, serverUtils.prototypes.imageInfo)) {
 	    					return res.sendStatus(500);
 	    				}
-						return res.json(output	);
+
+	    				logger.debug("sending back: " + JSON.stringify(output));
+						return res.json(output);
 	    			});
 	    		});
 			});

@@ -31,7 +31,8 @@
 		"publicDir" : "../public/",
 		"cacheImages" : "../data/cacheImages/",
 		"tmpDir" : "../data/tmp/",
-		"designImages" : "src/client/web/public/images/designs/"
+		"designImages" : "src/client/web/public/images/designs/",
+		"independentImages" : "../data/contentImages/independent/"
 	},
 	"social" : {
 		"facebook" : {
@@ -64,7 +65,8 @@
 		"user" : "/user/",
 		"brandImages" : "/images/static/branding/",
 		"cacheImages" : "/cacheImages/",
-		"designImages" : "/images/designs/"
+		"designImages" : "/images/designs/",
+		"independentImages" : "/images/independent/"
 	},
 	"name" : {
 		"defaultProfileImageName" : "default.png"
