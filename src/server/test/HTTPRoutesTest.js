@@ -139,8 +139,4 @@ describe("HTTP Routes", function() {
 	});
 });
 
-var challengeFields = [];
-function validateFields(entityType) {
-
-}
 
