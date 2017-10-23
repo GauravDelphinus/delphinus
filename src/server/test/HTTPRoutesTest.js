@@ -1,7 +1,10 @@
+require("../init")();
+
 var chai = require("chai");
 var chaiHttp = require("chai-http");
-var app = require("../app")();
 var dataUtils = require("../dataUtils");
+
+var app = require("../app");
 var logger = require("../logger");
 
 var should = chai.should();
@@ -9,16 +12,32 @@ var assert = chai.assert;
 
 chai.use(chaiHttp);
 
+var server = null;
+
+before(function(done) { //higher level - called only once for all tests
+	// Initialize app and store in 'server' variable
+	app(function(err, app) {
+		if (err) {
+			logger.error("Fatal Error.  Node JS App NOT STARTED.  " + err);
+			done(err);
+		}
+
+		server = app;
+		done();
+	});
+});
+
 describe("HTTP Routes", function() {
 	this.timeout(10000);
 
 	//call before running any tests in this block
 	before(function(done) {
-      //initialize DB
+		//initialize DB
 		var testData = require("./testData");
 		dataUtils.initializeDBWithData(testData, function(err) {
 			if (err) {
 				//DB couldn't be initialized.
+				done(err);
 			}
 			done();
 		});
@@ -33,7 +52,7 @@ describe("HTTP Routes", function() {
 	describe("Challenge Routes", function() {		
 		describe("GET /api/challenges?sortBy=dateCreated", function() {
 			it("should return list of all challenges sorted by dateCreated", function(done) {
-				chai.request(app)
+				chai.request(server)
 				.get("/api/challenges?sortBy=dateCreated")
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
@@ -46,7 +65,7 @@ describe("HTTP Routes", function() {
 
 		describe("GET /api/challenges?sortBy=popularity", function() {
 			it("should return list of all challenges sorted by popularity", function(done) {
-				chai.request(app)
+				chai.request(server)
 				.get("/api/challenges?sortBy=popularity")
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
@@ -59,7 +78,7 @@ describe("HTTP Routes", function() {
 
 		describe("GET /api/challenges", function() {
 			it("should return status 400 because of missing required query parameter: sortBy", function(done) {
-				chai.request(app)
+				chai.request(server)
 				.get("/api/challenges")
 				.end(function(err, res) {
 					assert.equal(res.status, 400);
@@ -71,7 +90,7 @@ describe("HTTP Routes", function() {
 
 		describe("GET /api/challenges/:challengeId", function() {
 			it("should return the specific challenge details", function(done) {
-				chai.request(app)
+				chai.request(server)
 				.get("/api/challenges/HkQawQ4PW")
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
@@ -87,7 +106,7 @@ describe("HTTP Routes", function() {
 	describe("Entry Routes", function() {		
 		describe("GET /api/entries?sortBy=dateCreated", function() {
 			it("should return list of all entries sorted by dateCreated", function(done) {
-				chai.request(app)
+				chai.request(server)
 				.get("/api/entries?sortBy=dateCreated")
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
@@ -100,7 +119,7 @@ describe("HTTP Routes", function() {
 
 		describe("GET /api/entries?sortBy=popularity", function() {
 			it("should return list of all entries sorted by popularity", function(done) {
-				chai.request(app)
+				chai.request(server)
 				.get("/api/entries?sortBy=popularity")
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
@@ -113,7 +132,7 @@ describe("HTTP Routes", function() {
 
 		describe("GET /api/entries", function() {
 			it("should return status 400 because of missing required query parameter: sortBy", function(done) {
-				chai.request(app)
+				chai.request(server)
 				.get("/api/entries")
 				.end(function(err, res) {
 					assert.equal(res.status, 400);
@@ -125,7 +144,7 @@ describe("HTTP Routes", function() {
 
 		describe("GET /api/entries/:entryId", function() {
 			it("should return the specific entry details", function(done) {
-				chai.request(app)
+				chai.request(server)
 				.get("/api/entries/NkQbwW4PK")
 				.end(function(err, res) {
 					assert.equal(res.status, 200);
