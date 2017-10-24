@@ -16,17 +16,14 @@ var server = null;
 
 before(function(done) { //higher level - called only once for all tests
 	// Initialize app and store in 'server' variable
-	logger.debug("calling app");
-	this.timeout(15000);
+	this.timeout(15000); //need this since init of app can take a bit of time
 	app(function(err, appServer) {
 		if (err) {
-			logger.debug("error: " + err);
 			logger.error("Fatal Error.  Node JS App NOT STARTED.  " + err);
 			return done(err);
 		}
 
 		server = appServer;
-		logger.debug("server = " + server + ", calling done");
 		return done();
 	});
 });

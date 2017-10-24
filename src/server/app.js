@@ -19,14 +19,11 @@ module.exports = function(callback) {
 	// Initialize the Neo4j Graph Database
 	const db = new neo4j("http://neo4j:mypassword@localhost:7474");
 
-	logger.debug("point 1");
 	dataUtils.initializeDB(db, function(err) {
 		if (err) {
-			logger.debug("error point 1: " + err);
 			return callback(err);
 		}
 
-		logger.debug("point 2");
 		const app = express();
 
 		require('./auth/passport')(app);
@@ -290,17 +287,13 @@ module.exports = function(callback) {
 		const publicDir = path.normalize(global.appRoot + config.path.publicDir);
 		app.use(express.static(publicDir));
 		
-		logger.debug("point 3");
 		// Finally, start listening for requests
 		app.listen(config.port, function() {
 			logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on port " + config.port);
 			logger.info("Application Root: " + global.appRoot + ", Express Static directory: " + publicDir);
 
-			logger.debug("point 4");
 			return callback(null, app);
 		});
-
-		logger.debug("point 5");
 	});
 };
 

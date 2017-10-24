@@ -13,7 +13,6 @@ module.exports = {
 	myDB: null,
 
 	initializeDB : function(db, callback) {
-		logger.debug("p1");
 		this.myDB = db;
 
 		var functions = [];
@@ -82,9 +81,7 @@ module.exports = {
 			}
 		}
 
-		logger.debug("p2");
 		async.series(functions, function(err) {
-			logger.debug("p3: err: " + err);
 			return callback(err);
 		});
 	},
