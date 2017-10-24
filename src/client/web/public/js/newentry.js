@@ -57,12 +57,9 @@ function refreshDesignView() {
 		//find the selected design, and use that image to pass to the new caption workflow
 		var selectedDesignObj = selectedDesignList.find(checkDesign, selectedDesignId);
 		designId = selectedDesignId; //set design Id to the selected design (see constructJSONObject)
-		$("#newentryimage").prop("src", selectedDesignObj.image);
-		$("#newentryimage").prop("title", selectedDesignObj.name);
 		defaultArtifactPresetSelectionID = selectedDesignObj.presetArtifactId;
 
-		$("#selectDesignSection").hide();
-		$("#stepsSection").show();
+		switchToStepsView(selectedDesignObj.image, selectedDesignObj.name);
 	});
 
 	//refresh the grid list
@@ -114,13 +111,18 @@ function handleDragOver(evt) {
 	Show the image and switch to next step 
 **/
 function handleFileSelected(data, path, title, type) {
-	//show the image, and hide the drag/drop view
-	$("#newentryimage").prop("src", path);
-	$("#newentryimage").prop("title", title);
-	$("#selectImageSection").hide();
-	$("#stepsSection").show();
+	switchToStepsView(path, title);
 }
 
+function switchToStepsView(imagePath, imageTitle) {
+	$("#newentryimage").prop("src", imagePath);
+	$("#newentryimage").prop("title", imageTitle);
+	$("#selectImageSection").hide();
+	$("#selectDesignSection").hide();
+
+	$("#stepsSection").show();
+	$("#bannerText").focus();
+}
 
 function setupMainItem() {
 	if (challengeId != 0) {
