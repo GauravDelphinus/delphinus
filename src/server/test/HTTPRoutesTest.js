@@ -16,14 +16,16 @@ var server = null;
 
 before(function(done) { //higher level - called only once for all tests
 	// Initialize app and store in 'server' variable
-	app(function(err, app) {
+	logger.debug("calling app");
+	app(function(err, appServer) {
 		if (err) {
 			logger.error("Fatal Error.  Node JS App NOT STARTED.  " + err);
-			done(err);
+			return done(err);
 		}
 
-		server = app;
-		done();
+		server = appServer;
+		logger.debug("server = " + server + ", calling done");
+		return done();
 	});
 });
 
