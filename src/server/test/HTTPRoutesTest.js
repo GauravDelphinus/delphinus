@@ -17,6 +17,7 @@ var server = null;
 before(function(done) { //higher level - called only once for all tests
 	// Initialize app and store in 'server' variable
 	logger.debug("calling app");
+	this.timeout(15000);
 	app(function(err, appServer) {
 		if (err) {
 			logger.debug("error: " + err);
