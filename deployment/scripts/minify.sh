@@ -54,7 +54,7 @@ then
 	MINIFY_FLAGS=""
 fi
 
-uglifyjs ${SOURCE_JS_FOLDER}/challenge.js -o ${MIN_JS_FOLDER}/challenge.min.js ${MINIFY_FLAGS}
+/usr/local/bin/uglifyjs ${SOURCE_JS_FOLDER}/challenge.js -o ${MIN_JS_FOLDER}/challenge.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/challenges.js -o ${MIN_JS_FOLDER}/challenges.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/entry.js -o ${MIN_JS_FOLDER}/entry.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/entries.js -o ${MIN_JS_FOLDER}/entries.min.js ${MINIFY_FLAGS}
