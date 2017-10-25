@@ -42,6 +42,9 @@
 (9) Install 'less' procompiler
 (a) $sudo npm install -g less
 
+(10) Install uglify-es minifier
+(a) $sudo npm install -g uglify-es
+
 ####################################################################
 # PREPARE DEPLOYMENT SPACE
 ####################################################################

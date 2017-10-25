@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "nyc mocha --recursive test",
-    "eslint": "eslint"
+    "eslint": "eslint",
+    "deploy-dev": "../deployment/scripts/deploy-local.sh"
   },
   "keywords": [
     "social",
