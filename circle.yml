@@ -11,12 +11,7 @@ dependencies:
   post:
     - sudo apt-get update
     - sudo apt-get install npm
-    - sudo npm install -g pm2@latest 
-    - sudo npm install -g uglify-es
-    - ls /usr/local/bin
-    - ls /usr/local/lib
-    - ls /usr/local/lib/node_modules
-    - ls /usr/local/lib/node_modules/uglify-es/bin
+    - sudo npm install -g pm2@latest
     - mkdir -p ../../../data/log
 deployment:
   production:
