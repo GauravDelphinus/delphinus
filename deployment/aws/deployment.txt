@@ -48,9 +48,6 @@
 (11) Install CSSO CLI CSS minifier
 (a) $sudo npm install -g csso-cli
 
-(12) Install less compiler to convert less to css
-(a) $sudo npm install -g less
-
 ####################################################################
 # PREPARE DEPLOYMENT SPACE
 ####################################################################
