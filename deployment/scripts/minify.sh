@@ -54,6 +54,7 @@ then
 	MINIFY_FLAGS=""
 fi
 
+#UGLIFY JS FILES
 uglifyjs ${SOURCE_JS_FOLDER}/challenge.js -o ${MIN_JS_FOLDER}/challenge.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/challenges.js -o ${MIN_JS_FOLDER}/challenges.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/entry.js -o ${MIN_JS_FOLDER}/entry.min.js ${MINIFY_FLAGS}
@@ -74,4 +75,6 @@ uglifyjs ${SOURCE_JS_FOLDER}/utils/comments.js \
 	${SOURCE_JS_FOLDER}/utils/sidebar.js \
 	${SOURCE_JS_FOLDER}/utils/social.js \
 	${SOURCE_JS_FOLDER}/utils/timelapse.js -o ${MIN_JS_FOLDER}/utils.min.js ${MINIFY_FLAGS}
+
+#UGLIFY CSS FILES
 uglifyjs ${SOURCE_CSS_FOLDER}/styles.css -o ${MIN_CSS_FOLDER}/styles.min.css ${MINIFY_FLAGS}
