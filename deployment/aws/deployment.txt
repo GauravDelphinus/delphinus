@@ -42,8 +42,14 @@
 (9) Install 'less' procompiler
 (a) $sudo npm install -g less
 
-(10) Install uglify-es minifier
+(10) Install uglify-es JS minifier
 (a) $sudo npm install -g uglify-es
+
+(11) Install CSSO CLI CSS minifier
+(a) $sudo npm install -g csso-cli
+
+(12) Install less compiler to convert less to css
+(a) $sudo npm install -g less
 
 ####################################################################
 # PREPARE DEPLOYMENT SPACE

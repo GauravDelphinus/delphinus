@@ -111,7 +111,7 @@ module.exports = {
 		path : '/var/www/staging',
 
 		'post-setup': "mkdir ../data; mkdir ../data/tmp; mkdir ../data/log; mkdir ../data/contentImages; mkdir ../data/cacheImages; mkdir ../data/contentImages/challenges; mkdir ../data/contentImages/entries; mkdir ../data/contentImages/users; mkdir ../data/contentImages/designs; mkdir ../data/db; mkdir ../public; mkdir ../public/js; mkdir ../public/css; mkdir ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/images/designs ../public/designImages; ln -s ../data/cacheImages ../public/cacheImages; ln -s ../current/src/client/web/public/images ../public/images; ln -s ../current/src/client/web/public/third-party ../public/third-party;",
-		'post-deploy' : '../current/deployment/scripts/minify.sh --sourcejsfolder ../current/src/client/web/public/js --minjsfolder ../public/js --sourcecssfolder ../current/src/client/web/public/css --mincssfolder ../public/css; npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging'
+		'post-deploy' : '../current/deployment/scripts/minify.sh --sourcejsfolder ../current/src/client/web/public/js --minjsfolder ../public/js --sourcelessfolder ../current/src/server/less --mincssfolder ../public/css; npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging'
     },
     production : {
     	user : 'node',

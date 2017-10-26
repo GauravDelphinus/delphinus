@@ -16,8 +16,8 @@ case $key in
     shift # past argument
     shift # past value
     ;;
-    --sourcecssfolder)
-    SOURCE_CSS_FOLDER="$2"
+    --sourcelessfolder)
+    SOURCE_LESS_FOLDER="$2"
     shift # past argument
     shift # past value
     ;;
@@ -41,12 +41,6 @@ case $key in
 esac
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
-
-echo SOURCE JS FOLDER = "${SOURCE_JS_FOLDER}"
-echo MIN JS FOLDER = "${MIN_JS_FOLDER}"
-echo SOURCE CSS FOLDER = "${SOURCE_CSS_FOLDER}"
-echo MIN CSS FOLDER = "${MIN_CSS_FOLDER}"
-echo CONCAT_ONLY = "${CONCAT_ONLY}"
 
 MINIFY_FLAGS=" -m -c "
 if [ "${CONCAT_ONLY}" == "true" ] 
@@ -76,5 +70,5 @@ uglifyjs ${SOURCE_JS_FOLDER}/utils/comments.js \
 	${SOURCE_JS_FOLDER}/utils/social.js \
 	${SOURCE_JS_FOLDER}/utils/timelapse.js -o ${MIN_JS_FOLDER}/utils.min.js ${MINIFY_FLAGS}
 
-#UGLIFY CSS FILES
-uglifyjs ${SOURCE_CSS_FOLDER}/styles.css -o ${MIN_CSS_FOLDER}/styles.min.css ${MINIFY_FLAGS}
+#First Convert LESS to CSS, and then directly minify it
+lessc ${SOURCE_LESS_FOLDER}/styles.less | csso -o ${MIN_CSS_FOLDER}/styles.min.css
