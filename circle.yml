@@ -17,5 +17,5 @@ deployment:
   production:
     branch: master
     commands:
-      - ../../deployment/aws/circleci_deploy_stage.sh
+      - ../../deployment/scripts/deploy_stage.sh
 
