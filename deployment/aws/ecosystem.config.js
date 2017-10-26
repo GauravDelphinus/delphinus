@@ -120,8 +120,8 @@ module.exports = {
 		repo : 'git@github.com:ezeeideas/delphinus.git',
 		path : '/var/www/production',
 
-		'post-setup': "mkdir ../data/log; mkdir ../data/tmp; mkdir ../data/contentImages; mkdir ../data/cacheImages; mkdir ../data/contentImages/challenges; mkdir ../data/contentImages/entries; mkdir ../data/contentImages/users; mkdir ../data/contentImages/designs; mkdir ../data/db; mkdir ../public; ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/images/designs ../public/designImages; ln -s ../data/cacheImages ../public/cacheImages; ln -s ../current/src/client/web/public/images ../public/images; ln -s ../current/src/client/web/public/third-party ../public/third-party;",
-		'post-deploy' : 'npm install --prefix ./src/server && pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env production'
+		'post-setup': '../current/deployment/scripts/setup_dirs.sh --projectroot ../current/',
+		'post-deploy' : '../current/deployment/scripts/minify.sh --sourcejsfolder ../current/src/client/web/public/js --minjsfolder ../public/js --sourcelessfolder ../current/src/server/less --mincssfolder ../public/css; npm install --prefix ./src/server && pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env production'
     }
   }
 };

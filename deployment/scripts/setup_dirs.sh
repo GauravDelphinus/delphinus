@@ -30,6 +30,15 @@ if [ -z ${PROJECT_ROOT+x} ];
 	then echo "Missing parameter --projectroot"; exit 1;
 fi
 
+if [ ! -L "${PROJECT_ROOT}/../current" ]; then
+	if [ -d "${PROJECT_ROOT}/../source" ]; then
+		ln -s ${PROJECT_ROOT}/../source ${PROJECT_ROOT}/../current;
+	elif [ -d "${PROJECT_ROOT}/../delphinus" ]; then
+		ln -s ${PROJECT_ROOT}/../delphinus ${PROJECT_ROOT}/../current;
+	fi
+fi
+
+ln -s ${PROJECT_ROOT}/../
 mkdir ${PROJECT_ROOT}/../data; 
 mkdir ${PROJECT_ROOT}/../data/tmp; 
 mkdir ${PROJECT_ROOT}/../data/log; 
@@ -44,7 +53,7 @@ mkdir ${PROJECT_ROOT}/../public;
 mkdir ${PROJECT_ROOT}/../public/js; 
 mkdir ${PROJECT_ROOT}/../public/css; 
 ln -s ${PROJECT_ROOT}/../data/contentImages ${PROJECT_ROOT}/../public/contentImages; 
-ln -s ${PROJECT_ROOT}/../delphinus/src/client/web/public/images/designs ${PROJECT_ROOT}/../public/designImages; 
+ln -s ${PROJECT_ROOT}/../current/src/client/web/public/images/designs ${PROJECT_ROOT}/../public/designImages; 
 ln -s ${PROJECT_ROOT}/../data/cacheImages ${PROJECT_ROOT}/../public/cacheImages; 
-ln -s ${PROJECT_ROOT}/../delphinus/src/client/web/public/images ${PROJECT_ROOT}/../public/images; 
-ln -s ${PROJECT_ROOT}/../delphinus/src/client/web/public/third-party ${PROJECT_ROOT}/../public/third-party;
+ln -s ${PROJECT_ROOT}/../current/src/client/web/public/images ${PROJECT_ROOT}/../public/images; 
+ln -s ${PROJECT_ROOT}/../current/src/client/web/public/third-party ${PROJECT_ROOT}/../public/third-party;
