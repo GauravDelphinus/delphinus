@@ -54,6 +54,11 @@ then
 	MINIFY_FLAGS=""
 fi
 
+ls /usr/local/bin
+ls /usr/local/lib
+ls /usr/local/lib/node_modules
+ls /usr/local/lib/node_modules/uglify-es/bin
+
 /usr/local/bin/uglifyjs ${SOURCE_JS_FOLDER}/challenge.js -o ${MIN_JS_FOLDER}/challenge.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/challenges.js -o ${MIN_JS_FOLDER}/challenges.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/entry.js -o ${MIN_JS_FOLDER}/entry.min.js ${MINIFY_FLAGS}
