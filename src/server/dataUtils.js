@@ -7,6 +7,7 @@ var mime = require("mime");
 var logger = require("./logger");
 var async = require("async");
 var serverUtils = require("./serverUtils");
+var dynamicConfig = require("../config/dynamicConfig");
 
 module.exports = {
 
@@ -210,7 +211,7 @@ module.exports = {
 	constructMetaData: function(entityType, entity, poster, challenge, design) {
 
 		var data = {
-			fbAppId: config.social.facebook.clientID,
+			fbAppId: dynamicConfig.facebookClientId,
 			publisherName : config.branding.siteName
 		};
 

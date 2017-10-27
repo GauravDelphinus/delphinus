@@ -3,12 +3,13 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 var dataUtils = require("../dataUtils");
 var config = require('../config');
 var logger = require("../logger");
+var dynamicConfig = require("../config/dynamicConfig");
 
 module.exports = function () {
 
     passport.use(new FacebookStrategy({
-            clientID: config.social.facebook.clientID,
-            clientSecret: config.social.facebook.clientSecret,
+            clientID: dynamicConfig.facebookClientId,
+            clientSecret: dynamicConfig.facebookClientSecret,
             callbackURL: config.hostname + config.social.facebook.oauthCallback,
             profileFields: ['id', 'email', 'name'],
             passReqToCallback: true
@@ -61,7 +62,7 @@ module.exports = function () {
                     user.facebook.emails.push(profile.emails[i].value);
                 }
                 
-                var facebook = require('../services/facebook')(config.social.facebook.clientID, config.social.facebook.clientSecret);
+                var facebook = require('../services/facebook')(dynamicConfig.facebookClientId, dynamicConfig.facebookClientSecret);
                 facebook.getImage(user.facebook.token, function (imageUrl) {
                     user.facebook.image = imageUrl;
 

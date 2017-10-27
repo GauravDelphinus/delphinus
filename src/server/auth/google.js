@@ -2,12 +2,13 @@ var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
 var dataUtils = require("../dataUtils");
 var config = require('../config');
+var dynamicConfig = require("../config/dynamicConfig");
 
 module.exports = function () {
 
     passport.use(new GoogleStrategy({
-            clientID: config.social.google.clientID,
-            clientSecret: config.social.google.clientSecret,
+            clientID: dynamicConfig.googleClientId,
+            clientSecret: dynamicConfig.googleClientSecret,
             callbackURL: config.hostname + config.social.google.oauthCallback,
             passReqToCallback: true
         },
