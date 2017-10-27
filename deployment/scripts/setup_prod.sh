@@ -1,4 +1,8 @@
 #Setup on production - only required once (not for every check-in) for setting up directories, links, etc.
-#Call from src/server (or similar level) directory
 
-pm2 deploy ../../deployment/aws/ecosystem.config.js production setup
+pushd `dirname $0` > /dev/null
+SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
+popd > /dev/null
+PROJECT_ROOT="${SCRIPT_PATH}/../../"
+
+pm2 deploy ${PROJECT_ROOT}/deployment/aws/ecosystem.config.js production setup

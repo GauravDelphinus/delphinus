@@ -110,7 +110,7 @@ module.exports = {
 		repo : 'git@github.com:ezeeideas/delphinus.git',
 		path : '/var/www/staging',
 
-		'post-setup': '../current/deployment/scripts/setup_dirs.sh --projectroot ../current/',
+		'post-setup': '../current/deployment/scripts/setup_dirs.sh',
 		'post-deploy' : '../current/deployment/scripts/minify.sh --sourcejsfolder ../current/src/client/web/public/js --minjsfolder ../public/js --sourcelessfolder ../current/src/server/less --mincssfolder ../public/css; npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging'
     },
     production : {
@@ -120,7 +120,7 @@ module.exports = {
 		repo : 'git@github.com:ezeeideas/delphinus.git',
 		path : '/var/www/production',
 
-		'post-setup': '../current/deployment/scripts/setup_dirs.sh --projectroot ../current/',
+		'post-setup': '../current/deployment/scripts/setup_dirs.sh',
 		'post-deploy' : '../current/deployment/scripts/minify.sh --sourcejsfolder ../current/src/client/web/public/js --minjsfolder ../public/js --sourcelessfolder ../current/src/server/less --mincssfolder ../public/css; npm install --prefix ./src/server && pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env production'
     }
   }
