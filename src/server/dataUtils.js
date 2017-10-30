@@ -17,7 +17,6 @@ module.exports = {
 		this.myDB = db;
 
 		var functions = [];
-
 		//enumerate preset filters and create the nodes if not present
 
 		for (let key in presets.presetLayout) {
