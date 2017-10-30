@@ -7,7 +7,7 @@ var mime = require("mime");
 var logger = require("./logger");
 var async = require("async");
 var serverUtils = require("./serverUtils");
-var dynamicConfig = require("../config/dynamicConfig");
+var dynamicConfig = require("./config/dynamicConfig");
 
 module.exports = {
 

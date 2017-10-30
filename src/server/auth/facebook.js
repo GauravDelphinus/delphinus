@@ -67,8 +67,8 @@ module.exports = function () {
                     user.facebook.image = imageUrl;
 
                     // set the user name and image, if not already set
-                    if (!user.displayName) {
-                        user.displayName = user.facebook.displayName;
+                    if (!user.displayName && profile.name && profile.name.givenName && profile.name.familyName) {
+                        user.displayName = profile.name.givenName + " " + profile.name.familyName;
                     }
 
                     // if user.image is not already set, set it to the one coming from Facebook
