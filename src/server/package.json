@@ -4,6 +4,7 @@
   "description": "Social App that allows users to share their creations",
   "main": "index.js",
   "scripts": {
+    "test": "nyc mocha --recursive test",
     "eslint": "eslint",
     "deploy-dev": "../deployment/scripts/deploy-local.sh"
   },
