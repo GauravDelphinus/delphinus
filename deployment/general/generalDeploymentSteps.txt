@@ -234,6 +234,14 @@ server {
 	$sudo crontab -e #edit crontab file in editor
 	$paste the following at the end of the crontab file => 15 3 * * * /usr/bin/certbot renew --quiet
 
+
+####################################################################
+# INSTALL SOCIAL KEYS TO SERVER
+####################################################################
+
+All social keys (facebook, twitter, etc.) are now picked up at run time from the .env file in the <root>/src/server
+folder.  You need to make sure these are copied to the appropriate server location, or node will not be able to start.
+
 ####################################################################
 # TRIGGER ACTUAL DEPLOYMENT (MANUAL) (from dev machine)
 ####################################################################
