@@ -1,0 +1,7 @@
+How to connect to the AWS EC2 Instances
+
+#Prod server
+ssh -i /location/of/production_server_key.pem ubuntu@<ec2-prod-instance-name>.compute.amazonaws.com
+
+#Stage server
+ssh -i /location/of/stage_server_key.pem ubuntu@<ec2-stage-instance-name>.compute.amazonaws.com
