@@ -1285,10 +1285,13 @@ function constructJSONObject(jsonObj) {
 			artifact.type = "preset";
 			artifact.preset = presetValue;
 		}
+
+		artifact.banner = {caption: $("#bannerText").prop("value")}; //this is only there to allow server to account for caption text when generating image hashes
+
 	} else if ($("#artifactOptionsButton").data("state") == "custom") {
 			artifact.type = "custom";
 
-			artifact.banner = {};
+			artifact.banner = {caption: $("#bannerText").prop("value")}; //this is only there to allow server to account for caption text when generating image hashes
 
 			if ($("#topBannerButton").hasClass("active")) {
 				artifact.banner.location = "top";
