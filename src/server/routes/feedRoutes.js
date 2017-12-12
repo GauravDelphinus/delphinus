@@ -539,69 +539,6 @@ var routes = function(db) {
 
 
 			/**************** DEFAULT FEED WHEN USER IS NOT LOGGED IN *****************/	
-			} else { 
-				// Challenges Posted Recently
-				runQueryFunctions.push(function(callback){
-
-					var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) " +
-						" WITH c, category, poster " +
-						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
-						" WITH c, category, poster, COUNT(u2) AS like_count " + 
-						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
-						" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
-						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-						" RETURN c, poster, like_count, comment_count, COUNT(entry) AS entry_count, category ORDER BY c.created DESC;";
-
-					db.cypherQuery(cypherQuery, function(err, result) {
-						if (err) {
-							logger.dbError(err, cypherQuery);
-							return callback(err, 0);
-						}
-
-						var output = [];
-		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, false, "recentlyPosted", null, null, null, null, result.data[i][5]);
-							output.push(data);
-		    			}
-
-		    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
-		    			}
-						resultArrays.push(output);
-						return callback(null, 0);
-					});
-				});
-
-				// Entries posted recently
-				runQueryFunctions.push(function(callback){
-					var cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User) " +
-						" WITH e, poster " + 
-						" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
-						" WITH e, poster, COUNT(u2) AS like_count " + 
-						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
-						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
-						" RETURN e, poster, like_count, comment_count ORDER BY e.created DESC;";
-
-					db.cypherQuery(cypherQuery, function(err, result) {
-						if (err) {
-							logger.dbError(err, cypherQuery);
-							return callback(err, 0);
-						}
-
-						var output = [];
-		    			for (var i = 0; i < result.data.length; i++) {
-		    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, false, "recentlyPosted", null, null, null, null);
-							output.push(data);
-		    			}
-
-		    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-		    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
-		    			}
-						resultArrays.push(output);
-						return callback(null, 0);
-					});
-				});
-
 			}
 
 			/**************** COMMON ENTRIES (whether user is logged in or not) ****************/
@@ -737,6 +674,70 @@ var routes = function(db) {
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
 	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "highCommentCount", null, null, null, null);
+						output.push(data);
+	    			}
+
+	    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
+	    				return callback(new error.DataValidationError(output, serverUtils.prototypes.entry), 0);
+	    			}
+					resultArrays.push(output);
+					return callback(null, 0);
+				});
+			});
+
+			//*************** FILLERS - IN CASE THE FEED LIST IS EMPTY ******************//
+
+			// Challenges Posted Recently
+			runQueryFunctions.push(function(callback){
+
+				var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) " +
+					" WITH c, category, poster " +
+					" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
+					" WITH c, category, poster, COUNT(u2) AS like_count " + 
+					" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
+					" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
+					" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
+					" RETURN c, poster, like_count, comment_count, COUNT(entry) AS entry_count, category ORDER BY c.created DESC;";
+
+				db.cypherQuery(cypherQuery, function(err, result) {
+					if (err) {
+						logger.dbError(err, cypherQuery);
+						return callback(err, 0);
+					}
+
+					var output = [];
+	    			for (var i = 0; i < result.data.length; i++) {
+	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, false, "recentlyPosted", null, null, null, null, result.data[i][5]);
+						output.push(data);
+	    			}
+
+	    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+	    				return callback(new error.DataValidationError(output, serverUtils.prototypes.challenge), 0);
+	    			}
+					resultArrays.push(output);
+					return callback(null, 0);
+				});
+			});
+
+			// Entries posted recently
+			runQueryFunctions.push(function(callback){
+				var cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User) " +
+					" WITH e, poster " + 
+					" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
+					" WITH e, poster, COUNT(u2) AS like_count " + 
+					" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
+					" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
+					" RETURN e, poster, like_count, comment_count ORDER BY e.created DESC;";
+
+				db.cypherQuery(cypherQuery, function(err, result) {
+					if (err) {
+						logger.dbError(err, cypherQuery);
+						return callback(err, 0);
+					}
+
+					var output = [];
+	    			for (var i = 0; i < result.data.length; i++) {
+	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, false, "recentlyPosted", null, null, null, null);
 						output.push(data);
 	    			}
 
