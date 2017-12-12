@@ -293,13 +293,12 @@ function showArtifactStep() {
 					list.push(data);
 				}
 
-				$("#presetArtifacts").remove();
 				var grid = createGrid("presetArtifacts", list, 3, true, true, defaultSelectionID, function(id) {
 					switchStepOptions("artifact", "preset", id);
 					
 					$(window).scrollTop(0);
 				});
-				$("#presetArtifactSection").append(grid);
+				$("#presetArtifactSection").empty().append(grid);
 
 				//apply changes to reflect default selection
 				applyChanges();
@@ -387,13 +386,12 @@ function showLayoutStep() {
 					list.push(data);
 				}
 
-				$("#presetLayouts").remove();
 				var grid = createGrid("presetLayouts", list, 3, true, true, defaultSelectionID, function(id) {
 					switchStepOptions("layout", "preset", id);
 
 					$(window).scrollTop(0);
 				});
-				$("#presetLayoutSection").append(grid);
+				$("#presetLayoutSection").empty().append(grid);
 
 				applyChanges(); //for default selection
 			}
@@ -610,13 +608,12 @@ function showFilterStep() {
 					list.push(data);
 				}
 
-				$("#presetFilters").remove();
 				var grid = createGrid("presetFilters", list, 3, true, true, defaultSelectionID, function(id) {
 					switchStepOptions("filter", "preset", id);
 
 					$(window).scrollTop(0);
 				});
-				$("#presetFilterSection").append(grid);
+				$("#presetFilterSection").empty().append(grid);
 
 				applyChanges(); //for default selection
 			}
@@ -806,13 +803,12 @@ function showDecorationStep() {
 					list.push(data);
 				}
 
-				$("#presetDecorations").remove();
 				var grid = createGrid("presetDecorations", list, 3, true, true, defaultSelectionID, function(id) {
 					switchStepOptions("decoration", "preset", id);
 
 					$(window).scrollTop(0);
 				});
-				$("#presetDecorationSection").append(grid);
+				$("#presetDecorationSection").empty().append(grid);
 
 				applyChanges(); //for default selection
 			}
