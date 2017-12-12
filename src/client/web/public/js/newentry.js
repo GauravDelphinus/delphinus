@@ -865,25 +865,25 @@ function switchStepOptions(stepType, optionType, presetOptionID) {
 			case "artifact":
 				$("#artifactOptionsButton").data("state", "preset");
 				$("#presetArtifactSection").data("selectedPresetID", presetOptionID);
-				$("#customArtifactSection button:not(.featureToggleButton), input, select ").prop("disabled", true);
+				$("#customArtifactSection button:not(.featureToggleButton), #customArtifactSection input, #customArtifactSection select ").prop("disabled", true);
 				$("#customArtifactSection .featureToggleButton").removeClass("active").text("OFF");
 				break;
 			case "layout":
 				$("#layoutOptionsButton").data("state", "preset");
 				$("#presetLayoutSection").data("selectedPresetID", presetOptionID);
-				$("#customLayoutSection button:not(.featureToggleButton), input, select ").prop("disabled", true);
+				$("#customLayoutSection button:not(.featureToggleButton), #customLayoutSection input, #customLayoutSection select ").prop("disabled", true);
 				$("#customLayoutSection .featureToggleButton").removeClass("active").text("OFF");
 				break;
 			case "filter":
 				$("#filterOptionsButton").data("state", "preset");
 				$("#presetFilterSection").data("selectedPresetID", presetOptionID);
-				$("#customFilterSection button:not(.featureToggleButton), input, select ").prop("disabled", true);
+				$("#customFilterSection button:not(.featureToggleButton), #customFilterSection input, #customFilterSection select ").prop("disabled", true);
 				$("#customFilterSection .featureToggleButton").removeClass("active").text("OFF");
 				break;
 			case "decoration":
 				$("#decorationOptionsButton").data("state", "preset");
 				$("#presetDecorationSection").data("selectedPresetID", presetOptionID);
-				$("#customDecorationSection button:not(.featureToggleButton), input, select ").prop("disabled", true);
+				$("#customDecorationSection button:not(.featureToggleButton), #customDecorationSection input, #customDecorationSection select ").prop("disabled", true);
 				$("#customDecorationSection .featureToggleButton").removeClass("active").text("OFF");
 				break;
 		}
