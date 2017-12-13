@@ -51,9 +51,12 @@ function createCommentsSectionTrimmed(data, contentTag) {
 	});
 
 	replyButton.click(function(e) {
-		var newCommentElement = createNewCommentElement(true, data.id, contentTag);
-		//$("#" + data.id + "CommentElement").after(newCommentElement);
-		appendNewCommentElement(newCommentElement, data.id, contentTag, null, true);
+		//add a new reply input box only if there isn't already one.
+		if (!$("#" + contentTag + data.id + "NewCommentText").length) {
+			var newCommentElement = createNewCommentElement(true, data.id, contentTag);
+			appendNewCommentElement(newCommentElement, data.id, contentTag, null, true);
+		}
+		
 	});
 
 	return socialStatusSection;

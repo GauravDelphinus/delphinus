@@ -50,9 +50,12 @@ function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 	socialStatusSection.append(replyButton);
 	replyButton.click(function(e) {
 		if (user) {
-			//for reply of reply, the parent is still the top comment
-			var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id), contentTag);
-			appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), contentTag, null, true);
+			//add a new reply input box only if there isn't already one.
+			if (!$("#" + contentTag + ((isReply) ? (parentId) : (data.id)) + "NewCommentText").length) {
+				//for reply of reply, the parent is still the top comment
+				var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id), contentTag);
+				appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), contentTag, null, true);
+			}
 		} else {
 			window.open("/auth", "_self");
 		}
