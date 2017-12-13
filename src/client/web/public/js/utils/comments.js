@@ -101,6 +101,16 @@ function createCommentsContainer(data, contentTag) {
 
 	if (data.activity && data.activity.comment) {
 		container.append(createCommentElement(data.activity.comment, data.id, contentTag, false));
+
+		//add the New Comment text box of the Sign-in button
+		if (user) {
+			//show new comment box if already logged in
+			var newCommentElement = createNewCommentElement(false, data.id, contentTag);
+			appendNewCommentElement(newCommentElement, data.id, contentTag, container, false);
+		} else {
+			var signInToCommentElement = createSignInToCommentElement();
+			container.append(signInToCommentElement);
+		}
 	}
 
 	return container;
