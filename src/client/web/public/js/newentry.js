@@ -145,7 +145,25 @@ function setupMainItem() {
 	$("#newentryimage").on("load", function() {
 		$("#newentryimage").data("naturalWidth", this.naturalWidth);
 		$("#newentryimage").data("naturalHeight", this.naturalHeight);
+		setImageHeight(); //adjust height
 	});
+
+	//listen to window resize events
+	$(window).bind('resize', setImageHeight);
+    setImageHeight();
+}
+
+/*
+	Set the Image Height to the best possible to fit into the resizable window.
+*/
+function setImageHeight() {
+	var offset = $("#newentryimage").offset();
+	var windowHeight = window.innerHeight;
+	if ($("#newentryimage").height() > $("#newentryimage").width()) {
+		//it's a portrait image, so try to adjust the height to fit in the visible window area
+		var desiredHeight = windowHeight - offset.top - 10;
+		$("#newentryimage").height(desiredHeight);
+	}
 }
 
 /*
