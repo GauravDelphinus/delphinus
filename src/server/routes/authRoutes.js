@@ -21,14 +21,14 @@ var routes = function() {
                 req.session.redirectTo = req.get('Referrer');
             }
 
-			res.render("auth", {pageTitle: "Sign In - " + config.branding.siteName});
+			res.render("auth", {pageTitle: "Sign In | " + config.branding.siteName});
         });
 
     authRouter.route("/login")
         .get(function(req, res, next) {
         	logger.debug("GET received on /auth/login, query: " + JSON.stringify(req.query));
 
-            res.render("login", {message: []});
+            res.render("login", {message: [], pageTitle: "Sign in | " + config.branding.siteName});
         })
 
         .post(passport.authenticate("local-login", {
@@ -51,7 +51,7 @@ var routes = function() {
         .get(function(req, res, next) {
         	logger.debug("GET received on /auth/signup, query: " + JSON.stringify(req.query));
 
-            res.render("signup", {message: req.flash("signupMessage")});
+            res.render("signup", {message: req.flash("signupMessage"), pageTitle: "Sign up | " + config.branding.siteName});
         })
         .post(passport.authenticate("local-signup", {
 	            failureRedirect: "/auth/signup",

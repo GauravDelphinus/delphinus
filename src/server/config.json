@@ -11,7 +11,7 @@
 		"hostname" : "www.captionify.com",
 		"host" : "www.captionify.com"
 	},
-	"hostname" : "http://localhost:8080",
+	"hostname" : "https://www.captionify.com",
 	"port" : "8080",
 	"path" : {
 		"challengeImages" : "../data/contentImages/challenges/",
@@ -49,6 +49,8 @@
 		"challenge" : "/challenge/",
 		"entry" : "/entry/",
 		"challenges" : "/challenges/",
+		"entries" : "/entries/",
+		"users" : "/users/",
 		"entryImages" : "/contentImages/entries/",
 		"challengeImages" : "/contentImages/challenges/",
 		"userImages" : "/contentImages/users/",
@@ -78,7 +80,7 @@
 			"imageHeight" : "62",
 			"imageWidth" : "197"
 		},
-		"siteTitle" : "Don't hold on your ideas anymore.  Caption Everything!",
-		"siteDescription" : "Captionify.com is the one-stop-shop for all creative minds to post their awesome captions to challenges."
+		"siteTitle" : "Caption everything!",
+		"siteDescription" : "Participate in challenges, capture your thoughts and ideas.  Caption everything!"
 	}
 }

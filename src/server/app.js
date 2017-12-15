@@ -117,11 +117,15 @@ module.exports = function(callback) {
 		});
 
 		app.get("/entries", function(req, res) {
-			res.render("entries", {user: normalizeUser(req.user)});
+			const metaData = dataUtils.constructMetaData("entries");
+			metaData.user = normalizeUser(req.user);
+			res.render("entries", metaData);
 		});
 
 		app.get("/users", function(req, res) {
-			res.render("users", {user: normalizeUser(req.user)});
+			const metaData = dataUtils.constructMetaData("users");
+			metaData.user = normalizeUser(req.user);
+			res.render("users", metaData);
 		});
 
 		// 1 - Challenge Page
@@ -275,7 +279,11 @@ module.exports = function(callback) {
 						return res.render("error", {redirectURL: "/users"});
 					}
 
-					return res.render("user", {userInfo: user, user: normalizeUser(req.user)});
+					const metaData = dataUtils.constructMetaData("user", user);
+					metaData.user = normalizeUser(req.user);
+					metaData.userInfo = user;
+					logger.debug("User is: " + JSON.stringify(user));
+					return res.render("user", metaData);
 	            });
 	    });
 

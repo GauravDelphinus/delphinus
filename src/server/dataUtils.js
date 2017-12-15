@@ -217,7 +217,7 @@ module.exports = {
 		if (entityType == "challenge") {
 			data.id = entity.id;
 			data.imageURL = config.hostname + config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
-			data.pageTitle = entity.title + " - " + config.branding.siteName;
+			data.pageTitle = "Challenge: " + entity.title + " | " + config.branding.siteName;
 			data.pageURL = config.hostname + config.url.challenge + entity.id;
 			data.pageDescription = "Challenge posted";
 			data.imageType = entity.image_type;
@@ -225,7 +225,7 @@ module.exports = {
 		} else if (entityType == "entry") {
 			data.id = entity.id;
 			data.imageURL = config.hostname + config.url.entryImages + entity.id  + "." + mime.extension(entity.image_type);
-			data.pageTitle = entity.caption + " - " + config.branding.siteName;
+			data.pageTitle = "Caption Entry: " + entity.caption + " | " + config.branding.siteName;
 			data.pageURL = config.hostname + config.url.entry + entity.id;
 			data.pageDescription = "Entry posted";
 			if (challenge && challenge.id) {
@@ -242,6 +242,36 @@ module.exports = {
 			
 			data.imageType = entity.image_type; //entry retains format of the challenge
 			data.authorName = poster.displayName;
+		} else if (entityType == "entries") {
+			data.imageURL = config.hostname + config.url.brandImages + config.branding.shareImage.imageName;
+			data.imageType = config.branding.shareImage.imageType;
+			data.imageWidth = config.branding.shareImage.imageWidth;
+			data.imageHeight = config.branding.shareImage.imageHeight;
+
+			data.pageTitle = "Entries" + " | " + config.branding.siteName;
+			data.pageURL = config.hostname + config.url.entries;
+			data.pageDescription = "Entries Posted";
+
+			data.authorName = config.branding.siteName;
+		} else if (entityType == "user") {
+			data.id = entity.id;
+			data.imageURL = config.hostname + entity.image;
+			data.pageTitle = "User: " + entity.displayName + " | " + config.branding.siteName;
+			data.pageURL = config.hostname + config.url.user + entity.id;
+			data.pageDescription = "User";
+			data.imageType = mime.lookup(entity.image);
+			data.authorName = config.branding.siteName;
+		} else if (entityType == "users") {
+			data.imageURL = config.hostname + config.url.brandImages + config.branding.shareImage.imageName;
+			data.imageType = config.branding.shareImage.imageType;
+			data.imageWidth = config.branding.shareImage.imageWidth;
+			data.imageHeight = config.branding.shareImage.imageHeight;
+
+			data.pageTitle = "Users | " + config.branding.siteName;
+			data.pageURL = config.hostname + config.url.users;
+			data.pageDescription = "Users";
+
+			data.authorName = config.branding.siteName;
 		} else if (entityType == "category") {
 			data.imageURL = config.hostname + config.url.brandImages + config.branding.shareImage.imageName;
 			data.imageType = config.branding.shareImage.imageType;
@@ -250,19 +280,19 @@ module.exports = {
 
 			if (entity) {
 				data.id = entity.id;
-				data.pageTitle = "Challenges under " + entity.name + " - " + config.branding.siteName;
+				data.pageTitle = "Challenges under " + entity.name + " | " + config.branding.siteName;
 				data.pageURL = config.hostname + config.url.challenges + "?category=" + entity.id;
 				data.pageDescription = "Challenge posted under " + entity.name;
 			} else {
-				data.pageTitle = "All Challenges" + " - " + config.branding.siteName;
+				data.pageTitle = "Challenges" + " | " + config.branding.siteName;
 				data.pageURL = config.hostname + config.url.challenges;
-				data.pageDescription = "All Challenges Posted";
+				data.pageDescription = "Challenges Posted";
 			}
 			
 			data.authorName = config.branding.siteName;
 		} else if (entityType == "home") { //home page or other generic pages
 			data.pageURL = config.hostname;
-			data.pageTitle = config.branding.siteTitle + " - " + config.branding.siteName;
+			data.pageTitle = config.branding.siteName + " | " + config.branding.siteTitle;
 			data.pageDescription = config.branding.siteDescription;
 			data.imageURL = config.hostname + config.url.brandImages + config.branding.shareImage.imageName;
 			data.imageType = config.branding.shareImage.imageType;
