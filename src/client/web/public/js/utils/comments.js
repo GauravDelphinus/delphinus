@@ -83,6 +83,9 @@ function showHideCommentsList(parentId, contentTag, show) {
 			if ($("#" + contentTag + parentId + "CommentsPopup").length) {
 				$("#" + contentTag + parentId + "CommentsPopup").show();
 			}
+		} else {
+			//if the comments list is already shown, make sure to focus in into the new comment text box
+			$("#" + contentTag + parentId + "NewCommentText").focus(); // set focus in the input field
 		}
 
 		//make sure the tab is 'active', not just 'shown'

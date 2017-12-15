@@ -56,6 +56,7 @@ function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 				var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id), contentTag);
 				appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), contentTag, null, true);
 			}
+			$("#" + contentTag + ((isReply) ? (parentId) : (data.id)) + "NewCommentText").focus(); // set focus in the input field
 		} else {
 			window.open("/auth", "_self");
 		}
