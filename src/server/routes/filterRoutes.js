@@ -153,59 +153,72 @@ var routes = function(db) {
     					//since we passed 'false' above to the processImageDataForEntry call
     					var hash = filterUtils.generateHash(JSON.stringify(steps));
 						var targetImageName = info.sourceId + "-" + hash + "." + mime.extension(info.imageType);
-						var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+						var targetImagePath = global.appRoot + config.path.cacheImagesRaw + targetImageName;
 						var targetImageUrl = config.url.cacheImages + targetImageName;
     				}
 
-    				imageProcessor.applyStepsToImage(info.sourceImagePath, targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePath){
+    				imageProcessor.applyStepsToImage(info.sourceImagePath, targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePathRaw){
 						if (err) {
 							logger.error("applyStepsToImage failed: " + err);
 							return res.sendStatus(500);
 						}
 
-						if (info.sourceFileIsTemp) {
-							//get rid of the source file since it was temporary
-							fs.unlink(info.sourceImagePath, function(err) {
-								if (err) {
-									logger.error("Failed to delete source image file: " + err);
-								}
-							});
+						//now, add the watermark
+						var imagePath = imagePathRaw;
+						if (targetImagePath) {
+							imagePath = global.appRoot + config.path.cacheImages + targetImageName;
 						}
 
-						if (targetImageUrl == null) {
-							//we generated a temp path.  make sure to send the file as blob and delete the temp file
-							const DataURI = require('datauri');
-							const datauri = new DataURI();
-							datauri.encode(imagePath, function(err, content) {
-								if (err) {
-									throw err;
-								}
+						imageProcessor.addWatermarkToImage(imagePathRaw, imagePath, function(err, outputPath) {
+							if (err) {
+								logger.error("Failed to apply watermark: " + fullPath);
+								return res.sendStatus(500);
+							}
 
-								fs.unlink(imagePath, function(err) {
+							if (info.sourceFileIsTemp) {
+								//get rid of the source file since it was temporary
+								fs.unlink(info.sourceImagePath, function(err) {
 									if (err) {
-										logger.error("Failed to delete temp file: " + err);
+										logger.error("Failed to delete source image file: " + err);
 									}
 								});
-								
+							}
 
-								var jsonObj = {"type" : "dataURI", "imageData" : content};
+							if (targetImageUrl == null) {
+								//we generated a temp path.  make sure to send the file as blob and delete the temp file
+								const DataURI = require('datauri');
+								const datauri = new DataURI();
+								datauri.encode(outputPath, function(err, content) {
+									if (err) {
+										throw err;
+									}
+
+									fs.unlink(outputPath, function(err) {
+										if (err) {
+											logger.error("Failed to delete temp file: " + err);
+										}
+									});
+									
+
+									var jsonObj = {"type" : "dataURI", "imageData" : content};
+
+									if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
+										return res.sendStatus(500);
+									}
+
+									return res.json(jsonObj);
+								});
+							} else {
+								//we saved to the provided target image path.  send the link
+								var jsonObj = {"type" : "imageURL", "imageData" : targetImageUrl};
 
 								if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
 									return res.sendStatus(500);
 								}
-
+								
 								return res.json(jsonObj);
-							});
-						} else {
-							//we saved to the provided target image path.  send the link
-							var jsonObj = {"type" : "imageURL", "imageData" : targetImageUrl};
-
-							if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
-								return res.sendStatus(500);
 							}
-							
-							return res.json(jsonObj);
-						}
+						});
 					});
     			});
 			});
@@ -229,14 +242,11 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			logger.debug("about to call getImageDataForEntry");
 			dataUtils.getImageDataForEntry(req.params.entryId, function(err, imageData){
 				if (err) {
 					logger.error("getImageDataForEntry, entry: " + req.params.entryId + ": " + err);
 					return res.sendStatus(500);
 				}
-
-				logger.debug("imageData: " + JSON.stringify(imageData));
 
 				var sourceImagePath = imageData.sourceImagePath;
 
@@ -245,8 +255,6 @@ var routes = function(db) {
 	    				logger.error("normalizeSteps, steps: " + imageDate.steps + ": " + err);
 	    				return res.sendStatus(500);
 	    			}
-
-	    			logger.debug("steps: " + JSON.stringify(steps));
 
 	    			//extract the steps (cumulative format) and generate the hash to 
 	    			//look for actual step images
@@ -287,7 +295,6 @@ var routes = function(db) {
 	    					return res.sendStatus(500);
 	    				}
 
-	    				logger.debug("sending back: " + JSON.stringify(output));
 						return res.json(output);
 	    			});
 	    		});

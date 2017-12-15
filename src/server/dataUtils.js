@@ -352,7 +352,7 @@ module.exports = {
 	    				return next(err, null);
 	    			}
 
-	    			sourceImagePath = global.appRoot + config.path.designImages + sourceId + designData.categoryId + "." + mime.extension(imageType);
+	    			sourceImagePath = global.appRoot + config.path.designImagesRaw + sourceId + designData.categoryId + "." + mime.extension(imageType);
 	    			sourceImageUrl = config.url.designImages + designData.categoryId + "/" + sourceId + "." + mime.extension(imageType);
 	    			return next(null, {source: source, sourceId: sourceId, sourceImagePath: sourceImagePath, sourceImageUrl: sourceImageUrl, imageType: imageType, imageCaption:imageCaption});
 	    		});
@@ -1524,6 +1524,7 @@ function createNodesForCategory(db, parentCategoryId, categoryId, categoryObj, c
 			
 		db.cypherQuery(cypherQuery, function(err, result){
 			if(err) {
+				logger.dbError(cypherQuery);
 				return callback(err, 0);
 			}
 
@@ -1544,7 +1545,7 @@ function createNodeForDesignCategory(db, categoryId, categoryName, callback) {
 	if (categoryId && categoryName) {
 
 		//before we create the node, check that the category folder exists
-		serverUtils.directoryExists(global.appRoot + config.path.designImages + categoryId, function(err) {
+		serverUtils.directoryExists(global.appRoot + config.path.designImagesRaw + categoryId, function(err) {
 			if (err) {
 				return callback(err, 0);
 			}
@@ -1553,6 +1554,7 @@ function createNodeForDesignCategory(db, categoryId, categoryName, callback) {
 
 			db.cypherQuery(cypherQuery, function(err, result) {
 				if (err) {
+					logger.dbError(cypherQuery);
 					return callback(err, 0);
 				}
 
@@ -1565,7 +1567,7 @@ function createNodeForDesignCategory(db, categoryId, categoryName, callback) {
 function createNodeForDesign(db, designId, designName, categoryId, presetArtifactId, callback) {
 	if (designId && designName) {
 		//first check to make sure the image file exists
-		serverUtils.fileExists(global.appRoot + config.path.designImages + categoryId + "/" + designId + ".jpeg", function(err) {
+		serverUtils.fileExists(global.appRoot + config.path.designImagesRaw + categoryId + "/" + designId + ".jpeg", function(err) {
 			if (err) {
 				return callback(err, 0);
 			}
@@ -1574,6 +1576,7 @@ function createNodeForDesign(db, designId, designName, categoryId, presetArtifac
 
 			db.cypherQuery(cypherQuery, function(err, result) {
 				if (err) {
+					logger.dbError(cypherQuery);
 					return callback(err, 0);
 				}
 

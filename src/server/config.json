@@ -15,16 +15,21 @@
 	"port" : "8080",
 	"path" : {
 		"challengeImages" : "../data/contentImages/challenges/",
+		"challengeImagesRaw" : "../data/contentImagesRaw/challenges/",
 		"userImages" : "../data/contentImages/users/",
 		"staticImages" : "src/client/web/public/images/static/",
 		"entryImages" : "../data/contentImages/entries/",
+		"entryImagesRaw" : "../data/contentImagesRaw/entries/",
 		"brandImages" : "src/client/web/public/images/static/branding/",
 		"logDir" : "../data/log/",
 		"publicDir" : "../public/",
 		"cacheImages" : "../data/cacheImages/",
+		"cacheImagesRaw" : "../data/cacheImagesRaw/",
 		"tmpDir" : "../data/tmp/",
-		"designImages" : "src/client/web/public/images/designs/",
-		"independentImages" : "../data/contentImages/independent/"
+		"designImagesRaw" : "src/client/web/public/images/designs/",
+		"independentImages" : "../data/contentImages/independent/",
+		"independentImagesRaw" : "../data/contentImagesRaw/independent/",
+		"watermarkImages" : "assets/watermarks/"
 	},
 	"social" : {
 		"facebook" : {

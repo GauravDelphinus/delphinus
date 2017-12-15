@@ -362,7 +362,8 @@ var routes = function(db) {
 
 	    						//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
 	    						var entryImagePath = global.appRoot + config.path.entryImages + id + "." + mime.extension(info.imageType);
-	    						serverUtils.copyFile(imagePaths[imagePaths.length - 1], entryImagePath, function(err) {
+	    						//serverUtils.copyFile(imagePaths[imagePaths.length - 1], entryImagePath, function(err) {
+	    						imageProcessor.addWatermarkToImage(imagePaths[imagePaths.length - 1], entryImagePath, function(err) {
 	    							if (err) {
 	    								logger.error("Error creating the final Entry Image: " + err);
 	    								return res.sendStatus(500);

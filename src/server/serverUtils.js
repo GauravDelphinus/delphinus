@@ -359,7 +359,6 @@ module.exports = {
 	},
 
 	copyFile: function(source, target, cb) {
-		logger.debug("copyFile: source: " + source + ", target: " + target);
 	  var cbCalled = false;
 
 	  var rd = fs.createReadStream(source);
@@ -381,6 +380,10 @@ module.exports = {
 	      cbCalled = true;
 	    }
 	  }
+	},
+
+	addWatermark: function(source, target, cb) {
+		
 	},
 
 	mergeFeeds: function(feedsArray, mergedFeed) {

@@ -207,7 +207,7 @@ module.exports = {
 							return callback(err);
 						}
 
-						var sourceImagePath = global.appRoot + config.path.challengeImages + entryData.challengeId + "." + mime.extension(imageData.imageType);
+						var sourceImagePath = global.appRoot + config.path.challengeImagesRaw + entryData.challengeId + "." + mime.extension(imageData.imageType);
 						//var hash = this.generateHash(JSON.stringify(steps));
 						//var targetImageName = entryData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
 						//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
@@ -232,7 +232,7 @@ module.exports = {
 			    				return callback(err);
 			    			}
 
-			    			var sourceImagePath = config.path.independentImages + data.id + "." + mime.extension(data.imageType);
+			    			var sourceImagePath = config.path.independentImagesRaw + data.id + "." + mime.extension(data.imageType);
 			    			return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: null, targetImageUrl: null, imageType: data.imageType, sourceId: data.id});
 			    		});
 		    		} else {
@@ -263,7 +263,7 @@ module.exports = {
 			    				return callback(err);
 			    			}
 
-			    			var sourceImagePath = config.path.independentImages + data.id + "." + mime.extension(data.imageType);
+			    			var sourceImagePath = config.path.independentImagesRaw + data.id + "." + mime.extension(data.imageType);
 			    			return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: null, targetImageUrl: null, imageType: data.imageType, sourceId: data.id});
 			    		});
 		    		} else {
@@ -293,7 +293,7 @@ module.exports = {
 							return callback(err);
 						}
 
-						var sourceImagePath = global.appRoot + config.path.designImages + imageData.categoryId + "/" + entryData.designId + "." + mime.extension(imageData.imageType);
+						var sourceImagePath = global.appRoot + config.path.designImagesRaw + imageData.categoryId + "/" + entryData.designId + "." + mime.extension(imageData.imageType);
 
 						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: "image/jpeg", sourceId: imageData.id});
 					});

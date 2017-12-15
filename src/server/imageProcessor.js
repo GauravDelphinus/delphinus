@@ -3,6 +3,7 @@ var fs = require("fs");
 var execFile = require('child_process').execFile;
 var logger = require("./logger");
 var mime = require("mime");
+var config = require("./config");
 
 module.exports = {
 	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
@@ -24,7 +25,11 @@ module.exports = {
 		}
 	},
 
-	findImageSize: findImageSize
+	findImageSize: findImageSize,
+
+	addWatermarkToImage: function(sourceImage, targetImage, next) {
+		addWatermark(sourceImage, targetImage, next);
+	}
 };
 
 
@@ -706,6 +711,30 @@ function writeImage(sourceImage, targetImage, imArgs, next) {
 }
 
 /**
+	Write the given sourceImage to the targetImage after applying the provided
+	ImageMagick arguments.  Then, call the next functin with the error (if any),
+	or with the path to the final image, along with info on whether there was 
+	really any change done.
+**/
+function compositeImage(sourceImage, targetImage, imArgs, next) {
+	if (imArgs.length > 0) {
+		logger.debug("calling composite with imArgs: " + JSON.stringify(imArgs));
+		execFile("composite", imArgs, (error, stdout, stderr) => {
+			logger.debug("output of composite: error: " + error);
+			if (error) {
+		    	next(error, null);
+		  	} else {
+		  		next(0, targetImage);
+		  	}
+	  	});
+	} else {
+		next(0, sourceImage); // no changes done, so just send back the source image
+	}
+}
+
+
+
+/**
 	Find the size of the provided image
 **/
 function findImageSize(imagePath, next) {
@@ -782,4 +811,54 @@ function normalizeColorToIM(color) {
 **/
 function normalizeFontNameToIM(fontName) {
 	return fontName; // TODO
+}
+
+/************************** WATERMARK RELATED ***************************/
+
+/**
+	Add a watermark to the SourceImage, and save that to the TargetImage
+**/
+function addWatermark(sourceImage, targetImage, next) {
+	var imArgs = []; //imageMagickArgs
+
+	applyWatermark(imArgs);
+
+	findImageSize(sourceImage, function(err, imageSize) {
+		if (err) {
+			return next(err);
+		}
+
+		let watermarkImagePath = global.appRoot + config.path.watermarkImages + "/";
+		if (imageSize.width < 600) {
+			watermarkImagePath += "captionify_watermark_gray_white_150x50.png";
+		} else if (imageSize.width < 1200) {
+			watermarkImagePath += "captionify_watermark_gray_white_300x100.png";
+		} else if (imageSize.width < 1800) {
+			watermarkImagePath += "captionify_watermark_gray_white_450x150.png";
+		} else if (imageSize.width < 2400) {
+			watermarkImagePath += "captionify_watermark_gray_white_600x200.png";
+		} else if (imageSize.width < 3600) {
+			watermarkImagePath += "captionify_watermark_gray_white_900x300.png";
+		} else if (imageSize.width < 4800) {
+			watermarkImagePath += "captionify_watermark_gray_white_1200x400.png";
+		} else {
+			watermarkImagePath += "captionify_watermark_gray_white_1500x500.png";
+		}
+
+		imArgs.push(watermarkImagePath);
+		imArgs.push(sourceImage);
+		imArgs.push(targetImage);
+
+		compositeImage(sourceImage, targetImage, imArgs, next);
+	});
+}
+
+function applyWatermark(imArgs) {
+	imArgs.push("-compose");
+	imArgs.push("multiply");
+	imArgs.push("-gravity");
+	imArgs.push("SouthWest");
+	imArgs.push("-geometry");
+	imArgs.push("+5+5");
+	
 }
