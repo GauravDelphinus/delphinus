@@ -101,6 +101,10 @@ module.exports = function(callback) {
 			res.render("index", metaData);
 		});
 
+		app.get("/favicon.ico", function(req, res) {
+			res.sendFile(global.appRoot + config.path.favicon);
+		});
+
 		app.get("/challenges", function(req, res) {
 			dataUtils.getMetaDataForCategory(req.query.category, function(err, data) {
 				if (err) {

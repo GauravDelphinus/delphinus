@@ -29,7 +29,8 @@
 		"designImagesRaw" : "src/client/web/public/images/designs/",
 		"independentImages" : "../data/contentImages/independent/",
 		"independentImagesRaw" : "../data/contentImagesRaw/independent/",
-		"watermarkImages" : "assets/watermarks/"
+		"watermarkImages" : "assets/watermarks/",
+		"favicon" : "assets/favicon/favicon.ico"
 	},
 	"social" : {
 		"facebook" : {
