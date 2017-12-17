@@ -260,7 +260,10 @@ module.exports = function(callback) {
 						return res.render("error", {redirectURL: "/users"});
 					}
 
-					return res.render("user", {user : user, userInfo: user});
+					const metaData = dataUtils.constructMetaData("user", user);
+					metaData.user = normalizeUser(req.user);
+					metaData.userInfo = user;
+					return res.render("user", metaData);
 				});
 
 			} else {
@@ -282,7 +285,6 @@ module.exports = function(callback) {
 					const metaData = dataUtils.constructMetaData("user", user);
 					metaData.user = normalizeUser(req.user);
 					metaData.userInfo = user;
-					logger.debug("User is: " + JSON.stringify(user));
 					return res.render("user", metaData);
 	            });
 	    });
