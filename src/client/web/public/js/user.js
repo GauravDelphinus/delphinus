@@ -228,6 +228,8 @@ function setupTabs(profileType) {
 
 	setupFollowersTab();
 
+	setupFollowingTab();
+
 	setupTabRedirection(userInfo.id);
 }
 
