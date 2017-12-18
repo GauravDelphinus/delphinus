@@ -3,13 +3,14 @@ var TwitterStrategy = require('passport-twitter').Strategy;
 var dataUtils = require("../dataUtils");
 var config = require('../config');
 var dynamicConfig = require("../config/dynamicConfig");
+var logger = require("../logger");
 
 module.exports = function () {
 
     passport.use(new TwitterStrategy({
             consumerKey: dynamicConfig.twitterClientId,
             consumerSecret: dynamicConfig.twitterClientSecret,
-            callbackURL: config.hostname + config.social.twitter.oauthCallback,
+            callbackURL: dynamicConfig.hostname + config.social.twitter.oauthCallback,
             passReqToCallback: true
         },
         function(req, token, tokenSecret, profile, done){

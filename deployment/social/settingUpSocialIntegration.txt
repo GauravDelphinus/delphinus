@@ -11,3 +11,6 @@ Facebook - Log In Integration
 8. Make sure to make the App Public
 9. This should be sufficient to "log in with Facebook" - test it on each environment
 
+Twitter - Log In Integration
+----------------------------
+
