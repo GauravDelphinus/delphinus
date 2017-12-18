@@ -22,3 +22,4 @@ Twitter - Log In Integration
 6. Change the Permissions to be "read only" (by default they are read/write)
 7. Privacy Policy URL is optional in case of Twitter
 8. This should be sufficient to "log in with Twitter" - test it on each environment
+
