@@ -2,17 +2,23 @@
 
 require("./init")();
 
+
 const config = require('./config');
 const dynamicConfig = require("./config/dynamicConfig");
 const path = require("path");
 const querystring = require("querystring");
+const logger = require("./logger");
+
+process.on('uncaughtException', function (error) {
+   logger.error(error);
+});
 
 module.exports = function(callback) {
 	
 	const express = require('express');
 	const bodyParser = require('body-parser');
 	const neo4j = require("node-neo4j");
-	const logger = require("./logger");
+
 	const serverUtils = require("./serverUtils");
 
 	const dataUtils = require("./dataUtils");
