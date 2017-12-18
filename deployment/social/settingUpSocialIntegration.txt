@@ -1,0 +1,13 @@
+Facebook - Log In Integration
+-----------------------------
+
+1. Use the ezeeideas@gmail.com Facebook account for managing all keys
+2. Have separate Facebook Apps for Dev, Stage and Production accounts (each with separate Client IDs and Client Secrets)
+3. Store the Client ID and Client Secret values in the .env file in the src/server folder on each system manually - NOTE: THIS FILE IS NOT CHECKED IN!
+4. In the developer.facebook.com/apps page, log in with ezeeideas@gmail.com account, and navigate to the individual app page
+5. Make sure to set the App Domain to the root URL (e.g., https://localhost:8080, or https://stage.captionify.com, or https://www.captionify.com)
+6. Make sure to set the Privacy Policy URL (can use same URL for each): https://www.captionify.com/pages/privacy.html
+7. Add Product for Facebook Login if not already, and add the Valid OAuth Redirect URL to the actual URL (e.g., https://localhost:8080/auth/facebook/callback, or https://stage.captionify.com/auth/facebook/callback, or https://www.captionify.com/auth/facebook/callback)
+8. Make sure to make the App Public
+9. This should be sufficient to "log in with Facebook" - test it on each environment
+
