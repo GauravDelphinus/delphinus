@@ -14,3 +14,11 @@ Facebook - Log In Integration
 Twitter - Log In Integration
 ----------------------------
 
+1. Use the ezeeideas@gmail.com Twitter account
+2. Login into apps.twitter.com
+3. Have separate Twitter apps for Dev, Stage and Production
+4. Store the Client ID and Client Secret values in the .env file in the src/server folder on each system manually - NOTE: THIS FILE IS NOT CHECKED IN!
+5. Twitter needs the URL provided to be publicly accessible, so in the Dev URL you can mention the "website" field as either the stage url or the production URL (will not impact anything)
+6. Change the Permissions to be "read only" (by default they are read/write)
+7. Privacy Policy URL is optional in case of Twitter
+8. This should be sufficient to "log in with Twitter" - test it on each environment
