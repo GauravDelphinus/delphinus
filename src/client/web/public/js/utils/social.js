@@ -401,28 +401,23 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		var shareButton = $("<button>", {id: contentTag + data.id + "ShareButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		shareButton.append($("<span>", {class: "glyphicon glyphicon-share-alt glyphiconAlign"})).append(" Share");
 		
-		if (user.facebook || user.twitter || user.google) {
-			var menu = createMenu(shareButton);
-			var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append($("<i>", {class: "fa fa-facebook", "aria-hidden" : "true"})).append("Share on Facebook");
-			appendMenuItemButton(menu, facebookButton);
-			facebookButton.click(function() {
-				sendShare("facebook", data);
-			});
+		console.log("user object is: " + JSON.stringify(user));
 
-			var twitterButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Twitter");
-			appendMenuItemButton(menu, twitterButton);
-			twitterButton.click(function() {
-				sendShare("twitter", data);
-			});
-			
-			socialActionsSection.append(menu);
-		} else {
-			// no social provider, so redirect to auth page
-			socialActionsSection.append(shareButton);
-			shareButton.click(function(e) {
-				window.open("/auth", "_self");
-			});
-		}
+		var menu = createMenu(shareButton);
+		var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append($("<i>", {class: "fa fa-facebook", "aria-hidden" : "true"})).append("Share on Facebook");
+		appendMenuItemButton(menu, facebookButton);
+		facebookButton.click(function() {
+			sendShare("facebook", data);
+		});
+
+		var twitterButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Twitter");
+		appendMenuItemButton(menu, twitterButton);
+		twitterButton.click(function() {
+			sendShare("twitter", data);
+		});
+		
+		socialActionsSection.append(menu);
+
 	}
 
 	// TIME LAPSE BUTTON
@@ -533,11 +528,20 @@ function sendShare(provider, data) {
 	jsonObj.message = data.caption;
 	jsonObj.link = data.link;
 
+	var redirectURL = "https://www.facebook.com/dialog/feed?" + 
+					"app_id=140197703347931" +
+					"&display=page" + 
+					"&link=" + "https://stage.captionify.com" + data.link + 
+					"&redirect_uri=" + "https://stage.captionify.com" + data.link;
+	window.location.replace(redirectURL);
+	/*
 	var postURL = "/api/social";
 	if (provider == "facebook") {
 		postURL += "?target=facebook";
+		jsonObj.target = "facebook";
 	} else if (provider == "twitter") {
 		postURL += "?target=twitter";
+		jsonObj.target = "twitter";
 	}
 
 	$.ajax({
@@ -553,6 +557,7 @@ function sendShare(provider, data) {
 	.fail(function(jqXHR, textStatus, errorThrown) {
 		showAlert("There appears to be a problem posting.  Please try again later.", 3);
 	});	
+	*/
 }
 
 function sendFollow(userId, follow, callback) {

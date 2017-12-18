@@ -7,11 +7,12 @@ var dynamicConfig = require("../config/dynamicConfig");
 
 module.exports = function () {
 
+	//https://github.com/jaredhanson/passport-facebook for more documentation
     passport.use(new FacebookStrategy({
             clientID: dynamicConfig.facebookClientId,
             clientSecret: dynamicConfig.facebookClientSecret,
             callbackURL: dynamicConfig.hostname + config.social.facebook.oauthCallback,
-            profileFields: ['id', 'email', 'name'],
+            profileFields: ['id', 'email', 'photos', 'displayName'],
             passReqToCallback: true
         },
         function(req, accessToken, refreshToken, profile, done){

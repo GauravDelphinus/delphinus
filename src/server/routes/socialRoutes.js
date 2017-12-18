@@ -1,6 +1,7 @@
 var express = require("express");
 var config = require("../config");
 var serverUtils = require("../serverUtils");
+var logger = require("../logger");
 
 var routes = function(db) {
 	var socialRouter = express.Router();
@@ -17,7 +18,7 @@ var routes = function(db) {
 				},
 				{
 					name: "link",
-					type: "url",
+					type: "myURL",
 					required: "yes"
 				},
 				{
@@ -37,7 +38,7 @@ var routes = function(db) {
 					if (error) {
 		        		res.sendStatus(500);
 		        	} else {
-		        		res.status(201).json({id: body.id});
+		        		res.status(201).json({id: data.id});
 		        	}
 				});
 			} else if (req.body.target == "twitter") {
@@ -46,7 +47,7 @@ var routes = function(db) {
 		        	if (error) {
 		        		res.sendStatus(500);
 		        	} else {
-		        		res.status(201).json({id: body.id});
+		        		res.status(201).json({id: data.id});
 		        	}
 		        });
 			}
