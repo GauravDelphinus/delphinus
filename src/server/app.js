@@ -3,6 +3,7 @@
 require("./init")();
 
 const config = require('./config');
+const dynamicConfig = require("./config/dynamicConfig");
 const path = require("path");
 const querystring = require("querystring");
 
@@ -299,7 +300,7 @@ module.exports = function(callback) {
 		
 		// Finally, start listening for requests
 		app.listen(config.port, function() {
-			logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on port " + config.port);
+			logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on " + dynamicConfig.hostname + ", port " + config.port);
 			logger.info("Application Root: " + global.appRoot + ", Express Static directory: " + publicDir);
 
 			return callback(null, app);
