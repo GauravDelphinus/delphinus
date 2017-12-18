@@ -1,4 +1,4 @@
-var OAuth = require('OAuth').OAuth2;
+var OAuth = require('oauth').OAuth2;
 var request = require("request");
 var config = require("../config");
 
