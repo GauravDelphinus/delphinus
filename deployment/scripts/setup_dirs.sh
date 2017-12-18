@@ -34,3 +34,4 @@ ln -s ${PROJECT_ROOT}/../data/contentImages ${PROJECT_ROOT}/../public/contentIma
 ln -s ${PROJECT_ROOT}/../data/cacheImages ${PROJECT_ROOT}/../public/cacheImages; 
 ln -s ${PROJECT_ROOT}/../current/src/client/web/public/images ${PROJECT_ROOT}/../public/images; 
 ln -s ${PROJECT_ROOT}/../current/src/client/web/public/third-party ${PROJECT_ROOT}/../public/third-party;
+ln -s ${PROJECT_ROOT}/../current/src/client/web/public/pages ${PROJECT_ROOT}/../public/pages;
