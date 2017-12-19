@@ -165,7 +165,30 @@ var routes = function() {
             next();
         })
         .get(passport.authenticate('facebook', {
-            scope: ['email', 'user_friends', 'publish_actions']
+            scope: ['email', 'user_friends']
+        }), function(req, res) {
+        });
+
+    //Reauthenticate with Facebook for "share" (aka publish) permissions
+    authRouter.route("/facebook/share")
+        .get(function (req, res, next) {
+        	logger.debug("GET received on /auth/facebook/share, query: " + JSON.stringify(req.query));
+            if (!req.session.redirectTo) {
+                /**
+                    If the redirectTo is not set, this means that this wasn't set explicitly
+                    by a "sign-in required" resource access, but the user explicitly clicked
+                    on the "Sign In" link from some web page.  Check the referring site's URL
+                    and set that to the redirectTo value in the session.
+                **/
+                //console.log("referrer: " + req.get('Referrer'));
+                req.session.redirectTo = req.get('Referrer');
+            }
+
+            next();
+        })
+        .get(passport.authenticate('facebook', {
+        	authType: 'rerequest',
+            scope: ['email', 'user_friends', 'publish_actions'] //include publish_actions permission
         }), function(req, res) {
         });
 

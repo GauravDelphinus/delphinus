@@ -20,7 +20,7 @@ function appendMenuItemButton(menu, menuItemButton) {
 /*
 	Good looking alert box that fades away after a certain number of seconds
 */
-function showAlert(message, secondsToFade) {
+function showAlert(message, secondsToFade, cb) {
 	var popupHeader = $("<h2>").append("Alert");
 	var popupBody = $("<p>", {class: "alert-message"}).append(message);
 	var element = createPopupElement("AlertPopup", "modal-narrow", null, null, popupBody, function() {
@@ -32,6 +32,9 @@ function showAlert(message, secondsToFade) {
 		$("#AlertPopup").fadeOut(2000, function() {
 			$("#AlertPopup").hide();
 			$("#AlertPopup").remove();
+			if (cb) {
+				cb();
+			}
 		});
 	}, secondsToFade * 1000);
 }

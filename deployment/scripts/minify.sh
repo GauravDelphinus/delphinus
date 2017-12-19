@@ -60,6 +60,7 @@ uglifyjs ${SOURCE_JS_FOLDER}/header.js -o ${MIN_JS_FOLDER}/header.min.js ${MINIF
 uglifyjs ${SOURCE_JS_FOLDER}/index.js -o ${MIN_JS_FOLDER}/index.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/newchallenge.js -o ${MIN_JS_FOLDER}/newchallenge.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/newentry.js -o ${MIN_JS_FOLDER}/newentry.min.js ${MINIFY_FLAGS}
+uglifyjs ${SOURCE_JS_FOLDER}/share.js -o ${MIN_JS_FOLDER}/share.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/user.js -o ${MIN_JS_FOLDER}/user.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/users.js -o ${MIN_JS_FOLDER}/users.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/utils/comments.js \

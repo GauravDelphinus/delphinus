@@ -394,20 +394,17 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 			showHideCommentsList(data.id, contentTag, true);	
 		});
 	}
-	
 
 	// SHARE BUTTON ---------------------------------
 	if (data.socialStatus.shares) {
 		var shareButton = $("<button>", {id: contentTag + data.id + "ShareButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		shareButton.append($("<span>", {class: "glyphicon glyphicon-share-alt glyphiconAlign"})).append(" Share");
 		
-		console.log("user object is: " + JSON.stringify(user));
-
 		var menu = createMenu(shareButton);
 		var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append($("<i>", {class: "fa fa-facebook", "aria-hidden" : "true"})).append("Share on Facebook");
 		appendMenuItemButton(menu, facebookButton);
 		facebookButton.click(function() {
-			sendShare("facebook", data);
+			window.location.replace("/share?id=" + data.id + "&type=" + data.type + "&target=facebook");
 		});
 
 		var twitterButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Twitter");
@@ -415,9 +412,8 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		twitterButton.click(function() {
 			sendShare("twitter", data);
 		});
-		
-		socialActionsSection.append(menu);
 
+		socialActionsSection.append(menu);
 	}
 
 	// TIME LAPSE BUTTON
@@ -523,18 +519,11 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	return socialActionsSection;
 }
 
-function sendShare(provider, data) {
+function sendShare(provider, data, done) {
 	var jsonObj = {};
 	jsonObj.message = data.caption;
 	jsonObj.link = data.link;
 
-	var redirectURL = "https://www.facebook.com/dialog/feed?" + 
-					"app_id=140197703347931" +
-					"&display=page" + 
-					"&link=" + "https://stage.captionify.com" + data.link + 
-					"&redirect_uri=" + "https://stage.captionify.com" + data.link;
-	window.location.replace(redirectURL);
-	/*
 	var postURL = "/api/social";
 	if (provider == "facebook") {
 		postURL += "?target=facebook";
@@ -552,12 +541,13 @@ function sendShare(provider, data) {
       	data: JSON.stringify(jsonObj)
   	})
 	.done(function(data, textStatus, jqXHR) {
-      	showAlert("Posted successfully!", 3);
+		done(null);
+      	
   	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
-		showAlert("There appears to be a problem posting.  Please try again later.", 3);
+		done(new Error("Error posting"));
+		
 	});	
-	*/
 }
 
 function sendFollow(userId, follow, callback) {

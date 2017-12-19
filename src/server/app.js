@@ -236,6 +236,20 @@ module.exports = function(callback) {
 			res.render("newcaption", {user: normalizeUser(req.user)});
 		});
 
+		app.get("/share", ensureLoggedIn, function(req, res) {
+			var params = {user: normalizeUser(req.user)};
+			if (req.query && req.query.id) {
+				params.id = req.query.id;
+			}
+			if (req.query && req.query.type) {
+				params.type = req.query.type;
+			}
+			if (req.query && req.query.target) {
+				params.target = req.query.target;
+			}
+			res.render("share", params);
+		});
+
 		app.get("/user", ensureLoggedIn, function(req, res) {
 	        if (req.user) {
 				const query = {

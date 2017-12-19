@@ -8,8 +8,6 @@ function createMainElement(data, contentTag) {
 
 	element.append(createTitleElement(data, contentTag));
 
-
-
 	element.append(createMainImageElement(data, contentTag));
 	
 	if (data.type == "entry") {
@@ -31,19 +29,20 @@ function createMainElement(data, contentTag) {
 	return element;
 }
 
-function createMainElement_Old(data, contentTag) {
-	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "mainElement"});
+/*
+	Create a preview for the Share Page.  This excludes/trims out some
+	elements such as Social buttons, Site logo, etc.
+*/
+function createSharePreview(data, contentTag) {
+	var element = $("<div>", {id: contentTag + data.id + "SharePreview", class: "centerDisplayWide"});
 	if (data.type == "entry") {
 		element.addClass("entry-element");
 	} else if (data.type == "challenge") {
 		element.addClass("challenge-element");
 	}
 
-	element.append(createTitleElement(data, contentTag));
-
-	if (data.postedDate) {
-		element.append(createPostHeaderElement(data, contentTag));
-	}
+	//add trimmed version of title element (for preview)
+	element.append(createTitleElementForPreview(data, contentTag));
 
 	element.append(createMainImageElement(data, contentTag));
 	
@@ -51,13 +50,9 @@ function createMainElement_Old(data, contentTag) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
-	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data, contentTag));
-		element.append(createSocialActionsSectionElement(data, contentTag));
+	if (data.postedDate) {
+		element.append(createPostHeaderElement(data, contentTag));
 	}
-
-	//container for likers list, if any
-	element.append(createLikersPopupElement(data, contentTag));
 
 	return element;
 }
@@ -372,6 +367,30 @@ function createTitleElement(data, contentTag) {
 	titleElement.append(logo);
 	titleElement.append($("<br>"));
 	titleElement.append(entityTypeTitle);
+	
+	if (data.type == "challenge") {
+		titleElement.append($("<hr>", {class: "low-top-margin"}));
+		titleElement.append(title);
+		titleElement.append($("<hr>", {class: "low-bottom-margin"}));
+	} else if (data.type == "entry") {
+		titleElement.append($("<hr>", {class: "low-top-margin low-bottom-margin"}));
+	}
+
+	return titleElement;
+}
+
+/*
+Create the header element for the main challenge page.
+*/
+function createTitleElementForPreview(data, contentTag) {
+	var titleElement = $("<div>", {id: contentTag + data.id + "TitleSection", class: "centerDisplayHeader"});
+	if (data.type == "challenge") {
+		titleElement.addClass("challenge-title");
+	} else if (data.type == "entry") {
+		titleElement.addClass("entry-title");
+	}
+
+	var title = $("<h1>", {class: "main-title"}).append(data.caption);
 	
 	if (data.type == "challenge") {
 		titleElement.append($("<hr>", {class: "low-top-margin"}));

@@ -1,0 +1,59 @@
+<html>
+<head>
+<% include ./favicon_header %>
+<title>Share | Captionify.com</title>
+<link rel="stylesheet" href="/third-party/bootstrap/css/bootstrap.min.css">
+<link ref="stylesheet" href="/third-party/font-awesome/css/font-awesome.min.css">
+<link rel="stylesheet" type="text/css" href="/css/styles.min.css"
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-46129625-3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-46129625-3');
+</script>
+</head>
+<body>
+
+<div class="centerDisplay">
+	<!-- HEADER -->
+	<div class="centerDisplayHeader">
+		<img src="/images/branding/captionify_logo_small.png">
+		<p id="titleMessage">Let's get ready to share!</p>
+	</div>
+	<hr>
+
+	<!-- CONTENT -->
+	<div class="centerDisplayContent">
+		  <div id="facebook-section">
+		    
+		    <div id="permission-status-section">
+		    	<p id="permission-status"></p>
+		    	<button type="button" class="btn btn-lg button-full" id="authenticate-facebook-button"></button>
+		    </div>
+		    <div id="content-section">
+		    	<textarea class="centreDisplayWide" id="data-caption" rows="2" placeholder="Type your message here (optional)"></textarea>
+
+		    	<div id="main"></div>
+
+		    	<button type="button" class="btn btn-lg button-full" id="facebook-share-button">Post on Facebook</button>
+		    </div>
+		  </div>
+	</div>
+</div>
+
+<script>
+	var id = '<%=id%>';
+	var type = '<%=type%>';
+	var target = '<%=target%>';
+	var user = <%- JSON.stringify(user) %>;
+</script>
+<script src="/third-party/jquery/js/jquery.min.js"></script>
+<script src="/third-party/bootstrap/js/bootstrap.min.js"></script>
+<script src="/js/utils.min.js"></script>
+<script src="/js/share.min.js"></script>
+<script src="/js/header.min.js"></script>
+</body>
+</html>

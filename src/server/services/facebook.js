@@ -1,6 +1,7 @@
 var OAuth = require('oauth').OAuth2;
 var request = require("request");
 var config = require("../config");
+var logger = require("../logger");
 
 var Facebook = function () {
 
@@ -44,15 +45,35 @@ var Facebook = function () {
     		link: link,
     		access_token: userKey
     	};
-    	console.log("request.post to facebook, jsonObj = " + JSON.stringify(jsonObj));
     	request.post(
 		    "https://graph.facebook.com/v2.8/me/feed",
 		    { json: jsonObj },
 		    function (error, response, body) {
-		    	console.log("callback, error = " + error + ", response = " + JSON.stringify(response) + ", body = " + JSON.stringify(body));
-		        done(error, body);
+		    	if (!body.hasOwnProperty("id")) { //https://developers.facebook.com/docs/graph-api/reference/v2.11/user/feed
+		    		//missing 'id' in body means there was an error
+		    		return done(response.statusCode, body);
+		    	} 
+		        return done(null, body);
 		    }
 		);
+    }
+
+    /*
+    	Get permissions for current user from Facebook
+    */
+    var getPermissions = function(userKey, done) {
+    	oauth.get(
+      'https://graph.facebook.com/v2.8/me/permissions',
+      userKey, //test user token
+      function (e, results, res){
+      	logger.debug("e: " + e + ", results = " + JSON.stringify(results));
+        if (e) {
+        	return done(e, null);
+        }
+
+        results = JSON.parse(results);
+        return done(e, results.data);      
+      });   
     }
 
     var logout = function(userKey, done) {
@@ -61,12 +82,10 @@ var Facebook = function () {
     		access_token: userKey
     	};
 
-    	console.log("sending request to facebook, jsonObj = " + JSON.stringify(jsonObj));
     	request.del(
     		"https://graph.facebook.com/v2.8/me/permissions",
     		{ json: jsonObj}, 
     		function(error, response, body) {
-	    		console.log("callback, error = " + error + ", response = " + JSON.stringify(response) + ", body = " + JSON.stringify(body));
 			    done(error, body);
     	});
     }
@@ -75,7 +94,8 @@ var Facebook = function () {
         getImage: getImage,
         getFriends: getFriends,
         postUpdate: postUpdate,
-        logout: logout
+        logout: logout,
+        getPermissions: getPermissions
     }
 
 }
