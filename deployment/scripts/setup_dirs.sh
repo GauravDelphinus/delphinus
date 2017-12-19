@@ -21,10 +21,15 @@ mkdir ${PROJECT_ROOT}/../data/db;
 mkdir ${PROJECT_ROOT}/../data/tmp; 
 mkdir ${PROJECT_ROOT}/../data/log; 
 mkdir ${PROJECT_ROOT}/../data/cacheImages;
+mkdir ${PROJECT_ROOT}/../data/cacheImagesRaw;
 mkdir ${PROJECT_ROOT}/../data/contentImages; 
 mkdir ${PROJECT_ROOT}/../data/contentImages/challenges; 
 mkdir ${PROJECT_ROOT}/../data/contentImages/entries; 
 mkdir ${PROJECT_ROOT}/../data/contentImages/users;
+mkdir ${PROJECT_ROOT}/../data/contentImagesRaw; 
+mkdir ${PROJECT_ROOT}/../data/contentImagesRaw/challenges; 
+mkdir ${PROJECT_ROOT}/../data/contentImagesRaw/entries; 
+mkdir ${PROJECT_ROOT}/../data/contentImagesRaw/users;
 
 mkdir ${PROJECT_ROOT}/../public; 
 mkdir ${PROJECT_ROOT}/../public/js; 
