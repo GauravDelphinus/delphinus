@@ -76,13 +76,11 @@ module.exports = function () {
                     user.displayName = user.google.displayName;
                 }
 
-                // if user.image is not already set, set it to the one coming from Google
-                if (!user.image) {
-                	if (user.google.images.length > 0) {
-	                    user.image = user.google.images[0];
-	                } else {
-						user.image = config.url.staticImages + config.name.defaultProfileImageName;
-					}
+                // set user image to the one coming from Google
+                if (user.google.images.length > 0) {
+					user.image = user.google.images[0];
+                } else if (!user.image) {
+					user.image = config.url.staticImages + config.name.defaultProfileImageName;
 				}
 
 				// set last seen

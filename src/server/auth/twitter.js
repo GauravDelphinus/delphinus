@@ -78,13 +78,11 @@ module.exports = function () {
                     user.displayName = user.twitter.displayName;
                 }
 
-                // if user.image is not already set, set it to the one coming from Twitter
-                if (!user.image) {
-                	if (user.twitter.images.length > 0) {
-	                    user.image = user.twitter.images[0];
-	                } else {
-						user.image = config.url.staticImages + config.name.defaultProfileImageName;
-					}
+                // set user.image to the one coming from Twitter
+                if (user.twitter.images.length > 0) {
+                	user.image = user.twitter.images[0];
+                } else if (!user.image) {
+					user.image = config.url.staticImages + config.name.defaultProfileImageName;
 				}
 
 				// set last seen

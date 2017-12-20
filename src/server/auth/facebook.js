@@ -72,14 +72,12 @@ module.exports = function () {
                         user.displayName = profile.name.givenName + " " + profile.name.familyName;
                     }
 
-                    // if user.image is not already set, set it to the one coming from Facebook
-                    if (!user.image) {
-	                   	if (user.facebook.image) {
-	                        user.image = user.facebook.image;
-	                    } else {
-	                    	user.image = config.url.staticImages + config.name.defaultProfileImageName;
-	                    }
-	                }
+                    // set user.image to the one coming from Facebook
+                    if (user.facebook.image) {
+                        user.image = user.facebook.image;
+                    } else if (!user.image) {
+                    	user.image = config.url.staticImages + config.name.defaultProfileImageName;
+                    }
 
                     // set last seen
                     user.lastSeen = (new Date()).getTime();
