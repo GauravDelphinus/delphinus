@@ -11,15 +11,46 @@ Facebook - Log In Integration
 8. Make sure to make the App Public
 9. This should be sufficient to "log in with Facebook" - test it on each environment
 
+Login URL: /auth/facebook
+Callback url: /auth/facebook/callback
+
+Facebook - Share Integration
+-----------------------------------------
+
+1. Sharing on Facebook requires one additional permission called 'publish_actions' which is not granted by default.
+2. You need to request for this permission as a "rerequest" or "reauthorize" request.  Refer /auth/facebook/share for more information
+3. For users who are already logged in with Facebook, we redirect them to /auth/facebook/share for reauthorization with additional permissions
+4. For users are not logged in with Facebook, we have them directly log in via /auth/facebook/share (which will prompt them twice, once for basic info and again for publish permissions)
+
+Login URL: /auth/facebook/share
+Callback URL: /auth/facebook/callback
+
+
 Twitter - Log In Integration
 ----------------------------
 
 1. Use the ezeeideas@gmail.com Twitter account
 2. Login into apps.twitter.com
 3. Have separate Twitter apps for Dev, Stage and Production
-4. Store the Client ID and Client Secret values in the .env file in the src/server folder on each system manually - NOTE: THIS FILE IS NOT CHECKED IN!
+4. Store the Client ID and Client Secret values in the .env file in the src/server folder on each system manually - NOTE: THIS FILE IS NOT CHECKED IN!  These are under Settings (app token and secret)
 5. Twitter needs the URL provided to be publicly accessible, so in the Dev URL you can mention the "website" field as either the stage url or the production URL (will not impact anything)
 6. Change the Permissions to be "read only" (by default they are read/write)
 7. Privacy Policy URL is optional in case of Twitter
 8. This should be sufficient to "log in with Twitter" - test it on each environment
+
+Login URL: /auth/twitter
+Callback URL: /auth/twitter/callback
+
+Google - Log In Integration
+---------------------------
+
+1. Use the ezeeideas@gmail.com Google acount
+2. Login to console.developers.google.com
+3. Create a new project for Dev, Stage and Prod environments (note: Project name cannot have . or _ or any special characters).  Project name is an internal name, not a public facing name
+4. Enable Google+ API on the project (click Enable APIs and Services and search for Google+)
+5. Click on "Create Credentials" under Google+ API, select "Web Server" for "Where will you be calling this API from?" question
+6. Add a Client name (say, CaptionifyDev) and enter the redirect URL for that environment (e.g., localhost:8080/auth/google/callback)
+7. Select Product name to be shown to users as the actual public facing name, say: Captionify.com (Dev) or something like that
+8. Download the credentials (in JSON format) - this contains the Client ID and the Client Secret values.  Enter these into the .env file in the corresponding environemnt (Dev, Stage or Prod)
+10. This shold be sufficient to "log in with Google" - test it on each environment
 
