@@ -23,9 +23,10 @@ function detectFacebookPermissions() {
 			//user is signed in with publish permissions
 			$("#facebook-connected-section").show();
 			$("#facebook-not-connected-section").hide();
-			setupPreview(function(link) {
+			setupPreview("facebook-preview", function(link) {
 				var shareData = {};
 				shareData.link = link;
+				link = getHostnameForCurrentPage() + link;
 				
 				$("#facebook-share-link").append(link);
 				$("#facebook-share-link").attr("href", link);
@@ -71,9 +72,10 @@ function detectTwitterPermissions() {
 			//user is signed in with publish permissions
 			$("#twitter-connected-section").show();
 			$("#twitter-not-connected-section").hide();
-			setupPreview(function(link) {
+			setupPreview("twitter-preview", function(link) {
 				var shareData = {};
 				shareData.link = link;
+				link = getHostnameForCurrentPage() + link;
 				
 				$("#twitter-share-link").append(link);
 				$("#twitter-share-link").attr("href", link);
@@ -110,7 +112,7 @@ function detectTwitterPermissions() {
 /*
 	Set up preview of the entity
 */
-function setupPreview(done) {
+function setupPreview(previewTag, done) {
 	var getURL = "";
 	var link = "";
 	if (type == "entry") {
@@ -124,7 +126,7 @@ function setupPreview(done) {
 	//pull data
 	$.getJSON(getURL, function(data) {
 		var mainElement = createSharePreview(data, "main");
-		$("#main").append(mainElement);
+		$("#" + previewTag).append(mainElement);
 		done(link);
 	}).fail(function() {
 		window.location.replace("/error");

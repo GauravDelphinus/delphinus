@@ -46,7 +46,8 @@ var routes = function(db) {
 				});
 			} else if (req.body.target == "twitter") {
 				var twitter = require('../services/twitter')();
-		        twitter.postUpdate(req.body.message, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
+				var tweet = req.body.message + " " + dynamicConfig.hostname + req.body.link;
+		        twitter.postUpdate(tweet, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
 		        	if (error) {
 		        		res.sendStatus(500);
 		        	} else {

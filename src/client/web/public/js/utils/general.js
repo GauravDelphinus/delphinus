@@ -111,3 +111,11 @@ function setupTabRedirection(id) {
 	var element = document.getElementById(id + "Tabs");
 	element.scrollIntoView(true);
 }
+
+/*
+	Get the full hostname for the current page, including protocol, hostname, and port (if any)
+*/
+function getHostnameForCurrentPage() {
+	var hostname = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
+	return hostname;
+}

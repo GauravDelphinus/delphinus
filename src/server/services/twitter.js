@@ -1,12 +1,12 @@
 var OAuth   = require('oauth').OAuth; //Twitter does NOT support OAuth2, Oauth1 requires a secret in additino to Key.
 var request = require('request');
 var crypto  = require('crypto');
-var config = require("../config");
+var dynamicConfig = require("../config/dynamicConfig");
 
 var Twitter = function () {
 
-    var key = config.social.twitter.clientID;
-    var secret = config.social.twitter.clientSecret;
+    var key = dynamicConfig.twitterClientId;
+    var secret = dynamicConfig.twitterClientSecret;
     
     var oauth = new OAuth(
            "https://api.twitter.com/oauth/request_token",
