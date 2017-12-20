@@ -34,7 +34,7 @@ function createMainElement(data, contentTag) {
 	elements such as Social buttons, Site logo, etc.
 */
 function createSharePreview(data, contentTag) {
-	var element = $("<div>", {id: contentTag + data.id + "SharePreview", class: "centerDisplayWide"});
+	var element = $("<div>", {id: contentTag + data.id + "SharePreview"});
 	if (data.type == "entry") {
 		element.addClass("entry-element");
 	} else if (data.type == "challenge") {

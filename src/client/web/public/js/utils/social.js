@@ -410,7 +410,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		var twitterButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Twitter");
 		appendMenuItemButton(menu, twitterButton);
 		twitterButton.click(function() {
-			sendShare("twitter", data);
+			window.location.replace("/share?id=" + data.id + "&type=" + data.type + "&target=twitter");
 		});
 
 		socialActionsSection.append(menu);
@@ -521,15 +521,13 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 
 function sendShare(provider, data, done) {
 	var jsonObj = {};
-	jsonObj.message = data.caption;
+	jsonObj.message = data.message;
 	jsonObj.link = data.link;
 
 	var postURL = "/api/social";
 	if (provider == "facebook") {
-		postURL += "?target=facebook";
 		jsonObj.target = "facebook";
 	} else if (provider == "twitter") {
-		postURL += "?target=twitter";
 		jsonObj.target = "twitter";
 	}
 

@@ -99,6 +99,15 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	text-align: left; /* override left align from centerDisplayContent */
 }
 
+.centerDisplayCaptionSmall{
+	.text-plain-medium;
+	.text-bold;
+	color: black;
+	text-align: left; /* override left align from centerDisplayContent */
+	margin-top: 10px;
+	margin-bottom: 10px;
+}
+
 .centerDisplayFixedColumn {
 	position: fixed;
 	left: 30px;
@@ -117,11 +126,16 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 /********************************** MODIFIERS *****************************/
 
 .low-top-margin {
-	margin-top: 0px;
+	margin-top: 5px;
 }
 
 .low-bottom-margin {
-	margin-bottom: 0px;
+	margin-bottom: 5px;
+}
+
+.low-top-bottom-margin {
+	.low-top-margin;
+	.low-bottom-margin;
 }
 
 /********************************** BUTTON MODIFIERS *****************************/
@@ -141,6 +155,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 /********************************** GENERAL - INPUT ELEMENTS *****************************/
 
+
 /*
 	Button that has full background color.
 */
@@ -148,12 +163,14 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	background-color: @theme-dominant-color;
 	color: white;
 	font-size: 16px;
+	.low-top-bottom-margin;
 }
 
 .button-full:hover {
 	background-color: @theme-dominant-color;
 	color: white;
 	font-size: 16px;
+	.low-top-bottom-margin;
 }
 
 /*
@@ -1351,10 +1368,11 @@ ul.nav li.dropdown.open > a {
 	/* height: 50px; */
 }
 
+/*
 textarea {
-	width: 90%;
 	margin: 10px auto;
 	border: 0.5px dotted gray;
 	border-radius: 10px;
 	padding: 20px;
 }
+*/

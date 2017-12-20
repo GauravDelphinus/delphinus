@@ -6,6 +6,10 @@ $(document).ready(function(){
 
 	if (target == "facebook") {
 		detectFacebookPermissions();
+		$("#facebook-section").show();
+	} else if (target == "twitter") {
+		detectTwitterPermissions();
+		$("#twitter-section").show();
 	}
 });
 
@@ -15,31 +19,19 @@ $(document).ready(function(){
 */
 function detectFacebookPermissions() {
 	$.getJSON('/api/social?target=facebook&attribute=permissions', function(data) {
-		if (data.permissions == "offline") {
-			//user is not signed in
-			$("#permission-status-section").show();
-			$("#content-section").hide();
-			$("#permission-status").text("Looks like you're not signed-in to Facebook.  Please sign-in to continue sharing");
-			$("#authenticate-facebook-button").empty().append("Sign in to Facebook");
-		} else if (data.permissions == "read") {
-			//user is signed in, but only in read-only mode
-			$("#permission-status-section").show();
-			$("#content-section").hide();
-			$("#permission-status").text("Looks like you need additional permissions to post this to Facebook.");
-			$("#authenticate-facebook-button").empty().append("Review permissions with Facebook");
-			$("#authenticate-facebook-button").click(function() {
-				window.location.replace("/auth/facebook/share");
-			});
-		} else if (data.permissions == "publish") {
+		if (data.permissions == "publish") {
 			//user is signed in with publish permissions
-			$("#content-section").show();
-			$("#permission-status-section").hide();
+			$("#facebook-connected-section").show();
+			$("#facebook-not-connected-section").hide();
 			setupPreview(function(link) {
 				var shareData = {};
 				shareData.link = link;
-				shareData.caption = $("#data-caption").val();
+				
+				$("#facebook-share-link").append(link);
+				$("#facebook-share-link").attr("href", link);
 
 				$("#facebook-share-button").click(function() {
+					shareData.message = $("#facebook-share-text").val();
 					sendShare("facebook", shareData, function(error) {
 						if (error) {
 							showAlert("There appears to be a problem posting to Facebook.  Please try again.", 3);
@@ -54,12 +46,59 @@ function detectFacebookPermissions() {
 			});
 			
 		} else {
-			$("#permission-status-section").show();
-			$("#content-section").hide();
-			$("#permission-status").text("Oops... We couldn't determine your connection status with Facebook.");
-			$("#authenticate-facebook-button").empty().append("Retry");
-			$("#authenticate-facebook-button").click(function() {
-				location.reload();
+			//either not connected, or don't have publish permissions
+			$("#facebook-connected-section").hide();
+			$("#facebook-not-connected-section").show();
+			$("#sign-in-facebook-button").click(function() {
+				window.location.replace("/auth/facebook/share");
+			});
+		}
+	})
+	.fail(function() {
+		window.location.replace("/error");
+	});
+}
+
+/*
+	Detect Twitter posting permissions, and depending on that,
+	show the appropriate message/action to the user
+	Note: On Twitter we always ask for read+write permissions in the
+	first place
+*/
+function detectTwitterPermissions() {
+	$.getJSON('/api/social?target=twitter&attribute=permissions', function(data) {
+		if (data.permissions == "publish") {
+			//user is signed in with publish permissions
+			$("#twitter-connected-section").show();
+			$("#twitter-not-connected-section").hide();
+			setupPreview(function(link) {
+				var shareData = {};
+				shareData.link = link;
+				
+				$("#twitter-share-link").append(link);
+				$("#twitter-share-link").attr("href", link);
+
+				$("#twitter-share-button").click(function() {
+					shareData.message = $("#twitter-share-text").val();
+					sendShare("twitter", shareData, function(error) {
+						if (error) {
+							showAlert("There appears to be a problem posting to Twitter.  Please try again.", 3);
+						}
+						else {
+							showAlert("Posted successfully!", 3, function() {
+								window.location.replace(document.referrer);
+							});
+						}
+					});
+				});
+			});
+			
+		} else {
+			//either not connected, or don't have publish permissions
+			$("#twitter-connected-section").hide();
+			$("#twitter-not-connected-section").show();
+			$("#sign-in-twitter-button").click(function() {
+				window.location.replace("/auth/twitter");
 			});
 		}
 	})

@@ -67,6 +67,7 @@ var routes = function(db) {
 				},
 				{
 					name: "attribute",
+					required: "yes",
 					type: ["permissions"]
 				}
 			];
@@ -106,6 +107,15 @@ var routes = function(db) {
 						jsonObj.permissions = "offline"; //must be offline
 						return res.json(jsonObj);
 					}
+				}
+			} else if (req.query.target == "twitter") {
+				if (req.query.attribute == "permissions") {
+					if (req.user && req.user.twitter && req.user.twitter.token) {
+						jsonObj.permissions = "publish";
+					} else {
+						jsonObj.permissions = "offline";
+					}
+					return res.json(jsonObj);
 				}
 			}
 			

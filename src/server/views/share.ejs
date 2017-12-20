@@ -27,18 +27,50 @@
 
 	<!-- CONTENT -->
 	<div class="centerDisplayContent">
-		  <div id="facebook-section">
-		    
-		    <div id="permission-status-section">
-		    	<p id="permission-status"></p>
-		    	<button type="button" class="btn btn-lg button-full" id="authenticate-facebook-button"></button>
+		<br>
+		  <div id="facebook-section" style="display:none;">
+		    <div id="facebook-not-connected-section">
+		    	<p class="text-plain-small">Looks like you're not signed-in to Facebook, or you do not have sufficient permissions to post to Facebook.  Please sign-in to continue sharing</p>
+		    	<button type="button" class="btn btn-lg button-full" id="sign-in-facebook-button">Sign in to Facebook</button>
 		    </div>
-		    <div id="content-section">
-		    	<textarea class="centreDisplayWide" id="data-caption" rows="2" placeholder="Type your message here (optional)"></textarea>
+		    <div id="facebook-connected-section">
+		    	<table width="100%">
+		    		<tr>
+		    			<td valign="bottom"><p class="centerDisplayCaptionSmall">Message:</p></td>
+		    			<td align="right"><button type="button" class="btn btn-lg button-full" id="facebook-share-button">Post on Facebook</button></td>
+		    		</tr>
+		    	</table>
+		    	
+		    	
+		    	<textarea id="facebook-share-text" class="form-control" rows="2" placeholder="Type your message here (optional)"></textarea>
+		    	<p class="centerDisplayCaptionSmall">Link:</p>
 
+		    	<a id="facebook-share-link" href="" target="_blank"></a>
+		    	<p class="centerDisplayCaptionSmall">Preview:</p>
 		    	<div id="main"></div>
+		    </div>
+		  </div>
+		  <div id="twitter-section" style="display:none;">
+		    
+		    <div id="twitter-not-connected-section">
+		    	<p class="text-plain-small">Looks like you're not signed-in to Twitter, or you do not have sufficient permissions to post to Twitter.  Please sign-in to continue sharing</p>
+		    	<button type="button" class="btn btn-lg button-full" id="sign-in-twitter-button">Sign in to Twitter</button>
+		    </div>
+		    <div id="twitter-connected-section">
+		    	<table width="100%">
+		    		<tr>
+		    			<td valign="bottom"><p class="centerDisplayCaptionSmall">Message:</p></td>
+		    			<td align="right"><button type="button" class="btn btn-lg button-full" id="twitter-share-button">Post on Twitter</button></td>
+		    		</tr>
+		    	</table>
+		    	
+		    	
+		    	<textarea id="twitter-share-text" class="form-control" rows="2" placeholder="Type your message here (optional)"></textarea>
+		    	<p class="centerDisplayCaptionSmall">Link:</p>
 
-		    	<button type="button" class="btn btn-lg button-full" id="facebook-share-button">Post on Facebook</button>
+		    	<a id="twitter-share-link" href="" target="_blank"></a>
+		    	<p class="centerDisplayCaptionSmall">Preview:</p>
+		    	<div id="main"></div>
 		    </div>
 		  </div>
 	</div>

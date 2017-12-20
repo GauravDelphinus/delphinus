@@ -236,7 +236,7 @@ module.exports = function(callback) {
 			res.render("newcaption", {user: normalizeUser(req.user)});
 		});
 
-		app.get("/share", ensureLoggedIn, function(req, res) {
+		app.get("/share", function(req, res) {
 			var params = {user: normalizeUser(req.user)};
 			if (req.query && req.query.id) {
 				params.id = req.query.id;
