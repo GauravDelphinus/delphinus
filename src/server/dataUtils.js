@@ -219,7 +219,7 @@ module.exports = {
 			data.imageURL = dynamicConfig.hostname + config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
 			data.pageTitle = "Challenge: " + entity.title + " | " + config.branding.siteName;
 			data.pageURL = dynamicConfig.hostname + config.url.challenge + entity.id;
-			data.pageDescription = "Challenge posted";
+			data.pageDescription = "Posted by " + poster.displayName + ".  Up for the challenge?  Check out the challenge and post your entry now, it's free and takes just a few minutes!  Also, check out the awesome entries posted by others :)";
 			data.imageType = entity.image_type;
 			data.authorName = poster.displayName;
 		} else if (entityType == "entry") {
@@ -227,7 +227,7 @@ module.exports = {
 			data.imageURL = dynamicConfig.hostname + config.url.entryImages + entity.id  + "." + mime.extension(entity.image_type);
 			data.pageTitle = "Caption Entry: " + entity.caption + " | " + config.branding.siteName;
 			data.pageURL = dynamicConfig.hostname + config.url.entry + entity.id;
-			data.pageDescription = "Entry posted";
+			data.pageDescription = "Posted by " + poster.displayName + ".  Like this entry?  Check out more such entries, and challenge yourself to post one of your own!  It takes just a few minutes, and it's free :)";
 			if (challenge && challenge.id) {
 				data.challengeId = challenge.id;
 			} else {
@@ -250,7 +250,7 @@ module.exports = {
 
 			data.pageTitle = "Entries" + " | " + config.branding.siteName;
 			data.pageURL = dynamicConfig.hostname + config.url.entries;
-			data.pageDescription = "Entries Posted";
+			data.pageDescription = "Check out all the awesome entries posted at Captionify.com, and challenge yourself to post your own!";
 
 			data.authorName = config.branding.siteName;
 		} else if (entityType == "user") {
