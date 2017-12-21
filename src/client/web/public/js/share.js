@@ -46,10 +46,22 @@ function detectFacebookPermissions() {
 				});
 			});
 			
-		} else {
-			//either not connected, or don't have publish permissions
+		} else if (data.permissions == "read") {
 			$("#facebook-connected-section").hide();
 			$("#facebook-not-connected-section").show();
+			$("#facebook-not-enough-permissions-section").show();
+			$("#facebook-not-signed-in-section").hide();
+
+			$("#authenticate-facebook-button").click(function() {
+				window.location.replace("/auth/facebook/share");
+			});
+		} else {
+			//either not connected, or couldn't determine the status
+			$("#facebook-connected-section").hide();
+			$("#facebook-not-connected-section").show();
+			$("#facebook-not-enough-permissions-section").hide();
+			$("#facebook-not-signed-in-section").show();
+
 			$("#sign-in-facebook-button").click(function() {
 				window.location.replace("/auth/facebook/share");
 			});

@@ -178,7 +178,7 @@ module.exports = function(callback) {
 					redirectURL = referrerURL;
 				} else if (req.query.target) {
 					redirectURL = req.query.target;
-				} else {
+				} else if (referrerURL) {
 					const redirects = require("./redirects");
 					for (const redirect in redirects) {
 						if (referrerURL.includes(redirect)) {

@@ -29,11 +29,17 @@
 	<div class="centerDisplayContent">
 		<br>
 		  <div id="facebook-section" style="display:none;">
-		    <div id="facebook-not-connected-section">
-		    	<p class="text-plain-small">Looks like you're not signed-in to Facebook, or you do not have sufficient permissions to post to Facebook.  Please sign-in to continue sharing</p>
-		    	<button type="button" class="btn btn-lg button-full" id="sign-in-facebook-button">Sign in to Facebook</button>
+		    <div id="facebook-not-connected-section" style="display:none;">
+		    	<div id="facebook-not-enough-permissions-section" style="display:none;">
+		    		<p class="text-plain-small">Looks like you do not have sufficient permissions to post to Facebook.  Please authenticate with Facebook to continue sharing.</p>
+		    		<button type="button" class="btn btn-lg button-full" id="authenticate-facebook-button">Authenticate with Facebook</button>
+		    	</div>
+		    	<div id="facebook-not-signed-in-section" style="display:none;">
+		    		<p class="text-plain-small">Looks like you're not signed-in to Facebook.  Please sign-in to continue sharing.</p>
+		    		<button type="button" class="btn btn-lg button-full" id="sign-in-facebook-button">Sign in to Facebook</button>
+		    	</div>
 		    </div>
-		    <div id="facebook-connected-section">
+		    <div id="facebook-connected-section" style="display:none;">
 		    	<table width="100%">
 		    		<tr>
 		    			<td valign="bottom"><p class="centerDisplayCaptionSmall">Message:</p></td>
@@ -52,11 +58,11 @@
 		  </div>
 		  <div id="twitter-section" style="display:none;">
 		    
-		    <div id="twitter-not-connected-section">
-		    	<p class="text-plain-small">Looks like you're not signed-in to Twitter, or you do not have sufficient permissions to post to Twitter.  Please sign-in to continue sharing</p>
+		    <div id="twitter-not-connected-section" style="display:none;">
+		    	<p class="text-plain-small">Looks like you're not signed-in to Twitter.  Please sign-in to continue sharing.</p>
 		    	<button type="button" class="btn btn-lg button-full" id="sign-in-twitter-button">Sign in to Twitter</button>
 		    </div>
-		    <div id="twitter-connected-section">
+		    <div id="twitter-connected-section" style="display:none;">
 		    	<table width="100%">
 		    		<tr>
 		    			<td valign="bottom"><p class="centerDisplayCaptionSmall">Message:</p></td>
