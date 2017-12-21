@@ -404,13 +404,13 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append($("<i>", {class: "fa fa-facebook", "aria-hidden" : "true"})).append("Share on Facebook");
 		appendMenuItemButton(menu, facebookButton);
 		facebookButton.click(function() {
-			window.location.replace("/share?id=" + data.id + "&type=" + data.type + "&target=facebook");
+			window.location.replace("/share?id=" + data.id + "&type=" + data.type + "&target=facebook" + "&referrer=" + encodeURIComponent(getFullPathForCurrentPage()));
 		});
 
 		var twitterButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Twitter");
 		appendMenuItemButton(menu, twitterButton);
 		twitterButton.click(function() {
-			window.location.replace("/share?id=" + data.id + "&type=" + data.type + "&target=twitter");
+			window.location.replace("/share?id=" + data.id + "&type=" + data.type + "&target=twitter" + "&referrer=" + encodeURIComponent(getFullPathForCurrentPage()));
 		});
 
 		socialActionsSection.append(menu);

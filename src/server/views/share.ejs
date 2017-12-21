@@ -33,17 +33,24 @@
 		    	<div id="facebook-not-enough-permissions-section" style="display:none;">
 		    		<p class="text-plain-small">Looks like you do not have sufficient permissions to post to Facebook.  Please authenticate with Facebook to continue sharing.</p>
 		    		<button type="button" class="btn btn-lg button-full" id="authenticate-facebook-button">Authenticate with Facebook</button>
+		    		<br>
+		    		<a id="facebook-cancel-link1" href="">Go back</a>
 		    	</div>
 		    	<div id="facebook-not-signed-in-section" style="display:none;">
 		    		<p class="text-plain-small">Looks like you're not signed-in to Facebook.  Please sign-in to continue sharing.</p>
 		    		<button type="button" class="btn btn-lg button-full" id="sign-in-facebook-button">Sign in to Facebook</button>
+		    		<br>
+		    		<a id="facebook-cancel-link2" href="">Go back</a>
 		    	</div>
 		    </div>
 		    <div id="facebook-connected-section" style="display:none;">
 		    	<table width="100%">
 		    		<tr>
 		    			<td valign="bottom"><p class="centerDisplayCaptionSmall">Message:</p></td>
-		    			<td align="right"><button type="button" class="btn btn-lg button-full" id="facebook-share-button">Post on Facebook</button></td>
+		    			<td align="right">
+		    			<button type="button" class="btn btn-lg button-full" id="facebook-cancel-button">Cancel</button>
+		    			<button type="button" class="btn btn-lg button-full" id="facebook-share-button">Post on Facebook</button>
+		    			</td>
 		    		</tr>
 		    	</table>
 		    	
@@ -61,12 +68,17 @@
 		    <div id="twitter-not-connected-section" style="display:none;">
 		    	<p class="text-plain-small">Looks like you're not signed-in to Twitter.  Please sign-in to continue sharing.</p>
 		    	<button type="button" class="btn btn-lg button-full" id="sign-in-twitter-button">Sign in to Twitter</button>
+		    	<br>
+		    	<a id="twitter-cancel-link" href="">Go back</a>
 		    </div>
 		    <div id="twitter-connected-section" style="display:none;">
 		    	<table width="100%">
 		    		<tr>
 		    			<td valign="bottom"><p class="centerDisplayCaptionSmall">Message:</p></td>
-		    			<td align="right"><button type="button" class="btn btn-lg button-full" id="twitter-share-button">Post on Twitter</button></td>
+		    			<td align="right">
+		    			<button type="button" class="btn btn-lg button-full" id="twitter-cancel-button">Cancel</button>
+		    			<button type="button" class="btn btn-lg button-full" id="twitter-share-button">Post on Twitter</button>
+		    			</td>
 		    		</tr>
 		    	</table>
 		    	
@@ -86,6 +98,7 @@
 	var id = '<%=id%>';
 	var type = '<%=type%>';
 	var target = '<%=target%>';
+	var referrer = '<%=referrer%>';
 	var user = <%- JSON.stringify(user) %>;
 </script>
 <script src="/third-party/jquery/js/jquery.min.js"></script>

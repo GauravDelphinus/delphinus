@@ -247,6 +247,11 @@ module.exports = function(callback) {
 			if (req.query && req.query.target) {
 				params.target = req.query.target;
 			}
+			if (req.query && req.query.referrer) {
+				params.referrer = req.query.referrer;
+			} else {
+				params.referrer = "";
+			}
 			res.render("share", params);
 		});
 

@@ -119,3 +119,8 @@ function getHostnameForCurrentPage() {
 	var hostname = location.protocol+'//'+location.hostname+(location.port ? ':'+location.port: '');
 	return hostname;
 }
+
+function getFullPathForCurrentPage() {
+	var fullPath = window.location.protocol + "//" + window.location.hostname+(window.location.port ? ':'+ window.location.port: '') + window.location.pathname;
+	return fullPath;
+}

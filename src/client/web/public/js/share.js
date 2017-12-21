@@ -32,6 +32,10 @@ function detectFacebookPermissions() {
 				$("#facebook-share-button").click(function() {
 					sharePost("facebook", $("#facebook-share-text").val(), link, "facebook-share-button");
 				});
+
+				$("#facebook-cancel-button").click(function() {
+					window.location.replace(getBackLink());
+				});
 			});
 			
 		} else if (data.permissions == "read") {
@@ -43,6 +47,8 @@ function detectFacebookPermissions() {
 			$("#authenticate-facebook-button").click(function() {
 				window.location.replace("/auth/facebook/share");
 			});
+
+			$("#facebook-cancel-link1").attr("href", getBackLink());
 		} else {
 			//either not connected, or couldn't determine the status
 			$("#facebook-connected-section").hide();
@@ -53,6 +59,8 @@ function detectFacebookPermissions() {
 			$("#sign-in-facebook-button").click(function() {
 				window.location.replace("/auth/facebook/share");
 			});
+
+			$("#facebook-cancel-link2").attr("href", getBackLink());
 		}
 	})
 	.fail(function() {
@@ -81,6 +89,10 @@ function detectTwitterPermissions() {
 				$("#twitter-share-button").click(function() {
 					sharePost("twitter", $("#twitter-share-text").val(), link, "twitter-share-button");
 				});
+
+				$("#twitter-cancel-button").click(function() {
+					window.location.replace(getBackLink());
+				});
 			});
 			
 		} else {
@@ -90,6 +102,8 @@ function detectTwitterPermissions() {
 			$("#sign-in-twitter-button").click(function() {
 				window.location.replace("/auth/twitter");
 			});
+
+			$("#twitter-cancel-link").attr("href", getBackLink());
 		}
 	})
 	.fail(function() {
@@ -137,12 +151,22 @@ function sharePost(target, message, link, buttonId) {
 		}
 		else {
 			showAlert("Posted successfully!  Redirecting ...", 1, function() {
-				var redirectURL = document.referrer;
-				if (!redirectURL || redirectURL == "") {
-					redirectURL = getHostnameForCurrentPage();
-				}
-				window.location.replace(redirectURL);
+				window.location.replace(getBackLink());
 			});
 		}
 	});
+}
+
+/*
+	Get the back link where we should take the user back when he clicks on cancel or go back buttons
+	Typically passed as a 'referrer' get parameter to the /share page, and encoded using encodeURIComponent
+*/
+function getBackLink() {
+	var redirectURL = getHostnameForCurrentPage(); //default to home page
+
+	if (referrer) { //if there was a referrer parameter passed, then use that to decode
+		redirectURL = decodeURIComponent(referrer);
+	}
+
+	return redirectURL;
 }
