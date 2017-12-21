@@ -36,7 +36,7 @@ var routes = function(db) {
 
 			if (req.body.target == "facebook") {
 				var facebook = require('../services/facebook')();
-				facebook.postUpdate(req.body.message, dynamicConfig.hostname + req.body.link, req.user.facebook.token, function(error, data) {
+				facebook.postUpdate(req.body.message, req.body.link, req.user.facebook.token, function(error, data) {
 					if (error) {
 						logger.error("Error posting to facebook, error: " + error);
 						res.sendStatus(500);
@@ -46,7 +46,7 @@ var routes = function(db) {
 				});
 			} else if (req.body.target == "twitter") {
 				var twitter = require('../services/twitter')();
-				var tweet = req.body.message + " " + dynamicConfig.hostname + req.body.link;
+				var tweet = req.body.message + " " + req.body.link;
 		        twitter.postUpdate(tweet, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
 		        	if (error) {
 		        		res.sendStatus(500);
