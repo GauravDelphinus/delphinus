@@ -3,11 +3,7 @@ var request = require("request");
 var config = require("../config");
 var logger = require("../logger");
 
-var Facebook = function () {
-
-    var key = config.social.facebook.clientID;
-    var secret = config.social.facebook.clientSecret;
-
+var Facebook = function (key, secret) {
     var oauth = new OAuth(
         key, secret, 'https://graph.facebook.com',
         null,
@@ -20,9 +16,11 @@ var Facebook = function () {
       'https://graph.facebook.com/v2.8/me/picture?redirect=false&type=large',
       userKey, //test user token
       function (e, results, res){
-        if (e) console.error('error: ' + e);  
+        if (e) {
+        	return done(e);
+        }
         results = JSON.parse(results)
-        done(results.data.url);      
+        return done(null, results.data.url);      
       });    
     }
 

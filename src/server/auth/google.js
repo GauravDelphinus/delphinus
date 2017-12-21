@@ -71,10 +71,8 @@ module.exports = function () {
                 }
                 user.google.displayName = profile.displayName;
 
-                // set the user name and image, if not already set
-                if (!user.displayName) {
-                    user.displayName = user.google.displayName;
-                }
+                // set the user name and image
+                user.displayName = user.google.displayName;
 
                 // set user image to the one coming from Google
                 if (user.google.images.length > 0) {

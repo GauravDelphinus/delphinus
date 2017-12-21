@@ -73,10 +73,8 @@ module.exports = function () {
                     user.twitter.images.push(imageStr);
                 }
                 
-                // set the user name and image, if not already set
-                if (!user.displayName) {
-                    user.displayName = user.twitter.displayName;
-                }
+                // set the user name and image
+                user.displayName = user.twitter.displayName;
 
                 // set user.image to the one coming from Twitter
                 if (user.twitter.images.length > 0) {

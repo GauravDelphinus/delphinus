@@ -57,39 +57,49 @@ module.exports = function () {
                 user.facebook.id = profile.id;
                 user.facebook.profileLink = "https://www.facebook.com/" + profile.id;
                 user.facebook.token = accessToken;
-                user.facebook.displayName = profile.displayName;
+                
                 user.facebook.emails = [];
                 for (var i = 0; i < profile.emails.length; i++) {
                     user.facebook.emails.push(profile.emails[i].value);
                 }
+
+				// PROFILE DISPLAY NAME -----------------
+				user.facebook.displayName = profile.displayName;
+
+				// set the user name
+                user.displayName = user.facebook.displayName;
                 
+                // set last seen
+                user.lastSeen = (new Date()).getTime();
+
+                // PROFILE IMAGE -------------
+                user.facebook.images = [];
+                for (var i = 0; i < profile.photos.length; i++) {
+                    var imageStr = profile.photos[i].value;
+                    user.facebook.images.push(imageStr);
+                }
+
+                //NOTE: While we can directly use the profile image as returned in profile.photos[] array, but the size
+                //of these photos is very small.  So instead, we will use the Graph API to query the current profile picture
+                //which returns a higher resolution picture.
                 var facebook = require('../services/facebook')(dynamicConfig.facebookClientId, dynamicConfig.facebookClientSecret);
-                facebook.getImage(user.facebook.token, function (imageUrl) {
-                    user.facebook.image = imageUrl;
+                facebook.getImage(user.facebook.token, function (error, imageUrl) {
+                	if (error) {
+                		user.image = config.url.staticImages + config.name.defaultProfileImageName; //default placeholder picture
+                	}
 
-                    // set the user name and image, if not already set
-                    if (!user.displayName && profile.name && profile.name.givenName && profile.name.familyName) {
-                        user.displayName = profile.name.givenName + " " + profile.name.familyName;
-                    }
+                	user.image = imageUrl;
 
-                    // set user.image to the one coming from Facebook
-                    if (user.facebook.image) {
-                        user.image = user.facebook.image;
-                    } else if (!user.image) {
-                    	user.image = config.url.staticImages + config.name.defaultProfileImageName;
-                    }
+	                dataUtils.saveUser(user, function(err, user) {
+	                    if (err) {
+	                    	return done(err, null);
+	                    }
 
-                    // set last seen
-                    user.lastSeen = (new Date()).getTime();
+	                    return done(null, user);
+	                });
 
-                    dataUtils.saveUser(user, function(err, user) {
-                        if (err) {
-                        	return done(err, null);
-                        }
+				});
 
-                        return done(null, user);
-                    });   
-                });  
             });
         }
     ));

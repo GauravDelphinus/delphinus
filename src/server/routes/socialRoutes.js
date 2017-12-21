@@ -35,20 +35,21 @@ var routes = function(db) {
 			}
 
 			if (req.body.target == "facebook") {
-				var facebook = require('../services/facebook')();
+				var facebook = require('../services/facebook')(dynamicConfig.facebookClientId, dynamicConfig.facebookClientSecret);
 				facebook.postUpdate(req.body.message, req.body.link, req.user.facebook.token, function(error, data) {
 					if (error) {
-						logger.error("Error posting to facebook, error: " + error);
+						logger.error("Error posting to Facebook, error: " + JSON.stringify(error));
 						res.sendStatus(500);
 		        	} else {
 		        		res.status(201).json({id: data.id});
 		        	}
 				});
 			} else if (req.body.target == "twitter") {
-				var twitter = require('../services/twitter')();
+				var twitter = require('../services/twitter')(dynamicConfig.twitterClientId, dynamicConfig.twitterClientSecret);
 				var tweet = req.body.message + " " + req.body.link;
 		        twitter.postUpdate(tweet, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
 		        	if (error) {
+		        		logger.error("Error posting to Twitter, error: " + JSON.stringify(error));
 		        		res.sendStatus(500);
 		        	} else {
 		        		res.status(201).json({id: data.id});

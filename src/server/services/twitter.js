@@ -3,11 +3,7 @@ var request = require('request');
 var crypto  = require('crypto');
 var dynamicConfig = require("../config/dynamicConfig");
 
-var Twitter = function () {
-
-    var key = dynamicConfig.twitterClientId;
-    var secret = dynamicConfig.twitterClientSecret;
-    
+var Twitter = function (key, secret) {
     var oauth = new OAuth(
            "https://api.twitter.com/oauth/request_token",
            "https://api.twitter.com/oauth/access_token",
