@@ -24,25 +24,13 @@ function detectFacebookPermissions() {
 			$("#facebook-connected-section").show();
 			$("#facebook-not-connected-section").hide();
 			setupPreview("facebook-preview", function(link) {
-				var shareData = {};
-				shareData.link = link;
 				link = getHostnameForCurrentPage() + link;
 				
 				$("#facebook-share-link").append(link);
 				$("#facebook-share-link").attr("href", link);
 
 				$("#facebook-share-button").click(function() {
-					shareData.message = $("#facebook-share-text").val();
-					sendShare("facebook", shareData, function(error) {
-						if (error) {
-							showAlert("There appears to be a problem posting to Facebook.  Please try again.", 3);
-						}
-						else {
-							showAlert("Posted successfully!", 3, function() {
-								window.location.replace(document.referrer);
-							});
-						}
-					});
+					sharePost("facebook", $("#facebook-share-text").val(), link, "facebook-share-button");
 				});
 			});
 			
@@ -85,25 +73,13 @@ function detectTwitterPermissions() {
 			$("#twitter-connected-section").show();
 			$("#twitter-not-connected-section").hide();
 			setupPreview("twitter-preview", function(link) {
-				var shareData = {};
-				shareData.link = link;
 				link = getHostnameForCurrentPage() + link;
 				
 				$("#twitter-share-link").append(link);
 				$("#twitter-share-link").attr("href", link);
 
 				$("#twitter-share-button").click(function() {
-					shareData.message = $("#twitter-share-text").val();
-					sendShare("twitter", shareData, function(error) {
-						if (error) {
-							showAlert("There appears to be a problem posting to Twitter.  Please try again.", 3);
-						}
-						else {
-							showAlert("Posted successfully!", 3, function() {
-								window.location.replace(document.referrer);
-							});
-						}
-					});
+					sharePost("twitter", $("#twitter-share-text").val(), link, "twitter-share-button");
 				});
 			});
 			
@@ -142,5 +118,31 @@ function setupPreview(previewTag, done) {
 		done(link);
 	}).fail(function() {
 		window.location.replace("/error");
+	});
+}
+
+/*
+	Share the post to the target social network
+	The post consistns of a 'message' and a 'link'
+	The buttonId is the button that was clicked, and it will
+	disable the button while posting to prevent multiple clicks
+*/
+function sharePost(target, message, link, buttonId) {
+	var shareData = {message: message, link: link};
+	$("#" + buttonId).prop("disabled", true);
+	sendShare(target, shareData, function(error) {
+		if (error) {
+			showAlert("There appears to be a problem posting.  Please try again.", 1);
+			$("#" + buttonId).prop("disabled", false);
+		}
+		else {
+			showAlert("Posted successfully!  Redirecting ...", 1, function() {
+				var redirectURL = document.referrer;
+				if (!redirectURL || redirectURL == "") {
+					redirectURL = getHostnameForCurrentPage();
+				}
+				window.location.replace(redirectURL);
+			});
+		}
 	});
 }
