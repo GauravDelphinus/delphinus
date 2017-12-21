@@ -100,16 +100,6 @@ function postChallenge() {
 	jsonObj.created = (new Date()).getTime(); //created time
 	jsonObj.category = $("#categoryList option:selected").val(); //category id
 
-	//if social share checkboxes were checked, make sure to include that in the post message
-	// note that the server will do the actual posting to the networks
-	jsonObj.socialShare = {};
-	if ($("#checkboxFacebook").prop("checked")) {
-		jsonObj.socialShare.facebook = true;
-	}
-	if ($("#checkboxTwitter").prop("checked")) {
-		jsonObj.socialShare.twitter = true;
-	}
-
 	//finally, make the call to the server
 	$.ajax({
 		type: "POST",
@@ -120,7 +110,7 @@ function postChallenge() {
 	})
 	.done(function(data, textStatus, jqXHR) {
 		//if the challenge was posted successfully, redirect to the newly created challenge page
-    	window.open("/challenge/" + data.id, "_self");
+    	window.location.replace("/challenge/" + data.id);
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
 		failCount ++;
