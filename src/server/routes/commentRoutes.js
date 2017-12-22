@@ -110,7 +110,11 @@ var routes = function(db) {
 
 			var validationParams = [
 				{
-					name: "entityId",
+					name: "entityId", //base entity id (challenge, entry, etc.)
+					type: "id"
+				},
+				{
+					name: "parentId", //parent comment (in case of reply), or the entity Id
 					type: "id"
 				},
 				{
@@ -131,7 +135,7 @@ var routes = function(db) {
 			/**
 				First create the entry node.  Then later, link them to Filter nodes.
 			**/
-			var cypherQuery = "MATCH (e {id: '" + req.body.entityId + "'}) " + 
+			var cypherQuery = "MATCH (e {id: '" + req.body.parentId + "'}) " + 
 							" MATCH (u:User {id: '" + req.user.id + "'}) CREATE (c:Comment {" +
 							"id: '" + id + "', " + 
 							"created : '" + req.body.created + "', " + 
@@ -147,14 +151,29 @@ var routes = function(db) {
 					return res.sendStatus(500);
 				}
 
-				var output = dataUtils.constructEntityData("comment", result.data[0][0], result.data[0][1], result.data[0][0].created, 0, null, null, null, null, null, null, false, null, null, null, null, null, null, null);
+				//now, save the activity in the entity
+                var activityInfo = {
+                	entityId: req.body.entityId,
+                	type: "comment",
+                	timestamp: req.body.created,
+                	userId: req.user.id,
+                	commentId: result.data[0].id
+                }
+                dbUtils.saveActivity(activityInfo, function(err, id) {
+                	if (err) {
+                		logger.error(err);
+                		return res.sendStatus(500);
+                	}
 
-				if (!serverUtils.validateData(output, serverUtils.prototypes.comment)) {
-					return res.sendStatus(500);
-				}
-				
-				res.header("Location", "/api/comments/" + result.data[0].id);
-				return res.status(201).json(output);
+					var output = dataUtils.constructEntityData("comment", result.data[0][0], result.data[0][1], result.data[0][0].created, 0, null, null, null, null, null, null, false, null, null, null, null, null, null, null);
+
+					if (!serverUtils.validateData(output, serverUtils.prototypes.comment)) {
+						return res.sendStatus(500);
+					}
+					
+					res.header("Location", "/api/comments/" + result.data[0].id);
+					return res.status(201).json(output);
+				});
 			});
 		});
 

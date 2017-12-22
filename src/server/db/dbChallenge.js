@@ -30,33 +30,7 @@ function createChallenge(challengeInfo, done) {
 	});
 }
 
-/*
-	Add a record of activity to the Challenge.  Activity could
-	be a comment added, or a like, or a new entry posted to the challenge.
-*/
-function recordChallengeActivity(info, done) {
-	if (!serverUtils.validateData(challengeInfo, challengePrototype)) {
-		return done(new Error("Invalid challenge info"));
-	}
 
-	var cypherQuery = "MATCH(u:User {id: '" + challengeInfo.postedByUser + "'}) MATCH (category:Category {id: '" + challengeInfo.category + "'}) " +
-		"CREATE (n:Challenge {" +
-		"id: '" + challengeInfo.id + "'," +
-		"image_type : '" + challengeInfo.imageType + "'," + 
-		"created : '" + challengeInfo.created + "'," + 
-		"title : '" + dataUtils.sanitizeStringForCypher(challengeInfo.title) + "'" +
-		"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
-
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
-		if(err) {
-			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new Error(dbResultError(cypherQuery, 1, result.data.length)));
-		}
-
-		return done(null, {id: result.data[0].id});
-	});
-}
 
 var challengePrototype = {
 	"id" : "id",

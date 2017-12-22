@@ -556,9 +556,23 @@ var routes = function(db) {
 	                	return res.sendStatus(500);
 	                }
 
-	                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
+	                //now, save the activity in the challenge
+	                var activityInfo = {
+	                	entityId: req.params.entryId,
+	                	type: "like",
+	                	timestamp: req.body.created,
+	                	userId: req.user.id
+	                }
+	                dbUtils.saveActivity(activityInfo, function(err, id) {
+	                	if (err) {
+	                		logger.error(err);
+	                		return res.sendStatus(500);
+	                	}
 
-	                return res.json(output);
+		              	var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
+
+		                return res.json(output);
+		            });
 				});
       		} else if (req.body.likeAction == "unlike") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
@@ -572,9 +586,22 @@ var routes = function(db) {
 	                	return res.sendStatus(500);
 	                }
 
-					var output = {likeStatus: (result.data.length == 1) ? "off" : "on"};
-					
-					return res.json(output);
+	                //now, reset the activity in the challenge, since the person no longer likes this challenge
+	                var activityInfo = {
+	                	entityId: req.params.entryId,
+	                	type: "post"
+	                }
+	                dbUtils.saveActivity(activityInfo, function(err, id) {
+	                	if (err) {
+	                		logger.error(err);
+	                		return res.sendStatus(500);
+	                	}
+
+						var output = {likeStatus: (result.data.length == 1) ? "off" : "on"};
+						
+						return res.json(output);
+
+					});
 				});
       		}
 		});

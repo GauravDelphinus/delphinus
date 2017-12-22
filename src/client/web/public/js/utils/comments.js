@@ -1,4 +1,4 @@
-
+/*
 function createCommentsSectionTrimmed(data, contentTag) {
 	var socialStatusSection = $("<div>", {class: "commentsSectionTrimmed"});
 	var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "buttonSimple"}).append("Like");
@@ -61,6 +61,7 @@ function createCommentsSectionTrimmed(data, contentTag) {
 
 	return socialStatusSection;
 }
+*/
 
 /**
 	Show or Hide the Comments List associated with the given Entity.
@@ -111,7 +112,7 @@ function createCommentsContainer(data, contentTag) {
 		//add the New Comment text box of the Sign-in button
 		if (user) {
 			//show new comment box if already logged in
-			var newCommentElement = createNewCommentElement(false, data.id, contentTag);
+			var newCommentElement = createNewCommentElement(false, data.id, data.id, contentTag);
 			appendNewCommentElement(newCommentElement, data.id, contentTag, container, false);
 		} else {
 			var signInToCommentElement = createSignInToCommentElement();
@@ -160,7 +161,7 @@ function createCommentElement(data, parentId, contentTag, isReply) {
 	return element;
 }
 
-function createNewCommentElement(isReply, parentId, contentTag) {
+function createNewCommentElement(isReply, parentId, entityId, contentTag) {
 	var element = $("<div>", {id: contentTag + parentId + "NewCommentElement", class: "commentElement"});
 	if (isReply) {
 		element.addClass("replyElement");
@@ -189,7 +190,8 @@ function createNewCommentElement(isReply, parentId, contentTag) {
 	        var jsonObj = {};
 			jsonObj.text = this.value;
 			jsonObj.created = (new Date()).getTime();
-			jsonObj.entityId = parentId;
+			jsonObj.entityId = entityId;
+			jsonObj.parentId = parentId;
 
 			$.ajax({
 				type: "POST",
@@ -323,7 +325,7 @@ function createCommentsList(id, contentTag, list) { //id is the entity id
 
 	if (user) {
 		//show new comment box if already logged in
-		var newCommentElement = createNewCommentElement(false, id, contentTag);
+		var newCommentElement = createNewCommentElement(false, id, id, contentTag);
 		appendNewCommentElement(newCommentElement, id, contentTag, container, false);
 	} else {
 		var signInToCommentElement = createSignInToCommentElement();

@@ -6,7 +6,8 @@ var mime = require("mime");
 var imageProcessor = require("../imageProcessor");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
-var Challenge = require("../classes/challenge");
+var dbUtils = require("../db/dbUtils");
+var Challenge = require("../classes/challenge").Challenge;
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -172,13 +173,27 @@ var routes = function(db) {
 								return res.sendStatus(500);
 							}
 
-							var output = {id: result.id};
-							if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
-		    					return res.sendStatus(500);
-		    				}
-							
-							res.header("Location", "/api/challenges/" + output.id);
-							return res.status(201).json(output);
+							//now, save the activity in the entity
+			                var activityInfo = {
+			                	entityId: id,
+			                	type: "post",
+			                	timestamp: req.body.created,
+			                	userId: req.user.id
+			                }
+			                dbUtils.saveActivity(activityInfo, function(err, result) {
+			                	if (err) {
+			                		logger.error(err);
+			                		return res.sendStatus(500);
+			                	}
+
+								var output = {id: result.id};
+								if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+			    					return res.sendStatus(500);
+			    				}
+								
+								res.header("Location", "/api/challenges/" + output.id);
+								return res.status(201).json(output);
+							});
 						});
 					});
 				});
@@ -313,9 +328,25 @@ var routes = function(db) {
 	                	return res.sendStatus(500);
 	                }
 
-	                var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
+	                //now, save the activity in the challenge
+	                var activityInfo = {
+	                	entityId: req.params.challengeId,
+	                	type: "like",
+	                	timestamp: req.body.created,
+	                	userId: req.user.id
+	                }
+	                dbUtils.saveActivity(activityInfo, function(err, id) {
+	                	if (err) {
+	                		logger.error(err);
+	                		return res.sendStatus(500);
+	                	}
 
-	                return res.json(output);
+	                	var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
+
+	                	return res.json(output);
+	                });
+
+	                
 				});
       		} else if (req.body.likeAction == "unlike") {
       			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
@@ -329,9 +360,22 @@ var routes = function(db) {
 	                	return res.sendStatus(500);
 	                }
 
-					var output = {likeStatus: (result.data.length == 1) ? "off" : "on"};
+	                //now, reset the activity in the challenge, since the person no longer likes this challenge
+	                var activityInfo = {
+	                	entityId: req.params.challengeId,
+	                	type: "post"
+	                }
+	                dbUtils.saveActivity(activityInfo, function(err, id) {
+	                	if (err) {
+	                		logger.error(err);
+	                		return res.sendStatus(500);
+	                	}
 
-					return res.json(output);
+	                	var output = {likeStatus: (result.data.length == 1) ? "off" : "on"};
+
+						return res.json(output);
+	                });
+					
 				});
       		}
 		});

@@ -53,7 +53,7 @@ function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 			//add a new reply input box only if there isn't already one.
 			if (!$("#" + contentTag + ((isReply) ? (parentId) : (data.id)) + "NewCommentText").length) {
 				//for reply of reply, the parent is still the top comment
-				var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id), contentTag);
+				var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id), data.id, contentTag);
 				appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), contentTag, null, true);
 			}
 			$("#" + contentTag + ((isReply) ? (parentId) : (data.id)) + "NewCommentText").focus(); // set focus in the input field
