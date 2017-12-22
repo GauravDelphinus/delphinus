@@ -16,7 +16,7 @@ class Challenge extends ContentEntity {
 			imageType: this.imageType,
 			created: this.created,
 			title: this.caption,
-			postedByUser: this.postedBy,
+			userId: this.postedBy,
 			category: this.category
 		};
 

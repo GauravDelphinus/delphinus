@@ -173,27 +173,13 @@ var routes = function(db) {
 								return res.sendStatus(500);
 							}
 
-							//now, save the activity in the entity
-			                var activityInfo = {
-			                	entityId: id,
-			                	type: "post",
-			                	timestamp: req.body.created,
-			                	userId: req.user.id
-			                }
-			                dbUtils.saveActivity(activityInfo, function(err, result) {
-			                	if (err) {
-			                		logger.error(err);
-			                		return res.sendStatus(500);
-			                	}
-
-								var output = {id: result.id};
-								if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
-			    					return res.sendStatus(500);
-			    				}
-								
-								res.header("Location", "/api/challenges/" + output.id);
-								return res.status(201).json(output);
-							});
+							var output = {id: result.id};
+							if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+		    					return res.sendStatus(500);
+		    				}
+							
+							res.header("Location", "/api/challenges/" + output.id);
+							return res.status(201).json(output);
 						});
 					});
 				});

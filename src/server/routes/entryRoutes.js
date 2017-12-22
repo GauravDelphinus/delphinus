@@ -9,6 +9,7 @@ var mime = require("mime");
 var fs = require("fs");
 var imageProcessor = require("../imageProcessor");
 var serverUtils = require("../serverUtils");
+var dbEntry = require("../db/dbEntry");
 
 /*
 
@@ -215,35 +216,27 @@ var routes = function(db) {
 			var id = shortid.generate();
 			
 			//First create the entry node.  Then later, link them to Filter nodes.
-			
-			var cypherQuery = " MATCH (u:User {id: '" + req.user.id + "'}) CREATE (e:Entry {" +
-							"id: '" + id + "', " + 
-							"caption: '" + dataUtils.sanitizeStringForCypher(req.body.caption) + "', " + 
-							"created : '" + req.body.created + "'" + 
-							"})-[r:POSTED_BY]->(u) ";
+			var entryInfo = {
+				id: id,
+				created: req.body.created,
+				title: req.body.caption,
+				userId: req.user.id,
+				source: req.body.source
+			};
 
-			if (req.body.source == "challengeId") { //link to challenge
-				cypherQuery = "MATCH (c:Challenge {id: '" + req.body.challengeId + "'}) " +
-							cypherQuery +
-							", (c)<-[:PART_OF]-(e) RETURN e;";
-			} else if (req.body.source == "designId") {// link to design
-				cypherQuery = "MATCH (d:Design {id: '" + req.body.designId + "'}) " +
-							cypherQuery +
-							", (d)<-[:BASED_ON]-(e) RETURN e;";
-			} else { //independent entry
-				cypherQuery += " RETURN e;";
+			if (req.body.source == "designId") {
+				entryInfo.sourceId = req.body.designId;
+			} else if (req.body.source == "challengeId") {
+				entryInfo.sourceId = req.body.challengeId;
 			}
-			
-			db.cypherQuery(cypherQuery, function(err, result){
+
+			dbEntry.createEntry(entryInfo, function(err, result) {
 				if(err) {
-					logger.dbError(err, cypherQuery);
-					return res.sendStatus(500);
-				} else if (result.data.length != 1) {
-					logger.dbResultError(cypherQuery, 1, result.data.length);
+					logger.error(err);
 					return res.sendStatus(500);
 				}
 
-				var newEntryId = result.data[0].id;
+				var newEntryId = result.id;
 
 				
 					//Next extract all the filters, decorations, layouts and artifacts, and create the

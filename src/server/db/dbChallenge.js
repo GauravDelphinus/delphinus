@@ -1,17 +1,18 @@
 require("../error");
 var serverUtils = require("../serverUtils");
 var dataUtils = require("../dataUtils");
+var dbUtils = require("./dbUtils");
 
 /*
 	Create a new Challenge node in the db.
-	Prototype: dbUtils.prototype.challenge
+	Prototype: challengePrototype
 */
 function createChallenge(challengeInfo, done) {
 	if (!serverUtils.validateData(challengeInfo, challengePrototype)) {
 		return done(new Error("Invalid challenge info"));
 	}
 
-	var cypherQuery = "MATCH(u:User {id: '" + challengeInfo.postedByUser + "'}) MATCH (category:Category {id: '" + challengeInfo.category + "'}) " +
+	var cypherQuery = "MATCH(u:User {id: '" + challengeInfo.userId + "'}) MATCH (category:Category {id: '" + challengeInfo.category + "'}) " +
 		"CREATE (n:Challenge {" +
 		"id: '" + challengeInfo.id + "'," +
 		"image_type : '" + challengeInfo.imageType + "'," + 
@@ -26,7 +27,21 @@ function createChallenge(challengeInfo, done) {
 			return done(new Error(dbResultError(cypherQuery, 1, result.data.length)));
 		}
 
-		return done(null, {id: result.data[0].id});
+		//now, save the activity in the entity
+        var activityInfo = {
+        	entityId: result.data[0].id,
+        	type: "post",
+        	timestamp: challengeInfo.created,
+        	userId: challengeInfo.userId
+        }
+        dbUtils.saveActivity(activityInfo, function(err, result) {
+        	if (err) {
+        		logger.error(err);
+        		return res.sendStatus(500);
+        	}
+
+			return done(null, {id: result.id});
+		});
 	});
 }
 
@@ -37,7 +52,7 @@ var challengePrototype = {
 	"imageType" : "imageType",
 	"created" : "timestamp",
 	"title" : "string",
-	"postedByUser" : "id", //id of user who is posting this challenge
+	"userId" : "id", //id of user who is posting this challenge
 	"category" : "category" //id of category this challenge belongs to
 }
 
