@@ -1,4 +1,5 @@
-var ContentEntity = require("./contentEntity");
+var ContentEntity = require("./contentEntity").ContentEntity;
+var ContentEntitySocialInfo = require("./contentEntity").ContentEntitySocialInfo;
 
 var dbChallenge = require("../db/dbChallenge");
 
@@ -29,4 +30,16 @@ class Challenge extends ContentEntity {
 	}
 }
 
-module.exports = Challenge;
+class ChallengeSocialInfo extends ContentEntitySocialInfo {
+	constructor (numLikes, numShares, numComments, numEntries) {
+		super(numLikes, numShares, numComments);
+
+		this.numEntries = numEntries;
+		this.popularity = this.numLikes + this.numShares + this.numComments + this.numEntries;
+	}
+}
+
+module.exports = {
+	Challenge : Challenge,
+	ChallengeSocialInfo : ChallengeSocialInfo
+};

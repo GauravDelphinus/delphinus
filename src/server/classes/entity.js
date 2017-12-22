@@ -5,4 +5,6 @@ class Entity {
 	}
 }
 
-module.exports = Entity;
+module.exports = {
+	Entity : Entity
+};
