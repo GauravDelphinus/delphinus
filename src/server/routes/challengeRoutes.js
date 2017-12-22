@@ -6,7 +6,7 @@ var mime = require("mime");
 var imageProcessor = require("../imageProcessor");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
-var dbChallenge = require("../db/dbChallenge");
+var Challenge = require("../classes/challenge");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -165,17 +165,10 @@ var routes = function(db) {
 					}
 
 					imageProcessor.findImageSize(outputPath, function(size) {
-						var challengeInfo = {
-							id: id,
-							imageType: imageType,
-							created: req.body.created,
-							title: req.body.caption,
-							postedByUser: req.user.id,
-							category: req.body.category
-						}
-						dbChallenge.createChallenge(challengeInfo, function(err, result) {
+						var challenge = new Challenge(id, imageType, req.body.created, req.body.caption, req.user.id, req.body.category);
+						challenge.save(function(err, result) {
 							if(err) {
-								logger.dbError(err, cypherQuery);
+								logger.error(err);
 								return res.sendStatus(500);
 							}
 
