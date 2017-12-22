@@ -6,6 +6,7 @@ var mime = require("mime");
 var imageProcessor = require("../imageProcessor");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
+var dbChallenge = require("../db/dbChallenge");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -164,45 +165,26 @@ var routes = function(db) {
 					}
 
 					imageProcessor.findImageSize(outputPath, function(size) {
-						var cypherQuery = "MATCH(u:User {id: '" + req.user.id + "'}) MATCH (category:Category {id: '" + req.body.category + "'}) CREATE (n:Challenge {" +
-							"id: '" + id + "'," +
-							"image : '" + name + "'," +
-							"image_type : '" + imageType + "'," + 
-							"created : '" + req.body.created + "'," + 
-							"title : '" + dataUtils.sanitizeStringForCypher(req.body.caption) + "'" +
-							"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
-					
-						db.cypherQuery(cypherQuery, function(err, result){
+						var challengeInfo = {
+							id: id,
+							imageType: imageType,
+							created: req.body.created,
+							title: req.body.caption,
+							postedByUser: req.user.id,
+							category: req.body.category
+						}
+						dbChallenge.createChallenge(challengeInfo, function(err, result) {
 							if(err) {
 								logger.dbError(err, cypherQuery);
 								return res.sendStatus(500);
-							} else if (result.data.length != 1) {
-								logger.dbResultError(cypherQuery, 1, result.data.length);
-								return res.sendStatus(500);
 							}
 
-							var output = {id: result.data[0].id};
+							var output = {id: result.id};
 							if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
 		    					return res.sendStatus(500);
 		    				}
-
-							//now, check if the user selected to share to social networks
-							if (req.body.socialShare) {
-								if (req.body.socialShare.facebook) {
-									var facebook = require('../services/facebook')();
-									facebook.postUpdate(config.social.share.newChallengeMessage, config.hostname + config.url.challenges + id, req.user.facebook.token, function(error, data) {
-										//do nothing
-									});
-								}
-								if (req.body.socialShare.twitter) {
-									var twitter = require('../services/twitter')();
-							        twitter.postUpdate(config.social.share.newChallengeMessage + " " + config.hostname + config.url.challenges + id, req.user.twitter.token, req.user.twitter.tokenSecret, function (error, data) {
-							        	//do nothing
-							        });
-								}
-							}
 							
-							res.header("Location", "/api/challenges/" + result.data[0].id);
+							res.header("Location", "/api/challenges/" + output.id);
 							return res.status(201).json(output);
 						});
 					});

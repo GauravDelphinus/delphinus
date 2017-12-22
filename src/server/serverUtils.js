@@ -225,6 +225,14 @@ module.exports = {
 				//throw new Error("");
 				return false;
 			}
+		} else if (type == "timestamp") {
+			var date = new Date(value);
+			var isValidDate = (date instanceof Date && !isNaN(date.valueOf())); //https://stackoverflow.com/questions/10589732/checking-if-a-date-is-valid-in-javascript
+
+			if (!isValidDate) {
+				logger.errorIf(logError, "Invalid value '" + value + "' received for param '" + name + "' - Not a valid timestamp");
+				return false;
+			}
 		} else if (type == "url") {
 			if (!validUrl.isUri(value)) {
 				logger.errorIf(logError, "Invalid URL '" + value + "' received for param '" + name + "'");
