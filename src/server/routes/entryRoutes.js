@@ -10,6 +10,7 @@ var fs = require("fs");
 var imageProcessor = require("../imageProcessor");
 var serverUtils = require("../serverUtils");
 var dbEntry = require("../db/dbEntry");
+var dbUtils = require("../db/dbUtils");
 
 /*
 
