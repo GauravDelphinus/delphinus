@@ -7,6 +7,7 @@ var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 var mime = require("mime");
 var async = require("async");
+var dbUser = require("../db/dbUser");
 
 var routes = function(db) {
 	var userRouter = express.Router();
@@ -182,41 +183,47 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
+			var queryParams = [
+				{
+					name: "info",
+					type: ["basic", "extended"],
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.query, queryParams)) {
+				return res.sendStatus(400);
+			}
+
 			var meId = (req.user) ? (req.user.id) : (0);
-                  
-            var cypherQuery = "MATCH (u:User{id: '" + req.params.userId + "'}) WITH u " +
-                  		" OPTIONAL MATCH (u)<-[:FOLLOWING]-(follower:User) " +
-                  		" WITH u, COUNT(follower) AS numFollowers " +
-                  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(c:Challenge) " +
-                  		" WITH u, numFollowers, COLLECT(c) AS challengesPosted " +
-                  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(e:Entry) " +
-                  		" WITH u, numFollowers, challengesPosted, COLLECT(e) AS entriesPosted " +
-                  		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
-                  		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following), (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
 
-			db.cypherQuery(cypherQuery, function(err, result) {
-				if (err) {
-					logger.dbError(err, cypherQuery);
-					return res.sendStatus(500);
-				} else if (result.data.length != 1) {
-                	logger.dbResultError(cypherQuery, 1, result.data.length);
-                	return res.sendStatus(500);
-                }
+			if (req.query.type == "extended") { //extended user info
+				dbUser.findUserExtended(req.params.userId, meId, function(err, userInfo) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
 
-				var socialInfo = {};
-				if (result.data[0][0].twitter_profile_link) {
-					socialInfo.twitterLink = result.data[0][0].twitter_profile_link;
-				}
-				if (result.data[0][0].facebook_profile_link) {
-					socialInfo.facebookLink = result.data[0][0].facebook_profile_link;
-				}
-				var data = dataUtils.constructEntityData("user", result.data[0][0], null, result.data[0][0].last_seen, null, null, null, null, result.data[0][1], result.data[0][3] > 0, result.data[0][2], null, "none", null, null, null, null, null, socialInfo);
-				
-				if (!serverUtils.validateData(data, serverUtils.prototypes.user)) {
-					return res.sendStatus(500);
-				}
-				return res.json(data);
-			});
+					if (!serverUtils.validateData(userInfo, dbUser.userPrototypeExtended)) {
+						return res.sendStatus(500);
+					}
+
+					return res.json(userInfo);
+				});
+			} else { //basic user info
+				dbUser.findUserBasic(req.params.userId, function(err, userInfo) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					if (!serverUtils.validateData(userInfo, dbUser.userPrototypeBasic)) {
+						return res.sendStatus(500);
+					}
+
+					return res.json(userInfo);
+				});
+			}
 		})
 
 		.patch(function(req, res) {

@@ -319,15 +319,22 @@ function createActivitySectionElement(data, contentTag) {
 
 	if (data.activity) {
 		if (data.activity.type == "recentlyLiked") {
-			if (data.activity.like && data.activity.like.postedByUser) {
-				var userLink = $("<a>", {href: "/user/" + data.activity.like.postedByUser.id}).append(data.activity.like.postedByUser.displayName);
-				activityText.append(userLink).append(" likes this " + formatDate(data.activity.like.postedDate));
-			}
+			//Fetch the like info (user name, link, image)
+			$.getJSON("/api/users/" + data.activity.userId + "?info=basic", function(userData) {
+				var userLink = $("<a>", {href: userData.link}).append(userData.displayName);
+				activityText.append(userLink).append(" likes this " + formatDate(data.activity.timestamp));
+			})
+			.fail(function() {
+				//eat this
+			});
 		} else if (data.activity.type == "recentlyCommented") {
-			if (data.activity.comment && data.activity.comment.postedByUser) {
-				var userLink = $("<a>", {href: "/user/" + data.activity.comment.postedByUser.id}).append(data.activity.comment.postedByUser.displayName);
-				activityText.append(userLink).append(" commented on this " + formatDate(data.activity.comment.postedDate));
-			}
+			$.getJSON("/api/users/" + data.activity.userId + "?info=basic", function(userData) {
+				var userLink = $("<a>", {href: userData.link}).append(userData.displayName);
+				activityText.append(userLink).append(" commented on this " + formatDate(data.activity.timestamp));
+			})
+			.fail(function() {
+				//eat this
+			});
 		} else if (data.activity.type == "highLikeCount" || data.activity.type == "highCommentCount") {
 			activityText.append("Popular among other users");
 		}

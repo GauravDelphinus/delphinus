@@ -5,6 +5,7 @@ var config = require("../config");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 var dataUtils = require("../dataUtils");
+var dbUtils = require("../db/dbUtils");
 
 var routes = function(db) {
 
@@ -157,8 +158,9 @@ var routes = function(db) {
                 	type: "comment",
                 	timestamp: req.body.created,
                 	userId: req.user.id,
-                	commentId: result.data[0].id
+                	commentId: result.data[0][0].id
                 }
+                logger.debug("calling saveActivity with activityInfo = " + JSON.stringify(activityInfo));
                 dbUtils.saveActivity(activityInfo, function(err, id) {
                 	if (err) {
                 		logger.error(err);
@@ -171,7 +173,7 @@ var routes = function(db) {
 						return res.sendStatus(500);
 					}
 					
-					res.header("Location", "/api/comments/" + result.data[0].id);
+					res.header("Location", "/api/comments/" + result.data[0][0].id);
 					return res.status(201).json(output);
 				});
 			});
