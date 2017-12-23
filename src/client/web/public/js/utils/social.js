@@ -330,7 +330,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	var socialActionsSection = $("<div>", {id: contentTag + data.id + "SocialActionsSection", class: "socialActionsSection"});
 
 	// LIKE BUTTON ---------------------------------
-	if (data.socialStatus.likes) {
+	if (data.type == "challenge" || data.type == "entry") {
 		var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		likeButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Like");
 		socialActionsSection.append(likeButton);
@@ -385,7 +385,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	}
 
 	// COMMENT BUTTON ---------------------------------
-	if (data.socialStatus.comments) {
+	if (data.type == "challenge" || data.type == "entry") {
 		var commentButton = $("<button>", {id: contentTag + data.id + "CommentButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		commentButton.append($("<span>", {class: "glyphicon glyphicon-comment glyphiconAlign"})).append(" Comment");
 		socialActionsSection.append(commentButton);
@@ -396,7 +396,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	}
 
 	// SHARE BUTTON ---------------------------------
-	if (data.socialStatus.shares) {
+	if (data.type == "challenge" || data.type == "entry") {
 		var shareButton = $("<button>", {id: contentTag + data.id + "ShareButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		shareButton.append($("<span>", {class: "glyphicon glyphicon-share-alt glyphiconAlign"})).append(" Share");
 		
@@ -433,7 +433,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	}
 	
 	// ADD ENTRY BUTTON ---------------------------------
-	if (data.socialStatus.entries) {
+	if (data.type == "challenge") {
 		var addEntryButton = $("<button>", {id: contentTag + data.id + "AddEntryButton", type: "button", class: "button-active-link text-plain-small text-bold"});
 		addEntryButton.append($("<span>", {class: "glyphicon glyphicon-flag glyphiconAlign"})).append(" Captionify");
 		socialActionsSection.append(addEntryButton);
@@ -444,7 +444,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	}
 	
 	// FOLLOW BUTTON ---------------------------------
-	if (data.socialStatus.follows && (!user || user.id != data.id)) {
+	if (data.type == "user" && (!user || user.id != data.id)) {
 		var followButton = $("<button>", {id: contentTag + data.id + "FollowButton", type: "button", class: "button-active-link text-plain-small text-bold"}).append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append($("<span>", {id: contentTag + data.id + "FollowText"}));
 		
 		socialActionsSection.append(followButton);

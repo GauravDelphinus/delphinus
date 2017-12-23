@@ -1431,8 +1431,7 @@ module.exports = {
 
 		var data = {
 			type : entityType,
-			id : entity.id,
-			compareDate: compareDate,
+			id : entity.id
 		};
 
 		//social status values
@@ -1500,7 +1499,7 @@ module.exports = {
 			data.activity = {};
 			data.activity.type = activityType;
 
-			if (activityType == "recentlyCommented") {
+			if (activityType == "comment") {
 				if (lastComment) {
 					data.activity.comment = {};
 					data.activity.comment.postedDate = lastComment.created;
@@ -1521,7 +1520,7 @@ module.exports = {
 						}
 					};
 				}
-			} else if (activityType == "recentlyLiked") {
+			} else if (activityType == "like") {
 				if (likeTime && liker) {
 					data.activity.like = {};
 					data.activity.like.postedDate = likeTime;

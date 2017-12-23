@@ -58,7 +58,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][5] > 0, "recentlyPosted", null, null, null, null, result.data[i][6]);
+	    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][5] > 0, "post", null, null, null, null, result.data[i][6]);
 						output.push(data);
 	    			}
 
@@ -89,7 +89,7 @@ var routes = function(db) {
 
 					var output = [];
 	    			for (var i = 0; i < result.data.length; i++) {
-	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "recentlyPosted", null, null, null, null);
+	    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "post", null, null, null, null);
 						output.push(data);
 	    			}
 

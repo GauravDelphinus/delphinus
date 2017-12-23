@@ -226,7 +226,7 @@ module.exports = {
 				return false;
 			}
 		} else if (type == "timestamp") {
-			var date = new Date(value);
+			var date = new Date(parseInt(value));
 			var isValidDate = (date instanceof Date && !isNaN(date.valueOf())); //https://stackoverflow.com/questions/10589732/checking-if-a-date-is-valid-in-javascript
 
 			if (!isValidDate) {
@@ -305,11 +305,13 @@ module.exports = {
 				if (typeof prototype[key] !== 'object') {
 					//logger.debug("prototype[key] is not an object, so looking at the predefined prototypes");
 					//check to see if there's a prototype available
-					if (this.prototypes.hasOwnProperty(key) && typeof this.prototypes[key] === 'object') {
-						if (!this.validateObjectWithPrototype(object[key], this.prototypes[key])) {
+					var prototypeKey = prototype[key];
+					if (this.prototypes.hasOwnProperty(prototypeKey) && typeof this.prototypes[prototypeKey] === 'object') {
+						if (!this.validateObjectWithPrototype(object[key], this.prototypes[prototypeKey])) {
 							return false;
 						}
 					} else {
+						logger.error("Prototype for key " + prototypeKey + " not found");	
 						return false;
 					}
 				} else if (!this.validateObjectWithPrototype(object[key], prototype[key])) { //call recursively if object found
@@ -587,27 +589,12 @@ module.exports = {
 		it will *not* catch it, but if it is present it will make sure to match and validate
 		it using the prototype.
 	*/
-	prototypes: {
-		"challenge" : {
+	prototypes : {
+		"challengeExtended" : {
 			"type" : ["challenge"],
 			"id" : "id",
-			"compareDate" : "number",
-			"socialStatus" : {
-				"likes" : {
-					"numLikes" : "number",
-					"amLiking" : [true , false]
-				},
-				"shares" : {
-					"numShares" : "number"
-				},
-				"comments" : {
-					"numComments" : "number"
-				},
-				"entries": {
-					"numEntries" : "number"
-				}
-			},
-			"postedDate" : "number",
+			"socialStatus" : "challengeSocialInfo",
+			"postedDate" : "timestamp",
 			"postedByUser" : "postedByUser",
 			"image": "myURL",
 			"imageType": "imageType",
@@ -617,18 +604,32 @@ module.exports = {
 			"categoryID" : "category",
 			"activity" : "activity"
 		},
-		"postedByUser" : {
+		"challengeBasic" : {
+			"type" : ["challenge"],
 			"id" : "id",
-			"displayName" : "string",
-			"image" : ["oneoftypes", "url", "myURL"],
-			"lastSeen" : "number"
+			"postedDate" : "timestamp",
+			"postedByUser" : "postedByUser",
+			"image": "myURL",
+			"imageType": "imageType",
+			"caption": "string",
+			"link" : "myURL",
+			"categoryName" : "string",
+			"categoryID" : "category"
 		},
-		"onlyId" : {
-			"id" : "id"
-		},
-		"category" : {
-			"name" : "string",
-			"id" : "category"
+		"challengeSocialInfo" : {
+			"likes" : {
+				"numLikes" : "number",
+				"amLiking" : [true , false]
+			},
+			"shares" : {
+				"numShares" : "number"
+			},
+			"comments" : {
+				"numComments" : "number"
+			},
+			"entries": {
+				"numEntries" : "number"
+			}
 		},
 		"comment" : {
 			"type" : ["comment"],
@@ -669,23 +670,26 @@ module.exports = {
 			"activity" : "activity"
 		},
 		"activity" : {
-			"type" : ["recentlyPosted", "recentlyLiked", "recentlyCommented", "highLikeCount", "highCommentCount"],
-			"comment": {
-				"id" : "id",
-				"text" : "string",
-				"postedDate" : "number",
-				"postedByUser" : "postedByUser",
-				"socialStatus" : {
-					"likes" : {
-						"numLikes" : "number"
-					}
-				}
-			},
-			"like" : {
-				"postedByUser" : "postedByUser",
-				"postedDate": "number"
-			}
+			"type" : ["post", "like", "comment", "highLikeCount", "highCommentCount"],
+			"timestamp" : "timestamp",
+			"userId" : "id",
+			"commentId" : "id"
 		},
+		"category" : {
+			"name" : "string",
+			"id" : "category"
+		},
+		"postedByUser" : {
+			"id" : "id",
+			"displayName" : "string",
+			"image" : ["oneoftypes", "url", "myURL"],
+			"lastSeen" : "timestamp"
+		},
+		"onlyId" : {
+			"id" : "id"
+		},
+		
+		
 		"filter" : {
 			"id" : "filter",
 			"name" : "string"

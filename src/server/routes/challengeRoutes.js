@@ -8,6 +8,7 @@ var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 var dbUtils = require("../db/dbUtils");
 var Challenge = require("../classes/challenge").Challenge;
+var dbChallenge = require("../db/dbChallenge");
 
 var routes = function(db) {
 	var challengeRouter = express.Router();
@@ -93,7 +94,7 @@ var routes = function(db) {
 
     			}
 
-    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+    			if (!serverUtils.validateData(output, serverUtils.prototypes.challengeExtended)) {
     				return res.sendStatus(500);
     			}
 
@@ -204,35 +205,61 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
+			var queryParams = [
+				{
+					name: "info",
+					type: ["basic", "extended", "social"],
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.query, queryParams)) {
+				return res.sendStatus(400);
+			}
+
 			var meId = (req.user) ? (req.user.id) : (0);
 
-			var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge {id: '" + req.params.challengeId + "'})-[r:POSTED_BY]->(poster:User) " +
-						" WITH c, category, poster " +
-						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
-						" WITH c, category, poster, COUNT(u2) AS like_count " + 
-						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
-						" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
-						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-						" WITH c, category, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
-						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
-						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), category ORDER BY c.created DESC;";
+			if (req.query.info == "basic") {
+				dbChallenge.findChallengeBasicInfo(req.params.challengeId, function(err, output) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
 
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) {
-    				logger.dbError(err, cypherQuery);
-    				return res.sendStatus(500);
-    			} else if (result.data.length != 1) {
-    				logger.dbResultError(cypherQuery, 1, result.data.length);
-    				return res.sendStatus(404); //invalid request
-    			}
+					if (!serverUtils.validateData(output, serverUtils.prototypes.challengeBasic)) {
+	    				return res.sendStatus(500);
+	    			}
 
-    			var output = dataUtils.constructEntityData("challenge", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], result.data[0][4], 0, null, null, null, result.data[0][5] > 0, "none", null, null, null, null, result.data[0][6]);
-    			if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-    				return res.sendStatus(500);
-    			}
+	    			return res.json(output);
+				});
+			} else if (req.query.info == "extended") {
+				dbChallenge.findChallengeExtendedInfo(req.params.challengeId, meId, function(err, output) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
 
-    			return res.json(output);
-			});
+					if (!serverUtils.validateData(output, serverUtils.prototypes.challengeExtended)) {
+	    				return res.sendStatus(500);
+	    			}
+
+	    			return res.json(output);
+				});
+			} else if (req.query.info == "social") {
+				dbChallenge.findChallengeSocialInfo(req.params.challengeId, meId, function(err, output) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					if (!serverUtils.validateData(output, serverUtils.prototypes.challengeSocial)) {
+	    				return res.sendStatus(500);
+	    			}
+
+	    			return res.json(output);
+				});
+			}
+			
 		})
 
 		.delete(function(req, res){

@@ -19,10 +19,11 @@ $(document).ready(function(){
 });
 
 function setupMainItem() {
-	$.getJSON('/api/challenges/' + challengeId, function(data) {
+	$.getJSON('/api/challenges/' + challengeId + "?info=extended", function(data) {
 		var mainElement = createMainElement(data, "main");
 		$("#main").append(mainElement);
 	}).fail(function() {
+		alert("error");
 		window.location.replace("/error");
 	});
 }

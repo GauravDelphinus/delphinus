@@ -106,7 +106,7 @@ function createFeedElement(data, contentTag) {
 		element.addClass("challenge-element");
 	}
 
-	if (data.activity && data.activity.type != "recentlyPosted") {
+	if (data.activity && data.activity.type != "post") {
 		element.append(createActivitySectionElement(data, contentTag));
 	}
 

@@ -22,10 +22,6 @@ var routes = function(db) {
 						logger.error(err);
 						return res.sendStatus(500);
 					}
-
-					for (var i = 0; i < result.length; i++) {
-						logger.debug("returning to client, " + i + ": " + JSON.stringify(result[i]));
-					}
 					
 					return res.json(result);
 				});

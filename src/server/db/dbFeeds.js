@@ -35,12 +35,11 @@ function createMainFeedForLoggedInUser(userId, done) {
 		for (var i = 0; i < result.data.length; i++) {
 			var data = {};
 
-			logger.debug("Result from query, " + i + ": " + JSON.stringify(result.data[i]));
 			if (result.data[i][0] == "Entry")
 			{
-				data.entityType = "entry";
+				data.type = "entry";
 			} else if (result.data[i][0] == "Challenge") {
-				data.entityType = "challenge";
+				data.type = "challenge";
 			}
 
 			var entity = result.data[i][1];
@@ -48,7 +47,6 @@ function createMainFeedForLoggedInUser(userId, done) {
 			var category = result.data[i][2];
 
 			data.id = entity.id;
-			data.compareDate = entity.activity_timestamp;
 
 			data.postedDate = entity.created;
 			data.postedByUser = {};
@@ -57,32 +55,27 @@ function createMainFeedForLoggedInUser(userId, done) {
 			data.postedByUser.image = poster.image;
 			data.postedByUser.lastSeen = poster.last_seen;
 
-			if (data.entityType == "challenge") {
+			if (data.type == "challenge") {
 				data.image = config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
 				data.caption = entity.title;
 				data.link = config.url.challenge + entity.id;
 				data.categoryName = category.name;
 				data.categoryID = category.id;
-			} else if (data.entityType == "entry") {
+			} else if (data.type == "entry") {
 				data.image = config.url.entryImages + entity.id + "." + mime.extension(entity.image_type);
 				data.caption = entity.caption;
 				data.link = config.url.entry + entity.id;
 			}
 			
 			data.imageType = entity.image_type;
+
 			data.activity = {};
-
-			var activityType;
-			if (entity.activity_type == "post") {
-				data.activity.type = "recentlyPosted";
-
-			} else if (entity.activity_type == "like") {
-				data.activity.type = "recentlyLiked";
-			} else if (entity.activity_type == "comment") {
-				data.activity.type = "recentlyCommented";
-			}
+			data.activity.type = entity.activity_type;
 			data.activity.timestamp = entity.activity_timestamp;
 			data.activity.userId = entity.activity_user;
+			if (entity.activity_type == "comment") {
+				data.activity.commentId = entity.activity_commentid;
+			}
 
 			output.push(data);
 		}

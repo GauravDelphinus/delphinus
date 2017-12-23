@@ -20,7 +20,7 @@ function saveActivity(activityInfo, done) {
 		// in case of post, the user and timestamp are ignored and the original values are used in the entity
 	} else if (activityInfo.type == "comment") { //recently commented
 		cypherQuery +=
-			", e.comment_id = '" + activityInfo.commentId + "' ";
+			", e.activity_commentid = '" + activityInfo.commentId + "' ";
 	} else if (activityInfo.type == "like") { //recently liked
 		// no additional info needed other than the person who liked, and the timestamp
 	}

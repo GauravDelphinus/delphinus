@@ -145,8 +145,7 @@ var routes = function(db) {
 
     			var output = [];
     			for (var i = 0; i < result.data.length; i++) {
-
-    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "recentlyPosted", null, null, null, null);
+    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "post", null, null, null, null);
 					output.push(data);
     			}
 
@@ -445,7 +444,7 @@ var routes = function(db) {
     				return res.sendStatus(404); //not found
     			}
 
-    			var data = dataUtils.constructEntityData("entry", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], null, 0, null, null, null, result.data[0][4] > 0, "recentlyPosted", null, null, null, null);
+    			var data = dataUtils.constructEntityData("entry", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], null, 0, null, null, null, result.data[0][4] > 0, "post", null, null, null, null);
 
     			if (!serverUtils.validateData(data, serverUtils.prototypes.entry)) {
     				return res.sendStatus(500);
