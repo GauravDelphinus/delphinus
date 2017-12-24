@@ -11,7 +11,6 @@ var watchScrolls = false; // Global Variable - to determine if we need to active
 var lastFetchedTimestamp = 0; // Global Variable - used to track the value of the timestamp to be used for fetching the next batch of content
 function startInfiniteScroll(getURL, lastFetchedTimestamp, updateContent) {
 	watchScrolls = true;
-	console.log("setupInfiniteScroll called, lastFetchedTimestamp = " + lastFetchedTimestamp);
 	$(window).scroll(function() {
 		// Fetch variables
 
