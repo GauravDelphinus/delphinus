@@ -16,30 +16,23 @@ var routes = function(db) {
 
 			logger.debug("GET received on /api/feeds, query: " + JSON.stringify(req.query));
 
+			var meId = null;
 			if (req.user && req.user.id) {
-				dbFeeds.createMainFeedForLoggedInUser(req.user.id, function(err, result) {
-					if (err) {
-						logger.error(err);
-						return res.sendStatus(500);
-					}
-					
-					if (!serverUtils.validateData(result, serverUtils.prototypes.entityExtended)) {
-	    				return res.sendStatus(500);
-	    			}
-
-					return res.json(result);
-				});
-			} else {
-				dbFeeds.createMainFeedForAnonymousUser(function(err, result) {
-					if (err) {
-						logger.error(err);
-						return res.sendStatus(500);
-					}
-
-					return res.json(result);
-				});
+				meId = req.user.id;
 			}
 			
+			dbFeeds.createMainFeed(meId, function(err, result) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
+				
+				if (!serverUtils.validateData(result, serverUtils.prototypes.entityExtended)) {
+    				return res.sendStatus(500);
+    			}
+
+				return res.json(result);
+			});
 		});
 
 	return feedRouter;

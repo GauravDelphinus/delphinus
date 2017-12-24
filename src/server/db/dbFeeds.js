@@ -3,9 +3,12 @@ const logger = require("../logger");
 const config = require("../config");
 const mime = require("mime");
 
-function createMainFeedForLoggedInUser(userId, done) {
+function createMainFeed(userId, done) {
 
-	var cypherQuery = "MATCH (me:User{id: '" + userId + "'}) " +
+	var cypherQuery = "";
+
+	if (userId) {
+		cypherQuery += "MATCH (me:User{id: '" + userId + "'}) " +
 		" MATCH (e) WHERE e:Entry OR e:Challenge " +
 		" OPTIONAL MATCH (e)-[:POSTED_BY]->(me) " +
 		" WITH me, COLLECT(e) AS all_entities " +
@@ -26,6 +29,15 @@ function createMainFeedForLoggedInUser(userId, done) {
 		" WITH e, category, poster " +
 		" RETURN labels(e), e, category, poster " +
 		" ORDER BY e.activity_timestamp DESC;";
+	} else {
+		cypherQuery += "MATCH (e) WHERE e:Entry OR e:Challenge " +
+		" OPTIONAL MATCH (category:Category)<-[:POSTED_IN]-(e) " +
+		" WITH e, category " +
+		" MATCH (e)-[:POSTED_BY]->(poster:User) " +
+		" WITH e, category, poster " +
+		" RETURN labels(e), e, category, poster " +
+		" ORDER BY e.activity_timestamp DESC;";
+	}
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
 		if (err) {
@@ -87,11 +99,6 @@ function createMainFeedForLoggedInUser(userId, done) {
 
 }
 
-function createMainFeedForAnonymousUser(done) {
-	return done(null, {});
-}
-
 module.exports = {
-	createMainFeedForLoggedInUser : createMainFeedForLoggedInUser,
-	createMainFeedForAnonymousUser : createMainFeedForAnonymousUser
+	createMainFeed : createMainFeed
 };
