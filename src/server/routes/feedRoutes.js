@@ -23,6 +23,10 @@ var routes = function(db) {
 						return res.sendStatus(500);
 					}
 					
+					if (!serverUtils.validateData(result, serverUtils.prototypes.entityExtended)) {
+	    				return res.sendStatus(500);
+	    			}
+
 					return res.json(result);
 				});
 			} else {

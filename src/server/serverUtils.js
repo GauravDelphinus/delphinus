@@ -231,6 +231,7 @@ module.exports = {
 
 			if (!isValidDate) {
 				logger.errorIf(logError, "Invalid value '" + value + "' received for param '" + name + "' - Not a valid timestamp");
+				throw new Error("");
 				return false;
 			}
 		} else if (type == "url") {
@@ -287,17 +288,20 @@ module.exports = {
 		//logger.debug("validateObjectWithPrototype: object: " + JSON.stringify(object) + ", prototype: " + JSON.stringify(prototype));
 		if (typeof object !== 'object' || typeof prototype !== 'object') {
 			logger.error("validateObjectWithPrototype: either one of object or prototype are not a valid object");
+			throw new Error("");
 			return false;
 		}
 
 		for (var key in object) {
 			if (!prototype.hasOwnProperty(key)) {
 				logger.error("prototype doesn't have the key: " + key);
+				throw new Error("");
 				return false;
 			}
 
 			if (object[key] == undefined) {
 				logger.error("object[key] is undefined, for key = " + key + ", object = " + JSON.stringify(object));
+				throw new Error("");
 				return false;
 			}
 
@@ -645,28 +649,52 @@ module.exports = {
 			},
 			"text" : "string"
 		},
-		"entry" : {
+		"entryExtended" : {
 			"type" : ["entry"],
 			"id" : "id",
-			"compareDate" : "number",
-			"socialStatus" : {
-				"likes" : {
-					"numLikes" : "number",
-					"amLiking" : [true , false]
-				},
-				"shares" : {
-					"numShares" : "number"
-				},
-				"comments" : {
-					"numComments" : "number"
-				}
-			},
-			"postedDate" : "number",
+			"socialStatus" : "entrySocialInfo",
+			"postedDate" : "timestamp",
 			"postedByUser" : "postedByUser",
 			"image": "myURL",
 			"imageType": "imageType",
 			"caption": "string",
 			"link" : "myURL",
+			"activity" : "activity"
+		},
+		"entryBasic" : {
+			"type" : ["entry"],
+			"id" : "id",
+			"postedDate" : "timestamp",
+			"postedByUser" : "postedByUser",
+			"image": "myURL",
+			"imageType": "imageType",
+			"caption": "string",
+			"link" : "myURL"
+		},
+		"entrySocialInfo" : {
+			"likes" : {
+				"numLikes" : "number",
+				"amLiking" : [true , false]
+			},
+			"shares" : {
+				"numShares" : "number"
+			},
+			"comments" : {
+				"numComments" : "number"
+			}
+		},
+		"entityExtended" : {
+			"type" : ["challenge", "entry"],
+			"id" : "id",
+			"socialStatus" : "challengeSocialInfo",
+			"postedDate" : "timestamp",
+			"postedByUser" : "postedByUser",
+			"image": "myURL",
+			"imageType": "imageType",
+			"caption": "string",
+			"link" : "myURL",
+			"categoryName" : "string",
+			"categoryID" : "category",
 			"activity" : "activity"
 		},
 		"activity" : {

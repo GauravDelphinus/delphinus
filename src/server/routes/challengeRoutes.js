@@ -233,6 +233,7 @@ var routes = function(db) {
 	    			return res.json(output);
 				});
 			} else if (req.query.info == "extended") {
+				logger.debug("calling get extzended info");
 				dbChallenge.findChallengeExtendedInfo(req.params.challengeId, meId, function(err, output) {
 					if (err) {
 						logger.error(err);
@@ -243,6 +244,7 @@ var routes = function(db) {
 	    				return res.sendStatus(500);
 	    			}
 
+	    			logger.debug("output : " + JSON.stringify(output));
 	    			return res.json(output);
 				});
 			} else if (req.query.info == "social") {
@@ -252,7 +254,7 @@ var routes = function(db) {
 						return res.sendStatus(500);
 					}
 
-					if (!serverUtils.validateData(output, serverUtils.prototypes.challengeSocial)) {
+					if (!serverUtils.validateData(output, serverUtils.prototypes.challengeSocialInfo)) {
 	    				return res.sendStatus(500);
 	    			}
 

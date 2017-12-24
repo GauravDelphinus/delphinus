@@ -12,6 +12,7 @@ var serverUtils = require("../serverUtils");
 var dbEntry = require("../db/dbEntry");
 var dbUtils = require("../db/dbUtils");
 
+
 /*
 
 						source: challenge id:
@@ -67,29 +68,12 @@ var routes = function(db) {
 
 			var validationParams = [
 				{
-					name: "sortBy",
-					required: "yes",
-					type: ["dateCreated", "popularity"]
-				},
-				{
 					name: "challengeId",
 					type: "id"
 				},
 				{
 					name: "postedBy",
 					type: "id"
-				},
-				{
-					name: "user",
-					type: "id"
-				},
-				{
-					name: "excludeUser",
-					type: "id"
-				},
-				{
-					name: "limit",
-					type: "number"
 				}
 			];
 
@@ -97,61 +81,16 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			var meId = (req.user) ? (req.user.id) : (0);
-
-			var cypherQuery;
-
-			// In case a challenge is mentioned, extract all entries linked to that challenge
-			if (req.query.challengeId && req.query.user) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + req.query.user + "'}), (e)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}) ";
-			} else if (req.query.challengeId && req.query.excludeUser) {
-				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(poster:User) WHERE NOT ('" + req.query.excludeUser + "' IN poster.id) ";
-			} else if (req.query.challengeId) {
-				cypherQuery = "MATCH (e:Entry)-[:PART_OF]->(c:Challenge {id: '" + req.query.challengeId + "'}), (e)-[:POSTED_BY]->(poster:User) ";
-			} else if (req.query.postedBy) {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + req.query.postedBy + "'}) ";
-			} else {
-				cypherQuery = "MATCH (e:Entry)-[:POSTED_BY]->(poster:User) ";
-			}
-			
-			cypherQuery += 
-						" WITH e, poster " + 
-						" OPTIONAL MATCH (liker:User)-[:LIKES]->(e) " + 
-						" WITH e, poster, COUNT(liker) AS like_count " + 
-						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
-						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
-						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(e) " +	
-						" RETURN e, poster, like_count, comment_count, COUNT(like), (like_count + comment_count) AS popularity_count ";
-
-			if (req.query.sortBy) {
-				if (req.query.sortBy == "dateCreated") {
-					cypherQuery += " ORDER BY e.created DESC";
-				} else if (req.query.sortBy == "popularity") {
-					cypherQuery += " ORDER BY popularity_count DESC";
+			dbEntry.fetchEntries(req.query.postedBy, req.query.challengeId, function(err, output) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
 				}
-			}
 
-			if (req.query.limit) {
-				cypherQuery += " LIMIT " + req.query.limit;
-			}
-
-			cypherQuery += ";";
-
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) {
-    				logger.dbError(err, cypherQuery);
+				if (!serverUtils.validateData(output, serverUtils.prototypes.entryExtended)) {
     				return res.sendStatus(500);
     			}
 
-    			var output = [];
-    			for (var i = 0; i < result.data.length; i++) {
-    				var data = dataUtils.constructEntityData("entry", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], null, 0, null, null, null, result.data[i][4] > 0, "post", null, null, null, null);
-					output.push(data);
-    			}
-
-    			if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
-    				return res.sendStatus(500);
-    			}
     			return res.json(output);
 			});
 		})
@@ -410,7 +349,7 @@ var routes = function(db) {
 				Returns a single JSON object of type entry
 			**/
 
-			logger.debug("GET received o /api/entries/" + req.params.entryId + ", query: " + JSON.stringify(req.query));
+			logger.debug("GET received on /api/entries/" + req.params.entryId + ", query: " + JSON.stringify(req.query));
 
 			var validationParams = [
 				{
@@ -424,33 +363,60 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
+			var queryParams = [
+				{
+					name: "info",
+					type: ["basic", "extended", "social"],
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.query, queryParams)) {
+				return res.sendStatus(400);
+			}
+
 			var meId = (req.user) ? (req.user.id) : (0);
 
-			var cypherQuery = "MATCH (e:Entry {id: '" + req.params.entryId + "'})-[:POSTED_BY]->(poster:User) " +
-						" WITH e, poster " + 
-						" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
-						" WITH e, poster, COUNT(u2) AS like_count " + 
-						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
-						" WITH e, poster, like_count, COUNT(comment) AS comment_count " + 
-						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(e) " +	
-						" RETURN e, poster, like_count, comment_count, COUNT(like) ORDER BY e.created DESC;";
-	
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) {
-    				logger.dbError(err, cypherQuery);
-    				return res.sendStatus(500);
-    			} else if (result.data.length != 1) {
-    				logger.dbResultError(cypherQuery, 1, result.data.length);
-    				return res.sendStatus(404); //not found
-    			}
+			if (req.query.info == "basic") {
+				dbEntry.lookupEntryBasicInfo(req.params.entryId, function(err, output) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
 
-    			var data = dataUtils.constructEntityData("entry", result.data[0][0], result.data[0][1], result.data[0][0].created, result.data[0][2], result.data[0][3], null, 0, null, null, null, result.data[0][4] > 0, "post", null, null, null, null);
+					if (!serverUtils.validateData(output, serverUtils.prototypes.entryBasic)) {
+	    				return res.sendStatus(500);
+	    			}
 
-    			if (!serverUtils.validateData(data, serverUtils.prototypes.entry)) {
-    				return res.sendStatus(500);
-    			}
-    			return res.json(data);
-			});
+	    			return res.json(output);
+				});
+			} else if (req.query.info == "extended") {
+				dbEntry.lookupEntryExtendedInfo(req.params.entryId, meId, function(err, output) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					if (!serverUtils.validateData(output, serverUtils.prototypes.entryExtended)) {
+	    				return res.sendStatus(500);
+	    			}
+
+	    			return res.json(output);
+				});
+			} else if (req.query.info == "social") {
+				dbEntry.lookupEntrySocialInfo(req.params.entryId, meId, function(err, output) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					if (!serverUtils.validateData(output, serverUtils.prototypes.entrySocialInfo)) {
+	    				return res.sendStatus(500);
+	    			}
+
+	    			return res.json(output);
+				});
+			}
 		})
 
 		.delete(function(req, res){

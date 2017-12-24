@@ -213,7 +213,7 @@ function createNewCommentElement(isReply, parentId, entityId, contentTag) {
 		    		//update the numComments in the Social Status section
 		    		var numComments = parseInt($("#" + contentTag + parentId + "NumComments").text());
 		    		numComments++;
-		    		$("#" + contentTag + parentId + "NumComments").text(numComments);
+		    		updateComments(contentTag, parentId, numComments);
 		    		$("#" + contentTag + parentId + "CommentsButton").show();
 		    	}
 			})
@@ -334,6 +334,16 @@ function createCommentsList(id, contentTag, list) { //id is the entity id
 	
 
 	return container;
+}
+
+function updateComments(contentTag, entityId, numComments) {
+	$("#" + contentTag + entityId + "NumComments").text(numComments);
+
+	if (numComments == 0) {
+		$("#" + contentTag + entityId + "CommentsButton").hide();
+	} else {
+		$("#" + contentTag + entityId + "CommentsButton").show();
+	}
 }
 
 function createSignInToCommentElement() {

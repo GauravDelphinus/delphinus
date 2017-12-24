@@ -9,13 +9,13 @@ var logger = require("../logger");
 function findChallengeBasicInfo(challengeId, done) {
 	var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge {id: '" + challengeId + "'})-[r:POSTED_BY]->(poster:User) " +
 		" WITH c, category, poster " +
-		" RETURN c, poster, category ORDER BY c.created DESC;";
+		" RETURN c, poster, category;";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-			return(new DBResultError(cypherQuery, 1, result.data.length));
+			return done(new DBResultError(cypherQuery, 1, result.data.length));
 		}
 
 		var challenge = result.data[0][0];
@@ -41,7 +41,7 @@ function findChallengeBasicInfo(challengeId, done) {
 		output.categoryName = category.name;
 		output.categoryID = category.id;
 
-		return done(null ,output);
+		return done(null, output);
 	});
 }
 
@@ -55,13 +55,13 @@ function findChallengeExtendedInfo(challengeId, meId, done) {
 		" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
 		" WITH c, category, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
 		" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
-		" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), category ORDER BY c.created DESC;";
+		" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), category;";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-			return(new DBResultError(cypherQuery, 1, result.data.length));
+			return done(new DBResultError(cypherQuery, 1, result.data.length));
 		}
 
 		var challenge = result.data[0][0];
@@ -103,6 +103,7 @@ function findChallengeExtendedInfo(challengeId, meId, done) {
 		var numEntries = result.data[0][4];
 		var amLiking = result.data[0][5] > 0;
 		var numShares = 0; //no yet implemented
+
 		output.socialStatus = {
 			likes : {
 				numLikes : numLikes,
@@ -125,6 +126,7 @@ function findChallengeExtendedInfo(challengeId, meId, done) {
 
 function findChallengeSocialInfo(challengeId, meId, done) {
 	var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) " +
+		" WITH c " +
 		" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
 		" WITH c, COUNT(u2) AS like_count " + 
 		" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
@@ -132,16 +134,15 @@ function findChallengeSocialInfo(challengeId, meId, done) {
 		" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
 		" WITH c, like_count, comment_count, COUNT(entry) AS entry_count " +
 		" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
-		" RETURN like_count, comment_count, entry_count, COUNT(like) ORDER BY c.created DESC;";
+		" WITH c, like_count, comment_count, entry_count, COUNT(like) AS amLiking " +
+		" RETURN like_count, comment_count, entry_count, amLiking;";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-			return(new DBResultError(cypherQuery, 1, result.data.length));
+			return done(new DBResultError(cypherQuery, 1, result.data.length));
 		}
-
-		var challenge = result.data[0][0];
 
 		//social status
 		var numLikes = result.data[0][0];
@@ -149,7 +150,7 @@ function findChallengeSocialInfo(challengeId, meId, done) {
 		var numEntries = result.data[0][2];
 		var amLiking = result.data[0][3] > 0;
 		var numShares = 0; //no yet implemented
-		output = {
+		var output = {
 			likes : {
 				numLikes : numLikes,
 				amLiking : amLiking

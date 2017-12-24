@@ -20,10 +20,10 @@ $(document).ready(function(){
 
 function setupMainItem() {
 	$.getJSON('/api/challenges/' + challengeId + "?info=extended", function(data) {
+		console.log("got info for challenge, creating main element.  Data: " + JSON.stringify(data));
 		var mainElement = createMainElement(data, "main");
 		$("#main").append(mainElement);
 	}).fail(function() {
-		alert("error");
 		window.location.replace("/error");
 	});
 }
@@ -49,7 +49,7 @@ function setupCaptionSidebar() {
 
 function setupEntriesTab() {
 	var tabDiv = appendNewTab(challengeId, "entries", "Entries");
-	createAndAppendContentContainer(tabDiv, challengeId, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=dateCreated"}, {type: "popularity", url: "/api/entries/?challengeId=" + challengeId + "&sortBy=popularity"}]);
+	createAndAppendContentContainer(tabDiv, challengeId, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/entries/?challengeId=" + challengeId}]);
 }
 
 function setupCommentsTab() {

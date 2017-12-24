@@ -18,10 +18,7 @@ function createMainElement(data, contentTag) {
 		element.append(createPostHeaderElement(data, contentTag));
 	}
 
-	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data, contentTag));
-		element.append(createSocialActionsSectionElement(data, contentTag));
-	}
+	appendSocialSection(element, data, contentTag, true, true);
 
 	//container for likers list, if any
 	element.append(createLikersPopupElement(data, contentTag));
@@ -80,14 +77,9 @@ function createScrollableElement(data, contentTag, compressed = false) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
-	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data, contentTag, !compressed));
+	element.append(createSocialStatusSectionElement(data, contentTag, !compressed));
 
-		if (!compressed) {
-			element.append(createSocialActionsSectionElement(data, contentTag));
-		}
-		
-	}
+	appendSocialSection(element, data, contentTag, true, !compressed);
 	
 	//container for comments, if any
 	element.append(createCommentsContainer(data, contentTag));
@@ -135,10 +127,7 @@ function createFeedElement(data, contentTag) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
-	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data, contentTag));
-		element.append(createSocialActionsSectionElement(data, contentTag));
-	}
+	appendSocialSection(element, data, contentTag, true, true);
 
 	//container for comments, if any
 	element.append(createCommentsContainer(data, contentTag));
@@ -177,10 +166,7 @@ function createThumbnailElement(data, contentTag, createLink) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
-	if (data.socialStatus) {
-		element.append(createSocialStatusSectionElement(data, contentTag, false));
-		//element.append(createSocialActionsSectionElement(data, contentTag));
-	}
+	appendSocialSection(element, data, contentTag, true, false);
 
 	//container for comments, if any
 	var commentPopupHeader = $("<h2>").append("Comments");
@@ -318,7 +304,7 @@ function createActivitySectionElement(data, contentTag) {
 	var activityText = $("<span>", {id: contentTag + data.id + "ActivityText", class: "text-plain-small"});
 
 	if (data.activity) {
-		if (data.activity.type == "recentlyLiked") {
+		if (data.activity.type == "like") {
 			//Fetch the like info (user name, link, image)
 			$.getJSON("/api/users/" + data.activity.userId + "?info=basic", function(userData) {
 				var userLink = $("<a>", {href: userData.link}).append(userData.displayName);
@@ -327,7 +313,7 @@ function createActivitySectionElement(data, contentTag) {
 			.fail(function() {
 				//eat this
 			});
-		} else if (data.activity.type == "recentlyCommented") {
+		} else if (data.activity.type == "comment") {
 			$.getJSON("/api/users/" + data.activity.userId + "?info=basic", function(userData) {
 				var userLink = $("<a>", {href: userData.link}).append(userData.displayName);
 				activityText.append(userLink).append(" commented on this " + formatDate(data.activity.timestamp));

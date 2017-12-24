@@ -6,6 +6,7 @@ const mime = require("mime");
 function createMainFeedForLoggedInUser(userId, done) {
 
 	var cypherQuery = "MATCH (me:User{id: '" + userId + "'}) " +
+		" MATCH (e) WHERE e:Entry OR e:Challenge " +
 		" OPTIONAL MATCH (e)-[:POSTED_BY]->(me) " +
 		" WITH me, COLLECT(e) AS all_entities " +
 		" OPTIONAL MATCH (me)-[:LIKES]->(e) " +
@@ -20,7 +21,8 @@ function createMainFeedForLoggedInUser(userId, done) {
 		" WITH DISTINCT e " +
 		" OPTIONAL MATCH (category:Category)<-[:POSTED_IN]-(e) " +
 		" WITH e, category " +
-		" OPTIONAL MATCH (e)-[:POSTED_BY]->(poster:User) " +
+		" MATCH (e)-[:POSTED_BY]->(poster:User) " +
+		" WHERE e.activity_user <> '" + userId + "' " +
 		" WITH e, category, poster " +
 		" RETURN labels(e), e, category, poster " +
 		" ORDER BY e.activity_timestamp DESC;";

@@ -1,28 +1,13 @@
+
 function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 	var socialStatusSection = $("<div>", {class: "socialStatusSectionSimple"});
 	var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "button-link text-plain-small separator"}).append("Like");
-	if (data.socialStatus.likes.amLiking) {
-		likeButton.addClass("active");
-	}
 	socialStatusSection.append(likeButton);
 
 	
 	socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 	
 	var restURL = "/api/comments/" + data.id + "/like";
-	/*
-	if (user) {
-		$.getJSON(restURL, function(result) {
-			if (result.likeStatus == "on") {
-				//show button as depressed
-				$("#" + data.id + "LikeButton").addClass("active");
-			}
-		})
-		.fail(function() {
-			//eat this
-		});
-	}
-	*/
 
 	likeButton.click(function(e) {
 		if (user) {
@@ -32,12 +17,12 @@ function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 				} else {
 					var numLikes = parseInt($("#" + contentTag + data.id + "NumLikes").text());
 					if (likeStatus) {
-						$("#" + contentTag + data.id + "LikeButton").addClass("active");
-						$("#" + contentTag + data.id + "NumLikes").text(" " + (numLikes + 1));
+						numLikes ++;
 					} else {
-						$("#" + contentTag + data.id + "LikeButton").removeClass("active");
-						$("#" + contentTag + data.id + "NumLikes").text(" " + (numLikes - 1));
+						numLikes --;
 					}
+					updateLikes(contentTag, data.id, numLikes);
+					updateAmLiking(contentTag, data.id, likeStatus);
 				}
 			});
 		} else {
@@ -127,17 +112,61 @@ function sendLikeAction(restURL, likeAction, callback) {
 	});
 }
 
+function appendSocialSection(appendTo, data, contentTag, showStatusElement, showActionElement) {
+	if (showStatusElement) {
+		appendTo.append(createSocialStatusSectionElement(data, contentTag));
+	}
+	
+	if (showActionElement) {
+		appendTo.append(createSocialActionsSectionElement(data, contentTag));
+	}
+
+	var getURL;
+	if (data.type == "challenge") {
+		getURL = "/api/challenges/" + data.id + "?info=social";
+	} else if (data.type == "entry") {
+		getURL = "/api/entries/" + data.id + "?info=social";
+	} else if (data.type == "user") {
+		getURL = "/api/users/" + data.id + "?info=social";
+	}
+	$.getJSON(getURL, function(socialInfo) {
+		if (socialInfo.likes) {
+			if (socialInfo.likes.amLiking) {
+				updateAmLiking(contentTag, data.id, socialInfo.likes.amLiking);
+			}
+
+			if (socialInfo.likes.numLikes) {
+				updateLikes(contentTag, data.id, socialInfo.likes.numLikes);
+			}
+		}
+
+		if (socialInfo.comments) {
+			if (socialInfo.comments.numComments) {
+				updateComments(contentTag, data.id, socialInfo.comments.numComments);
+			}
+		}
+
+		if (socialInfo.entries) {
+			if (socialInfo.entries.numEntries) {
+				updateEntries(contentTag, data.id, socialInfo.entries.numEntries);
+			}
+		}
+	})
+	.fail(function() {
+		//eat this
+	});
+}
+
 function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	var socialStatus = $("<div>", {class: "socialStatusSection" + (showBorder ? " bottom-border" : ""), id: contentTag + data.id + "SocialStatusSection"});
 
 	// For Challenges and Entries
-	if (data.socialStatus.likes) {
+	if (data.type == "challenge" || data.type == "entry") {
 		var likeButton = $("<button>", {id: contentTag + data.id + "LikesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		likeButton.append($("<span>", {id: contentTag + data.id + "NumLikes", text: data.socialStatus.likes.numLikes}));
+		likeButton.append($("<span>", {id: contentTag + data.id + "NumLikes", text: 0}));
 		likeButton.append($("<span>", {text: " Likes"}));
-		if (data.socialStatus.likes.numLikes <= 0) {
-			likeButton.hide();
-		}
+		likeButton.hide();
+
 		socialStatus.append(likeButton);
 
 		likeButton.click(function() {
@@ -145,25 +174,23 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 		});
 	}
 	
-	if (data.socialStatus.shares) {
+	if (data.type == "challenge" || data.type == "entry") {
 
 		var shareButton = $("<button>", {id: contentTag + data.id + "SharesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		shareButton.append($("<span>", {id: contentTag + data.id + "NumShares", text: data.socialStatus.shares.numShares}));
+		shareButton.append($("<span>", {id: contentTag + data.id + "NumShares", text: 0}));
 		shareButton.append($("<span>", {text: " Shares"}));
-		if (data.socialStatus.shares.numShares <= 0) {
-			shareButton.hide();
-		}
+		shareButton.hide();
+
 		socialStatus.append(shareButton);
 	}
 	
-	if (data.socialStatus.comments) {
+	if (data.type == "challenge" || data.type == "entry") {
 
 		var commentButton = $("<button>", {id: contentTag + data.id + "CommentsButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		commentButton.append($("<span>", {id: contentTag + data.id + "NumComments", text: data.socialStatus.comments.numComments}));
+		commentButton.append($("<span>", {id: contentTag + data.id + "NumComments", text: 0}));
 		commentButton.append($("<span>", {text: " Comments"}));
-		if (data.socialStatus.comments.numComments <= 0) {
-			commentButton.hide();
-		}
+		commentButton.hide();
+
 		socialStatus.append(commentButton);
 
 		commentButton.click(function() {			
@@ -172,14 +199,12 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	}
 	
 	// For challenges only
-	if (data.socialStatus.entries) {
+	if (data.type == "challenge") {
 
 		var entriesButton = $("<button>", {id: contentTag + data.id + "EntriesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		entriesButton.append($("<span>", {id: contentTag + data.id + "NumEntries", text: data.socialStatus.entries.numEntries}));
+		entriesButton.append($("<span>", {id: contentTag + data.id + "NumEntries", text: 0}));
 		entriesButton.append($("<span>", {text: " Entries"}));
-		if (data.socialStatus.entries.numEntries <= 0) {
-			entriesButton.hide();
-		}
+		entriesButton.hide();
 
 		entriesButton.click(function(e) {
 			//if we're already in the challenge page, then just open the entries tab
@@ -195,7 +220,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	}
 
 	// For Users
-	if (data.socialStatus.follows) {
+	if (data.type == "user") {
 
 		if (data.socialStatus.follows.numFollowers) {
 
@@ -230,7 +255,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 		*/
 	}
 
-	if (data.socialStatus.posts) {
+	if (data.type == "user") {
 		if (data.socialStatus.posts.numPosts) {
 
 			var postsButton = $("<button>", {id: contentTag + data.id + "PostsButton", type: "button", class: "button-link text-plain-small separator-medium"});
@@ -324,7 +349,31 @@ function showHideFollowersList(userId, contentTag, show) {
 	}
 }
 
+function updateAmLiking(contentTag, entityId, amLiking) {
+	if (amLiking) {
+		$("#" + contentTag + entityId + "LikeButton").addClass("active");
+	} else {
+		$("#" + contentTag + entityId + "LikeButton").removeClass("active");
+	}
+}
 
+function updateLikes(contentTag, entityId, numLikes) {
+	$("#" + contentTag + entityId + "NumLikes").text(numLikes);
+	if (numLikes == 0) {
+		$("#" + contentTag + entityId + "LikesButton").hide();
+	} else {
+		$("#" + contentTag + entityId + "LikesButton").show();
+	}
+}
+
+function updateEntries(contentTag, entityId, numEntries) {
+	$("#" + contentTag + entityId + "NumEntries").text(numEntries);
+	if (numEntries == 0) {
+		$("#" + contentTag + entityId + "EntriesButton").hide();
+	} else {
+		$("#" + contentTag + entityId + "EntriesButton").show();
+	}
+}
 
 function createSocialActionsSectionElement(data, contentTag, full /* show full status */) {
 	var socialActionsSection = $("<div>", {id: contentTag + data.id + "SocialActionsSection", class: "socialActionsSection"});
@@ -342,19 +391,6 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 			restURL = "/api/entries/" + data.id + "/like";
 		}
 
-		if (data.socialStatus.likes.amLiking) {
-			likeButton.addClass("active");
-		}
-		/*
-		if (user) {
-			$.getJSON(restURL, function(result) {
-				if (result.likeStatus == "on") {
-					//show button as depressed
-					$("#" + data.id + "LikeButton").addClass("active");
-				}
-			});
-		}*/
-
 		likeButton.click(function(e) {
 			if (user) {
 				sendLikeAction(restURL, !$("#" + this.id).hasClass("active"), function(err, likeStatus) {
@@ -364,17 +400,12 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 						var numLikes = parseInt($("#" + contentTag + data.id + "NumLikes").text());
 						if (likeStatus) {
 							numLikes ++;
-							$("#" + contentTag + data.id + "LikeButton").addClass("active");
-							$("#" + contentTag + data.id + "NumLikes").text(numLikes);
-							$("#" + contentTag + data.id + "LikesButton").show();
+							
 						} else {
 							numLikes --;
-							$("#" + contentTag + data.id + "LikeButton").removeClass("active");
-							$("#" + contentTag + data.id + "NumLikes").text(numLikes);
-							if (numLikes == 0) {
-								$("#" + contentTag + data.id + "LikesButton").hide();
-							}
 						}
+						updateLikes(contentTag, data.id, numLikes);
+						updateAmLiking(contentTag, data.id, likeStatus);
 					}
 				});
 			} else {
