@@ -183,7 +183,7 @@ function createChallenge(challengeInfo, done) {
 		"CREATE (n:Challenge {" +
 		"id: '" + challengeInfo.id + "'," +
 		"image_type : '" + challengeInfo.imageType + "'," + 
-		"created : '" + challengeInfo.created + "'," + 
+		"created : " + challengeInfo.created + "," + 
 		"title : '" + dataUtils.sanitizeStringForCypher(challengeInfo.title) + "'" +
 		"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
 
