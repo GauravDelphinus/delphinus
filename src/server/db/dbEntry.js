@@ -235,7 +235,7 @@ function createEntry(entryInfo, done) {
 	var cypherQuery = " MATCH (u:User {id: '" + entryInfo.userId + "'}) CREATE (e:Entry {" +
 					"id: '" + entryInfo.id + "', " + 
 					"caption: '" + dataUtils.sanitizeStringForCypher(entryInfo.title) + "', " + 
-					"created : '" + entryInfo.created + "'" + 
+					"created : " + entryInfo.created + " " + 
 					"})-[r:POSTED_BY]->(u) ";
 
 	if (entryInfo.source == "challengeId") { //link to challenge

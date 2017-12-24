@@ -13,7 +13,7 @@ function saveActivity(activityInfo, done) {
 	var cypherQuery = "MATCH(e {id: '" + activityInfo.entityId + "'}) " +
 		"SET " +
 		"e.activity_type = '" + activityInfo.type + "', " +
-		"e.activity_timestamp = '" + activityInfo.timestamp + "', " +
+		"e.activity_timestamp = " + activityInfo.timestamp + ", " +
 		"e.activity_user = '" + activityInfo.userId + "' ";
 
 	if (activityInfo.type == "post") { //activity is the original post itself, so it has no additional info

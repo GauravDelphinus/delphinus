@@ -3,21 +3,30 @@ const logger = require("../logger");
 const config = require("../config");
 const mime = require("mime");
 
-function createMainFeed(userId, done) {
+function createMainFeed(userId, lastFetchedTimestamp, done) {
 
 	var cypherQuery = "";
 
+	var timestampClause;
+
+	if (lastFetchedTimestamp == 0) {
+		timestampClause = "";
+	} else {
+		timestampClause = " AND (e.activity_timestamp < " + lastFetchedTimestamp + ") " ;
+	} 
+
 	if (userId) {
 		cypherQuery += "MATCH (me:User{id: '" + userId + "'}) " +
-		" MATCH (e) WHERE e:Entry OR e:Challenge " +
+		" MATCH (e) WHERE (e:Entry OR e:Challenge) " + timestampClause + 
+		" WITH me, e " + 
 		" OPTIONAL MATCH (e)-[:POSTED_BY]->(me) " +
-		" WITH me, COLLECT(e) AS all_entities " +
+		" WITH me, e, COLLECT(e) AS all_entities " +
 		" OPTIONAL MATCH (me)-[:LIKES]->(e) " +
-		" WITH me, all_entities + COLLECT(e) AS all_entities " +
+		" WITH me, e, all_entities + COLLECT(e) AS all_entities " +
 		" OPTIONAL MATCH (e)<-[:POSTED_IN]-(comment:Comment)-[:POSTED_BY]->(me) " +
-		" WITH me, all_entities + COLLECT(e) AS all_entities " +
+		" WITH me, e, all_entities + COLLECT(e) AS all_entities " +
 		" OPTIONAL MATCH (c:Challenge)<-[:PART_OF]-(entry:Entry)-[:POSTED_BY]->(me) " +
-		" WITH me, all_entities + COLLECT(c) AS all_entities " +
+		" WITH me, e, all_entities + COLLECT(c) AS all_entities " +
 		" OPTIONAL MATCH (e) WHERE (me)-[:FOLLOWING]->(:User{id: e.activity_user}) " + 
 		" WITH me, all_entities + COLLECT(e) AS all_entities " +
 		" UNWIND all_entities AS e " +
@@ -28,15 +37,15 @@ function createMainFeed(userId, done) {
 		" WHERE e.activity_user <> '" + userId + "' " +
 		" WITH e, category, poster " +
 		" RETURN labels(e), e, category, poster " +
-		" ORDER BY e.activity_timestamp DESC;";
+		" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	} else {
-		cypherQuery += "MATCH (e) WHERE e:Entry OR e:Challenge " +
+		cypherQuery += "MATCH (e) WHERE (e:Entry OR e:Challenge) " + timestampClause +
 		" OPTIONAL MATCH (category:Category)<-[:POSTED_IN]-(e) " +
 		" WITH e, category " +
 		" MATCH (e)-[:POSTED_BY]->(poster:User) " +
 		" WITH e, category, poster " +
 		" RETURN labels(e), e, category, poster " +
-		" ORDER BY e.activity_timestamp DESC;";
+		" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	}
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
@@ -46,6 +55,7 @@ function createMainFeed(userId, done) {
 		}
 
 		var output = [];
+		var newTimeStamp = 0;
 		for (var i = 0; i < result.data.length; i++) {
 			var data = {};
 
@@ -91,10 +101,11 @@ function createMainFeed(userId, done) {
 				data.activity.commentId = entity.activity_commentid;
 			}
 
+			newTimeStamp = data.activity.timestamp;
 			output.push(data);
 		}
 
-		return done(null, output);
+		return done(null, output, newTimeStamp);
 	});
 
 }

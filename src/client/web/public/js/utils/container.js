@@ -69,6 +69,20 @@ function createFeedList(contentTag, list) {
 	return container;
 }
 
+/*
+	Append newly fetched content to the existing feed list
+	This is in support of Infinite scroll functionality (refer infiniteScroll.js)
+*/
+function appendFeedList(contentTag, list) {
+	var container = $("#" + contentTag + "FeedList");
+	for (var i = 0; i < list.length; i++) {
+		var data = list[i];
+
+		var feedElement = createFeedElement(data, contentTag);
+		container.append(feedElement);
+	}
+}
+
 /**
 	Create and append a content container with the content.
 	appendTo: parent element to which to append this container.  The reason we pass this is so we can append
@@ -181,7 +195,9 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 }
 
 function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewType) {
-	$.getJSON(getURL, function(list) {
+	$.getJSON(getURL, function(output) {
+		var list = output.list;
+		var lastFetchedTimestamp = output.ts;
 
 		jQuery.data(document.body, contentTag + "List", list);
 
@@ -212,6 +228,11 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 			} else if (defaultViewType == "feed") {
 				var feedList = createFeedList(contentTag, list);
 				$("#" + contentTag + "Container").append(feedList);
+
+				//set up infinite scroll for the feed
+				startInfiniteScroll(getURL, lastFetchedTimestamp, function(newList, newTimestamp) {
+					appendFeedList(contentTag, newList);
+				});
 			}
 		}
 	}).fail(function() {

@@ -16,12 +16,24 @@ var routes = function(db) {
 
 			logger.debug("GET received on /api/feeds, query: " + JSON.stringify(req.query));
 
+			var validationParams = [
+				{
+					name: "ts", //last fetched timestamp
+					type: "timestamp"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.query, validationParams)) {
+				return res.sendStatus(400);
+			}
+
 			var meId = null;
 			if (req.user && req.user.id) {
 				meId = req.user.id;
 			}
 			
-			dbFeeds.createMainFeed(meId, function(err, result) {
+			var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
+			dbFeeds.createMainFeed(meId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
 				if (err) {
 					logger.error(err);
 					return res.sendStatus(500);
@@ -31,7 +43,8 @@ var routes = function(db) {
     				return res.sendStatus(500);
     			}
 
-				return res.json(result);
+    			var output = {ts: newTimeStamp, list: result};
+				return res.json(output);
 			});
 		});
 

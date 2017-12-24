@@ -71,6 +71,7 @@ uglifyjs ${SOURCE_JS_FOLDER}/utils/comments.js \
 	${SOURCE_JS_FOLDER}/utils/postElements.js \
 	${SOURCE_JS_FOLDER}/utils/sidebar.js \
 	${SOURCE_JS_FOLDER}/utils/social.js \
+	${SOURCE_JS_FOLDER}/utils/infiniteScroll.js \
 	${SOURCE_JS_FOLDER}/utils/timelapse.js -o ${MIN_JS_FOLDER}/utils.min.js ${MINIFY_FLAGS}
 
 #First Convert LESS to CSS, and then directly minify it

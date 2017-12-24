@@ -127,7 +127,7 @@ function switchToStepsView(imagePath, imageTitle) {
 function setupMainItem() {
 	if (challengeId != 0) {
 		//since we have the challenge Id, this is a Challenge Entry workflow
-		$.getJSON('/api/challenges/' + challengeId, function(result) {
+		$.getJSON('/api/challenges/' + challengeId + "?info=basic", function(result) {
 			$("#newentryimage").prop("src", result.image);
 			$("#newentryimage").data("imageType", result.imageType);
 			$("#selectImageSection").hide();
