@@ -170,6 +170,88 @@ function findChallengeSocialInfo(challengeId, meId, done) {
 	});
 }
 
+function fetchChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
+
+	var cypherQuery = "";
+
+	var timestampClause;
+
+	if (lastFetchedTimestamp == 0) {
+		timestampClause = "";
+	} else {
+		timestampClause = " WHERE (e.activity_timestamp < " + lastFetchedTimestamp + ") " ;
+	} 
+
+	if (postedBy) {
+		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " + timestampClause +
+			" WITH e, poster, category, COLLECT(e) AS all_entities " +
+			" UNWIND all_entities AS e " +
+			" RETURN e, poster, category " +
+			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+	} else if (categoryId) {
+		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Challenge)-[:POSTED_IN]->(category:Category {id: '" + categoryId + "'}) " + timestampClause +
+			" WITH e, poster, category " +
+			" RETURN e, poster, category " +
+			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+	} else {
+		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User) " + timestampClause +
+			" WITH e, poster, category " +
+			" RETURN e, poster, category " + 
+			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+	}
+
+	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			return done(err, 0);
+		}
+
+		var newTimeStamp = 0;
+		var output = [];
+		for (var i = 0; i < result.data.length; i++) {
+			var data = {};
+
+			var entity = result.data[i][0];
+			var poster = result.data[i][1];
+			var category = result.data[i][2];
+
+			data.type = "challenge";
+			data.id = entity.id;
+
+			data.postedDate = entity.created;
+			data.postedByUser = {};
+			data.postedByUser.id = poster.id;
+			data.postedByUser.displayName = poster.displayName;
+			data.postedByUser.image = poster.image;
+			data.postedByUser.lastSeen = poster.last_seen;
+
+			data.image = config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
+			data.caption = entity.title;
+			data.link = config.url.entry + entity.id;
+			
+			data.imageType = entity.image_type;
+
+			data.categoryName = category.name;
+			data.categoryID = category.id;
+
+			data.activity = {};
+			data.activity.type = entity.activity_type;
+			data.activity.timestamp = entity.activity_timestamp;
+			data.activity.userId = entity.activity_user;
+			if (entity.activity_type == "comment") {
+				data.activity.commentId = entity.activity_commentid;
+			}
+
+			newTimeStamp = data.activity.timestamp;
+
+			output.push(data);
+		}
+
+		return done(null, output, newTimeStamp);
+	});
+}
+
+
 /*
 	Create a new Challenge node in the db.
 	Prototype: challengePrototype
@@ -227,5 +309,6 @@ module.exports = {
 	createChallenge: createChallenge,
 	findChallengeSocialInfo : findChallengeSocialInfo,
 	findChallengeExtendedInfo : findChallengeExtendedInfo,
-	findChallengeBasicInfo : findChallengeBasicInfo
+	findChallengeBasicInfo : findChallengeBasicInfo,
+	fetchChallenges: fetchChallenges
 };

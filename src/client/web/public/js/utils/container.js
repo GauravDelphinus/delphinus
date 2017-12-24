@@ -56,6 +56,21 @@ function createScrollableList(contentTag, list, compressed = false) {
 	return container;
 }
 
+/*
+	Append scrollable list to support infinite scroll
+*/
+function appendScrollableList(contentTag, list, compressed = false) {
+	var container = $("#" + contentTag + "ScrollableList");
+
+	for (var i = 0; i < list.length; i++) {
+		var data = list[i];
+
+		var scrollableElement = createScrollableElement(data, contentTag, compressed);
+		container.append(scrollableElement);
+	}
+}
+
+
 function createFeedList(contentTag, list) {
 	var container = $("<div>", {id: contentTag + "FeedList", class: "feedList"});
 
@@ -212,6 +227,11 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 			} else if (viewOptionsButtonID == "scrollableViewButton") {
 				var scrollableList = createScrollableList(contentTag, list);
 				$("#" + contentTag + "Container").append(scrollableList);
+
+				//infinite scroll setup
+				startInfiniteScroll(getURL, lastFetchedTimestamp, function(newList) {
+					appendScrollableList(contentTag, newList);
+				});
 			}
 		} else {
 			if (defaultViewType == "thumbnail") {
@@ -220,6 +240,11 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 			} else if (defaultViewType == "filmstrip") {
 				var scrollableList = createScrollableList(contentTag, list);
 				$("#" + contentTag + "Container").append(scrollableList);
+
+				//infinite scroll setup
+				startInfiniteScroll(getURL, lastFetchedTimestamp, function(newList) {
+					appendScrollableList(contentTag, newList);
+				});
 			} else if (defaultViewType == "comments") {
 				var commentsList = createCommentsList(entityId, contentTag, list);
 				var commentsContainer = $("<div>", {id: contentTag + entityId + "CommentsContainer"}).empty();
@@ -230,7 +255,7 @@ function refreshListAndUpdateContent(getURL, entityId, contentTag, defaultViewTy
 				$("#" + contentTag + "Container").append(feedList);
 
 				//set up infinite scroll for the feed
-				startInfiniteScroll(getURL, lastFetchedTimestamp, function(newList, newTimestamp) {
+				startInfiniteScroll(getURL, lastFetchedTimestamp, function(newList) {
 					appendFeedList(contentTag, newList);
 				});
 			}

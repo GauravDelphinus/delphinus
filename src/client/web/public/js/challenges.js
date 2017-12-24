@@ -19,9 +19,9 @@ $(document).ready(function(){
 function setupMainItem() {
 	var appendCategory = "";
 	if (categoryId != "all") {
-		appendCategory = "&category=" + categoryId;
+		appendCategory = "?category=" + categoryId;
 	}
-	createAndAppendContentContainer($("#challenges"), 0, "challenges", [{type: "filmstrip"}, {type: "thumbnail"}], [{type: "date", url: "/api/challenges?sortBy=dateCreated" + appendCategory}, {type: "popularity", url: "/api/challenges?sortBy=popularity" + appendCategory}]);
+	createAndAppendContentContainer($("#challenges"), 0, "challenges", [{type: "filmstrip"}, {type: "thumbnail"}], [{type: "date", url: "/api/challenges" + appendCategory}, {type: "popularity", url: "/api/challenges" + appendCategory}]);
 
 }
 

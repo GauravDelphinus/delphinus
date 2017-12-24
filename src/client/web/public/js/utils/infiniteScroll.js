@@ -5,7 +5,7 @@
 	getURL - the URL that is used to fetch new content
 	lastFetchedTimestamp - the timestamp we got returned from the server from the last fetch
 	(next time we fetch, we need items older than that timestamp)
-	updateContent - callback function to be called with the newly fetched list and timestamp
+	updateContent - callback function to be called with the newly fetched list
 */
 var watchScrolls = false; // Global Variable - to determine if we need to actively monitor scrolls (set to false when we are already in the midst of fetching new content to avoid duplication)
 var lastFetchedTimestamp = 0; // Global Variable - used to track the value of the timestamp to be used for fetching the next batch of content
@@ -29,7 +29,7 @@ function startInfiniteScroll(getURL, lastFetchedTimestamp, updateContent) {
 			getURL = updateQueryStringParameter(getURL, "ts", lastFetchedTimestamp);
 			$.getJSON(getURL, function(output) {
 				if (output.ts > 0) {
-					updateContent(output.list, output.ts);
+					updateContent(output.list);
 
 					watchScrolls = true;
 					lastFetchedTimestamp = output.ts;

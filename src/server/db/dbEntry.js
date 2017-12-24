@@ -155,35 +155,43 @@ function lookupEntrySocialInfo(entryId, meId, done) {
 	});
 }
 
-function fetchEntries(postedBy, challengeId, done) {
+function fetchEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 
 	var cypherQuery = "";
 
+	var timestampClause;
+
+	if (lastFetchedTimestamp == 0) {
+		timestampClause = "";
+	} else {
+		timestampClause = " WHERE (e.activity_timestamp < " + lastFetchedTimestamp + ") " ;
+	} 
+
 	if (postedBy) {
-		cypherQuery += " MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " +
+		cypherQuery += " MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " + timestampClause +
 			" WITH poster, COLLECT(e) AS all_entities " +
 			" UNWIND all_entities AS e " +
 			" RETURN e, poster " +
-			" ORDER BY e.activity_timestamp DESC;";
+			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	} else if (challengeId) {
-		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Entry)-[:PART_OF]->(challenge:Challenge {id: '" + challengeId + "'}) " +
+		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Entry)-[:PART_OF]->(challenge:Challenge {id: '" + challengeId + "'}) " + timestampClause +
 			" WITH e, poster " +
 			" RETURN e, poster " +
-			" ORDER BY e.activity_timestamp DESC;";
+			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	} else {
-		cypherQuery += " MATCH (e:Entry)-[:POSTED_BY]->(poster:User) " +
+		cypherQuery += " MATCH (e:Entry)-[:POSTED_BY]->(poster:User) " + timestampClause +
 			" WITH e, poster " +
 			" RETURN e, poster " + 
-			" ORDER BY e.activity_timestamp DESC;";
+			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	}
 
-	logger.debug("calling query: " + cypherQuery);
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 
+		var newTimeStamp = 0;
 		var output = [];
 		for (var i = 0; i < result.data.length; i++) {
 			var data = {};
@@ -215,10 +223,12 @@ function fetchEntries(postedBy, challengeId, done) {
 				data.activity.commentId = entity.activity_commentid;
 			}
 
+			newTimeStamp = data.activity.timestamp;
+
 			output.push(data);
 		}
 
-		return done(null, output);
+		return done(null, output, newTimeStamp);
 	});
 }
 

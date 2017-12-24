@@ -179,6 +179,7 @@ module.exports = {
 				//if "oneoftypes" is not the first array element, then interpret all elements as values that need to be matched directly
 				if (type.indexOf(value) == -1) {
 					logger.errorIf(logError, "Invalid value '" + value + "' received for param: '" + name + "', expected among " + JSON.stringify(type));
+					throw new Error("");
 					return false;
 				}
 			}
@@ -597,7 +598,6 @@ module.exports = {
 		"challengeExtended" : {
 			"type" : ["challenge"],
 			"id" : "id",
-			"socialStatus" : "challengeSocialInfo",
 			"postedDate" : "timestamp",
 			"postedByUser" : "postedByUser",
 			"image": "myURL",
@@ -652,7 +652,6 @@ module.exports = {
 		"entryExtended" : {
 			"type" : ["entry"],
 			"id" : "id",
-			"socialStatus" : "entrySocialInfo",
 			"postedDate" : "timestamp",
 			"postedByUser" : "postedByUser",
 			"image": "myURL",
@@ -686,7 +685,6 @@ module.exports = {
 		"entityExtended" : {
 			"type" : ["challenge", "entry"],
 			"id" : "id",
-			"socialStatus" : "challengeSocialInfo",
 			"postedDate" : "timestamp",
 			"postedByUser" : "postedByUser",
 			"image": "myURL",

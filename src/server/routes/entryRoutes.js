@@ -74,6 +74,10 @@ var routes = function(db) {
 				{
 					name: "postedBy",
 					type: "id"
+				},
+				{
+					name: "ts", //last fetched timestamp
+					type: "timestamp"
 				}
 			];
 
@@ -81,16 +85,18 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			dbEntry.fetchEntries(req.query.postedBy, req.query.challengeId, function(err, output) {
+			var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
+			dbEntry.fetchEntries(req.query.postedBy, req.query.challengeId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
 				if (err) {
 					logger.error(err);
 					return res.sendStatus(500);
 				}
 
-				if (!serverUtils.validateData(output, serverUtils.prototypes.entryExtended)) {
+				if (!serverUtils.validateData(result, serverUtils.prototypes.entryExtended)) {
     				return res.sendStatus(500);
     			}
 
+    			var output = {ts: newTimeStamp, list: result};
     			return res.json(output);
 			});
 		})

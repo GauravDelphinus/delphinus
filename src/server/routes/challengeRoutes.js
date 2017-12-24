@@ -21,11 +21,6 @@ var routes = function(db) {
 
 			var validationParams = [
 				{
-					name: "sortBy",
-					required: "yes",
-					type: ["dateCreated", "popularity"]
-				},
-				{
 					name: "postedBy",
 					type: "id"
 				},
@@ -34,8 +29,8 @@ var routes = function(db) {
 					type: "category"
 				},
 				{
-					name: "limit",
-					type: "number"
+					name: "ts", //last fetched timestamp
+					type: "timestamp"
 				}
 			];
 
@@ -43,61 +38,18 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			var cypherQuery = "";
-
-			var meId = (req.user) ? (req.user.id) : (0);
-
-			if (req.query.postedBy) {
-				cypherQuery += "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User {id: '" + req.query.postedBy + "'}) ";
-			} else if (req.query.category) {
-				cypherQuery += "MATCH (category:Category {id: '" + req.query.category + "'})<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
-			} else {
-				cypherQuery += "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) ";
-			}
-
-			cypherQuery +=
-						" WITH c, category, poster " +
-						" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
-						" WITH c, category, poster, COUNT(u2) AS like_count " + 
-						" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
-						" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
-						" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-						" WITH c, category, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
-						" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
-						" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), (like_count + comment_count + entry_count) AS popularity_count, category ";
-
-			if (req.query.sortBy) {
-				if (req.query.sortBy == "dateCreated") {
-					cypherQuery += " ORDER BY c.created DESC";
-				} else if (req.query.sortBy == "popularity") {
-					cypherQuery += " ORDER BY popularity_count DESC";
-				}
-			}
-
-			if (req.query.limit) {
-				cypherQuery += " LIMIT " + req.query.limit;
-			}
-
-			cypherQuery += ";";
-
-			db.cypherQuery(cypherQuery, function(err, result){
-    			if(err) {
-    				logger.dbError(err, cypherQuery);
+			var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
+			dbChallenge.fetchChallenges(req.query.postedBy, req.query.categoryId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
+				if (err) {
+					logger.error(err);
 					return res.sendStatus(500);
-    			}
+				}
 
-    			var output = [];
-    			for (var i = 0; i < result.data.length; i++) {
-
-    				var data = dataUtils.constructEntityData("challenge", result.data[i][0], result.data[i][1], result.data[i][0].created, result.data[i][2], result.data[i][3], result.data[i][4], 0, null, null, null, result.data[i][5] > 0, "none", null, null, null, null, result.data[i][7]);
-					output.push(data);
-
-    			}
-
-    			if (!serverUtils.validateData(output, serverUtils.prototypes.challengeExtended)) {
+				if (!serverUtils.validateData(result, serverUtils.prototypes.challengeExtended)) {
     				return res.sendStatus(500);
     			}
 
+    			var output = {ts: newTimeStamp, list: result};
     			return res.json(output);
 			});
 		})
