@@ -1,3 +1,4 @@
+
 function DBResultError (query, expectedCount, actualCount) {
 	this.name = "DBResultError";
 	this.message = ("Ran Cypher Query: " + query + ", Expected Count of Result: " + expectedCount + ", but Actual Count: " + actualCount);

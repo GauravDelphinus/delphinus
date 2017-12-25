@@ -184,6 +184,90 @@ function createChallenge(challengeInfo, done) {
 	});
 }
 
+/*
+	Delete the matching challenge node from the DB
+*/
+function deleteChallenge(challengeId, done) {
+
+	var cypherQuery = " MATCH (c:Challenge {id: '" + challengeId + "'}) " +
+		" OPTIONAL MATCH (c)<-[:POSTED_IN*1..2]-(challengeComment:Comment) " +
+		" OPTIONAL MATCH (c)<-[:PART_OF]-(e:Entry) " + 
+		" OPTIONAL MATCH(e)<-[:POSTED_IN*1..2]-(entryComment:Comment) " +
+		" DETACH DELETE challengeComment, entryComment, c, e;";
+
+	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		if(err) {
+			return done(err);
+		}
+
+		return done(null);
+	});
+}
+
+/*
+	Update the Like status of a challenge node in the DB, along with the timestamp
+
+	This also internally will update the activity info in the corresponding Challenge Node in the DB
+
+	like: true for adding like, and false for removing like
+*/
+function likeChallenge(challengeId, like, userId, timestamp, done) {
+	if (like) {
+		var cypherQuery = "MATCH (u:User {id: '" + userId + "'}), (c:Challenge {id: '" + challengeId + "'}) " +
+			" CREATE (u)-[r:LIKES {created: '" + timestamp + "'}]->(c) " +
+			" RETURN r;";
+
+		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	        if(err) {
+	        	return done(err);
+	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        }
+
+	        //now, save the activity in the challenge
+	        var activityInfo = {
+	        	entityId: challengeId,
+	        	type: "like",
+	        	timestamp: timestamp,
+	        	userId: userId
+	        }
+	        dbUtils.saveActivity(activityInfo, function(err, id) {
+	        	if (err) {
+	        		return done(err);
+	        	}
+
+	        	return done(null, result.data.length == 1);
+	        });
+
+		});
+	} else {
+		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + "'})-[r:LIKES]->(c:Challenge {id: '" + req.params.challengeId + "'}) " +
+			" DELETE r " +
+			" RETURN COUNT(r);";
+
+		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	        if(err) {
+	        	return done(err);
+	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
+	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        }
+
+	        //now, reset the activity in the challenge, since the person no longer likes this challenge
+	        var activityInfo = {
+	        	entityId: challengeId,
+	        	type: "post"
+	        }
+	        dbUtils.saveActivity(activityInfo, function(err, id) {
+	        	if (err) {
+	        		return done(err);
+	        	}
+
+				return done(null, result.data.length == 0);
+	        });
+			
+		});
+	}
+}
 
 //prototype of challenge info that is needed to create a challenge node in the DB
 var challengePrototype = {
@@ -231,5 +315,7 @@ module.exports = {
 	createChallenge: createChallenge,
 	getChallengeSocialInfo : getChallengeSocialInfo,
 	getChallenge : getChallenge,
-	getChallenges: getChallenges
+	getChallenges: getChallenges,
+	likeChallenge: likeChallenge,
+	deleteChallenge: deleteChallenge
 };

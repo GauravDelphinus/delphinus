@@ -119,8 +119,16 @@ var routes = function(db) {
 					}
 
 					imageProcessor.findImageSize(outputPath, function(size) {
-						var challenge = new Challenge(id, imageType, req.body.created, req.body.caption, req.user.id, req.body.category);
-						challenge.save(function(err, result) {
+						var challengeInfo = {
+							id: id,
+							imageType: imageType,
+							created: req.body.created,
+							title: req.body.caption,
+							userId: req.user.id,
+							category: req.body.category
+						};
+
+						dbChallenge.createChallenge(challengeInfo, function(err, result) {
 							if(err) {
 								logger.error(err);
 								return res.sendStatus(500);
@@ -207,7 +215,7 @@ var routes = function(db) {
 				DELETE will permantently delete the specified node.  Call with Caution!
 			**/
 
-			logger.debug("DELETE received on /api/challenges/" + req.params.challengeid);
+			logger.debug("DELETE received on /api/challenges/" + req.params.challengeId);
 
 			var validationParams = [
 				{
@@ -221,11 +229,9 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			var cypherQuery = "MATCH (c:Challenge {id: '" + req.params.challengeId + "'}) OPTIONAL MATCH (c)<-[:POSTED_IN*1..2]-(challengeComment:Comment) OPTIONAL MATCH (c)<-[:PART_OF]-(e:Entry) OPTIONAL MATCH(e)<-[:POSTED_IN*1..2]-(entryComment:Comment) DETACH DELETE challengeComment, entryComment, c, e;";
-
-			db.cypherQuery(cypherQuery, function(err, result){
+			dbChallenge.deleteChallenge(req.params.challengeId, function(err) {
     			if(err) {
-    				logger.dbError(err, cypherQuery);
+    				logger.error(err);
     				return res.sendStatus(500);
     			}
 
@@ -268,68 +274,16 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			if (req.body.likeAction == "like") {
-      			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
-      				"'}), (c:Challenge {id: '" + req.params.challengeId + "'}) CREATE (u)-[r:LIKES {created: '" + req.body.created + "'}]->(c) RETURN r;";
-      			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) {
-	                	logger.dbError(err, cypherQuery);
-	                	return res.sendStatus(500);
-	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
-	                	return res.sendStatus(500);
-	                }
+			dbChallenge.likeChallenge(req.params.challengeId, req.body.likeAction == "like", req.user.id, req.body.created, function(err, likeResult) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
 
-	                //now, save the activity in the challenge
-	                var activityInfo = {
-	                	entityId: req.params.challengeId,
-	                	type: "like",
-	                	timestamp: req.body.created,
-	                	userId: req.user.id
-	                }
-	                dbUtils.saveActivity(activityInfo, function(err, id) {
-	                	if (err) {
-	                		logger.error(err);
-	                		return res.sendStatus(500);
-	                	}
+				var output = {likeStatus: (likeResult ? "on" : "off")};
 
-	                	var output = {likeStatus: (result.data.length == 1) ? "on" : "off"};
-
-	                	return res.json(output);
-	                });
-
-	                
-				});
-      		} else if (req.body.likeAction == "unlike") {
-      			var cypherQuery = "MATCH (u:User {id: '" + req.user.id + 
-      				"'})-[r:LIKES]->(c:Challenge {id: '" + req.params.challengeId + "'}) DELETE r RETURN COUNT(r);";
-      			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) {
-	                	logger.dbError(err, cypherQuery);
-	                	return res.sendStatus(500);
-	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
-	                	return res.sendStatus(500);
-	                }
-
-	                //now, reset the activity in the challenge, since the person no longer likes this challenge
-	                var activityInfo = {
-	                	entityId: req.params.challengeId,
-	                	type: "post"
-	                }
-	                dbUtils.saveActivity(activityInfo, function(err, id) {
-	                	if (err) {
-	                		logger.error(err);
-	                		return res.sendStatus(500);
-	                	}
-
-	                	var output = {likeStatus: (result.data.length == 1) ? "off" : "on"};
-
-						return res.json(output);
-	                });
-					
-				});
-      		}
+				return res.json(output);
+			});
 		});
 
 		return challengeRouter;
