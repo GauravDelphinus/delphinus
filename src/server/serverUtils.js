@@ -595,7 +595,7 @@ module.exports = {
 		it using the prototype.
 	*/
 	prototypes : {
-		"challengeExtended" : {
+		"challenge" : {
 			"type" : ["challenge"],
 			"id" : "id",
 			"postedDate" : "timestamp",
@@ -607,18 +607,6 @@ module.exports = {
 			"categoryName" : "string",
 			"categoryID" : "category",
 			"activity" : "activity"
-		},
-		"challengeBasic" : {
-			"type" : ["challenge"],
-			"id" : "id",
-			"postedDate" : "timestamp",
-			"postedByUser" : "postedByUser",
-			"image": "myURL",
-			"imageType": "imageType",
-			"caption": "string",
-			"link" : "myURL",
-			"categoryName" : "string",
-			"categoryID" : "category"
 		},
 		"challengeSocialInfo" : {
 			"likes" : {

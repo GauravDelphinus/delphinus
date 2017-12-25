@@ -39,13 +39,13 @@ var routes = function(db) {
 			}
 
 			var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
-			dbChallenge.fetchChallenges(req.query.postedBy, req.query.categoryId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
+			dbChallenge.getChallenges(req.query.postedBy, req.query.categoryId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
 				if (err) {
 					logger.error(err);
 					return res.sendStatus(500);
 				}
 
-				if (!serverUtils.validateData(result, serverUtils.prototypes.challengeExtended)) {
+				if (!serverUtils.validateData(result, serverUtils.prototypes.challenge)) {
     				return res.sendStatus(500);
     			}
 
@@ -172,35 +172,20 @@ var routes = function(db) {
 			var meId = (req.user) ? (req.user.id) : (0);
 
 			if (req.query.info == "basic") {
-				dbChallenge.findChallengeBasicInfo(req.params.challengeId, function(err, output) {
+				dbChallenge.getChallenge(req.params.challengeId, function(err, output) {
 					if (err) {
 						logger.error(err);
 						return res.sendStatus(500);
 					}
 
-					if (!serverUtils.validateData(output, serverUtils.prototypes.challengeBasic)) {
+					if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
 	    				return res.sendStatus(500);
 	    			}
 
-	    			return res.json(output);
-				});
-			} else if (req.query.info == "extended") {
-				logger.debug("calling get extzended info");
-				dbChallenge.findChallengeExtendedInfo(req.params.challengeId, meId, function(err, output) {
-					if (err) {
-						logger.error(err);
-						return res.sendStatus(500);
-					}
-
-					if (!serverUtils.validateData(output, serverUtils.prototypes.challengeExtended)) {
-	    				return res.sendStatus(500);
-	    			}
-
-	    			logger.debug("output : " + JSON.stringify(output));
 	    			return res.json(output);
 				});
 			} else if (req.query.info == "social") {
-				dbChallenge.findChallengeSocialInfo(req.params.challengeId, meId, function(err, output) {
+				dbChallenge.getChallengeSocialInfo(req.params.challengeId, meId, function(err, output) {
 					if (err) {
 						logger.error(err);
 						return res.sendStatus(500);

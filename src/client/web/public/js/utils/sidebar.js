@@ -135,7 +135,7 @@ function createPopularUsersSidebar(callback) {
 
 function createChallengeSidebar(challengeId, callback) {
 	if (challengeId != 0) {
-		$.getJSON('/api/challenges/' + challengeId + "?info=extended", function(data) {
+		$.getJSON('/api/challenges/' + challengeId + "?info=basic", function(data) {
 			var element = createThumbnailElement(data, "challenge", true);
 			var sidebar = createFramelessSidebar("challengeSidebar", "Challenge", element);
 			return callback(sidebar);

@@ -19,7 +19,7 @@ $(document).ready(function(){
 });
 
 function setupMainItem() {
-	$.getJSON('/api/challenges/' + challengeId + "?info=extended", function(data) {
+	$.getJSON('/api/challenges/' + challengeId + "?info=basic", function(data) {
 		console.log("got info for challenge, creating main element.  Data: " + JSON.stringify(data));
 		var mainElement = createMainElement(data, "main");
 		$("#main").append(mainElement);

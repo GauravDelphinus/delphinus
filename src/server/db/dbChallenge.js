@@ -6,7 +6,7 @@ var config = require("../config");
 var mime = require("mime");
 var logger = require("../logger");
 
-function findChallengeBasicInfo(challengeId, done) {
+function getChallenge(challengeId, done) {
 	var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge {id: '" + challengeId + "'})-[r:POSTED_BY]->(poster:User) " +
 		" WITH c, category, poster " +
 		" RETURN c, poster, category;";
@@ -22,109 +22,13 @@ function findChallengeBasicInfo(challengeId, done) {
 		var poster = result.data[0][1];
 		var category = result.data[0][2];
 
-		var output = {
-			type: "challenge",
-			id : challenge.id,
-			postedDate : challenge.created,
-			postedByUser : {
-				id : poster.id,
-				displayName : poster.displayName,
-				image : poster.image,
-				lastSeen : poster.last_seen
-			}
-		};
-
-		output.image = config.url.challengeImages + challenge.id + "." + mime.extension(challenge.image_type);
-		output.imageType = challenge.image_type;
-		output.caption = challenge.title;
-		output.link = config.url.challenge + challenge.id;
-		output.categoryName = category.name;
-		output.categoryID = category.id;
-
-		return done(null, output);
-	});
-}
-
-function findChallengeExtendedInfo(challengeId, meId, done) {
-	var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge {id: '" + challengeId + "'})-[r:POSTED_BY]->(poster:User) " +
-		" WITH c, category, poster " +
-		" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
-		" WITH c, category, poster, COUNT(u2) AS like_count " + 
-		" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(c) " + 
-		" WITH c, category, poster, like_count, COUNT(comment) as comment_count " + 
-		" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(c) " +
-		" WITH c, category, poster, like_count, comment_count, COUNT(entry) AS entry_count " +
-		" OPTIONAL MATCH (me:User {id: '" + meId + "'})-[like:LIKES]->(c) " +
-		" RETURN c, poster, like_count, comment_count, entry_count, COUNT(like), category;";
-
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
-		if(err) {
-			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new DBResultError(cypherQuery, 1, result.data.length));
-		}
-
-		var challenge = result.data[0][0];
-		var poster = result.data[0][1];
-		var category = result.data[0][6];
-
-		var output = {
-			type: "challenge",
-			id : challenge.id,
-			postedDate : challenge.created,
-			postedByUser : {
-				id : poster.id,
-				displayName : poster.displayName,
-				image : poster.image,
-				lastSeen : poster.last_seen
-			}
-		};
-
-		output.image = config.url.challengeImages + challenge.id + "." + mime.extension(challenge.image_type);
-		output.imageType = challenge.image_type;
-		output.caption = challenge.title;
-		output.link = config.url.challenge + challenge.id;
-		output.categoryName = category.name;
-		output.categoryID = category.id;
-
-		output.activity = {
-			type : challenge.activity_type,
-			timestamp : challenge.activity_timestamp,
-			userId : challenge.activity_user
-		};
-
-		if (challenge.activity_type == "comment") {
-			output.activity.commentId = challenge.activity_commentid;
-		}
-
-		//social status
-		var numLikes = result.data[0][2];
-		var numComments = result.data[0][3];
-		var numEntries = result.data[0][4];
-		var amLiking = result.data[0][5] > 0;
-		var numShares = 0; //no yet implemented
-
-		output.socialStatus = {
-			likes : {
-				numLikes : numLikes,
-				amLiking : amLiking
-			},
-			shares : {
-				numShares : numShares
-			},
-			comments : {
-				numComments : numComments
-			},
-			entries : {
-				numEntries : numEntries
-			}
-		};
+		output = challengeNodeToClientData(challenge, poster, category);
 
 		return done(null ,output);
 	});
 }
 
-function findChallengeSocialInfo(challengeId, meId, done) {
+function getChallengeSocialInfo(challengeId, meId, done) {
 	var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) " +
 		" WITH c " +
 		" OPTIONAL MATCH (u2:User)-[:LIKES]->(c) " + 
@@ -166,11 +70,11 @@ function findChallengeSocialInfo(challengeId, meId, done) {
 			}
 		};
 
-		return done(null ,output);
+		return done(null, output);
 	});
 }
 
-function fetchChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
+function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 
 	var cypherQuery = "";
 
@@ -211,36 +115,11 @@ function fetchChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 		for (var i = 0; i < result.data.length; i++) {
 			var data = {};
 
-			var entity = result.data[i][0];
+			var challenge = result.data[i][0];
 			var poster = result.data[i][1];
 			var category = result.data[i][2];
 
-			data.type = "challenge";
-			data.id = entity.id;
-
-			data.postedDate = entity.created;
-			data.postedByUser = {};
-			data.postedByUser.id = poster.id;
-			data.postedByUser.displayName = poster.displayName;
-			data.postedByUser.image = poster.image;
-			data.postedByUser.lastSeen = poster.last_seen;
-
-			data.image = config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
-			data.caption = entity.title;
-			data.link = config.url.entry + entity.id;
-			
-			data.imageType = entity.image_type;
-
-			data.categoryName = category.name;
-			data.categoryID = category.id;
-
-			data.activity = {};
-			data.activity.type = entity.activity_type;
-			data.activity.timestamp = entity.activity_timestamp;
-			data.activity.userId = entity.activity_user;
-			if (entity.activity_type == "comment") {
-				data.activity.commentId = entity.activity_commentid;
-			}
+			data = challengeNodeToClientData(challenge, poster, category);
 
 			newTimeStamp = data.activity.timestamp;
 
@@ -305,10 +184,44 @@ var challengePrototype = {
 	"category" : "category" //id of category this challenge belongs to
 }
 
+//convert the challenge DB node to data in the format the client expects
+function challengeNodeToClientData(challenge, poster, category) {
+	var output = {
+		type: "challenge",
+		id : challenge.id,
+		postedDate : challenge.created,
+		postedByUser : {
+			id : poster.id,
+			displayName : poster.displayName,
+			image : poster.image,
+			lastSeen : poster.last_seen
+		}
+	};
+
+	output.image = config.url.challengeImages + challenge.id + "." + mime.extension(challenge.image_type);
+	output.imageType = challenge.image_type;
+	output.caption = challenge.title;
+	output.link = config.url.challenge + challenge.id;
+	output.categoryName = category.name;
+	output.categoryID = category.id;
+
+	//add activity info
+	output.activity = {
+		type : challenge.activity_type,
+		timestamp : challenge.activity_timestamp,
+		userId : challenge.activity_user
+	};
+
+	if (challenge.activity_type == "comment") {
+		output.activity.commentId = challenge.activity_commentid;
+	}
+
+	return output;
+}
+
 module.exports = {
 	createChallenge: createChallenge,
-	findChallengeSocialInfo : findChallengeSocialInfo,
-	findChallengeExtendedInfo : findChallengeExtendedInfo,
-	findChallengeBasicInfo : findChallengeBasicInfo,
-	fetchChallenges: fetchChallenges
+	getChallengeSocialInfo : getChallengeSocialInfo,
+	getChallenge : getChallenge,
+	getChallenges: getChallenges
 };
