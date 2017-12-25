@@ -6,6 +6,9 @@ var config = require("../config");
 var mime = require("mime");
 var logger = require("../logger");
 
+/*
+	Get info about a Challenge by looking up the DB
+*/
 function getChallenge(challengeId, done) {
 	var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge {id: '" + challengeId + "'})-[r:POSTED_BY]->(poster:User) " +
 		" WITH c, category, poster " +
@@ -28,6 +31,9 @@ function getChallenge(challengeId, done) {
 	});
 }
 
+/*
+	Get info about the social info about a Challenge from the DB
+*/
 function getChallengeSocialInfo(challengeId, meId, done) {
 	var cypherQuery = "MATCH (c:Challenge {id: '" + challengeId + "'}) " +
 		" WITH c " +
@@ -74,6 +80,11 @@ function getChallengeSocialInfo(challengeId, meId, done) {
 	});
 }
 
+/*
+	Fetch all challenges from the DB matching the provided criteria.
+
+	Note that info is returned in chunks of size config.businessLogic.chunkSize
+*/
 function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 
 	var cypherQuery = "";
@@ -174,7 +185,7 @@ function createChallenge(challengeInfo, done) {
 }
 
 
-
+//prototype of challenge info that is needed to create a challenge node in the DB
 var challengePrototype = {
 	"id" : "id",
 	"imageType" : "imageType",
@@ -195,21 +206,18 @@ function challengeNodeToClientData(challenge, poster, category) {
 			displayName : poster.displayName,
 			image : poster.image,
 			lastSeen : poster.last_seen
+		},
+		image: config.url.challengeImages + challenge.id + "." + mime.extension(challenge.image_type),
+		imageType: challenge.image_type,
+		caption: challenge.title,
+		link: config.url.challenge + challenge.id,
+		categoryName: category.name,
+		categoryID: category.id,
+		activity: {
+			type : challenge.activity_type,
+			timestamp : challenge.activity_timestamp,
+			userId : challenge.activity_user
 		}
-	};
-
-	output.image = config.url.challengeImages + challenge.id + "." + mime.extension(challenge.image_type);
-	output.imageType = challenge.image_type;
-	output.caption = challenge.title;
-	output.link = config.url.challenge + challenge.id;
-	output.categoryName = category.name;
-	output.categoryID = category.id;
-
-	//add activity info
-	output.activity = {
-		type : challenge.activity_type,
-		timestamp : challenge.activity_timestamp,
-		userId : challenge.activity_user
 	};
 
 	if (challenge.activity_type == "comment") {

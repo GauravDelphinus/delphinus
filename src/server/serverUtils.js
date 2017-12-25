@@ -637,7 +637,7 @@ module.exports = {
 			},
 			"text" : "string"
 		},
-		"entryExtended" : {
+		"entry" : {
 			"type" : ["entry"],
 			"id" : "id",
 			"postedDate" : "timestamp",
@@ -647,16 +647,6 @@ module.exports = {
 			"caption": "string",
 			"link" : "myURL",
 			"activity" : "activity"
-		},
-		"entryBasic" : {
-			"type" : ["entry"],
-			"id" : "id",
-			"postedDate" : "timestamp",
-			"postedByUser" : "postedByUser",
-			"image": "myURL",
-			"imageType": "imageType",
-			"caption": "string",
-			"link" : "myURL"
 		},
 		"entrySocialInfo" : {
 			"likes" : {

@@ -21,7 +21,7 @@ function setupMainItem() {
 	if (categoryId != "all") {
 		appendCategory = "?category=" + categoryId;
 	}
-	createAndAppendContentContainer($("#challenges"), 0, "challenges", [{type: "filmstrip"}, {type: "thumbnail"}], [{type: "date", url: "/api/challenges" + appendCategory}, {type: "popularity", url: "/api/challenges" + appendCategory}]);
+	createAndAppendContentContainer($("#challenges"), 0, "challenges", [{type: "filmstrip"}, {type: "thumbnail"}], [{type: "date", url: "/api/challenges" + appendCategory}]);
 
 }
 

@@ -15,46 +15,46 @@ var dbUtils = require("../db/dbUtils");
 
 /*
 
-						source: challenge id:
-						---------------------
+	source: challenge id:
+	---------------------
 
-						input file: /challengeImages/challengeid.jpeg
-						output file: /entryImages/entryid.jpeg
+	input file: /challengeImages/challengeid.jpeg
+	output file: /entryImages/entryid.jpeg
 
-						step files:
+	step files:
 
-						/cacheImages/challengeid-fkdfhd.jpeg
-						/cacheImages/challengeid-dffdfs.jpeg
-						/cacheImages/challengeid-sddfds.jpeg
-
-
-						source: design id:
-						---------------------
-
-						input file: /designImages/designid.jpeg
-						output file: /entryImages/entryid.jpeg
-
-						step files:
-
-						/cacheImages/designid-fkdfhd.jpeg
-						/cacheImages/designid-dffdfs.jpeg
-						/cacheImages/designid-sddfds.jpeg
+	/cacheImages/challengeid-fkdfhd.jpeg
+	/cacheImages/challengeid-dffdfs.jpeg
+	/cacheImages/challengeid-sddfds.jpeg
 
 
-						source: dataURI:
-						---------------------
+	source: design id:
+	---------------------
 
-						input file: /independentEntryImages/independententryid.jpeg
-						output file: /entryImages/entryid.jpeg
+	input file: /designImages/designid.jpeg
+	output file: /entryImages/entryid.jpeg
 
-						step files:
+	step files:
 
-						/cacheImages/independententryid-kdfsdkhfd.jpeg
-						/cacheImages/independententryid-dffdfs.jpeg
-						/cacheImages/independententryid-sddfds.jpeg
+	/cacheImages/designid-fkdfhd.jpeg
+	/cacheImages/designid-dffdfs.jpeg
+	/cacheImages/designid-sddfds.jpeg
 
 
-						*/
+	source: dataURI:
+	---------------------
+
+	input file: /independentEntryImages/independententryid.jpeg
+	output file: /entryImages/entryid.jpeg
+
+	step files:
+
+	/cacheImages/independententryid-kdfsdkhfd.jpeg
+	/cacheImages/independententryid-dffdfs.jpeg
+	/cacheImages/independententryid-sddfds.jpeg
+
+
+*/
 
 var routes = function(db) {
 
@@ -86,13 +86,13 @@ var routes = function(db) {
 			}
 
 			var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
-			dbEntry.fetchEntries(req.query.postedBy, req.query.challengeId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
+			dbEntry.getEntries(req.query.postedBy, req.query.challengeId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
 				if (err) {
 					logger.error(err);
 					return res.sendStatus(500);
 				}
 
-				if (!serverUtils.validateData(result, serverUtils.prototypes.entryExtended)) {
+				if (!serverUtils.validateData(result, serverUtils.prototypes.entry)) {
     				return res.sendStatus(500);
     			}
 
@@ -372,7 +372,7 @@ var routes = function(db) {
 			var queryParams = [
 				{
 					name: "info",
-					type: ["basic", "extended", "social"],
+					type: ["basic", "social"],
 					required: "yes"
 				}
 			];
@@ -384,33 +384,20 @@ var routes = function(db) {
 			var meId = (req.user) ? (req.user.id) : (0);
 
 			if (req.query.info == "basic") {
-				dbEntry.lookupEntryBasicInfo(req.params.entryId, function(err, output) {
+				dbEntry.getEntry(req.params.entryId, function(err, output) {
 					if (err) {
 						logger.error(err);
 						return res.sendStatus(500);
 					}
 
-					if (!serverUtils.validateData(output, serverUtils.prototypes.entryBasic)) {
-	    				return res.sendStatus(500);
-	    			}
-
-	    			return res.json(output);
-				});
-			} else if (req.query.info == "extended") {
-				dbEntry.lookupEntryExtendedInfo(req.params.entryId, meId, function(err, output) {
-					if (err) {
-						logger.error(err);
-						return res.sendStatus(500);
-					}
-
-					if (!serverUtils.validateData(output, serverUtils.prototypes.entryExtended)) {
+					if (!serverUtils.validateData(output, serverUtils.prototypes.entry)) {
 	    				return res.sendStatus(500);
 	    			}
 
 	    			return res.json(output);
 				});
 			} else if (req.query.info == "social") {
-				dbEntry.lookupEntrySocialInfo(req.params.entryId, meId, function(err, output) {
+				dbEntry.getEntrySocialInfo(req.params.entryId, meId, function(err, output) {
 					if (err) {
 						logger.error(err);
 						return res.sendStatus(500);
