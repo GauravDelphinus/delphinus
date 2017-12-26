@@ -82,7 +82,7 @@ module.exports = function () {
 				}
 
 				// set last seen
-				user.lastSeen = (new Date()).getTime();
+				user.activity = {lastSeen : (new Date()).getTime()};
                 
                 dataUtils.saveUser(user, function(err, user) {
                     if (err) {

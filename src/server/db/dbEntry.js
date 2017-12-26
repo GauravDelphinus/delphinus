@@ -24,7 +24,7 @@ function getEntry(entryId, done) {
 		var entry = result.data[0][0];
 		var poster = result.data[0][1];
 
-		output = entryNodeToClientData(entry, poster);
+		output = dbUtils.entityNodeToClientData("Entry", entry, poster, null);
 
 		return done(null ,output);
 	});
@@ -120,7 +120,7 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 			var entry = result.data[i][0];
 			var poster = result.data[i][1];
 
-			data = entryNodeToClientData(entry, poster);
+			data = dbUtils.entityNodeToClientData("Entry", entry, poster, null);
 
 			//update new time stamp to be sent back to client
 			newTimeStamp = data.activity.timestamp;
@@ -132,57 +132,6 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 	});
 }
 
-
-/*
-	Create a new Entry node in the db.
-	Prototype: entryPrototype
-*/
-function createEntryOld(entryInfo, done) {
-	if (!serverUtils.validateData(entryInfo, entryPrototype)) {
-		return done(new Error("Invalid entry info"));
-	}
-
-	var cypherQuery = " MATCH (u:User {id: '" + entryInfo.userId + "'}) CREATE (e:Entry {" +
-					"id: '" + entryInfo.id + "', " + 
-					"caption: '" + dataUtils.sanitizeStringForCypher(entryInfo.title) + "', " + 
-					"created : " + entryInfo.created + " " + 
-					"})-[r:POSTED_BY]->(u) ";
-
-	if (entryInfo.source == "challengeId") { //link to challenge
-		cypherQuery = "MATCH (c:Challenge {id: '" + entryInfo.sourceId + "'}) " +
-					cypherQuery +
-					", (c)<-[:PART_OF]-(e) RETURN e;";
-	} else if (entryInfo.source == "designId") {// link to design
-		cypherQuery = "MATCH (d:Design {id: '" + entryInfo.sourceId + "'}) " +
-					cypherQuery +
-					", (d)<-[:BASED_ON]-(e) RETURN e;";
-	} else { //independent entry
-		cypherQuery += " RETURN e;";
-	}
-
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
-		if(err) {
-			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new Error(dbResultError(cypherQuery, 1, result.data.length)));
-		}
-
-		//now, save the activity in the entity
-        var activityInfo = {
-        	entityId: result.data[0].id,
-        	type: "post",
-        	timestamp: entryInfo.created,
-        	userId: entryInfo.userId
-        }
-        dbUtils.saveActivity(activityInfo, function(err, result) {
-        	if (err) {
-        		return done(err);
-        	}
-
-			return done(null, {id: result.id});
-		});
-	});
-}
 
 function createEntry(entryInfo, done) {
 
@@ -536,35 +485,7 @@ var entryPrototype = {
 	"sourceId" : "id"
 }
 
-//convert the entry DB node to data in the format the client expects
-function entryNodeToClientData(entry, poster) {
-	var output = {
-		type: "entry",
-		id : entry.id,
-		postedDate : entry.created,
-		postedByUser : {
-			id : poster.id,
-			displayName : poster.displayName,
-			image : poster.image,
-			lastSeen : poster.last_seen
-		},
-		image: config.url.entryImages + entry.id + "." + mime.extension(entry.image_type),
-		imageType: entry.image_type,
-		caption: entry.caption,
-		link: config.url.entry + entry.id,
-		activity : {
-			type : entry.activity_type,
-			timestamp : entry.activity_timestamp,
-			userId : entry.activity_user
-		}
-	};
 
-	if (entry.activity_type == "comment") {
-		output.activity.commentId = entry.activity_commentid;
-	}
-
-	return output;
-}
 
 module.exports = {
 	createEntry: createEntry,

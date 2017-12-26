@@ -32,13 +32,8 @@ var routes = function(db) {
 					type: "id",
 				},
 				{
-					name: "sortBy",
-					required: "yes",
-					type: ["lastSeen", "popularity"]
-				},
-				{
-					name: "limit",
-					type: "number"
+					name: "ts", //last fetched timestamp
+					type: "timestamp"
 				}
 			];
 
@@ -46,125 +41,24 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			if (req.query.followedId) {
-          		cypherQuery = "MATCH (followed:User {id: '" + req.query.followedId + "'})<-[:FOLLOWING]-(u:User)";
-			} else if (req.query.followingId) {
-          		cypherQuery = "MATCH (following:User {id: '" + req.query.followingId + "'})-[:FOLLOWING]->(u:User)";
-			} else if (req.query.likedEntityId) {
-          		cypherQuery = "MATCH ({id: '" + req.query.likedEntityId + "'})<-[:LIKES]-(u:User)";
-			} else if (req.user) {
-				//exclude the logged in user
-				cypherQuery = "MATCH (u:User) WHERE u.id <> '" + req.user.id + "' ";
-			} else { // return all users
-                cypherQuery = "MATCH (u:User) ";
-			}
-
 			var meId = (req.user) ? (req.user.id) : (0);
-          
-			cypherQuery += " WITH u " +
-          		" OPTIONAL MATCH (u)<-[:FOLLOWING]-(follower:User) " +
-          		" WITH u, COUNT(follower) AS numFollowers " +
-          		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(c:Challenge) " +
-          		" WITH u, numFollowers, COLLECT(c) AS challengesPosted " +
-          		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(e:Entry) " +
-          		" WITH u, numFollowers, challengesPosted, COLLECT(e) AS entriesPosted " +
-          		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
-          		" RETURN u, numFollowers, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following), (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
 
-			if (req.query.sortBy == "lastSeen") {
-				cypherQuery += " ORDER BY u.last_seen DESC";
-			} else if (req.query.sortBy == "popularity") {
-				cypherQuery += " ORDER BY popularity_count DESC";
-			}
+			var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
+			dbUser.getUsers(meId, req.query.followedId, req.query.followingId, req.query.likedEntityId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
 
-			if (req.query.limit) {
-				cypherQuery += " LIMIT " + req.query.limit;
-			}
-
-			cypherQuery += ";";
-
-			db.cypherQuery(cypherQuery, function(err, result){
-                if(err) {
-                	logger.dbError(err, cypherQuery);
-                	return res.sendStatus(500);
-                }
-
-                var output = [];
-    			for (var i = 0; i < result.data.length; i++) {
-    				var data = dataUtils.constructEntityData("user", result.data[i][0], null, result.data[i][0].last_seen, null, null, null, null, result.data[i][1], result.data[i][3] > 0, result.data[i][2], "none", null, null, null, null);
-		
-					output.push(data);
+				if (!serverUtils.validateData(result, serverUtils.prototypes.user)) {
+    				return res.sendStatus(500);
     			}
-                
-                if (!serverUtils.validateData(output, serverUtils.prototypes.user, false)) {
-                	return res.sendStatus(500);
-                }
-                return res.json(output);
+
+    			var output = {ts: newTimeStamp, list: result};
+    			return res.json(output);
 			});
 		});
 
-	userRouter.route("/:followedId/follow") //api/users/follow
-
-		.put(function(req, res) {
-
-			logger.debug("PUT received on /api/users/" + req.params.followedId + "/follow, body: " + JSON.stringify(req.body));
-
-			var validationParams = [
-				{
-					name: "followAction",
-					type: ["follow", "unfollow"],
-					required: "yes"
-				}
-			];
-
-			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
-				return res.sendStatus(400);
-			}
-
-			validationParams = [
-				{
-					name: "followedId",
-					required: "yes",
-					type: "id"
-				}
-			];
-
-			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
-				return res.sendStatus(400);
-			}
-
-      		if (req.body.followAction == "follow") {
-      			var cypherQuery = "MATCH (u1:User {id: '" + req.user.id + 
-      				"'}), (u2:User {id: '" + req.params.followedId + "'}) CREATE (u1)-[r:FOLLOWING]->(u2) RETURN r;";
-      			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) {
-	                	logger.dbError(err, cypherQuery);
-	                	return res.sendStatus(500);
-	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
-	                	return res.sendStatus(500);
-	                }
-
-	                var output = {followStatus: (result.data.length == 1) ? "following" : "not_following"};
-	                return res.json(output);
-				});
-      		} else if (req.body.followAction == "unfollow") {
-      			var cypherQuery = "MATCH (u1:User {id: '" + req.user.id + 
-      				"'})-[r:FOLLOWING]->(u2:User {id: '" + req.params.followedId + "'}) DELETE r RETURN COUNT(r);";
-      			db.cypherQuery(cypherQuery, function(err, result){
-	                if(err) {
-	                	logger.dbError(err, cypherQuery);
-	                	return res.sendStatus(500);
-	                } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	                	logger.dbResultError(cypherQuery, "0 or 1", result.data.length);
-	                	return res.sendStatus(500);
-	                }
-
-					var output = {followStatus: (result.data.length == 1) ? "not_following" : "following"};
-					return res.json(output);
-				});
-      		}	
-		});
 
 	userRouter.route("/:userId") // /api/users/<id>
 		.get(function(req, res) {
@@ -183,47 +77,19 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			var queryParams = [
-				{
-					name: "info",
-					type: ["basic", "extended"],
-					required: "yes"
+			dbUser.getUser(req.params.userId, function(err, userInfo) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
 				}
-			];
 
-			if (!serverUtils.validateQueryParams(req.query, queryParams)) {
-				return res.sendStatus(400);
-			}
+				if (!serverUtils.validateData(userInfo, serverUtils.prototypes.user)) {
+					return res.sendStatus(500);
+				}
 
-			var meId = (req.user) ? (req.user.id) : (0);
+				return res.json(userInfo);
+			});
 
-			if (req.query.type == "extended") { //extended user info
-				dbUser.findUserExtended(req.params.userId, meId, function(err, userInfo) {
-					if (err) {
-						logger.error(err);
-						return res.sendStatus(500);
-					}
-
-					if (!serverUtils.validateData(userInfo, dbUser.userPrototypeExtended)) {
-						return res.sendStatus(500);
-					}
-
-					return res.json(userInfo);
-				});
-			} else { //basic user info
-				dbUser.findUserBasic(req.params.userId, function(err, userInfo) {
-					if (err) {
-						logger.error(err);
-						return res.sendStatus(500);
-					}
-
-					if (!serverUtils.validateData(userInfo, dbUser.userPrototypeBasic)) {
-						return res.sendStatus(500);
-					}
-
-					return res.json(userInfo);
-				});
-			}
 		})
 
 		.patch(function(req, res) {
@@ -307,6 +173,83 @@ var routes = function(db) {
 				});
 			});
 		});
+
+	userRouter.route("/:userId/social") // /api/users/<id>/social
+		.get(function(req, res) {
+
+			logger.debug("GET received on /api/users/" + req.params.userId + "/social, query: " + JSON.stringify(req.query));
+
+			var validationParams = [
+				{
+					name: "userId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
+
+			var meId = (req.user) ? (req.user.id) : (0);
+
+			dbUser.getUserSocialInfo(req.params.userId, meId, function(err, output) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
+
+				if (!serverUtils.validateData(output, serverUtils.prototypes.userSocialInfo)) {
+					return res.sendStatus(500);
+				}
+
+				return res.json(output);
+			});
+
+		});
+
+	userRouter.route("/:followedId/follow") //api/users/follow
+
+		.put(function(req, res) {
+
+			logger.debug("PUT received on /api/users/" + req.params.followedId + "/follow, body: " + JSON.stringify(req.body));
+
+			var validationParams = [
+				{
+					name: "followAction",
+					type: ["follow", "unfollow"],
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
+				return res.sendStatus(400);
+			}
+
+			validationParams = [
+				{
+					name: "followedId",
+					required: "yes",
+					type: "id"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
+
+      		dbUser.followUser(req.user.id, req.params.followedId, req.body.followAction == "follow", function(err, followResult) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
+
+				var output = {followStatus: (followResult ? "on" : "off")};
+
+				return res.json(output);
+			});
+		});
+
 
 	return userRouter;
 };

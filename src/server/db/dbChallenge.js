@@ -26,7 +26,7 @@ function getChallenge(challengeId, done) {
 		var poster = result.data[0][1];
 		var category = result.data[0][2];
 
-		output = challengeNodeToClientData(challenge, poster, category);
+		output = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
 
 		return done(null ,output);
 	});
@@ -131,7 +131,7 @@ function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 			var poster = result.data[i][1];
 			var category = result.data[i][2];
 
-			data = challengeNodeToClientData(challenge, poster, category);
+			data = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
 
 			newTimeStamp = data.activity.timestamp;
 
@@ -333,38 +333,6 @@ var challengePrototype = {
 	"title" : "string",
 	"userId" : "id", //id of user who is posting this challenge
 	"category" : "category" //id of category this challenge belongs to
-}
-
-//convert the challenge DB node to data in the format the client expects
-function challengeNodeToClientData(challenge, poster, category) {
-	var output = {
-		type: "challenge",
-		id : challenge.id,
-		postedDate : challenge.created,
-		postedByUser : {
-			id : poster.id,
-			displayName : poster.displayName,
-			image : poster.image,
-			lastSeen : poster.last_seen
-		},
-		image: config.url.challengeImages + challenge.id + "." + mime.extension(challenge.image_type),
-		imageType: challenge.image_type,
-		caption: challenge.title,
-		link: config.url.challenge + challenge.id,
-		categoryName: category.name,
-		categoryID: category.id,
-		activity: {
-			type : challenge.activity_type,
-			timestamp : challenge.activity_timestamp,
-			userId : challenge.activity_user
-		}
-	};
-
-	if (challenge.activity_type == "comment") {
-		output.activity.commentId = challenge.activity_commentid;
-	}
-
-	return output;
 }
 
 module.exports = {

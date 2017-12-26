@@ -219,15 +219,15 @@ module.exports = {
 			data.imageURL = dynamicConfig.hostname + config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);
 			data.pageTitle = "Challenge: " + entity.title + " | " + config.branding.siteName;
 			data.pageURL = dynamicConfig.hostname + config.url.challenge + entity.id;
-			data.pageDescription = "Posted by " + poster.displayName + ".  Up for the challenge?  Check out the challenge and post your entry now, it's free and takes just a few minutes!  Also, check out the awesome entries posted by others :)";
+			data.pageDescription = "Posted by " + poster.display_name + ".  Up for the challenge?  Check out the challenge and post your entry now, it's free and takes just a few minutes!  Also, check out the awesome entries posted by others :)";
 			data.imageType = entity.image_type;
-			data.authorName = poster.displayName;
+			data.authorName = poster.display_name;
 		} else if (entityType == "entry") {
 			data.id = entity.id;
 			data.imageURL = dynamicConfig.hostname + config.url.entryImages + entity.id  + "." + mime.extension(entity.image_type);
 			data.pageTitle = "Caption Entry: " + entity.caption + " | " + config.branding.siteName;
 			data.pageURL = dynamicConfig.hostname + config.url.entry + entity.id;
-			data.pageDescription = "Posted by " + poster.displayName + ".  Like this entry?  Check out more such entries, and challenge yourself to post one of your own!  It takes just a few minutes, and it's free :)";
+			data.pageDescription = "Posted by " + poster.display_name + ".  Like this entry?  Check out more such entries, and challenge yourself to post one of your own!  It takes just a few minutes, and it's free :)";
 			if (challenge && challenge.id) {
 				data.challengeId = challenge.id;
 			} else {
@@ -241,7 +241,7 @@ module.exports = {
 			}
 			
 			data.imageType = entity.image_type; //entry retains format of the challenge
-			data.authorName = poster.displayName;
+			data.authorName = poster.display_name;
 		} else if (entityType == "entries") {
 			data.imageURL = dynamicConfig.hostname + config.url.brandImages + config.branding.shareImage.imageName;
 			data.imageType = config.branding.shareImage.imageType;
@@ -256,7 +256,7 @@ module.exports = {
 		} else if (entityType == "user") {
 			data.id = entity.id;
 			data.imageURL = dynamicConfig.hostname + entity.image;
-			data.pageTitle = "User: " + entity.displayName + " | " + config.branding.siteName;
+			data.pageTitle = "User: " + entity.display_name + " | " + config.branding.siteName;
 			data.pageURL = dynamicConfig.hostname + config.url.user + entity.id;
 			data.pageDescription = "User";
 			data.imageType = mime.lookup(entity.image);
@@ -1044,8 +1044,8 @@ module.exports = {
 					user.id = userFromDB.id;
 				}
 
-				if (userFromDB.displayName) {
-					user.displayName = userFromDB.displayName;
+				if (userFromDB.display_name) {
+					user.displayName = userFromDB.display_name;
 				}
 
 				if (userFromDB.image) {
@@ -1067,7 +1067,7 @@ module.exports = {
 				if (userFromDB.google_id) {
 					user.google = {};
 					user.google.id = userFromDB.google_id;
-					user.google.displayName = userFromDB.google_displayName;
+					user.google.displayName = userFromDB.google_display_name;
 					user.google.token = userFromDB.google_token;
 					user.google.emails = userFromDB.google_emails;
 					user.google.images = userFromDB.google_images;
@@ -1079,8 +1079,8 @@ module.exports = {
 					user.twitter.username = userFromDB.twitter_username;
 					user.twitter.profileLink = userFromDB.twitter_profile_link;
 					user.twitter.token = userFromDB.twitter_token;
-					user.twitter.tokenSecret = userFromDB.twitter_tokenSecret;
-					user.twitter.displayName = userFromDB.twitter_displayName;
+					user.twitter.tokenSecret = userFromDB.twitter_token_secret;
+					user.twitter.displayName = userFromDB.twitter_display_name;
 					user.twitter.images = userFromDB.twitter_images;
 				}
 
@@ -1089,7 +1089,7 @@ module.exports = {
 					user.facebook.id = userFromDB.facebook_id;
 					user.facebook.profileLink = userFromDB.facebook_profile_link;
 					user.facebook.token = userFromDB.facebook_token;
-					user.facebook.displayName = userFromDB.facebook_displayName;
+					user.facebook.displayName = userFromDB.facebook_display_name;
 					user.facebook.image = userFromDB.facebook_image;
 					user.facebook.emails = userFromDB.facebook_emails;
 				}
@@ -1143,7 +1143,7 @@ module.exports = {
 				var setValues = [];
 
 				if (user.displayName) {
-					setValues.push(" u.displayName = '" + user.displayName + "'");
+					setValues.push(" u.display_name = '" + user.displayName + "'");
 				}
 				if (user.image) {
 					setValues.push(" u.image = '" + user.image + "'");
@@ -1162,7 +1162,7 @@ module.exports = {
 				}
 
 				if (user.lastSeen) {
-					setValues.push(" u.last_seen = '" + user.lastSeen + "'");
+					setValues.push(" u.activity_last_seen = " + user.activity.lastSeen + "");
 				}
 
 				if (user.google) {
@@ -1183,7 +1183,7 @@ module.exports = {
 					}
 
 					if (user.google.displayName) {
-						setValues.push(" u.google_displayName = '" + user.google.displayName + "'");
+						setValues.push(" u.google_display_name = '" + user.google.displayName + "'");
 					}
 				}
 
@@ -1197,7 +1197,7 @@ module.exports = {
 					}
 
 					if (user.twitter.tokenSecret) {
-						setValues.push(" u.twitter_tokenSecret = '" + user.twitter.tokenSecret + "'");
+						setValues.push(" u.twitter_token_secret = '" + user.twitter.tokenSecret + "'");
 					}
 
 					if (user.twitter.username) {
@@ -1209,7 +1209,7 @@ module.exports = {
 					}
 
 					if (user.twitter.displayName) {
-						setValues.push(" u.twitter_displayName = '" + user.twitter.displayName + "'");
+						setValues.push(" u.twitter_display_name = '" + user.twitter.displayName + "'");
 					}
 
 					if (user.twitter.images) {
@@ -1231,7 +1231,7 @@ module.exports = {
 					}
 
 					if (user.facebook.displayName) {
-						setValues.push(" u.facebook_displayName = '" + user.facebook.displayName + "'");
+						setValues.push(" u.facebook_display_name = '" + user.facebook.displayName + "'");
 					}
 
 					if (user.facebook.emails) {
@@ -1274,7 +1274,7 @@ module.exports = {
 				cypherQuery += "id: '" + user.id + "'";
 
 				if (user.displayName) {
-					cypherQuery += ", displayName: '" + user.displayName + "'";
+					cypherQuery += ", display_name: '" + user.displayName + "'";
 				}
 
 				if (user.image) {
@@ -1294,7 +1294,7 @@ module.exports = {
 				}
 
 				if (user.lastSeen) {
-					cypherQuery += ", last_seen: '" + user.lastSeen + "'";
+					cypherQuery += ", activity_last_seen: " + user.activity.lastSeen + "";
 				}
 
 				if (user.google) {
@@ -1315,7 +1315,7 @@ module.exports = {
 					}
 
 					if (user.google.displayName) {
-						cypherQuery += ", google_displayName: '" + user.google.displayName + "'";
+						cypherQuery += ", google_display_name: '" + user.google.displayName + "'";
 					}
 				}
 
@@ -1329,7 +1329,7 @@ module.exports = {
 					}
 
 					if (user.twitter.tokenSecret) {
-						cypherQuery += ", twitter_tokenSecret: '" + user.twitter.tokenSecret + "'";
+						cypherQuery += ", twitter_token_secret: '" + user.twitter.tokenSecret + "'";
 					}
 
 					if (user.twitter.username) {
@@ -1341,7 +1341,7 @@ module.exports = {
 					}
 
 					if (user.twitter.displayName) {
-						cypherQuery += ", twitter_displayName: '" + user.twitter.displayName + "'";
+						cypherQuery += ", twitter_display_name: '" + user.twitter.displayName + "'";
 					}
 
 					if (user.twitter.images) {
@@ -1363,7 +1363,7 @@ module.exports = {
 					}
 
 					if (user.facebook.displayName) {
-						cypherQuery += ", facebook_displayName: '" + user.facebook.displayName + "'";
+						cypherQuery += ", facebook_display_name: '" + user.facebook.displayName + "'";
 					}
 
 					if (user.facebook.emails) {
@@ -1406,9 +1406,9 @@ module.exports = {
 	removeAccessForUser: function(userId, provider, callback) {
 		var removeQuery;
 		if (provider == "facebook") {
-			removeQuery = " REMOVE u.facebook_id, u.facebook_profile_link, u.facebook_token, u.facebook_displayName, u.facebook_emails, u.facebook_image ";
+			removeQuery = " REMOVE u.facebook_id, u.facebook_profile_link, u.facebook_token, u.facebook_display_name, u.facebook_emails, u.facebook_image ";
 		} else if (provider == "twitter") {
-			removeQuery = " REMOVE u.twitter_id, u.twitter_token, u.twitter_tokenSecret, u.twitter_username, u.twitter_profile_link, u.twitter_displayName, u.twitter_images ";
+			removeQuery = " REMOVE u.twitter_id, u.twitter_token, u.twitter_token_secret, u.twitter_username, u.twitter_profile_link, u.twitter_display_name, u.twitter_images ";
 		}
 
 		var cypherQuery = "MATCH (u:User {id: '" + userId + "'}) ";
@@ -1454,9 +1454,9 @@ module.exports = {
 			data.postedDate = entity.created;
 			data.postedByUser = {};
 			data.postedByUser.id = poster.id;
-			data.postedByUser.displayName = poster.displayName;
+			data.postedByUser.displayName = poster.display_name;
 			data.postedByUser.image = poster.image;
-			data.postedByUser.lastSeen = poster.last_seen;
+			data.postedByUser.lastSeen = poster.activity_last_seen;
 		}
 
 		if (entityType == "challenge") {
@@ -1473,9 +1473,9 @@ module.exports = {
 			data.link = config.url.entry + entity.id;
 		} else if (entityType == "user") {
 			data.image = entity.image;
-			data.caption = entity.displayName;
+			data.caption = entity.display_name;
 			data.link = config.url.user + entity.id;
-			data.lastSeen = entity.last_seen;
+			data.lastSeen = entity.activity_last_seen;
 			if (socialInfo) {
 				if (socialInfo.facebookLink) {
 					data.socialStatus.facebook = {profileLink: socialInfo.facebookLink};
@@ -1509,9 +1509,9 @@ module.exports = {
 					if (lastCommenter) {
 						data.activity.comment.postedByUser = {};
 						data.activity.comment.postedByUser.id = lastCommenter.id;
-						data.activity.comment.postedByUser.displayName = lastCommenter.displayName;
+						data.activity.comment.postedByUser.displayName = lastCommenter.display_name;
 						data.activity.comment.postedByUser.image = lastCommenter.image;
-						data.activity.comment.postedByUser.lastSeen = lastCommenter.last_seen;
+						data.activity.comment.postedByUser.lastSeen = lastCommenter.activity_last_seen;
 					}
 				
 					data.activity.comment.socialStatus = {
@@ -1528,9 +1528,9 @@ module.exports = {
 					if (liker) {
 						data.activity.like.postedByUser = {};
 						data.activity.like.postedByUser.id = liker.id;
-						data.activity.like.postedByUser.displayName = liker.displayName;
+						data.activity.like.postedByUser.displayName = liker.display_name;
 						data.activity.like.postedByUser.image = liker.image;
-						data.activity.like.postedByUser.lastSeen = liker.last_seen;
+						data.activity.like.postedByUser.lastSeen = liker.activity_last_seen;
 					}
 				}
 			}
@@ -1619,9 +1619,9 @@ function createNodeForDesign(db, designId, designName, categoryId, presetArtifac
 
 function createUserNode(db, user, next) {
 	var cypherQuery = "MERGE (u:User {id: '" + user.id + "'}) ON CREATE SET " +
-		"u.displayName = '" + user.displayName + "', " +
+		"u.display_name = '" + user.displayName + "', " +
 		"u.image = '" + user.image + "', " +
-		"u.last_seen = '" + user.lastSeen + "' RETURN u;";
+		"u.activity_last_seen = " + user.activity.lastSeen + " RETURN u;";
 
 	db.cypherQuery(cypherQuery, function(err) {
 		if (err) {

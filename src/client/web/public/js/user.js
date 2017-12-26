@@ -200,7 +200,6 @@ function setupNameSection(profileType) {
 
 function setupSocialSection(profileType) {
 	// Followers Section
-	console.log("calling get on /api/users/" + userInfo.id);
 	$.getJSON("/api/users/" + userInfo.id, function(data) {
 		console.log("received data = " + JSON.stringify(data));
 		var socialStatusSection = createSocialStatusSectionElement(data);

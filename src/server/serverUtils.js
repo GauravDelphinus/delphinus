@@ -717,25 +717,27 @@ module.exports = {
 		"user" : {
 			"type" : ["user"],
 			"id" : "id",
-			"compareDate" : "number",
 			"image": ["oneoftypes", "url", "myURL"],
 			"caption": "string",
 			"link" : "myURL",
-			"lastSeen" : "number",
-			"socialStatus" : {
-				"facebook" : {
-					"profileLink" : "url"
-				},
-				"twitter" : {
-					"profileLink" : "url"
-				},
-				"follows" : {
-					"numFollowers" : "number",
-					"amFollowing" : [true, false]
-				},
-				"posts" : {
-					"numPosts" : "number"
-				}
+			"displayName": "string",
+			"activity" : {
+				"lastSeen" : "timestamp"
+			}
+		},
+		"userSocialInfo" : {
+			"facebook" : {
+				"profileLink" : "url"
+			},
+			"twitter" : {
+				"profileLink" : "url"
+			},
+			"follows" : {
+				"numFollowers" : "number",
+				"amFollowing" : [true, false]
+			},
+			"posts" : {
+				"numPosts" : "number"
 			}
 		},
 		"designCategory" : {

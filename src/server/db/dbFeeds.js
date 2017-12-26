@@ -75,9 +75,8 @@ function createMainFeed(userId, lastFetchedTimestamp, done) {
 			data.postedDate = entity.created;
 			data.postedByUser = {};
 			data.postedByUser.id = poster.id;
-			data.postedByUser.displayName = poster.displayName;
+			data.postedByUser.displayName = poster.display_name;
 			data.postedByUser.image = poster.image;
-			data.postedByUser.lastSeen = poster.last_seen;
 
 			if (data.type == "challenge") {
 				data.image = config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);

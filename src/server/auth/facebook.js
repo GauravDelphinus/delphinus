@@ -70,7 +70,7 @@ module.exports = function () {
                 user.displayName = user.facebook.displayName;
                 
                 // set last seen
-                user.lastSeen = (new Date()).getTime();
+                user.activity = {lastSeen : (new Date()).getTime()};
 
                 // PROFILE IMAGE -------------
                 user.facebook.images = [];
