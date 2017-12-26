@@ -1118,11 +1118,11 @@ function parseEntry(entry) {
 function constructJSONObject(jsonObj) {
 
 	if (challengeId != 0) {
-		jsonObj.source = "challengeId";
-		jsonObj.challengeId = challengeId;
+		jsonObj.sourceType = "challengeId";
+		jsonObj.sourceData = challengeId;
 	} else if (designId != 0) {
-		jsonObj.source = "designId";
-		jsonObj.designId = designId;
+		jsonObj.sourceType = "designId";
+		jsonObj.sourceData = designId;
 	} else {
 		var imageSrc = $("#newentryimage").data("originalSrc");
 		if (imageSrc == undefined) {
@@ -1132,12 +1132,12 @@ function constructJSONObject(jsonObj) {
 		
 		if (imageSrc.startsWith("data:image")) {
 			//data uri
-			jsonObj.source = "dataURI";
+			jsonObj.sourceType = "dataURI";
 		} else {
 			//assume URL
-			jsonObj.source = "imageURL";
+			jsonObj.sourceType = "imageURL";
 		}
-		jsonObj.imageData = imageSrc;
+		jsonObj.sourceData = imageSrc;
 	}
 
 	jsonObj.created = (new Date()).getTime();

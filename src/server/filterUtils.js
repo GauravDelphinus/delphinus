@@ -196,38 +196,40 @@ module.exports = {
 	processImageDataForEntry: function(entryData, createNodesIfNotFound, next) {
 		async.waterfall([
 		    function(callback) {
-		    	if (entryData.source == "challengeId") {
-					if (!entryData.challengeId) {
+		    	if (entryData.sourceType == "challengeId") {
+		    		var challengeId = entryData.sourceData;
+					if (!challengeId) {
 						logger.error("Challenge ID missing.");
 						return callback(new Error("Challenge ID Missing."));
 					}
 
-					dataUtils.getImageDataForChallenge(entryData.challengeId, function(err, imageData){
+					dataUtils.getImageDataForChallenge(challengeId, function(err, imageData){
 						if (err) {
 							return callback(err);
 						}
 
-						var sourceImagePath = global.appRoot + config.path.challengeImagesRaw + entryData.challengeId + "." + mime.extension(imageData.imageType);
+						var sourceImagePath = global.appRoot + config.path.challengeImagesRaw + challengeId + "." + mime.extension(imageData.imageType);
 						//var hash = this.generateHash(JSON.stringify(steps));
 						//var targetImageName = entryData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
 						//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
 						//var targetImageUrl = config.url.cacheImages + targetImageName;
 
-    					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, /* targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, */ imageType: imageData.imageType, sourceId: entryData.challengeId});
+    					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, /* targetImagePath: targetImagePath, targetImageUrl: targetImageUrl, */ imageType: imageData.imageType, sourceId: challengeId});
 					});
 				} else {
 					return callback(null, null);
 				}
 		    },
 		    function(info, callback) {
-		    	if (info == null && entryData.source == "imageURL") {
-		    		if (!entryData.imageData) {
+		    	if (info == null && entryData.sourceType == "imageURL") {
+		    		var imageURL = entryData.sourceData;
+		    		if (!imageURL) {
 		    			logger.error("Missing Image URL.");
 		    			return callback(new Error("Missing Image URL"));
 		    		}
 
 		    		if (createNodesIfNotFound) {
-		    			dataUtils.createIndependentImageNode(entryData.source, entryData.imageData, entryData.userId, function(err, data) {
+		    			dataUtils.createIndependentImageNode(entryData.sourceType, imageURL, entryData.userId, function(err, data) {
 			    			if (err) {
 			    				return callback(err);
 			    			}
@@ -236,12 +238,12 @@ module.exports = {
 			    			return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: null, targetImageUrl: null, imageType: data.imageType, sourceId: data.id});
 			    		});
 		    		} else {
-		    			serverUtils.downloadImage(entryData.imageData, null, function(err, outputPath) {
+		    			serverUtils.downloadImage(imageURL, null, function(err, outputPath) {
 		    				if (err) {
 		    					return callback(err);
 		    				}
 
-		    				var extension = entryData.imageData.split('.').pop();
+		    				var extension = imageURL.split('.').pop();
 		    				var imageType = mime.lookup(extension);
 		    				return callback(null, {sourceImagePath: outputPath, sourceFileIsTemp: true, /* targetImagePath: null, targetImageUrl: null, */ imageType: imageType, sourceId: 0});
 		    			});
@@ -251,14 +253,15 @@ module.exports = {
 		    	}
 		    },
 		    function(info, callback) {
-		    	if (info == null && entryData.source == "dataURI") {
-		    		if (!entryData.imageData) {
+		    	if (info == null && entryData.sourceType == "dataURI") {
+		    		var dataURI = entryData.sourceData;
+		    		if (!dataURI) {
 		    			logger.error("Missing Image URI");
 		    			return callback(new Error("Missing Image URI"));
 		    		}
 
 					if (createNodesIfNotFound) {
-		    			dataUtils.createIndependentImageNode(entryData.source, entryData.imageData, entryData.userId, function(err, data) {
+		    			dataUtils.createIndependentImageNode(entryData.sourceType, dataURI, entryData.userId, function(err, data) {
 			    			if (err) {
 			    				return callback(err);
 			    			}
@@ -267,13 +270,13 @@ module.exports = {
 			    			return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, targetImagePath: null, targetImageUrl: null, imageType: data.imageType, sourceId: data.id});
 			    		});
 		    		} else {
-		    			serverUtils.writeImageFromDataURI(entryData.imageData, null, function(err, outputPath) {
+		    			serverUtils.writeImageFromDataURI(dataURI, null, function(err, outputPath) {
 		    				if (err) {
 		    					return callback(err);
 		    				}
 
 		    				var parseDataURI = require("parse-data-uri");
-							var parsed = parseDataURI(entryData.imageData);
+							var parsed = parseDataURI(dataURI);
 		    				return callback(null, {sourceImagePath: outputPath, sourceFileIsTemp: true, /* targetImagePath: null, targetImageUrl: null, */ imageType: parsed.mimeType, sourceId: 0});
 		    			});
 		    		}
@@ -282,18 +285,19 @@ module.exports = {
 		    	}
 		    },
 		    function(info, callback) {
-		    	if (info == null && entryData.source == "designId") {
-		    		if (!entryData.designId ) {
+		    	if (info == null && entryData.sourceType == "designId") {
+		    		var designId = entryData.sourceData;
+		    		if (!designId ) {
 		    			logger.error("Missing Design ID");
 		    			return callback(new Error("Missing Design ID"));
 		    		}
 
-		    		dataUtils.getImageDataForDesign(entryData.designId, function(err, imageData){
+		    		dataUtils.getImageDataForDesign(designId, function(err, imageData){
 						if (err) {
 							return callback(err);
 						}
 
-						var sourceImagePath = global.appRoot + config.path.designImagesRaw + imageData.categoryId + "/" + entryData.designId + "." + mime.extension(imageData.imageType);
+						var sourceImagePath = global.appRoot + config.path.designImagesRaw + imageData.categoryId + "/" + designId + "." + mime.extension(imageData.imageType);
 
 						return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: "image/jpeg", sourceId: imageData.id});
 					});

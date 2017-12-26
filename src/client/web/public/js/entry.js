@@ -11,7 +11,7 @@ $(document).ready(function(){
 });
 
 function setupMainItem() {
-	$.getJSON('/api/entries/' + entryId + "?info=basic", function(data) {
+	$.getJSON('/api/entries/' + entryId, function(data) {
 		var mainElement = createMainElement(data, "main");
 		$("#main").append(mainElement);
 	}).fail(function() {

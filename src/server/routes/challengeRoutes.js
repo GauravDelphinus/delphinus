@@ -89,61 +89,28 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			// Store the incoming base64 encoded image into a local image file first
-			var fs = require('fs');
-			var parseDataURI = require("parse-data-uri");
-			var parsed = parseDataURI(req.body.imageDataURI);
+			var challengeInfo = {
+				id: shortid.generate(),
+				imageDataURI: req.body.imageDataURI,
+				created: req.body.created,
+				title: req.body.caption,
+				userId: req.user.id,
+				category: req.body.category
+			};
 
-			var imageType = parsed.mimeType;
-
-			//generate path name for challenge image
-			var baseDirRaw = global.appRoot + config.path.challengeImagesRaw;
-			var id = shortid.generate(); //new id for challenge
-			var name = id + "." + mime.extension(imageType); //generate name of image file
-			var fullpathRaw = baseDirRaw + name;
-			
-			//write the data to a file
-			var buffer = parsed.data;
-			fs.writeFile(fullpathRaw, buffer, function(err) {
-				if (err) {
-					logger.error("Failed to write file: " + fullpathRaw);
+			dbChallenge.createChallenge(challengeInfo, function(err, result) {
+				if(err) {
+					logger.error(err);
 					return res.sendStatus(500);
 				}
 
-				var baseDir = global.appRoot + config.path.challengeImages;
-				var fullPath = baseDir + name;
-				imageProcessor.addWatermarkToImage(fullpathRaw, fullPath, function(err, outputPath) {
-					if (err) {
-						logger.error("Failed to apply watermark: " + fullPath);
-						return res.sendStatus(500);
-					}
+				var output = {id: result.id};
+				if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+					return res.sendStatus(500);
+				}
 
-					imageProcessor.findImageSize(outputPath, function(size) {
-						var challengeInfo = {
-							id: id,
-							imageType: imageType,
-							created: req.body.created,
-							title: req.body.caption,
-							userId: req.user.id,
-							category: req.body.category
-						};
-
-						dbChallenge.createChallenge(challengeInfo, function(err, result) {
-							if(err) {
-								logger.error(err);
-								return res.sendStatus(500);
-							}
-
-							var output = {id: result.id};
-							if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
-		    					return res.sendStatus(500);
-		    				}
-							
-							res.header("Location", "/api/challenges/" + output.id);
-							return res.status(201).json(output);
-						});
-					});
-				});
+				res.header("Location", "/api/challenges/" + result.id);
+				return res.status(201).json(output);
 			});
 		});
 
@@ -165,48 +132,18 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			var queryParams = [
-				{
-					name: "info",
-					type: ["basic", "extended", "social"],
-					required: "yes"
+			dbChallenge.getChallenge(req.params.challengeId, function(err, output) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
 				}
-			];
 
-			if (!serverUtils.validateQueryParams(req.query, queryParams)) {
-				return res.sendStatus(400);
-			}
+				if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
+    				return res.sendStatus(500);
+    			}
 
-			var meId = (req.user) ? (req.user.id) : (0);
-
-			if (req.query.info == "basic") {
-				dbChallenge.getChallenge(req.params.challengeId, function(err, output) {
-					if (err) {
-						logger.error(err);
-						return res.sendStatus(500);
-					}
-
-					if (!serverUtils.validateData(output, serverUtils.prototypes.challenge)) {
-	    				return res.sendStatus(500);
-	    			}
-
-	    			return res.json(output);
-				});
-			} else if (req.query.info == "social") {
-				dbChallenge.getChallengeSocialInfo(req.params.challengeId, meId, function(err, output) {
-					if (err) {
-						logger.error(err);
-						return res.sendStatus(500);
-					}
-
-					if (!serverUtils.validateData(output, serverUtils.prototypes.challengeSocialInfo)) {
-	    				return res.sendStatus(500);
-	    			}
-
-	    			return res.json(output);
-				});
-			}
-			
+    			return res.json(output);
+			});
 		})
 
 		.delete(function(req, res){
@@ -239,6 +176,40 @@ var routes = function(db) {
 			});
 		});
 
+	challengeRouter.route("/:challengeId/social") // ROUTER FOR /api/challenges/<id>/social
+
+		.get(function(req, res){
+
+			logger.debug("GET received on /api/challenges/" + req.params.challengeId + "/social, query: " + JSON.stringify(req.query));
+
+			var validationParams = [
+				{
+					name: "challengeId",
+					type: "id",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
+
+			var meId = (req.user) ? (req.user.id) : (0);
+
+			dbChallenge.getChallengeSocialInfo(req.params.challengeId, meId, function(err, output) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
+
+				if (!serverUtils.validateData(output, serverUtils.prototypes.challengeSocialInfo)) {
+    				return res.sendStatus(500);
+    			}
+
+    			return res.json(output);
+			});
+		});
+
 	challengeRouter.route("/:challengeId/like") // /api/challenges/:challengeId/like
 
 		.put(function(req, res) {
@@ -253,7 +224,7 @@ var routes = function(db) {
 				},
 				{
 					name: "created",
-					type: "number",
+					type: "timestamp",
 					required: "yes"
 				}
 			];
@@ -285,6 +256,7 @@ var routes = function(db) {
 				return res.json(output);
 			});
 		});
+
 
 		return challengeRouter;
 };

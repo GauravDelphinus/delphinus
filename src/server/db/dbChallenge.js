@@ -5,6 +5,7 @@ var dbUtils = require("./dbUtils");
 var config = require("../config");
 var mime = require("mime");
 var logger = require("../logger");
+var imageProcessor = require("../imageProcessor");
 
 /*
 	Get info about a Challenge by looking up the DB
@@ -141,12 +142,67 @@ function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 	});
 }
 
+/*
+	Create the challenge node given the information provided
+*/
+function createChallenge(challengeInfo, done) {
+	createImageForChallenge(challengeInfo.id, challengeInfo.imageDataURI, function(err, info) {
+		if (err) {
+			return done(err);
+		}
+
+		challengeInfo.imageType = info.imageType;
+		delete challengeInfo.imageDataURI; //this is because createChallengeNode does not need this
+		createChallengeNode(challengeInfo, function(err, nodeInfo) {
+			if (err) {
+				return done(err);
+			}
+
+			return done(null, {id: nodeInfo.id});
+		});
+	});
+}
+
+/*
+	Create the Raw and Watermarked (public) images for the challenge
+*/
+function createImageForChallenge(challengeId, imageDataURI, done) {
+	// Store the incoming base64 encoded image into a local image file first
+	var fs = require('fs');
+	var parseDataURI = require("parse-data-uri");
+	var parsed = parseDataURI(imageDataURI);
+
+	var imageType = parsed.mimeType;
+
+	//generate path name for challenge image
+	var baseDirRaw = global.appRoot + config.path.challengeImagesRaw;
+	var name = challengeId + "." + mime.extension(imageType); //generate name of image file
+	var fullpathRaw = baseDirRaw + name;
+	
+	//write the data to a file
+	var buffer = parsed.data;
+	fs.writeFile(fullpathRaw, buffer, function(err) {
+		if (err) {
+			return done(new Error("Failed to write file: " + fullpathRaw));
+		}
+
+		var baseDir = global.appRoot + config.path.challengeImages;
+		var fullPath = baseDir + name;
+		imageProcessor.addWatermarkToImage(fullpathRaw, fullPath, function(err, outputPath) {
+			if (err) {
+				return done(new Error("Failed to apply watermark: " + fullPath));
+			}
+
+			return done(null, {imageType: imageType});
+		});
+	});
+}
 
 /*
 	Create a new Challenge node in the db.
 	Prototype: challengePrototype
 */
-function createChallenge(challengeInfo, done) {
+function createChallengeNode(challengeInfo, done) {
 	if (!serverUtils.validateData(challengeInfo, challengePrototype)) {
 		return done(new Error("Invalid challenge info"));
 	}
@@ -241,7 +297,7 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 
 		});
 	} else {
-		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + "'})-[r:LIKES]->(c:Challenge {id: '" + req.params.challengeId + "'}) " +
+		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + "'})-[r:LIKES]->(c:Challenge {id: '" + challengeId + "'}) " +
 			" DELETE r " +
 			" RETURN COUNT(r);";
 
