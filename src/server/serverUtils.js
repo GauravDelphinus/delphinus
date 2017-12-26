@@ -734,6 +734,7 @@ module.exports = {
 			},
 			"follows" : {
 				"numFollowers" : "number",
+				"numFollowing" : "number",
 				"amFollowing" : [true, false]
 			},
 			"posts" : {

@@ -245,7 +245,6 @@ var routes = function(db) {
 				}
 
 				var output = {followStatus: (followResult ? "on" : "off")};
-
 				return res.json(output);
 			});
 		});

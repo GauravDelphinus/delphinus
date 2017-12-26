@@ -201,12 +201,8 @@ function setupNameSection(profileType) {
 function setupSocialSection(profileType) {
 	// Followers Section
 	$.getJSON("/api/users/" + userInfo.id, function(data) {
-		console.log("received data = " + JSON.stringify(data));
-		var socialStatusSection = createSocialStatusSectionElement(data);
-		$("#socialStatusSection").append(socialStatusSection);
-
-		var socialActionsSection = createSocialActionsSectionElement(data, true);
-		$("#socialStatusSection").append(socialActionsSection);
+		//append social section, and set up callback to update the counts after receiving from server
+		appendSocialSection($("#socialStatusSection"), data, "UserSocialSection", true, true);
 	})
 	.fail(function() {
 		window.location.replace("/error");

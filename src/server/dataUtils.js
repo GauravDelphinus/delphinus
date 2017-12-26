@@ -1161,7 +1161,7 @@ module.exports = {
 					setValues.push(" u.location = '" + user.location + "'");
 				}
 
-				if (user.lastSeen) {
+				if (user.activity && user.activity.lastSeen) {
 					setValues.push(" u.activity_last_seen = " + user.activity.lastSeen + "");
 				}
 

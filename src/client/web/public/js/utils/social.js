@@ -123,11 +123,11 @@ function appendSocialSection(appendTo, data, contentTag, showStatusElement, show
 
 	var getURL;
 	if (data.type == "challenge") {
-		getURL = "/api/challenges/" + data.id + "?info=social";
+		getURL = "/api/challenges/" + data.id + "/social";
 	} else if (data.type == "entry") {
-		getURL = "/api/entries/" + data.id + "?info=social";
+		getURL = "/api/entries/" + data.id + "/social";
 	} else if (data.type == "user") {
-		getURL = "/api/users/" + data.id + "?info=social";
+		getURL = "/api/users/" + data.id + "/social";
 	}
 	$.getJSON(getURL, function(socialInfo) {
 		if (socialInfo.likes) {
@@ -151,6 +151,38 @@ function appendSocialSection(appendTo, data, contentTag, showStatusElement, show
 				updateEntries(contentTag, data.id, socialInfo.entries.numEntries);
 			}
 		}
+
+		if (socialInfo.follows) {
+			if (socialInfo.follows.numFollowers) {
+				updateFollowers(contentTag, data.id, socialInfo.follows.numFollowers);
+			}
+
+			if (socialInfo.follows.numFollowing) {
+				updateFollowing(contentTag, data.id, socialInfo.follows.numFollowing);
+			}
+
+			if (socialInfo.follows.amFollowing) {
+				updateAmFollowing(contentTag, data.id, socialInfo.follows.amFollowing);
+			}
+		}
+
+		if (socialInfo.posts) {
+			if (socialInfo.posts.numPosts) {
+				updatePosts(contentTag, data.id, socialInfo.posts.numPosts);
+			}
+		}
+
+		if (socialInfo.facebook) {
+			if (socialInfo.facebook.profileLink) {
+				updateFacebookLink(contentTag, data.id, socialInfo.facebook.profileLink);
+			}
+		}
+
+		if (socialInfo.twitter) {
+			if (socialInfo.twitter.profileLink) {
+				updateTwitterLink(contentTag, data.id, socialInfo.twitter.profileLink);
+			}
+		}
 	})
 	.fail(function() {
 		//eat this
@@ -163,7 +195,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	// For Challenges and Entries
 	if (data.type == "challenge" || data.type == "entry") {
 		var likeButton = $("<button>", {id: contentTag + data.id + "LikesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		likeButton.append($("<span>", {id: contentTag + data.id + "NumLikes", text: 0}));
+		likeButton.append($("<span>", {id: contentTag + data.id + "NumLikes", text: "0"}));
 		likeButton.append($("<span>", {text: " Likes"}));
 		likeButton.hide();
 
@@ -177,7 +209,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	if (data.type == "challenge" || data.type == "entry") {
 
 		var shareButton = $("<button>", {id: contentTag + data.id + "SharesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		shareButton.append($("<span>", {id: contentTag + data.id + "NumShares", text: 0}));
+		shareButton.append($("<span>", {id: contentTag + data.id + "NumShares", text: "0"}));
 		shareButton.append($("<span>", {text: " Shares"}));
 		shareButton.hide();
 
@@ -187,7 +219,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	if (data.type == "challenge" || data.type == "entry") {
 
 		var commentButton = $("<button>", {id: contentTag + data.id + "CommentsButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		commentButton.append($("<span>", {id: contentTag + data.id + "NumComments", text: 0}));
+		commentButton.append($("<span>", {id: contentTag + data.id + "NumComments", text: "0"}));
 		commentButton.append($("<span>", {text: " Comments"}));
 		commentButton.hide();
 
@@ -202,7 +234,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	if (data.type == "challenge") {
 
 		var entriesButton = $("<button>", {id: contentTag + data.id + "EntriesButton", type: "button", class: "button-link text-plain-small separator-medium"});
-		entriesButton.append($("<span>", {id: contentTag + data.id + "NumEntries", text: 0}));
+		entriesButton.append($("<span>", {id: contentTag + data.id + "NumEntries", text: "0"}));
 		entriesButton.append($("<span>", {text: " Entries"}));
 		entriesButton.hide();
 
@@ -221,61 +253,43 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 
 	// For Users
 	if (data.type == "user") {
+		var followersButton = $("<button>", {id: contentTag + data.id + "FollowersButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		followersButton.append($("<span>", {id: contentTag + data.id + "NumFollowers", text: "0"}));
+		followersButton.append($("<span>", {text: " Followers"}));
+		followersButton.hide();
 
-		if (data.socialStatus.follows.numFollowers) {
+		followersButton.click(function(e) {
+			showHideFollowersList(data.id, contentTag, true);
+		});
+		socialStatus.append(followersButton);
 
-			var followersButton = $("<button>", {id: contentTag + data.id + "FollowersButton", type: "button", class: "button-link text-plain-small separator-medium"});
-			followersButton.append($("<span>", {id: contentTag + data.id + "NumFollowers", text: data.socialStatus.follows.numFollowers}));
-			followersButton.append($("<span>", {text: " Followers"}));
-			if (data.socialStatus.follows.numFollowers <= 0) {
-				followersButton.hide();
-			}
+		var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		followingButton.append($("<span>", {id: data.id + "NumFollowing", text: "0"}));
+		followingButton.append($("<span>", {text: " Following"}));
+		followingButton.hide();
 
-			followersButton.click(function(e) {
-				showHideFollowersList(data.id, contentTag, true);
-			});
-			socialStatus.append(followersButton);
-		}
-		
-		/*
-		if (data.socialStatus.follows.numFollowing) {
-
-			var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "button-link text-plain-small separator-medium"});
-			followingButton.append($("<span>", {id: data.id + "NumFollowing", text: data.socialStatus.follows.numFollowing}));
-			followingButton.append($("<span>", {text: " Following"}));
-			if (data.socialStatus.follows.numFollowing <= 0) {
-				followingButton.hide();
-			}
-
-			followingButton.click(function(e) {
-				$('#' + data.id + 'Tabs a[href="#following"]').tab('show');
-			});
-			socialStatus.append(followingButton);
-		}
-		*/
+		followingButton.click(function(e) {
+			$('#' + data.id + 'Tabs a[href="#following"]').tab('show');
+		});
+		socialStatus.append(followingButton);
 	}
 
 	if (data.type == "user") {
-		if (data.socialStatus.posts.numPosts) {
+		var postsButton = $("<button>", {id: contentTag + data.id + "PostsButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		postsButton.append($("<span>", {id: contentTag + data.id + "NumPosts", text: "0"}));
+		postsButton.append($("<span>", {text: " Posts"}));
+		postsButton.hide();
 
-			var postsButton = $("<button>", {id: contentTag + data.id + "PostsButton", type: "button", class: "button-link text-plain-small separator-medium"});
-			postsButton.append($("<span>", {id: contentTag + data.id + "NumPosts", text: data.socialStatus.posts.numPosts}));
-			postsButton.append($("<span>", {text: " Posts"}));
-			if (data.socialStatus.posts.numPosts <= 0) {
-				postsButton.hide();
+		postsButton.click(function(e) {
+			//show the popup, or redirect if the popup doesn't exist
+			if ($('#' + data.id + 'Tabs a[href="#posts"]').length !== 0) {
+				$('#' + data.id + 'Tabs a[href="#posts"]').tab('show');
+			} else {
+				window.open("/user/" + data.id + "#posts");
 			}
-
-			postsButton.click(function(e) {
-				//show the popup, or redirect if the popup doesn't exist
-				if ($('#' + data.id + 'Tabs a[href="#posts"]').length !== 0) {
-					$('#' + data.id + 'Tabs a[href="#posts"]').tab('show');
-				} else {
-					window.open("/user/" + data.id + "#posts");
-				}
-				
-			});
-			socialStatus.append(postsButton);
-		}
+			
+		});
+		socialStatus.append(postsButton);
 	}
 
 	return socialStatus;
@@ -373,6 +387,54 @@ function updateEntries(contentTag, entityId, numEntries) {
 	} else {
 		$("#" + contentTag + entityId + "EntriesButton").show();
 	}
+}
+
+function updateAmFollowing(contentTag, entityId, amFollowing) {
+	if (amFollowing) {
+		$("#" + contentTag + entityId + "FollowButton").addClass("active");
+		$("#" + contentTag + entityId + "FollowText").empty().append(" Following");
+	} else {
+		$("#" + contentTag + entityId + "FollowButton").removeClass("active");
+		$("#" + contentTag + entityId + "FollowText").empty().append(" Follow");
+	}
+}
+
+function updateFollowers(contentTag, entityId, numFollowers) {
+	$("#" + contentTag + entityId + "NumFollowers").text(numFollowers);
+	if (numFollowers == 0) {
+		$("#" + contentTag + entityId + "FollowersButton").hide();
+	} else {
+		$("#" + contentTag + entityId + "FollowersButton").show();
+	}
+}
+
+function updateFollowing(contentTag, entityId, numFollowing) {
+	$("#" + contentTag + entityId + "NumFollowing").text(numFollowing);
+	if (numFollowing == 0) {
+		$("#" + contentTag + entityId + "FollowingButton").hide();
+	} else {
+		$("#" + contentTag + entityId + "FollowingButton").show();
+	}
+}
+
+function updatePosts(contentTag, entityId, numPosts) {
+	//followers
+	$("#" + contentTag + entityId + "NumPosts").text(numPosts);
+	if (numPosts == 0) {
+		$("#" + contentTag + entityId + "PostsButton").hide();
+	} else {
+		$("#" + contentTag + entityId + "PostsButton").show();
+	}
+}
+
+function updateFacebookLink(contentTag, entityId, facebookLink) {
+	$("#" + contentTag + entityId + "FacebookButton").show();
+	$("#" + contentTag + entityId + "FacebookButton").data("facebookLink", facebookLink);
+}
+
+function updateTwitterLink(contentTag, entityId, twitterLink) {
+	$("#" + contentTag + entityId + "TwitterButton").show();
+	$("#" + contentTag + entityId + "TwitterButton").data("twitterLink", twitterLink);
 }
 
 function createSocialActionsSectionElement(data, contentTag, full /* show full status */) {
@@ -480,12 +542,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		
 		socialActionsSection.append(followButton);
 
-		if (data.socialStatus.follows.amFollowing) {
-			followButton.addClass("active");
-			followButton.children("#" + contentTag + data.id + "FollowText").append(" Following");
-		} else {
-			followButton.children("#" + contentTag + data.id + "FollowText").append(" Follow");
-		}
+		followButton.children("#" + contentTag + data.id + "FollowText").append(" Follow");
 
 		var dataId = data.id;
 		followButton.click(function(e) {
@@ -500,21 +557,13 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 						// eat this
 					} else {
 						var numFollowers = parseInt($("#" + contentTag + dataId + "NumFollowers").text());
-			          	if (followResult) {
-			          		numFollowers ++;
-			          		$("#" + contentTag + dataId + "NumFollowers").text(numFollowers);
-			          		$("#" + contentTag + dataId + "FollowButton").addClass("active");
-			          		$("#" + contentTag + dataId + "FollowText").empty().append(" Following");
-			          		$("#" + contentTag + dataId + "FollowersButton").show();
-			          	} else {
-			          		numFollowers --;
-			          		$("#" + contentTag + dataId + "NumFollowers").text(numFollowers);
-			          		$("#" + contentTag + dataId + "FollowButton").removeClass("active");
-			          		$("#" + contentTag + dataId + "FollowText").empty().append(" Follow");
-			          		if (numFollowers <= 0) {
-			          			$("#" + contentTag + dataId + "FollowersButton").hide();
-			          		}
-			          	}
+						if (followResult) {
+							numFollowers ++;
+						} else {
+							numFollowers --;
+						}
+						updateFollowers(contentTag, data.id, numFollowers);
+						updateAmFollowing(contentTag, data.id, followResult);
 					}
 				});
 			} else {
@@ -523,28 +572,26 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		});
 	}
 
-	if (full && data.socialStatus.facebook) {
-		if (data.socialStatus.facebook.profileLink) {
-			var facebookButton = $("<button>", {id: contentTag + data.id + "FacebookButton", type: "button", class: "button-active-link text-plain-small text-bold"});
-			facebookButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Facebook");
-			socialActionsSection.append(facebookButton);
+	if (data.type == "user") {
+		var facebookButton = $("<button>", {id: contentTag + data.id + "FacebookButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+		facebookButton.append($("<i>", {class: "fa fa-facebook"})).append(" Facebook");
+		socialActionsSection.append(facebookButton);
+		facebookButton.hide();
 
-			facebookButton.click(function() {
-				window.open(data.socialStatus.facebook.profileLink, "_blank");
-			});
-		}
+		facebookButton.click(function() {
+			window.open($("#" + contentTag + data.id + "FacebookButton").data("facebookLink"), "_blank");
+		});
 	}
 
-	if (full && data.socialStatus.twitter) {
-		if (data.socialStatus.twitter.profileLink) {
-			var twitterButton = $("<button>", {id: contentTag + data.id + "TwitterButton", type: "button", class: "button-active-link text-plain-small text-bold"});
-			twitterButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Twitter");
-			socialActionsSection.append(twitterButton);
+	if (data.type == "user") {
+		var twitterButton = $("<button>", {id: contentTag + data.id + "TwitterButton", type: "button", class: "button-active-link text-plain-small text-bold"});
+		twitterButton.append($("<i>", {class: "fa fa-twitter"})).append(" Twitter");
+		socialActionsSection.append(twitterButton);
+		twitterButton.hide();
 
-			twitterButton.click(function() {
-				window.open(data.socialStatus.twitter.profileLink, "_blank");
-			});
-		}
+		twitterButton.click(function() {
+			window.open($("#" + contentTag + data.id + "TwitterButton").data("twitterLink"), "_blank");
+		});
 	}
 
 	return socialActionsSection;
@@ -595,7 +642,7 @@ function sendFollow(userId, follow, callback) {
       	data: JSON.stringify(jsonObj)
   	})
 	.done(function(data, textStatus, jqXHR) {
-      	if (data.followStatus == "following") {
+      	if (data.followStatus == "on") {
       		callback(0, true);
       	} else {
       		callback(0, false);

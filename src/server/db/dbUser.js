@@ -141,7 +141,7 @@ function followUser(followerId, followedId, follow, done) {
 		var cypherQuery = "MATCH (u1:User {id: '" + followerId + "'}), (u2:User {id: '" + followedId + "'}) " +
 			" CREATE (u1)-[r:FOLLOWING]->(u2) " +
 			" RETURN r;";
-		db.cypherQuery(cypherQuery, function(err, result){
+		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -154,7 +154,7 @@ function followUser(followerId, followedId, follow, done) {
 		var cypherQuery = "MATCH (u1:User {id: '" + followerId + "'})-[r:FOLLOWING]->(u2:User {id: '" + followedId + "'}) " +
 			" DELETE r " +
 			" RETURN COUNT(r);";
-		db.cypherQuery(cypherQuery, function(err, result){
+		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -177,5 +177,6 @@ module.exports = {
 	getUser : getUser,
 	getUserSocialInfo : getUserSocialInfo,
 	getUsers: getUsers,
+	followUser: followUser,
 	userPrototypeBasic : userPrototypeBasic
 };
