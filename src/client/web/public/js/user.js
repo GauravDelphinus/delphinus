@@ -278,17 +278,17 @@ function setupProfileTab(profileType) {
 
 function setupPostsTab() {
 	var tabDiv = appendNewTab(userInfo.id, "posts", "Posts");
-	createAndAppendContentContainer(tabDiv, 0, "posts", [{type: "thumbnail"}, {type: "filmstrip"}], "/api/posts/?postedBy=" + userInfo.id);
+	createAndAppendContentContainer(tabDiv, userInfo.id, "posts", [{type: "thumbnail"}, {type: "filmstrip"}], "/api/posts/?postedBy=" + userInfo.id);
 }
 
 function setupFollowersTab() {
 	var tabDiv = appendNewTab(userInfo.id, "followers", "Followers");
-	createAndAppendContentContainer(tabDiv, 0, "followers", [{type: "thumbnail"}], "/api/users/?followedId=" + userInfo.id + "&sortBy=lastSeen");
+	createAndAppendContentContainer(tabDiv, userInfo.id, "followers", [{type: "thumbnail"}], "/api/users/?followedId=" + userInfo.id + "&sortBy=lastSeen");
 }
 
 function setupFollowingTab() {
 	var tabDiv = appendNewTab(userInfo.id, "following", "Following");
-	createAndAppendContentContainer(tabDiv, 0, "following", [{type: "thumbnail"}], "/api/users/?followingId=" + userInfo.id + "&sortBy=lastSeen");
+	createAndAppendContentContainer(tabDiv, userInfo.id, "following", [{type: "thumbnail"}], "/api/users/?followingId=" + userInfo.id + "&sortBy=lastSeen");
 }
 
 function setupAndShowCarousel() {
