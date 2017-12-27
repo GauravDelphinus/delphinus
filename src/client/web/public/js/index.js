@@ -11,5 +11,5 @@ $(document).ready(function(){
 });
 
 function setupFeed() {
-	createAndAppendContentContainer($("#feed"), 0, "feed", [{type: "feed"}], [{type: "date", url: "/api/feeds"}]);
+	createAndAppendContentContainer($("#feed"), 0, "feed", [{type: "feed"}], "/api/feeds");
 }

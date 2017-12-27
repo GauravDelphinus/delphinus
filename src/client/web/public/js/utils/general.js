@@ -124,3 +124,19 @@ function getFullPathForCurrentPage() {
 	var fullPath = window.location.protocol + "//" + window.location.hostname+(window.location.port ? ':'+ window.location.port: '') + window.location.pathname;
 	return fullPath;
 }
+
+//courtesy: https://stackoverflow.com/questions/5999118/how-can-i-add-or-update-a-query-string-parameter
+/*
+	Update the URI with the new key/value pair.  If already present, it will update the value
+	otherwise it will add this to the URI
+*/
+function updateQueryStringParameter(uri, key, value) {
+  var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+  var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+  if (uri.match(re)) {
+    return uri.replace(re, '$1' + key + "=" + value + '$2');
+  }
+  else {
+    return uri + separator + key + "=" + value;
+  }
+}

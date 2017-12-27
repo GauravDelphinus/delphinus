@@ -59,5 +59,5 @@ function setupSidebars() {
 function setupCommentsTab() {
 	var tabDiv = appendNewTab(entryId, "comments", "Comments");
 	//note: setting the contentTag to "main" below as we want the comments to be associated with the main element
-	createAndAppendContentContainer(tabDiv, entryId, "main", [{type: "comments"}], [{type: "date", url: "/api/comments/?entityId=" + entryId + "&sortBy=reverseDate"}]);
+	createAndAppendContentContainer(tabDiv, entryId, "main", [{type: "comments"}], "/api/comments/?entityId=" + entryId + "&sortBy=reverseDate");
 }

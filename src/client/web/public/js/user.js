@@ -278,17 +278,17 @@ function setupProfileTab(profileType) {
 
 function setupPostsTab() {
 	var tabDiv = appendNewTab(userInfo.id, "posts", "Posts");
-	createAndAppendContentContainer(tabDiv, 0, "posts", [{type: "thumbnail"}, {type: "filmstrip"}], [{type: "date", url: "/api/posts/?postedBy=" + userInfo.id + "&sortBy=dateCreated"}, {type: "popularity", url: "/api/posts/?postedBy=" + userInfo.id + "&sortBy=popularity"}]);
+	createAndAppendContentContainer(tabDiv, 0, "posts", [{type: "thumbnail"}, {type: "filmstrip"}], "/api/posts/?postedBy=" + userInfo.id);
 }
 
 function setupFollowersTab() {
 	var tabDiv = appendNewTab(userInfo.id, "followers", "Followers");
-	createAndAppendContentContainer(tabDiv, 0, "followers", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followedId=" + userInfo.id + "&sortBy=lastSeen"}]);
+	createAndAppendContentContainer(tabDiv, 0, "followers", [{type: "thumbnail"}], "/api/users/?followedId=" + userInfo.id + "&sortBy=lastSeen");
 }
 
 function setupFollowingTab() {
 	var tabDiv = appendNewTab(userInfo.id, "following", "Following");
-	createAndAppendContentContainer(tabDiv, 0, "following", [{type: "thumbnail"}], [{type: "date", url: "/api/users/?followingId=" + userInfo.id + "&sortBy=lastSeen"}]);
+	createAndAppendContentContainer(tabDiv, 0, "following", [{type: "thumbnail"}], "/api/users/?followingId=" + userInfo.id + "&sortBy=lastSeen");
 }
 
 function setupAndShowCarousel() {

@@ -296,7 +296,22 @@ function appendCommentElement(commentElement, parentId, contentTag, isReply) {
 	}	
 }
 
-function createCommentsList(id, contentTag, list) { //id is the entity id
+function createCommentsList(id, contentTag) { //id is the entity id
+	var container = $("<div>", {id: id + contentTag + "CommentsList", class: "commentsList", "data-id" : id});
+
+	if (user) {
+		//show new comment box if already logged in
+		var newCommentElement = createNewCommentElement(false, id, id, contentTag);
+		appendNewCommentElement(newCommentElement, id, contentTag, container, false);
+	} else {
+		var signInToCommentElement = createSignInToCommentElement();
+		container.append(signInToCommentElement);
+	}
+	
+	return container;
+}
+
+function createCommentsListOld(id, contentTag, list) { //id is the entity id
 	var container = $("<div>", {id: contentTag + id + "CommentsList", class: "commentsList", "data-id" : id});
 
 	for (var i = 0; i < list.length; i++) {

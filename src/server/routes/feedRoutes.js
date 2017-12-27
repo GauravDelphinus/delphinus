@@ -44,6 +44,7 @@ var routes = function(db) {
     			}
 
     			var output = {ts: newTimeStamp, list: result};
+    			logger.debug("returning output: " + JSON.stringify(output));
 				return res.json(output);
 			});
 		});
