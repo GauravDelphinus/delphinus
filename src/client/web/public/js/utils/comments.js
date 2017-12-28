@@ -19,7 +19,6 @@ function createAndAppendCommentsContainer(appendTo, entityId, contentTag, getURL
 **/
 function showHideCommentsList(entityId, contentTag, show) {
 	//comments list is currently hidden, so fetch comments and show the list
-	console.log("showHideCommentsList, entityId: " + entityId + ", contentTag: " + contentTag + ", show: " + show);
 	if (show) {
 		//empty out and refresh the comments list
 		j.CommentsList(entityId, contentTag).get().empty();

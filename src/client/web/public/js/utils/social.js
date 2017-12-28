@@ -292,6 +292,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	return socialStatus;
 }
 
+
 /**
 	Show the list of likes for this parentId, along with names of users and their 'Follow' status
 	w.r.t. to currently logged-in user
@@ -299,17 +300,20 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 function showHideLikersList(parentId, contentTag, show) {
 	if (show) {
 		if ($("#" + contentTag + parentId + "LikersContainer").is(":empty")) {
-			$.getJSON("/api/users/?likedEntityId=" + parentId + "&sortBy=popularity", function(list) {
-				var likersList = createLikersList(parentId, contentTag, list);
-				$("#" + contentTag + parentId + "LikersContainer").empty().append(likersList);
-			})
-			.fail(function() {
-				//eat this
-			});
+			var likersList = createLikersList(parentId, contentTag);
+			$("#" + contentTag + parentId + "LikersContainer").empty().append(likersList);
 
-			if ($("#" + contentTag + parentId + "LikersPopup").length) {
-				$("#" + contentTag + parentId + "LikersPopup").show();
-			}
+			fetchNextBatch("/api/users?likedEntityId=" + parentId, function(list) {
+				//processData
+				appendLikersList(parentId, contentTag, list);
+			}, function (err) {
+				if (!err) {
+					//done
+					if ($("#" + contentTag + parentId + "LikersPopup").length) {
+						$("#" + contentTag + parentId + "LikersPopup").show();
+					}
+				}
+			});
 		}
 	} else {
 		if (!$("#" + contentTag + parentId + "LikersContainer").is(":empty")) {
@@ -682,10 +686,8 @@ function createFollowersPopupElement(data, contentTag) {
 	return element;
 }
 
-function createLikersList(id, contentTag, list) {
-	var container = $("<div>", {id: contentTag + id + "LikersList", class: "likersList", "data-id": id});
-
-	var table = $("<table width='100%'>");
+function appendLikersList(id, contentTag, list) {
+	var table = $("#" + contentTag + id + "LikersList table");
 
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
@@ -693,56 +695,22 @@ function createLikersList(id, contentTag, list) {
 		var row = $("<tr>");
 		var userImage = $("<img>", {src: data.image, class: "user-image-tiny"});
 
-		var userName = $("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.caption);
-		var followButton = $("<button>", {type: "button", id: contentTag + data.id + "FollowButton", class: "btn button-full-width "});
-		if (data.socialStatus.follows.amFollowing) {
-			//already following
-			followButton.append($("<span>", {class: "glyphicon glyphicon-ok"})).append(" Following");
-			followButton.addClass("button-full");
-			followButton.attr("disabled", "disabled"); // no need to be clickable as already following
-		} else {
-			followButton.append($("<span>", {class: "glyphicon glyphicon-plus"})).append(" Follow");
-			followButton.addClass("button-line");
-			followButton.click(
-			
-
-				(function(id) {
-				return function(e) {
-
-					if (!user) {
-						//not logged in, so redirect to login page
-						window.open("/auth", "_self");
-					}
-					sendFollow(id, true, function(err, followResult) {
-						if (err) {
-							//eat this
-						} else {
-							if (followResult) {
-								//now following
-								var button = $("#" + contentTag + id + "FollowButton");
-								button.empty();
-								button.append($("<span>", {class: "glyphicon glyphicon-ok"})).append(" Following");
-								button.removeClass("button-line");
-								button.addClass("button-full");
-								button.attr("disabled", "disabled"); // no need to be clickable as already following
-							}
-						}
-					});
-				}
-			})(data.id));
-		}
+		var userName = $("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.displayName);
+		
 
 		row.append($("<td>", {class: "user-image-column"}).append(userImage));
 		row.append($("<td>", {class: "user-name-column"}).append(userName));
-		if (user && user.id == data.id) {
-			//it's me, so don't show the button!
-			row.append($("<td>"));
-		} else {
-			row.append($("<td>").append(followButton));
-		}
 
 		table.append(row);
 	}
+
+	return table;
+}
+
+function createLikersList(id, contentTag) {
+	var container = $("<div>", {id: contentTag + id + "LikersList", class: "likersList", "data-id": id});
+
+	var table = $("<table width='100%'>");
 
 	container.append(table);
 

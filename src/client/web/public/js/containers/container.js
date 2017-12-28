@@ -88,64 +88,14 @@ function initializeContainerAndStartFetchingContent(container, entityId, content
 		container.append(createFeedList(entityId, contentTag));
 	}
 
-	//now start infinite scroll 
-	startInfiniteScroll(getURL, entityId, contentTag, viewType);
-}
-
-var watchScrolls = false; // Global Variable - to determine if we need to actively monitor scrolls (set to false when we are already in the midst of fetching new content to avoid duplication)
-function startInfiniteScroll(getURL, entityId, contentTag, defaultViewType) {
-	//console.log("startInfiniteScroll, getURL = " + getURL + ", entityId = " + entityId + ", contentTag = " + contentTag + ", defaultViewType = " + defaultViewType);
-	jQuery.data(document.body, entityId + contentTag + "LastFetchedTimestamp", 0);
-	fetchMoreContent(getURL, entityId, contentTag, defaultViewType);
-
-	$(window).scroll(function() {
-		// Fetch variables
-
-		if (!watchScrolls) {
-			return;
-		}
-
-		var scrollTop = $(document).scrollTop();
-		var bodyHeight = $(document).height() - $(window).height();
-		var scrollPercentage = (scrollTop / bodyHeight);
-		// if the scroll is more than 90% from the top, load more content.
-		if(scrollPercentage > 0.9) {
-			// Load content
-			watchScrolls = false;
-
-			fetchMoreContent(getURL, entityId, contentTag, defaultViewType);
-		}
+	//now start infinite scroll!
+	startFetchOnScroll(getURL, function(list) {
+		//process data
+		appendContent(list, entityId, contentTag, viewType);
+	}, function(err) {
+		//done processing all data
+		//err means we ended a session mid-way
 	});
-}
-
-function fetchMoreContent(getURL, entityId, contentTag, defaultViewType) {
-	var lastFetchedTimestamp = jQuery.data(document.body, entityId + contentTag + "LastFetchedTimestamp");
-	getURL = updateQueryStringParameter(getURL, "ts", lastFetchedTimestamp);
-	$.getJSON(getURL, function(output) {
-		if (output.ts > 0) {
-			appendContent(output.list, entityId, contentTag, defaultViewType);
-			
-			jQuery.data(document.body, entityId + contentTag + "LastFetchedTimestamp", output.ts);
-
-			//If the content is not able to fill the entire page, fetch more content
-			var bodyHeight = $(document).height() - $(window).height();
-			if (bodyHeight == 0) {
-				fetchMoreContent(getURL, entityId, contentTag, defaultViewType);
-			} else {
-				//content fits, so we will now start relying on the window scroll events as ther scrolls to the bottom
-				watchScrolls = true;
-			}
-		} else {
-			//no longer need to listen to scrolls
-			endInfiniteScroll(entityId, contentTag);
-		}
-	});
-}
-
-function endInfiniteScroll(entityId, contentTag) {
-	$(window).unbind('scroll');
-	watchScrolls = false;
-	jQuery.data(document.body, entityId + contentTag + "LastFetchedTimestamp", 0);
 }
 
 function appendContent(list, entityId, contentTag, defaultViewType) {

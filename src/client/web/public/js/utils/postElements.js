@@ -184,7 +184,7 @@ function createThumbnailElement(data, contentTag, createLink) {
 
 	//container for comments, if any
 	var commentPopupHeader = $("<h2>").append("Comments");
-	var commentPopupBody = createCommentsContainer(data, contentTag);
+	var commentPopupBody = createCommentsContainer(data.id, contentTag);
 	element.append(createPopupElement(contentTag + data.id + "CommentsPopup", "modal-medium", commentPopupHeader, null, commentPopupBody, function() {
 		showHideCommentsList(data.id, contentTag, false);
 	}));
