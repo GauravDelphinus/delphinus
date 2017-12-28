@@ -626,16 +626,15 @@ module.exports = {
 		"comment" : {
 			"type" : ["comment"],
 			"id" : "id",
-			"compareDate" : "number",
-			"postedDate" : "number",
+			"postedDate" : "timestamp",
 			"postedByUser" : "postedByUser",
-			"socialStatus" : {
-				"likes" : {
+			"text" : "string"
+		},
+		"commentSocialInfo": {
+			"likes" : {
 					"numLikes" : "number",
 					"amLiking" : [true , false]
-				},
-			},
-			"text" : "string"
+				}
 		},
 		"entry" : {
 			"type" : ["entry"],

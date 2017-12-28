@@ -1,5 +1,5 @@
 
-function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
+function createSocialStatusSectionForComment(data, parentId, contentTag, isReply) {
 	var socialStatusSection = $("<div>", {class: "socialStatusSectionSimple"});
 	var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "button-link text-plain-small separator"}).append("Like");
 	socialStatusSection.append(likeButton);
@@ -36,19 +36,21 @@ function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 	replyButton.click(function(e) {
 		if (user) {
 			//add a new reply input box only if there isn't already one.
-			if (!$("#" + contentTag + ((isReply) ? (parentId) : (data.id)) + "NewCommentText").length) {
-				//for reply of reply, the parent is still the top comment
-				var newCommentElement = createNewCommentElement(true, (isReply) ? (parentId) : (data.id), data.id, contentTag);
-				appendNewCommentElement(newCommentElement, (isReply) ? (parentId) : (data.id), contentTag, null, true);
+			var newReplyParentId = (isReply) ? (parentId) : (data.id);
+			if (!$("#" + contentTag + newReplyParentId + "NewCommentText").length) {
+				//*** NOTE ***** 
+				// Replying to a reply attaches the new reply to the current reply's parent, not to the reply
+				// This is to keep nesting to a max 2 levels.
+				
+				var newCommentElement = createNewCommentElement(true, newReplyParentId, data.id, contentTag);
+				appendNewCommentElement(newCommentElement, newReplyParentId, contentTag, null, true);
 			}
-			$("#" + contentTag + ((isReply) ? (parentId) : (data.id)) + "NewCommentText").focus(); // set focus in the input field
+			$("#" + contentTag + newReplyParentId + "NewCommentText").focus(); // set focus in the input field
 		} else {
 			window.open("/auth", "_self");
 		}
 		
 	});
-
-
 
 	// Allow delete for comments posted by currently logged-in user
 	if (user && user.id == data.postedByUser.id) {
@@ -68,7 +70,7 @@ function createSocialStatusSectionComment(data, parentId, contentTag, isReply) {
 
 	socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 
-	var numLikes = $("<span>", {id: contentTag + data.id + "NumLikes", class: "secondary-info separator-small"}).append(data.socialStatus.likes.numLikes);
+	var numLikes = $("<span>", {id: contentTag + data.id + "NumLikes", class: "secondary-info separator-small"}).append("0");
 	socialStatusSection.append(numLikes);
 
 	socialStatusSection.append($("<span>", {text: " Likes", class: "secondary-info"}));
@@ -112,15 +114,8 @@ function sendLikeAction(restURL, likeAction, callback) {
 	});
 }
 
-function appendSocialSection(appendTo, data, contentTag, showStatusElement, showActionElement) {
-	if (showStatusElement) {
-		appendTo.append(createSocialStatusSectionElement(data, contentTag));
-	}
-	
-	if (showActionElement) {
-		appendTo.append(createSocialActionsSectionElement(data, contentTag));
-	}
 
+function refreshSocialInfo(data, contentTag) {
 	var getURL;
 	if (data.type == "challenge") {
 		getURL = "/api/challenges/" + data.id + "/social";
@@ -128,6 +123,8 @@ function appendSocialSection(appendTo, data, contentTag, showStatusElement, show
 		getURL = "/api/entries/" + data.id + "/social";
 	} else if (data.type == "user") {
 		getURL = "/api/users/" + data.id + "/social";
+	} else if (data.type == "comment") {
+		getURL = "/api/comments/" + data.id + "/social";
 	}
 	$.getJSON(getURL, function(socialInfo) {
 		if (socialInfo.likes) {
@@ -484,7 +481,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		socialActionsSection.append(commentButton);
 		
 		commentButton.click(function(e) {
-			showHideCommentsList(data.id, contentTag, true);	
+			showHideCommentsList(data.id, contentTag, true);
 		});
 	}
 

@@ -55,5 +55,5 @@ function setupEntriesTab() {
 function setupCommentsTab() {
 	var tabDiv = appendNewTab(challengeId, "comments", "Comments");
 	//note: setting the contentTag to "main" below as we want the comments to be associated with the main element
-	createAndAppendContentContainer(tabDiv, challengeId, "main", [{type: "comments"}], "/api/comments/?entityId=" + challengeId + "&sortBy=reverseDate");
+	createAndAppendCommentsContainer(tabDiv, challengeId, "main", "/api/comments?entityId=" + challengeId);
 }

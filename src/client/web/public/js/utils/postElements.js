@@ -18,7 +18,9 @@ function createMainElement(data, contentTag) {
 		element.append(createPostHeaderElement(data, contentTag));
 	}
 
-	appendSocialSection(element, data, contentTag, true, true);
+	element.append(createSocialStatusSectionElement(data, contentTag));
+	element.append(createSocialActionsSectionElement(data, contentTag));
+	refreshSocialInfo(data, contentTag);
 
 	//container for likers list, if any
 	element.append(createLikersPopupElement(data, contentTag));
@@ -79,10 +81,14 @@ function createScrollableElement(data, contentTag, compressed = false) {
 
 	element.append(createSocialStatusSectionElement(data, contentTag, !compressed));
 
-	appendSocialSection(element, data, contentTag, true, !compressed);
+	element.append(createSocialStatusSectionElement(data, contentTag));
+	if (!compressed) {
+		element.append(createSocialActionsSectionElement(data, contentTag));
+	}
+	refreshSocialInfo(data, contentTag);
 	
 	//container for comments, if any
-	element.append(createCommentsContainer(data, contentTag));
+	element.append(createCommentsContainer(data.id, contentTag));
 
 	//container for likers list, if any
 	element.append(createLikersPopupElement(data, contentTag));
@@ -127,10 +133,16 @@ function createFeedElement(data, contentTag) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
-	appendSocialSection(element, data, contentTag, true, true);
+	element.append(createSocialStatusSectionElement(data, contentTag));
+	element.append(createSocialActionsSectionElement(data, contentTag));
+	refreshSocialInfo(data, contentTag);
 
 	//container for comments, if any
-	element.append(createCommentsContainer(data, contentTag));
+	if (data.activity && data.activity.type && data.activity.type == "comment") {
+		element.append(createCommentsContainerForActivity(data.id, data.activity, contentTag));
+	} else {
+		element.append(createCommentsContainer(data.id, contentTag));
+	}
 
 	//container for likers list, if any
 	element.append(createLikersPopupElement(data, contentTag));
@@ -166,13 +178,15 @@ function createThumbnailElement(data, contentTag, createLink) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
-	appendSocialSection(element, data, contentTag, true, false);
+	element.append(createSocialStatusSectionElement(data, contentTag));
+	element.append(createSocialActionsSectionElement(data, contentTag));
+	refreshSocialInfo(data, contentTag);
 
 	//container for comments, if any
 	var commentPopupHeader = $("<h2>").append("Comments");
 	var commentPopupBody = createCommentsContainer(data, contentTag);
 	element.append(createPopupElement(contentTag + data.id + "CommentsPopup", "modal-medium", commentPopupHeader, null, commentPopupBody, function() {
-		showHideCommentsList(contentTag + data.id, false);
+		showHideCommentsList(data.id, contentTag, false);
 	}));
 
 	//container for likers list, if any

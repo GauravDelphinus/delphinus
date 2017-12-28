@@ -297,7 +297,7 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 
 		});
 	} else {
-		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + "'})-[r:LIKES]->(c:Challenge {id: '" + challengeId + "'}) " +
+		var cypherQuery = "MATCH (u:User {id: '" + userId + "'})-[r:LIKES]->(c:Challenge {id: '" + challengeId + "'}) " +
 			" DELETE r " +
 			" RETURN COUNT(r);";
 

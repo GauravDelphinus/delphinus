@@ -1,130 +1,87 @@
+
 /*
-function createCommentsSectionTrimmed(data, contentTag) {
-	var socialStatusSection = $("<div>", {class: "commentsSectionTrimmed"});
-	var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "buttonSimple"}).append("Like");
-	var replyButton = $("<button>", {id: contentTag + data.id + "ReplyButton", type: "button", class: "buttonSimple"}).append("Reply");
-	var likeIcon = $("<span>", {id: contentTag + data.id + "LikeIcon", class: "glyphicon glyphicon-thumbs-up"});
-	var numLikes = $("<span>", {id: contentTag + data.id + "NumLikes"}).append(" " + data.socialStatus.numLikes);
-
-	var postedDate = $("<span>", {class: "commentPostedDate", text: "" + formatDate(data.postedDate)});
-
-	socialStatusSection.append(likeButton);
-	socialStatusSection.append(replyButton);
-	socialStatusSection.append(likeIcon);
-	socialStatusSection.append(numLikes);
-	socialStatusSection.append("     ");
-	socialStatusSection.append(postedDate);
-
-	var restURL = "/api/comments/" + data.id + "/like";
-	if (user) {
-		$.getJSON(restURL, function(result) {
-			if (result.likeStatus == "on") {
-				//show button as depressed
-				$("#" + contentTag + data.id + "LikeButton").addClass("active");
-			}
-		})
-		.fail(function() {
-			//eat this
-		});
-	}
-
-	likeButton.click(function(e) {
-		if (user) {
-			sendLikeAction(restURL, !$("#" + this.id).hasClass("active"), function(err, likeStatus) {
-				if (err) {
-					// eat this
-				} else {
-					var numLikes = parseInt($("#" + contentTag + data.id + "NumLikes").text());
-					if (likeStatus) {
-						$("#" + contentTag + data.id + "LikeButton").addClass("active");
-						$("#" + contentTag + data.id + "NumLikes").text(" " + (numLikes + 1));
-					} else {
-						$("#" + contentTag + data.id + "LikeButton").removeClass("active");
-						$("#" + contentTag + data.id + "NumLikes").text(" " + (numLikes - 1));
-					}
-				}
-			});
-		} else {
-			window.open("/auth", "_self");
-		}
-	
-	});
-
-	replyButton.click(function(e) {
-		//add a new reply input box only if there isn't already one.
-		if (!$("#" + contentTag + data.id + "NewCommentText").length) {
-			var newCommentElement = createNewCommentElement(true, data.id, contentTag);
-			appendNewCommentElement(newCommentElement, data.id, contentTag, null, true);
-		}
-		
-	});
-
-	return socialStatusSection;
-}
+	Create a new comments list and container, and fetch new comments using the getURL
+	Append the received comments to the container, and also append the new comment element (or Sign in button)
 */
+function createAndAppendCommentsContainer(appendTo, entityId, contentTag, getURL) {
+	var container = createCommentsList(entityId, contentTag);
+	var holder = j.CommentsContainer(entityId, contentTag).create();
+	holder.append(container);
+
+	appendTo.append(holder);
+
+	refreshCommentsList(entityId, contentTag);
+}
 
 /**
 	Show or Hide the Comments List associated with the given Entity.
 	parentId - Entity id to which the list is attached (eg. Challenge, Entry, etc.)
 **/
-function showHideCommentsList(parentId, contentTag, show) {
+function showHideCommentsList(entityId, contentTag, show) {
 	//comments list is currently hidden, so fetch comments and show the list
+	console.log("showHideCommentsList, entityId: " + entityId + ", contentTag: " + contentTag + ", show: " + show);
 	if (show) {
-		if ($("#" + contentTag + parentId + "CommentsContainer").is(":empty")) { 
-			$.getJSON("/api/comments/?entityId=" + parentId + "&sortBy=reverseDate", function(list) {
-				var commentsList = createCommentsList(parentId, contentTag, list);
-				$("#" + contentTag + parentId + "CommentsContainer").empty().append(commentsList);
-				$("#" + contentTag + parentId + "NewCommentText").focus(); // set focus in the input field
-			})
-			.fail(function() {
-				//eat this
-			});
+		//empty out and refresh the comments list
+		j.CommentsList(entityId, contentTag).get().empty();
+		refreshCommentsList(entityId, contentTag);
 
-			//if we're showing the comments list on a popup, then show the popup
-			if ($("#" + contentTag + parentId + "CommentsPopup").length) {
-				$("#" + contentTag + parentId + "CommentsPopup").show();
-			}
-		} else {
-			//if the comments list is already shown, make sure to focus in into the new comment text box
-			$("#" + contentTag + parentId + "NewCommentText").focus(); // set focus in the input field
-		}
+		//if we're showing the comments list on a popup, then show the popup
+		if (j.CommentsPopup(entityId, contentTag).get().length) {
+			j.CommentsPopup(entityId, contentTag).get().show();
+		}	
 
 		//make sure the tab is 'active', not just 'shown'
-		$('#' + parentId + 'Tabs a[href="#comments"]').tab('show');
+		$('#' + entityId + 'Tabs a[href="#comments"]').tab('show');
 	} else {
-		if (!$("#" + contentTag + parentId + "CommentsContainer").is(":empty")) {
-			$("#" + contentTag + parentId + "CommentsContainer").empty();
+		if (!j.CommentsList(entityId, contentTag).get().is(":empty")) {
+			j.CommentsList(entityId, contentTag).get().empty();
 
 			//if we're showing the comments list on a popup, then hide the popup
-			if ($("#" + contentTag + parentId + "CommentsPopup").length) {
-				$("#" + contentTag + parentId + "CommentsPopup").hide();
+			if (j.CommentsPopup(entityId, contentTag).get().length) {
+				j.CommentsPopup(entityId, contentTag).get().hide();
 			}
 		}
 	}
 }
 
-function createCommentsContainer(data, contentTag) {
-	var container = $("<div>", {id: contentTag + data.id + "CommentsContainer"}).empty();
+function createCommentsContainer(entityId, contentTag) {
+	var container = createCommentsList(entityId, contentTag);
+	var holder = j.CommentsContainer(entityId, contentTag).create();
+	holder.append(container);
 
-	if (data.activity && data.activity.comment) {
-		container.append(createCommentElement(data.activity.comment, data.id, contentTag, false));
+	return holder;
+}
 
-		//add the New Comment text box of the Sign-in button
-		if (user) {
-			//show new comment box if already logged in
-			var newCommentElement = createNewCommentElement(false, data.id, data.id, contentTag);
-			appendNewCommentElement(newCommentElement, data.id, contentTag, container, false);
-		} else {
-			var signInToCommentElement = createSignInToCommentElement();
-			container.append(signInToCommentElement);
-		}
+function createCommentsContainerForActivity(entityId, activity, contentTag) {
+	var container = createCommentsList(entityId, contentTag);
+	var holder = j.CommentsContainer(entityId, contentTag).create();
+	holder.append(container);
+
+	if (activity && activity.type == "comment" && activity.commentId) {
+		var getURL = "/api/comments/" + activity.commentId;
+		$.getJSON(getURL, function(commentInfo) {
+			var container = j.CommentsList(entityId, contentTag).get();
+			container.empty();
+
+			container.append(createCommentElement(commentInfo, entityId, contentTag, false));
+
+			//Now append either the New Commet Input field (if user is signed in) or the Sign in Button
+			if (user) {
+				//show new comment box if already logged in
+				var newCommentElement = createNewCommentElement(false, entityId, entityId, contentTag);
+				appendNewCommentElement(newCommentElement, entityId, contentTag, container, false);
+			} else {
+				var signInToCommentElement = createSignInToCommentElement();
+				container.append(signInToCommentElement);
+			}
+		});
 	}
 
-	return container;
+	return holder;
 }
 
 function createCommentElement(data, parentId, contentTag, isReply) {
-	var element = $("<div>", {id: contentTag + data.id + "CommentElement", class: "commentElement"});
+	var element = j.CommentElement(data.id, contentTag).create().prop("class", "commentElement");
 	if (isReply) {
 		element.addClass("replyElement");
 	}
@@ -151,7 +108,8 @@ function createCommentElement(data, parentId, contentTag, isReply) {
 
 	tdRight.append("<br>");
 
-	tdRight.append(createSocialStatusSectionComment(data, parentId, contentTag, isReply));
+	tdRight.append(createSocialStatusSectionForComment(data, parentId, contentTag, isReply));
+	refreshSocialInfo(data, contentTag);
 
 	tr.append(tdRight);
 
@@ -161,8 +119,12 @@ function createCommentElement(data, parentId, contentTag, isReply) {
 	return element;
 }
 
+/*
+	Create a new Comment element (input text area) given the parentId and entityId
+	Note that parentId and entityId will be same for top-level comments
+*/
 function createNewCommentElement(isReply, parentId, entityId, contentTag) {
-	var element = $("<div>", {id: contentTag + parentId + "NewCommentElement", class: "commentElement"});
+	var element = j.NewCommentElement(parentId, contentTag).create().prop("class", "commentElement");
 	if (isReply) {
 		element.addClass("replyElement");
 	}
@@ -179,11 +141,11 @@ function createNewCommentElement(isReply, parentId, entityId, contentTag) {
 
 	var tdRight = $("<td>", {class: "commentsRightColumn"});
 
-	var input = $("<input>", {type: "text", id: contentTag + parentId + "NewCommentText", class:"form-control", placeholder: "Add your comment here"});
+	var input = j.NewCommentText(parentId, contentTag).create().prop("class", "form-control").prop("placeholder", "Add your comment here");
 
 	tdRight.append(input);
 
-	//set up submit logic
+	//post the comment to the server when the user hits ENTER key
 	input.on('keyup', function (e) {
 	    if (e.keyCode == 13) {
 	        // Do something
@@ -201,20 +163,26 @@ function createNewCommentElement(isReply, parentId, entityId, contentTag) {
 				data: JSON.stringify(jsonObj)
 			})
 			.done(function(data, textStatus, jqXHR) {
-		    	//appendCommentElement("comments", data);
-		    	var commentElement = createCommentElement(data, parentId, contentTag, isReply);
-		    	var atEnd = (!isReply);
+		    	var commentData = {
+		    		id: data.id,
+		    		postedDate: jsonObj.created,
+		    		type: "comment",
+		    		text: jsonObj.text,
+		    		postedByUser: {
+		    			id: user.id,
+		    			displayName: user.displayName,
+		    			image: user.image		    		
+		    		}
+		    	};
+
+		    	//comment creation on server was successful, so append the new comment element to the list
+		    	var commentElement = createCommentElement(commentData, parentId, contentTag, isReply);
 		    	appendCommentElement(commentElement, parentId, contentTag, isReply);
-		    	if (isReply) {
-		    		$("#" + contentTag + parentId + "NewCommentElement").remove();
-		    	} else {
-		    		$("#" + contentTag + parentId + "NewCommentText").prop("value", "").blur().focus();
-		    		
-		    		//update the numComments in the Social Status section
-		    		var numComments = parseInt($("#" + contentTag + parentId + "NumComments").text());
-		    		numComments++;
-		    		updateComments(contentTag, parentId, numComments);
-		    		$("#" + contentTag + parentId + "CommentsButton").show();
+
+		    	if (isReply) { //remove the input text if we just committed a reply
+		    		j.NewCommentElement(parentId, contentTag).get().remove();
+		    	} else { //empty out the input text and set it to focus (ready for any new comment)
+		    		j.NewCommentText(parentId, contentTag).get().prop("value", "").blur().focus();
 		    	}
 			})
 			.fail(function(jqXHR, textStatus, errorThrown) {
@@ -231,48 +199,51 @@ function createNewCommentElement(isReply, parentId, entityId, contentTag) {
 	return element;
 }
 
+/*
+	Append the new comment element (input text) to the provided container
+	In case of replies, the new comment needs to be added to the parent's last child
+	while in case of top level comment, it will be added as the last element of the container
+*/
 function appendNewCommentElement(newCommentElement, parentId, contentTag, container, isReply) {
-	//var newCommentElement = createNewCommentElement(false, entityId);
-	//$("#" + parentId).append(newCommentElement);
 	if (!isReply) { //new top level comment, append to the end of the list
 		//parentElementId should be the container ID
 		container.append(newCommentElement);
 	} else {
 		//adding a new reply
-		var parentElement = $("#" + contentTag + parentId + "CommentElement");
+		var parentElement = j.CommentElement(parentId, contentTag).get();
 		var current = parentElement;
 		var next;
 		while (true) {
 			next = current.next();
-			if (next.length == 0) {
+			if (next.length == 0) { //reached the end
 				break;
 			}
 			if (next.hasClass("replyElement")) {
-			} else {
+			} else { //reached end of current hierarchy
 				break;
 			}
 			current = next;
 		}
-		//var nextSibling = parentElement.next(":not(.replyElement)");
+
 		if (next.length == 0) {
-			//append at end
+			//append at end of list
 			parentElement.parent().append(newCommentElement);
 		} else {
+			//append before the next major element
 			next.before(newCommentElement);
 		}
 	}
 
-	$("#" + parentId + "NewCommentText").focus(); // set focus in the input field
+	//after successfully appending the new text element, set focus on it
+	j.NewCommentText(parentId, contentTag).get().focus();
 }
 
 function appendCommentElement(commentElement, parentId, contentTag, isReply) {
-	//var commentElement = createCommentElement(data);
 	if (!isReply) {
-		$("#" + contentTag + parentId + "NewCommentElement").before(commentElement);
-		//$("#" + parentId + "CommentsList").append(commentElement);
+		j.NewCommentElement(parentId, contentTag).get().before(commentElement);
 	} else {
 		//reply
-		var parentElement = $("#" + contentTag + parentId + "CommentElement");
+		var parentElement = j.CommentElement(parentId, contentTag).get();
 		var current = parentElement;
 		var next;
 		while (true) {
@@ -297,32 +268,21 @@ function appendCommentElement(commentElement, parentId, contentTag, isReply) {
 }
 
 function createCommentsList(id, contentTag) { //id is the entity id
-	var container = $("<div>", {id: id + contentTag + "CommentsList", class: "commentsList", "data-id" : id});
-
-	if (user) {
-		//show new comment box if already logged in
-		var newCommentElement = createNewCommentElement(false, id, id, contentTag);
-		appendNewCommentElement(newCommentElement, id, contentTag, container, false);
-	} else {
-		var signInToCommentElement = createSignInToCommentElement();
-		container.append(signInToCommentElement);
-	}
+	var container = j.CommentsList(id, contentTag).create().prop("class", "commentsList").prop("data-id", id);
 	
 	return container;
 }
 
-function createCommentsListOld(id, contentTag, list) { //id is the entity id
-	var container = $("<div>", {id: contentTag + id + "CommentsList", class: "commentsList", "data-id" : id});
-
+function appendCommentsList(container, entityId, contentTag, list) { //id is the entity id
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
 
-		var commentElement = createCommentElement(data, id, contentTag, false);
+		var commentElement = createCommentElement(data, entityId, contentTag, false);
 		container.append(commentElement);
 
 		//passing the right array element to the callback by using the technique desribed at https://stackoverflow.com/questions/27364891/passing-additional-arguments-into-a-callback-function
 		(function(id) {
-			$.getJSON("/api/comments/?entityId=" + id + "&sortBy=reverseDate", function(replyList) {
+			$.getJSON("/api/comments/?entityId=" + id, function(replyList) {
 				if (replyList.length > 0) {
 					for (var j = 0; j < replyList.length; j++) {
 						var replyData = replyList[j];
@@ -338,18 +298,9 @@ function createCommentsListOld(id, contentTag, list) { //id is the entity id
 		})(data.id);
 	}
 
-	if (user) {
-		//show new comment box if already logged in
-		var newCommentElement = createNewCommentElement(false, id, id, contentTag);
-		appendNewCommentElement(newCommentElement, id, contentTag, container, false);
-	} else {
-		var signInToCommentElement = createSignInToCommentElement();
-		container.append(signInToCommentElement);
-	}
-	
-
 	return container;
 }
+
 
 function updateComments(contentTag, entityId, numComments) {
 	$("#" + contentTag + entityId + "NumComments").text(numComments);
@@ -372,14 +323,55 @@ function createSignInToCommentElement() {
         Refresh the comments list attached to the given entity (parentId)
         This assumes that the comments list is already showing to the user
 **/
-function refreshCommentsList(parentId, contentTag) {
-	console.log("refreshCommentsList, parentId = " + parentId + ", contentTag = " + contentTag);
-        $.getJSON("/api/comments/?entityId=" + parentId + "&sortBy=reverseDate", function(list) {
-                var commentsList = createCommentsList(parentId, contentTag, list);
-                $("#" + contentTag + parentId + "CommentsContainer").empty().append(commentsList);
-                $("#" + contentTag + parentId + "NewCommentText").focus(); // set focus in the input field
+function refreshCommentsList(entityId, contentTag) {
+	var getURL = "/api/comments?entityId=" + entityId;
+	$.getJSON(getURL, function(list) {
+		var container = j.CommentsList(entityId, contentTag).get();
+		container.empty();
 
-                //also, update the counter
-                $("#" + contentTag + parentId + "NumComments").text(list.length);
-        });
+		appendCommentsList(container, entityId, contentTag, list);
+
+		//Now append either the New Commet Input field (if user is signed in) or the Sign in Button
+		if (user) {
+			//show new comment box if already logged in
+			var newCommentElement = createNewCommentElement(false, entityId, entityId, contentTag);
+			appendNewCommentElement(newCommentElement, entityId, contentTag, container, false);
+		} else {
+			var signInToCommentElement = createSignInToCommentElement();
+			container.append(signInToCommentElement);
+		}
+	});
 }
+
+//jQuery helper functions to get and create elements
+var j = {
+	createHelperObject: function(entityId, contentTag, type, name) {
+		var id = contentTag + entityId + name;
+		return {
+			get: function() {
+				return $("#" + id);
+			},
+			create: function() {
+				return $(type, {id: id});
+			}
+		}
+	},
+	CommentsList: function(entityId, contentTag) {
+		return this.createHelperObject(entityId, contentTag, "<div>", "CommentsList");
+	},
+	CommentsContainer: function(entityId, contentTag) {
+		return this.createHelperObject(entityId, contentTag, "<div>", "CommentsContainer");
+	},
+	NewCommentElement: function(entityId, contentTag) {
+		return this.createHelperObject(entityId, contentTag, "<div>", "NewCommentElement");
+	},
+	CommentElement: function(entityId, contentTag) {
+		return this.createHelperObject(entityId, contentTag, "<div>", "CommentElement");
+	},
+	CommentsPopup: function(entityId, contentTag) {
+		return this.createHelperObject(entityId, contentTag, "<div>", "CommentsPopup");
+	},
+	NewCommentText: function(entityId, contentTag) {
+		return this.createHelperObject(entityId, contentTag, "<input>", "NewCommentText");
+	}
+};
