@@ -16,5 +16,4 @@ $(document).ready(function(){
 
 function setupMainItem() {
 	createAndAppendContentContainer($("#users"), 0, "users", [{type: "thumbnail"}], "/api/users");
-
 }

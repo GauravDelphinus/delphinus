@@ -23,30 +23,50 @@ function fetchNextBatch(getURL, processData, done) {
 }
 
 /************** FETCH BATCH WISE DATA ON SCROLL ********************/
-var gSessionID = 0;
-function startFetchOnScroll(getURL, processData, done) {
-	gSessionID = Math.random();
-	fetchNextBatchOnScroll(getURL, processData, done, gSessionID);
+var gSessionList = new Map();
+
+/*
+	Start a new Fetching on Scroll session
+	sessionKey is a string that identifies the particular workflow.  It will be ensured
+	that no more than one session can co-exist for the same sessionKey at any time.
+	This is to avoid redundant client/server communication.
+*/
+function startFetchOnScroll(getURL, processData, done, sessionKey) {
+	var sessionID = Math.random();
+	gSessionList.set(sessionKey, sessionID);
+	fetchNextBatchOnScroll(getURL, processData, done, sessionKey, sessionID);
 }
 
+function endFetchOnScrollSession(sessionKey) {
+	gSessionList.delete(sessionKey);
+}
+
+function logMapElements(value, key, map) {
+    console.log(`m[${key}] = ${value}`);
+}
 /*
 	Fetch batchwise data from the given getURL
 	Data is fetched only if the user is scrolling beyond 90% scroll position
 	processData: called with the list from the next batch
 	done: called when you're finished processing all data
 */
-function fetchNextBatchOnScroll(getURL, processData, done, sessionID) {
-	if (sessionID != gSessionID) {
+function fetchNextBatchOnScroll(getURL, processData, done, sessionKey, sessionID) {
+	//console.log("fetchNextBatchOnScroll, sessionKe: " + sessionKey + ", sessionID: " + sessionID + ", map:");
+	//gSessionList.forEach(logMapElements);
+
+	if (sessionID != gSessionList.get(sessionKey)) {
 		return done(new Error("Ending session mid-way"));
 	}
 
 	$.getJSON(getURL, function(output) {
-		if (sessionID != gSessionID) {
+		if (sessionID != gSessionList.get(sessionKey)) {
 			return done(new Error("Ending session mid-way"));
 		}
 
+		//console.log('calling processData with list: ' + JSON.stringify(output.list));
 		processData(output.list);
 		if (output.list.length <= 0) {
+			endFetchOnScrollSession(sessionKey);
 			return done(null);
 		}
 
@@ -54,7 +74,7 @@ function fetchNextBatchOnScroll(getURL, processData, done, sessionID) {
 		if (bodyHeight <= 0) {
 			//If the content is not able to fill the entire page, fetch more content
 			getURL = updateQueryStringParameter(getURL, "ts", output.ts);
-			fetchNextBatchOnScroll(getURL, processData, done, sessionID);
+			fetchNextBatchOnScroll(getURL, processData, done, sessionKey, sessionID);
 		} else {
 			//content is fitting the page, so now rely on scroll events to decide when to fetch more content
 			$(window).scroll(function() {
@@ -69,7 +89,7 @@ function fetchNextBatchOnScroll(getURL, processData, done, sessionID) {
 					$(window).unbind('scroll');
 
 					getURL = updateQueryStringParameter(getURL, "ts", output.ts);
-					fetchNextBatchOnScroll(getURL, processData, done, sessionID);
+					fetchNextBatchOnScroll(getURL, processData, done, sessionKey, sessionID);
 				}
 			});
 		}

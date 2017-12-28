@@ -22,7 +22,7 @@ function getUser(userId, done) {
         	type: "user",
         	id: userId,
         	image: user.image,
-        	displayName: user.display_name,
+        	caption: user.display_name,
         	link: config.url.user + userId
         }
 
@@ -120,7 +120,7 @@ function getUsers(meId, followedId, followingId, likedEntityId, lastFetchedTimes
 				type: "user",
 	        	id: user.id,
 	        	image: user.image,
-	        	displayName: user.display_name,
+	        	caption: user.display_name,
 	        	link: config.url.user + user.id
 	        }
 

@@ -88,14 +88,14 @@ function initializeContainerAndStartFetchingContent(container, entityId, content
 		container.append(createFeedList(entityId, contentTag));
 	}
 
-	//now start infinite scroll!
+	//now start infinite scroll!  Pass the combination of contentTag + entityId as the sessionKey
 	startFetchOnScroll(getURL, function(list) {
 		//process data
 		appendContent(list, entityId, contentTag, viewType);
 	}, function(err) {
 		//done processing all data
 		//err means we ended a session mid-way
-	});
+	}, contentTag + entityId);
 }
 
 function appendContent(list, entityId, contentTag, defaultViewType) {
