@@ -256,7 +256,7 @@ module.exports = {
 		} else if (entityType == "user") {
 			data.id = entity.id;
 			data.imageURL = dynamicConfig.hostname + entity.image;
-			data.pageTitle = "User: " + entity.display_name + " | " + config.branding.siteName;
+			data.pageTitle = "User: " + entity.displayName + " | " + config.branding.siteName;
 			data.pageURL = dynamicConfig.hostname + config.url.user + entity.id;
 			data.pageDescription = "User";
 			data.imageType = mime.lookup(entity.image);

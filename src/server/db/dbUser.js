@@ -20,7 +20,7 @@ function getUser(userId, done) {
 
         var output = {
         	type: "user",
-        	id: userId,
+        	id: user.id,
         	image: user.image,
         	caption: user.display_name,
         	link: config.url.user + userId
