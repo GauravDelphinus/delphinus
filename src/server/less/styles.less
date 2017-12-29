@@ -32,6 +32,36 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 @entry-color-ultra-light: #f7fcff;
 @entry-color-light: #def2ff;
 
+@theme-dark-fill-color: rgba(0, 0, 0, 0.5);
+@theme-dark-fill-hover-color: #ee4c43;
+
+@theme-light-text-color: #ffffff;
+
+/************************** NEW THEME COLORS - DEC 2017 ***************************************/
+/********************* MAIN THEME SETTINGS **********************/
+
+/* DARK BG COLORS */
+@dark-bg-background-color-normal: rgba(0, 0, 0, 0.5);
+@dark-bg-background-color-hover: #ee4c43;
+
+@dark-bg-text-color-normal: #91949d;
+@dark-bg-text-color-strong: #ffffff;
+@dark-bg-text-color-hover: #ffffff;
+
+/* LIGHT BG COLORS */
+@light-bg-text-color-normal: #1a1c21;
+@light-bg-text-color-weak: #676969;
+@light-bg-text-color-ultra-weak: #8b99a0;
+
+/* COLORED TEXT */
+@colored-text-color-normal: #f643cf; /* reddish color */
+@colored-text-color-hover: #d4443e;
+
+.page-background {
+	background-image: url("http://static.tumblr.com/3nghtcy/cRImezufo/low_contrast_linen.png");
+	background-repeat: repeat;
+}
+
 /********************************* CENTER DISPLAY **************************/
 /*
 	The Center Display shows a centered container with a rounded
@@ -515,7 +545,9 @@ hr {
 body {
 	font-family: Source Sans Pro,Helvetica,Arial,sans-serif;
 	padding-top: 60px; /* Push content below the navbar */
-	background-color: @theme-neutral-color;
+	/* background-color: @theme-neutral-color; */
+    .page-background;
+
 }
 
 /*
@@ -560,6 +592,16 @@ img {
 .smallRoundedBottomCorners {
 	border-bottom-left-radius: 5px;
 	border-bottom-right-radius: 5px	
+}
+
+.mediumRoundedTopCorners {
+	border-top-left-radius: 10px;
+	border-top-right-radius: 10px;
+}
+
+.mediumRoundedBottomCorners {
+	border-bottom-left-radius: 10px;
+	border-bottom-right-radius: 10px	
 }
 
 .flex-parent {
@@ -1226,10 +1268,8 @@ input[type=range] .range-setting {
 .sidebar {
 	width: 100%;
 	margin: 0px 0px 10px 0px;
-	/* .floatingElement; */
-	.general-element;
 	overflow: hidden;
-	.floatingElement;
+	background: transparent;
 }
 
 .framelessSidebar {
@@ -1240,25 +1280,46 @@ input[type=range] .range-setting {
 
 .sidebarHeading {
 	width: 100%; 
-	padding: 5px 10px 5px 10px;
-	/* background-color: white; */
-	color: @theme-dominant-color;
+	
+	padding: 10px 20px 10px 20px;
+	margin: 1px;
 	.text-plain-medium;
+	.text-bold;
+	letter-spacing: 1px;
+	
+	.mediumRoundedTopCorners;
+	background-color: @dark-bg-background-color-normal;
+	color: @dark-bg-text-color-strong;
 }
 
 .sidebarContent {
-	padding: 10px;
-	.smallRoundedBottomCorners;
 }
 
-.sidebarLink {
+.sidebar-item {
+	margin: 1px;
+	.text-plain-small;
+	.text-all-caps;
+	letter-spacing: 1px;
+	font-weight: 700;
+	
+	background-color: @dark-bg-background-color-normal;
+}
+
+.sidebar-item:last-child {
+	.mediumRoundedBottomCorners;
+}
+
+.sidebar-item a {
+	padding: 10px 20px 10px 20px;
 	display: block;
-	.text-plain-medium;
-	color: @gray-dark;
+	text-decoration: none;
+	color: @dark-bg-text-color-normal;
 }
 
-.sidebarLink:hover {
-	color: @theme-dominant-color-dark;
+.sidebar-item a:hover {
+	text-decoration: none;
+	color: @dark-bg-text-color-strong;
+	background-color: @dark-bg-background-color-hover;
 }
 
 .sidebarSeparator {
@@ -1288,7 +1349,8 @@ input[type=range] .range-setting {
 
 /* Override bootstrap nav bar */
 .navbar-fixed-top {
-	background: @theme-neutral-color;
+	/* background: @theme-neutral-color; */
+	.page-background;
 }
 
 /* Override bootstrap color.  Custom color for all links in navbar */
@@ -1303,7 +1365,7 @@ already matches the navbar height */
 }
 
 .navbar-link {
-	color: @theme-dominant-color;
+	color: @theme-light-text-color;
 }
 
 ul.nav > li > a:hover {

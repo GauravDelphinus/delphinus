@@ -36,7 +36,9 @@ function createSimpleLinkList(list) {
 	for (var i = 0; i < list.length; i++) {
 		var item = list[i];
 		if (item.type && item.type == "link") {
-			listContent.append($("<a>", {class: "sidebarLink", href: item.link}).append(item.name));
+			var link = $("<div>", {class: "sidebar-item"});
+			link.append($("<a>", {href: item.link}).append(item.name));
+			listContent.append(link);
 		}
 	}
 
