@@ -138,7 +138,7 @@ function createComment(commentInfo, done) {
 		" MATCH (u:User {id: '" + commentInfo.userId + "'}) CREATE (c:Comment {" +
 		"id: '" + commentInfo.id + "', " + 
 		"created : '" + commentInfo.created + "', " + 
-		"text : '" + dataUtils.sanitizeStringForCypher(commentInfo.text) + "'" + 
+		"text : '" + dbUtils.sanitizeStringForCypher(commentInfo.text) + "'" + 
 		"})-[:POSTED_IN]->(e), (u)<-[r:POSTED_BY]-(c) RETURN c, u;";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){

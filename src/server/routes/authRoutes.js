@@ -217,7 +217,7 @@ var routes = function() {
 			facebook.logout(req.user.facebook.token, function(error, data) {
 				if (!error) {
 					//delete locally stored tokens
-					dataUtils.removeAccessForUser(req.user.id, "facebook", function(err) {
+					dbUser.removeAccessForUser(req.user.id, "facebook", function(err) {
 						console.log("removed from DB, req.session.user is " + JSON.stringify(req.session.user));
 
 						if (req.session.redirectTo) {
@@ -249,7 +249,7 @@ var routes = function() {
 			twitter.logout(req.user.twitter.token, req.user.twitter.tokenSecret, function(error, data) {
 				if (!error) {
 					//delete locally stored tokens
-					dataUtils.removeAccessForUser(req.user.id, "twitter", function(err) {
+					dbUser.removeAccessForUser(req.user.id, "twitter", function(err) {
 						console.log("removed from DB, req.session.user is " + JSON.stringify(req.session.user));
 
 						if (req.session.redirectTo) {

@@ -4,6 +4,7 @@ var dataUtils = require("../dataUtils");
 var config = require('../config');
 var dynamicConfig = require("../config/dynamicConfig");
 var logger = require("../logger");
+var dbUser = require("../db/dbUser");
 
 module.exports = function () {
 
@@ -39,7 +40,7 @@ module.exports = function () {
                 query.googleID = profile.id;
             }
 
-            dataUtils.findUser(query, function (error, user) {
+            dbUser.findUser(query, function (error, user) {
             	if (error) {
             		return done(error, null);
             	}
@@ -84,7 +85,7 @@ module.exports = function () {
 				// set last seen
 				user.activity = {lastSeen : (new Date()).getTime()};
                 
-                dataUtils.saveUser(user, function(err, user) {
+                dbUser.saveUser(user, function(err, user) {
                     if (err) {
                     	return done(err, null);
                     }

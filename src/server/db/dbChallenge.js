@@ -212,7 +212,7 @@ function createChallengeNode(challengeInfo, done) {
 		"id: '" + challengeInfo.id + "'," +
 		"image_type : '" + challengeInfo.imageType + "'," + 
 		"created : " + challengeInfo.created + "," + 
-		"title : '" + dataUtils.sanitizeStringForCypher(challengeInfo.title) + "'" +
+		"title : '" + dbUtils.sanitizeStringForCypher(challengeInfo.title) + "'" +
 		"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){

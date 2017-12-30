@@ -183,7 +183,7 @@ function createEntryNode(entryInfo, done) {
 
 	var cypherQuery = " MATCH (u:User {id: '" + entryInfo.userId + "'}) CREATE (e:Entry {" +
 					"id: '" + entryInfo.id + "', " + 
-					"caption: '" + dataUtils.sanitizeStringForCypher(entryInfo.title) + "', " + 
+					"caption: '" + dbUtils.sanitizeStringForCypher(entryInfo.title) + "', " + 
 					"created : " + entryInfo.created + ", " + 
 					"image_type: '" + entryInfo.imageType + "' " +
 					"})-[r:POSTED_BY]->(u) ";
@@ -284,7 +284,7 @@ function createImagesForEntry(entryData, steps, caption, done) {
 			var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
 			var targetImagePath = global.appRoot + config.path.cacheImages + info.sourceId + "-" + hash + "." + mime.extension(info.imageType);
 
-			applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, info.sourceImagePath, targetImagePath, info.imageType, singleStepList[i], dataUtils.escapeSingleQuotes(caption)));
+			applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, info.sourceImagePath, targetImagePath, info.imageType, singleStepList[i], dbUtils.escapeSingleQuotes(caption)));
 		}
 
 		var imagePaths = []; //list of image paths for each sub step

@@ -2,6 +2,7 @@ var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
 var dataUtils = require("../dataUtils");
 var config = require('../config');
+var dbUser = require("../db/dbUser");
 
 module.exports = function () {
 
@@ -15,7 +16,7 @@ module.exports = function () {
             query.localEmail = email;
             query.type = "extended"; // search emails not just in local, but other social accounts
 
-            dataUtils.findUser(query, function(err, user) {
+            dbUser.findUser(query, function(err, user) {
             	if (err) {
             		return done(err, null);
             	}
@@ -39,7 +40,7 @@ module.exports = function () {
                         }
                     }
 
-                    dataUtils.findUser(query, function (error, user) {
+                    dbUser.findUser(query, function (error, user) {
                     	if (error) {
                     		return done(error, null);
                     	}
@@ -62,7 +63,7 @@ module.exports = function () {
                         // set last seen
                     	user.activity = {lastSeen : (new Date()).getTime()};
                         
-                        dataUtils.saveUser(user, function(err, user) {
+                        dbUser.saveUser(user, function(err, user) {
                             if (err) {
                             	return done(err, null);
                             }
@@ -84,7 +85,7 @@ module.exports = function () {
             var query = {};
             query.localEmail = email;
 
-            dataUtils.findUser(query, function(err, user) {
+            dbUser.findUser(query, function(err, user) {
             	if (err) {
             		return done(err, null);
             	}
@@ -112,7 +113,7 @@ module.exports = function () {
                         }
                     }
 
-                    dataUtils.findUser(query, function (error, user) {
+                    dbUser.findUser(query, function (error, user) {
                     	if (error) {
                     		return done(error, null);
                     	}
@@ -136,7 +137,7 @@ module.exports = function () {
                         // set last seen
                     	user.activity = {lastSeen : (new Date()).getTime()};
 
-                        dataUtils.saveUser(user, function(err) {
+                        dbUser.saveUser(user, function(err) {
                             if (err) {
                             	return done(err, null);
                             }

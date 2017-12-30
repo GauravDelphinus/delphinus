@@ -118,7 +118,7 @@ var routes = function() {
 			}
 
 			var findUserQuery = {userID: req.params.userId};
-			dataUtils.findUser(findUserQuery, function(err, user) {
+			dbUser.findUser(findUserQuery, function(err, user) {
 				if (err) {
 					//user not found
 					logger.warn("Trying to update a user '" + req.params.userId + "' that doesn't exist. " + err);
@@ -254,7 +254,7 @@ var routes = function() {
 };
 
 function updateUserInDB(res, user, next) {
-	dataUtils.saveUser(user, function(err) {
+	dbuser.saveUser(user, function(err) {
 		next(err);
 	});
 }

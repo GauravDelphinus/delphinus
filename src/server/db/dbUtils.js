@@ -155,6 +155,16 @@ function entityNodeToClientData(label, entity, poster, category, entrySourceLabe
 	return output;
 }
 
+function escapeSingleQuotes(str) {
+	return str.replace(/'/g, "\\'");
+}
+
+function sanitizeStringForCypher(str) {
+	var out = str.replace(/\\/g, "\\\\");
+	out = out.replace(/'/g, "\\'");
+	return out;
+}
+
 var activityPrototype = {
 	"entityId" : "id",
 	"type" : ["post", "comment", "like"],

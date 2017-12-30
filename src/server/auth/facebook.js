@@ -4,6 +4,7 @@ var dataUtils = require("../dataUtils");
 var config = require('../config');
 var logger = require("../logger");
 var dynamicConfig = require("../config/dynamicConfig");
+var dbUser = require("../db/dbUser");
 
 module.exports = function () {
 
@@ -40,7 +41,7 @@ module.exports = function () {
                 query.facebookID = profile.id;
             }
 
-            dataUtils.findUser(query, function (error, user) {
+            dbUser.findUser(query, function (error, user) {
             	if (error) {
             		return done(error, 0);
             	}
@@ -90,7 +91,7 @@ module.exports = function () {
 
                 	user.image = imageUrl;
 
-	                dataUtils.saveUser(user, function(err, user) {
+	                dbUser.saveUser(user, function(err, user) {
 	                    if (err) {
 	                    	return done(err, null);
 	                    }
