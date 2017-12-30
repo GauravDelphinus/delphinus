@@ -296,6 +296,20 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	font-weight: bold;
 }
 
+.social-action-button {
+	background-color: @dark-bg-background-color-normal;
+	color: @dark-bg-text-color-normal;
+	display: table-cell;
+	cursor: pointer;
+	word-wrap: break-word; // for same width effect
+	padding: 10px;
+}
+
+.social-action-button:hover {
+	background-color: @dark-bg-background-color-hover;
+	color: @dark-bg-text-color-hover;
+}
+
 /*
 	Button used for settings
 */
@@ -663,6 +677,9 @@ img {
 .feedElement {
 	margin: 0px 0px 20px 0px;
 	.floatingElement;
+	background-color: transparent;
+	.mediumRoundedTopCorners;
+	.mediumRoundedBottomCorners;
 }
 
 /*
@@ -719,9 +736,10 @@ img {
 	Header of the Element that includes things like Poster, Posted Date and the Drop-down menu.
 */
 .postHeaderSection {
-	margin: 5px 5px 5px 10px; /* Right margin is less to allow the Drop Down menu (caret) to be as right as possible */
-	padding: 10px 0px;
+	//margin: 5px 5px 5px 10px; /* Right margin is less to allow the Drop Down menu (caret) to be as right as possible */
+	padding: 10px 5px 10px 10px;
 	position: relative;
+	background-color: white;
 }
 
 .posted-by {
@@ -775,9 +793,10 @@ input[type=range] .timelapseRange  {
 
 /* Social Status section that contains buttons such as X Entries, Y Likes, etc. */
 .socialStatusSection {
-	margin: 5px 20px;
-	padding: 10px 0px;
+	//margin: 5px 20px;
+	padding: 10px 10px 10px 10px;
 	text-align: center;
+	background-color: white;
 }
 
 .bottom-border {
@@ -788,14 +807,18 @@ input[type=range] .timelapseRange  {
 
 /* Social Actions section that contains buttons such as Like, Comment, etc. */
 .socialActionsSection {
-	margin: 5px 20px;
 	text-align: center;
+	display: table;
+	width: 100%;
+	.mediumRoundedBottomCorners;
 }
 
 /* Caption Section that contains the Caption for the entity */
 .captionSection {
-	margin: 5px 20px;
-	padding: 10px 0px;
+	//margin: 5px 20px;
+	padding: 10px 10px 10px 10px;
+	background-color: white;
+	text-align: center;
 }
 
 /****************************** Alert / Popup *************************/

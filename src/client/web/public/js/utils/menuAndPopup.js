@@ -1,5 +1,5 @@
 function createMenu(menuButton) {
-	var menu = $("<div>", {class: "dropdown DropDown"});
+	var menu = $("<div>", {class: "dropdown"});
 	$(menuButton).addClass("class", "dropdown-toggle");
 	$(menuButton).attr("data-toggle", "dropdown");
 	var menuList = $("<ul>", {class: "dropdown-menu", role: "menu", "aria-labelledby" : $(menuButton).attr("id")});
