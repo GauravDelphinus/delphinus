@@ -16,6 +16,4 @@ function createLoginHeader() {
 		$(navbarItem).empty().removeClass("dropdown");
 		$(navbarItem).append($("<a>", {href: "/auth"}).append("Sign in"));
 	}
-
-	updateShortcutsSidebar();
 }

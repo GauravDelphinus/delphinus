@@ -178,18 +178,6 @@ function createIndependentCaptionSidebar(callback) {
 }
 
 /*
-	Update the Shortcuts sidebar with the User Profile link, incase the user is signed in
-*/
-function updateShortcutsSidebar() {
-	if (user) {
-		var link = $("<a>", {id: "sidebarProfileLink", class: "sidebarLink", href: "/user"}).append(user.displayName);
-		$("#shortcutsSidebar a:nth-of-type(1)").after(link);
-	} else {
-		$("#sidebarProfileLink").remove();
-	}
-}
-
-/*
 	Keep the sidebars scrollable but visible in fixed positions.
 	Refer https://stackoverflow.com/questions/45626470/allow-one-column-to-scroll-till-end-of-content-and-then-remain-fixed
 */
