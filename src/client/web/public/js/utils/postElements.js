@@ -133,9 +133,6 @@ function createFeedElement(data, contentTag) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
-	element.append(createSocialStatusSectionElement(data, contentTag));
-	element.append(createSocialActionsSectionElement(data, contentTag));
-	refreshSocialInfo(data, contentTag);
 
 	//container for comments, if any
 	if (data.activity && data.activity.type && data.activity.type == "comment") {
@@ -146,6 +143,10 @@ function createFeedElement(data, contentTag) {
 
 	//container for likers list, if any
 	element.append(createLikersPopupElement(data, contentTag));
+
+	element.append(createSocialStatusSectionElement(data, contentTag));
+	element.append(createSocialActionsSectionElement(data, contentTag));
+	refreshSocialInfo(data, contentTag);
 
 	return element;
 }
@@ -320,7 +321,7 @@ function createActivitySectionElement(data, contentTag) {
 	if (data.activity) {
 		if (data.activity.type == "like") {
 			//Fetch the like info (user name, link, image)
-			$.getJSON("/api/users/" + data.activity.userId + "?info=basic", function(userData) {
+			$.getJSON("/api/users/" + data.activity.userId, function(userData) {
 				var userLink = $("<a>", {href: userData.link}).append(userData.displayName);
 				activityText.append(userLink).append(" likes this " + formatDate(data.activity.timestamp));
 			})
@@ -328,7 +329,7 @@ function createActivitySectionElement(data, contentTag) {
 				//eat this
 			});
 		} else if (data.activity.type == "comment") {
-			$.getJSON("/api/users/" + data.activity.userId + "?info=basic", function(userData) {
+			$.getJSON("/api/users/" + data.activity.userId, function(userData) {
 				var userLink = $("<a>", {href: userData.link}).append(userData.displayName);
 				activityText.append(userLink).append(" commented on this " + formatDate(data.activity.timestamp));
 			})

@@ -22,7 +22,7 @@ function getUser(userId, done) {
         	type: "user",
         	id: user.id,
         	image: user.image,
-        	caption: user.display_name,
+        	displayName: user.display_name,
         	link: config.url.user + userId
         }
 

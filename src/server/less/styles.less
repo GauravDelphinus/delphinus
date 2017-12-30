@@ -297,17 +297,31 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .social-action-button {
+	//margin: 1px;
 	background-color: @dark-bg-background-color-normal;
 	color: @dark-bg-text-color-normal;
 	display: table-cell;
 	cursor: pointer;
 	word-wrap: break-word; // for same width effect
 	padding: 10px;
+	width: 100%;
+}
+
+.social-action-button:not(:first-child) {
+	margin-left: 1px;
 }
 
 .social-action-button:hover {
 	background-color: @dark-bg-background-color-hover;
 	color: @dark-bg-text-color-hover;
+}
+
+.social-action-button:first-child {
+	.mediumRoundedBottomLeftCorner;
+}
+
+.social-action-button:last-child {
+	.mediumRoundedBottomRightCorner;
 }
 
 /*
@@ -615,7 +629,15 @@ img {
 
 .mediumRoundedBottomCorners {
 	border-bottom-left-radius: 10px;
-	border-bottom-right-radius: 10px	
+	border-bottom-right-radius: 10px;
+}
+
+.mediumRoundedBottomLeftCorner {
+	border-bottom-left-radius: 10px;
+}
+
+.mediumRoundedBottomRightCorner {
+	border-bottom-right-radius: 10px;
 }
 
 .flex-parent {
@@ -676,11 +698,19 @@ img {
 */
 .feedElement {
 	margin: 0px 0px 20px 0px;
-	.floatingElement;
+	//.floatingElement;
 	background-color: transparent;
+}
+
+
+.feedElement > *:first-child {
 	.mediumRoundedTopCorners;
+}
+
+.feedElement > *:last-child {
 	.mediumRoundedBottomCorners;
 }
+
 
 /*
 	Scrollable Element - when you click on the FilmStrip view
@@ -720,11 +750,15 @@ img {
 	such as "Recently commented by XYZ, or Popular among other users, etc."
 */
 .activitySection {
-	margin: 5px 20px;
-	padding: 10px 0px;
-	border-bottom-style: solid;
-	border-width: 0.1px;
-	border-color: gray;
+	padding: 10px 10px 10px 10px;
+	margin-bottom: 1px;
+	background-color: @dark-bg-background-color-normal;
+	color: @dark-bg-text-color-normal;
+}
+
+.activitySection a {
+	text-decoration: none;
+	color: @dark-bg-text-color-strong;
 }
 
 .titleSection {
@@ -739,35 +773,35 @@ img {
 	//margin: 5px 5px 5px 10px; /* Right margin is less to allow the Drop Down menu (caret) to be as right as possible */
 	padding: 10px 5px 10px 10px;
 	position: relative;
-	background-color: white;
+	background-color: @dark-bg-background-color-normal;
 }
 
 .posted-by {
-	color: @gray-dark;
+	color: @dark-bg-text-color-strong;
 	.text-plain-small;
 	.text-bold;
+	text-decoration: none;
 }
 
 .posted-by:hover {
-	color: @theme-dominant-color;
-	text-decoration: underline;
+	text-decoration: none;
 }
 
 .posted-date {
 	.text-plain-small;
 	.text-italic;
-	color: @gray-light;
+	color: @dark-bg-text-color-normal;
 }
 
 .posted-category {
 	.text-plain-small;
 	.text-italic;
-	color: @gray-light;
+	color: @dark-bg-text-color-normal;
 }
 
 .posted-category:hover {
-	color: @theme-dominant-color;
-	text-decoration: underline;
+	color: @dark-bg-text-color-hover;
+	text-decoration: none;
 }
 
 /*
@@ -808,9 +842,12 @@ input[type=range] .timelapseRange  {
 /* Social Actions section that contains buttons such as Like, Comment, etc. */
 .socialActionsSection {
 	text-align: center;
-	display: table;
+	display: flex;
+	justify-content: space-between;
+	border-collapse:separate;
+	border-spacing:1px 0px;
 	width: 100%;
-	.mediumRoundedBottomCorners;
+	//.mediumRoundedBottomCorners;
 }
 
 /* Caption Section that contains the Caption for the entity */
@@ -1002,6 +1039,10 @@ input[type=range] .range-setting {
 .commentsList {
 	width: 100%;
 	margin: 0 auto;
+	
+}
+
+.comments-container {
 	background-color: #f6f7f9;
 }
 

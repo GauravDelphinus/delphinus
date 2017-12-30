@@ -74,6 +74,7 @@ function createPopupElement(id, classes, headerContent, footerContent, bodyConte
 	}
 
 	element.append(content);
+	element.hide(); //popup elements are hidden by default
 
 	return element;
 }
