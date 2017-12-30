@@ -5,26 +5,29 @@ var dbUtils = require("./dbUtils");
 var config = require("../config");
 var mime = require("mime");
 var logger = require("../logger");
+var error = require("../error");
 
 /*
 	Get Info about an Entry by looking up the DB
 */
 function getEntry(entryId, done) {
-	var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[:POSTED_BY]->(poster:User) " +
-		" WITH e, poster " + 
-		" RETURN e, poster;";
+	var cypherQuery = "MATCH (source)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'})-[:POSTED_BY]->(poster:User) " +
+		" WITH e, poster, source, labels(source) AS source_labels " + 
+		" RETURN e, poster, source_labels, source;";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-			return done(new DBResultError(cypherQuery, 1, result.data.length));
+			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
 		}
 
 		var entry = result.data[0][0];
 		var poster = result.data[0][1];
+		var sourceLabel = result.data[0][2];
+		var source = result.data[0][3];
 
-		output = dbUtils.entityNodeToClientData("Entry", entry, poster, null);
+		output = dbUtils.entityNodeToClientData("Entry", entry, poster, null, sourceLabel, source);
 
 		return done(null ,output);
 	});
@@ -89,20 +92,19 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 	} 
 
 	if (postedBy) {
-		cypherQuery += " MATCH (e:Entry)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " + timestampClause +
-			" WITH poster, COLLECT(e) AS all_entities " +
-			" UNWIND all_entities AS e " +
-			" RETURN e, poster " +
+		cypherQuery += " MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " + timestampClause +
+			" WITH e, poster, labels(source) AS source_labels, source " +
+			" RETURN e, poster, source_labels, source " +
 			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	} else if (challengeId) {
-		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Entry)-[:PART_OF]->(challenge:Challenge {id: '" + challengeId + "'}) " + timestampClause +
-			" WITH e, poster " +
-			" RETURN e, poster " +
+		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Entry)-[:PART_OF]->(source:Challenge {id: '" + challengeId + "'}) " + timestampClause +
+			" WITH e, poster, labels(source) AS source_labels, source " +
+			" RETURN e, poster, source_labels, source " +
 			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	} else {
-		cypherQuery += " MATCH (e:Entry)-[:POSTED_BY]->(poster:User) " + timestampClause +
-			" WITH e, poster " +
-			" RETURN e, poster " + 
+		cypherQuery += " MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User) " + timestampClause +
+			" WITH e, poster, labels(source) AS source_labels, source " +
+			" RETURN e, poster, source_labels, source " + 
 			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	}
 
@@ -119,8 +121,10 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 
 			var entry = result.data[i][0];
 			var poster = result.data[i][1];
+			var sourceLabel = result.data[i][2];
+			var source = result.data[i][3];
 
-			data = dbUtils.entityNodeToClientData("Entry", entry, poster, null);
+			data = dbUtils.entityNodeToClientData("Entry", entry, poster, null, sourceLabel, source);
 
 			//update new time stamp to be sent back to client
 			newTimeStamp = data.activity.timestamp;
@@ -191,11 +195,11 @@ function createEntryNode(entryInfo, done) {
 	} else if (entryInfo.sourceType == "designId") {// link to design
 		cypherQuery = "MATCH (d:Design {id: '" + entryInfo.sourceId + "'}) " +
 					cypherQuery +
-					", (d)<-[:BASED_ON]-(e) RETURN e;";
+					", (d)<-[:PART_OF]-(e) RETURN e;";
 	} else if (entryInfo.sourceType == "independentImageId") {// link to Independent Image
 		cypherQuery = "MATCH (i:IndependentImage {id: '" + entryInfo.sourceId + "'}) " +
 					cypherQuery +
-					", (d)<-[:BASED_ON]-(e) RETURN e;";
+					", (d)<-[:PART_OF]-(e) RETURN e;";
 	}
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){

@@ -28,7 +28,7 @@ function getChallenge(challengeId, done) {
 
 		output = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
 
-		return done(null ,output);
+		return done(null, output);
 	});
 }
 

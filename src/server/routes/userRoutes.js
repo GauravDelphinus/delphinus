@@ -9,7 +9,7 @@ var mime = require("mime");
 var async = require("async");
 var dbUser = require("../db/dbUser");
 
-var routes = function(db) {
+var routes = function() {
 	var userRouter = express.Router();
 
 	userRouter.route("/") // Route for /api/users

@@ -19,28 +19,24 @@ $(document).ready(function(){
 });
 
 function setupMainItem() {
-	$.getJSON('/api/challenges/' + challengeId, function(data) {
-		console.log("got info for challenge, creating main element.  Data: " + JSON.stringify(data));
-		var mainElement = createMainElement(data, "main");
-		$("#main").append(mainElement);
-	}).fail(function() {
-		window.location.replace("/error");
-	});
+	//set up the main item
+	var mainElement = createMainElement(challenge, "main");
+	$("#main").empty().append(mainElement);
 }
 
 function setupTabs() {
-	var tabGroup = createNewTabGroup(challengeId);
+	var tabGroup = createNewTabGroup(challenge.id);
 	$("#tabs").append(tabGroup);
 
 	setupEntriesTab();
 
 	setupCommentsTab();
 
-	setupTabRedirection(challengeId);
+	setupTabRedirection(challenge.id);
 }
 
 function setupCaptionSidebar() {
-	createChallengeCaptionSidebar(challengeId, function(sidebar) {
+	createChallengeCaptionSidebar(challenge.id, function(sidebar) {
 		if (sidebar) {
 			$("#rightTopSidebar").append(sidebar);
 		}
@@ -48,12 +44,12 @@ function setupCaptionSidebar() {
 }
 
 function setupEntriesTab() {
-	var tabDiv = appendNewTab(challengeId, "entries", "Entries");
-	createAndAppendContentContainer(tabDiv, challengeId, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], "/api/entries/?challengeId=" + challengeId);
+	var tabDiv = appendNewTab(challenge.id, "entries", "Entries");
+	createAndAppendContentContainer(tabDiv, challenge.id, "entries", [{type: "thumbnail"}, {type: "filmstrip"}], "/api/entries/?challengeId=" + challenge.id);
 }
 
 function setupCommentsTab() {
-	var tabDiv = appendNewTab(challengeId, "comments", "Comments");
+	var tabDiv = appendNewTab(challenge.id, "comments", "Comments");
 	//note: setting the contentTag to "main" below as we want the comments to be associated with the main element
-	createAndAppendCommentsContainer(tabDiv, challengeId, "main", "/api/comments?entityId=" + challengeId);
+	createAndAppendCommentsContainer(tabDiv, challenge.id, "main", "/api/comments?entityId=" + challenge.id);
 }

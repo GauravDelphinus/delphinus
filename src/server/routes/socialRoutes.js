@@ -5,7 +5,7 @@ var serverUtils = require("../serverUtils");
 var logger = require("../logger");
 var passport = require("passport");
 
-var routes = function(db) {
+var routes = function() {
 	var socialRouter = express.Router();
 
 	socialRouter.route("/")

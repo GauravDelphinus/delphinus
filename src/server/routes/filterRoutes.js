@@ -10,7 +10,7 @@ var filterUtils = require("../filterUtils");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 
-var routes = function(db) {
+var routes = function() {
 
 	var filterRouter = express.Router();
 	var imageProcessor = require("../imageProcessor");
@@ -68,7 +68,7 @@ var routes = function(db) {
 				return res.sendStatus(400);
 			}
 
-			db.cypherQuery(cypherQuery, function(err, result){
+			dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 				if(err) {
 					logger.dbError(err, cypherQuery);
 					return res.sendStatus(500);

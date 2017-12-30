@@ -11,42 +11,33 @@ $(document).ready(function(){
 });
 
 function setupMainItem() {
-	$.getJSON('/api/entries/' + entryId, function(data) {
-		var mainElement = createMainElement(data, "main");
-		$("#main").append(mainElement);
-	}).fail(function() {
-		window.location.replace("/error");
-	});
+	//set up the main item
+	var mainElement = createMainElement(entry, "main");
+	$("#main").empty().append(mainElement);
 }
 
 function setupTabs() {
-	var tabGroup = createNewTabGroup(entryId);
+	var tabGroup = createNewTabGroup(entry.id);
 	$("#tabs").append(tabGroup);
 
 	setupCommentsTab();
 
-	setupTabRedirection(entryId);
+	setupTabRedirection(entry.id);
 }
 
 function setupSidebars() {
-	if (challengeId != 0) {
-  		createChallengeSidebar(challengeId, function(sidebar) {
+	if (entry.sourceType == "challengeId") {
+  		createChallengeSidebar(entry.sourceId, function(sidebar) {
 	  		if (sidebar) {
 	  			$("#rightTopSidebar").append(sidebar);
-
-	  			createChallengeCaptionSidebar(challengeId, function(sidebar) {
-	  				if (sidebar) {
-	  					$("#rightMiddleSidebar").append(sidebar);
-	  				}
-	  			});
-	  		} else {
-	  			createIndependentCaptionSidebar(function(sidebar) {
-	  				if (sidebar) {
-	  					$("#rightTopSidebar").append(sidebar);
-	  				}
-	  			});
 	  		}
 	  	});
+  	} else if (entry.sourceType == "designId") {
+  		createDesignSidebar(entry.sourceId, function(sidebar) {
+  			if (sidebar) {
+	  			$("#rightTopSidebar").append(sidebar);
+	  		}
+  		});
   	} else {
   		createIndependentCaptionSidebar(function(sidebar) {
 			if (sidebar) {
@@ -57,7 +48,7 @@ function setupSidebars() {
 }
 
 function setupCommentsTab() {
-	var tabDiv = appendNewTab(entryId, "comments", "Comments");
+	var tabDiv = appendNewTab(entry.id, "comments", "Comments");
 	//note: setting the contentTag to "main" below as we want the comments to be associated with the main element
-	createAndAppendContentContainer(tabDiv, entryId, "main", [{type: "comments"}], "/api/comments/?entityId=" + entryId + "&sortBy=reverseDate");
+	createAndAppendCommentsContainer(tabDiv, entry.id, "main", "/api/comments?entityId=" + entry.id);
 }

@@ -3,7 +3,7 @@
 <head>
 <% include ./metadata %>
 <% include ./favicon_header %>
-<title><%=pageTitle%></title>
+<title><%=metadata.pageTitle%></title>
 <link rel="stylesheet" href="/third-party/bootstrap/css/bootstrap.min.css">
 <link ref="stylesheet" href="/third-party/font-awesome/css/font-awesome.min.css">
 <link rel="stylesheet" type="text/css" href="/css/styles.min.css">
@@ -36,6 +36,8 @@
 	</div>
 	<div class="col-md-5 col-md-offset-2">
 		<div id="main">
+			<h1><%=challenge.caption%></h1>
+			<img src="<%=metadata.imageURL%>">
 		</div>
 		<hr/>
 		<div id="tabs">
@@ -55,9 +57,9 @@
 </div>
 
 <script>
-	var challengeId = '<%=challengeId%>';
-	var entityId = challengeId;
+	var challenge = <%- JSON.stringify(challenge) %>;
 	var user = <%- JSON.stringify(user) %>;
+	var metadata = <%- JSON.stringify(metadata) %>;
 </script>
 <script src="/third-party/jquery/js/jquery.min.js"></script>
 <script src="/third-party/bootstrap/js/bootstrap.min.js"></script>

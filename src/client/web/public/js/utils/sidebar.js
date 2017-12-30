@@ -147,6 +147,18 @@ function createChallengeSidebar(challengeId, callback) {
 	}
 }
 
+function createDesignSidebar(designId, callback) {
+	if (designId != 0) {
+		$.getJSON('/api/designs/' + designId, function(data) {
+			var element = createThumbnailElement(data, "challenge", true);
+			var sidebar = createFramelessSidebar("challengeSidebar", "Challenge", element);
+			return callback(sidebar);
+		}).fail(function() {
+			return callback(null);
+		});
+	}
+}
+
 function createChallengeCaptionSidebar(challengeId, callback) {
 	var content = $("<div>", {class: "wide-container"});
 	var message = $("<p>", {class: "text-plain-medium"}).append("Let your creative juices flow and create your own caption entry for this challenge now!  It's as simple as Get-Set-Go!");

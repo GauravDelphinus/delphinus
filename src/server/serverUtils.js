@@ -645,7 +645,9 @@ module.exports = {
 			"imageType": "imageType",
 			"caption": "string",
 			"link" : "myURL",
-			"activity" : "activity"
+			"activity" : "activity",
+			"sourceType" : ["challengeId", "designId", "independentImageId"],
+			"sourceId" : "id"
 		},
 		"entrySocialInfo" : {
 			"likes" : {
@@ -747,6 +749,16 @@ module.exports = {
 		"design" : {
 			"name" : "string",
 			"id" : "design"
+		},
+		"metadata" : {
+			"fbAppId": "number",
+			"publisherName" : "string",
+			"imageURL" : "url",
+			"pageTitle" : "string",
+			"pageURL" : "url",
+			"pageDescription" : "string",
+			"imageType" : "imageType",
+			"authorName" : "string"
 		}
 	}
 }

@@ -12,7 +12,7 @@ var serverUtils = require("../serverUtils");
 var dbEntry = require("../db/dbEntry");
 var dbUtils = require("../db/dbUtils");
 
-var routes = function(db) {
+var routes = function() {
 
 	var entryRouter = express.Router();
 

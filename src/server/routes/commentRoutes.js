@@ -8,7 +8,7 @@ var dataUtils = require("../dataUtils");
 var dbUtils = require("../db/dbUtils");
 var dbComment = require("../db/dbComment");
 
-var routes = function(db) {
+var routes = function() {
 
 	var commentRouter = express.Router();
 

@@ -349,9 +349,9 @@ module.exports = {
 	    var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) " +
 	    						" OPTIONAL MATCH (c:Challenge)<-[:PART_OF]-(e) " +
 	    						" WITH e, c, COUNT(c) AS c_count " +
-	    						" OPTIONAL MATCH (d:Design)<-[:BASED_ON]-(e) " +
+	    						" OPTIONAL MATCH (d:Design)<-[:PART_OF]-(e) " +
 	    						" WITH e, c, c_count, d, COUNT(d) AS d_count " +
-	    						" OPTIONAL MATCH (i:IndependentImage)<-[:BASED_ON]-(e) " +
+	    						" OPTIONAL MATCH (i:IndependentImage)<-[:PART_OF]-(e) " +
 	    						" WITH e, c, c_count, d, d_count, i, COUNT(i) AS i_count " +
 	    						" RETURN e.image_type, e.caption, c, c_count, d, d_count, i, i_count;";
 	    myDB.cypherQuery(cypherQuery, function(err, result) {

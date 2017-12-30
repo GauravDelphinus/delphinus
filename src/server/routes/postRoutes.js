@@ -5,7 +5,7 @@ var async = require("async");
 var dataUtils = require("../dataUtils");
 var dbUtils = require("../db/dbUtils");
 
-var routes = function(db) {
+var routes = function() {
 	var postRouter = express.Router();
 
 	postRouter.route("/")

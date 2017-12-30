@@ -10,7 +10,7 @@ var dbUtils = require("../db/dbUtils");
 var Challenge = require("../classes/challenge").Challenge;
 var dbChallenge = require("../db/dbChallenge");
 
-var routes = function(db) {
+var routes = function() {
 	var challengeRouter = express.Router();
 
 	challengeRouter.route("/") // ROUTER FOR /api/challenges

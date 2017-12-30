@@ -1,8 +1,9 @@
 var express = require("express");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
+var dataUtils = require("../dataUtils");
 
-var routes = function(db) {
+var routes = function() {
 	var categoryRouter = express.Router();
 
 	categoryRouter.route("/") // ROUTER FOR /api/categories
@@ -32,7 +33,7 @@ var routes = function(db) {
 
 			cypherQuery += " RETURN c;";
 
-			db.cypherQuery(cypherQuery, function(err, result){
+			dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
     			if(err) {
     				logger.dbError(err, cypherQuery);
     				return res.sendStatus(500);

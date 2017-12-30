@@ -100,7 +100,7 @@ function getPosts(postedBy, lastFetchedTimestamp, done) {
 }
 
 //convert the entry DB node to data in the format the client expects
-function entityNodeToClientData(label, entity, poster, category) {
+function entityNodeToClientData(label, entity, poster, category, entrySourceLabel, entrySource) {
 	var output = {
 		id : entity.id,
 		postedDate : entity.created,
@@ -125,6 +125,17 @@ function entityNodeToClientData(label, entity, poster, category) {
 		output.image = config.url.entryImages + entity.id + "." + mime.extension(entity.image_type);
 		output.link = config.url.entry + entity.id;
 		output.caption = entity.caption;
+
+		if (entrySourceLabel && entrySource) {
+			if (entrySourceLabel == "Challenge") {
+				output.sourceType = "challengeId";
+			} else if (entrySourceLabel == "Design") {
+				output.sourceType = "designId";
+			} else if (entrySourceLabel == "IndependentImage") {
+				output.sourceType = "independentImageId";
+			}
+			output.sourceId = entrySource.id;
+		}
 	} else if (label == "Challenge") {
 		output.type = "challenge";
 		output.image = config.url.challengeImages + entity.id + "." + mime.extension(entity.image_type);

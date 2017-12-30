@@ -6,7 +6,7 @@ var serverUtils = require("../serverUtils");
 var error = require("../error");
 var dbFeeds = require("../db/dbFeeds");
 
-var routes = function(db) {
+var routes = function() {
 	var feedRouter = express.Router();
 
 	
