@@ -1,5 +1,5 @@
 function createMainElement(data, contentTag) {
-	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "centerDisplayWide"});
+	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "mainElement"});
 	if (data.type == "entry") {
 		element.addClass("entry-element");
 	} else if (data.type == "challenge") {
@@ -10,13 +10,21 @@ function createMainElement(data, contentTag) {
 
 	element.append(createMainImageElement(data, contentTag));
 	
+	if (data.postedDate) {
+		element.append(createPostHeaderElement(data, contentTag));
+	}
+
+	if (data.caption && data.type != "entry") {
+		element.append(createCaptionSectionElement(data, contentTag));
+	}
+
+
+
 	if (data.type == "entry") {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
-	if (data.postedDate) {
-		element.append(createPostHeaderElement(data, contentTag));
-	}
+
 
 	element.append(createSocialStatusSectionElement(data, contentTag));
 	element.append(createSocialActionsSectionElement(data, contentTag));
@@ -354,34 +362,17 @@ function createTextSection(data, contentTag) {
 Create the header element for the main challenge page.
 */
 function createTitleElement(data, contentTag) {
-	var titleElement = $("<div>", {id: contentTag + data.id + "TitleSection", class: "centerDisplayHeader"});
-	if (data.type == "challenge") {
-		titleElement.addClass("challenge-title");
-	} else if (data.type == "entry") {
-		titleElement.addClass("entry-title");
-	}
+	var titleElement = $("<div>", {id: contentTag + data.id + "TitleSection", class: "titleSection"});
 
-	var logo = $("<img>", {src: "/images/branding/captionify_logo_tiny.png"});
+	var logo = $("<img>", {src: "/images/branding/captionify_logo_tiny_inverse.png"});
 	var entityTypeTitle = $("<p>", {class: "entityTypeTitle"});
 	if (data.type == "entry") {
-		entityTypeTitle.append("CAPTION ENTRY");
+		entityTypeTitle.append("ENTRY");
 	} else if (data.type == "challenge") {
 		entityTypeTitle.append("CHALLENGE");
 	}
 
-	var title = $("<h1>", {class: "main-title"}).append(data.caption);
-
-	titleElement.append(logo);
-	titleElement.append($("<br>"));
-	titleElement.append(entityTypeTitle);
-	
-	if (data.type == "challenge") {
-		titleElement.append($("<hr>", {class: "low-top-margin"}));
-		titleElement.append(title);
-		titleElement.append($("<hr>", {class: "low-bottom-margin"}));
-	} else if (data.type == "entry") {
-		titleElement.append($("<hr>", {class: "low-top-margin low-bottom-margin"}));
-	}
+	titleElement.append(logo).append(entityTypeTitle);
 
 	return titleElement;
 }

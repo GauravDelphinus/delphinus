@@ -690,7 +690,15 @@ img {
 */
 .mainElement {
 	margin: 0px 0px 20px 0px;
-	.floatingElement;
+	background-color: transparent;
+}
+
+.mainElement > *:first-child {
+	.mediumRoundedTopCorners;
+}
+
+.mainElement > *:last-child {
+	.mediumRoundedBottomCorners;
 }
 
 /*
@@ -779,6 +787,8 @@ img {
 .titleSection {
 	padding: 5px 10px;
 	text-align: center;
+	background-color: @dark-bg-background-color-normal;
+	color: @dark-bg-text-color-normal;
 }
 
 /*
