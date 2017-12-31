@@ -161,15 +161,11 @@ function createDesignSidebar(designId, callback) {
 
 function createChallengeCaptionSidebar(challengeId, callback) {
 	var content = $("<div>", {class: "wide-container"});
-	var message = $("<p>", {class: "text-plain-medium"}).append("Let your creative juices flow and create your own caption entry for this challenge now!  It's as simple as Get-Set-Go!");
-	var button = $("<button>", {class: "btn btn-lg button-full"}).append("Create Caption");
-	content.append(message).append(button);
+	var message = $("<div>", {class: "sidebar-item"}).append($("<p>").append("Let your creative juices flow and create your own caption entry for this challenge now!  It's as simple as Get-Set-Go!"));
+	var link = $("<div>", {class: "sidebar-item"}).append($("<a>", {href: "/newentry?challengeId=" + challengeId}).append("Post Caption"));
+	content.append(message).append(link);
 
 	var sidebar = createSidebar("createChallengeCaptionSidebar", "Up for the challenge?", content);
-
-	button.click(function() {
-		window.open("/newentry?challengeId=" + challengeId, "_self");
-	});
 
 	return callback(sidebar);
 }

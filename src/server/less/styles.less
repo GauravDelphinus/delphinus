@@ -1388,11 +1388,9 @@ input[type=range] .range-setting {
 .sidebar-item {
 	margin: 1px;
 	.text-plain-small;
-	.text-all-caps;
-	letter-spacing: 1px;
 	font-weight: 700;
-	
 	background-color: @dark-bg-background-color-normal;
+	width: 100%;
 }
 
 .sidebar-item:last-child {
@@ -1403,6 +1401,8 @@ input[type=range] .range-setting {
 	padding: 10px 20px 10px 20px;
 	display: block;
 	text-decoration: none;
+	.text-all-caps;
+	letter-spacing: 1px;
 	color: @dark-bg-text-color-normal;
 }
 
@@ -1410,6 +1410,12 @@ input[type=range] .range-setting {
 	text-decoration: none;
 	color: @dark-bg-text-color-strong;
 	background-color: @dark-bg-background-color-hover;
+}
+
+.sidebar-item p {
+	padding: 10px 20px 10px 20px;
+	margin: 0px;
+	color: @dark-bg-text-color-normal;
 }
 
 .sidebarSeparator {
