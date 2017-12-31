@@ -34,11 +34,9 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 		for (var i = 0; i < viewOptions.length; i++) {
 			var viewOption = viewOptions[i];
 			if (viewOption.type == "thumbnail") {
-				viewGroup.append($("<button>", {id: "thumbnailViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-th"})).append(" Thumbnails"));
+				viewGroup.append($("<button>", {id: "thumbnailViewButton", type: "button", "data-toggle": "buttons", class: "view-type-button" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-th"})).append(" Thumbnails"));
 			} else if (viewOption.type == "filmstrip") {
-				viewGroup.append($("<button>", {id: "scrollableViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-film"})).append(" Filmstrip"));
-			} else if (viewOption.type == "comments") {
-				viewGroup.append($("<button>", {id: "commentsViewButton", type: "button", "data-toggle": "buttons", class: "btn btn-default" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-film"})).append(" Comments"));
+				viewGroup.append($("<button>", {id: "scrollableViewButton", type: "button", "data-toggle": "buttons", class: "view-type-button" + (i == 0 ? " active" : "")}).append($("<span>", {class: "glyphicon glyphicon-film"})).append(" Filmstrip"));
 			}
 		}
 		containerHeader.append(viewGroup);
@@ -56,8 +54,6 @@ function createAndAppendContentContainer(appendTo, entityId, contentTag, viewOpt
 			viewType = "thumbnail";
 		} else if (this.id == "scrollableViewButton") {
 			viewType = "filmstrip";
-		} else if (this.id == "commentsViewButton") {
-			viewType = "comments";
 		}
 		
 		//toggle state, and reset all other buttons to not active
@@ -79,11 +75,6 @@ function initializeContainerAndStartFetchingContent(container, entityId, content
 		container.append(createGrid(entityId, contentTag, 3, false, false, null, null));
 	} else if (viewType == "filmstrip") {
 		container.append(createScrollableList(entityId, contentTag));
-	} else if (viewType == "comments") {
-		var commentsList = createCommentsList(entityId, contentTag);
-		var commentsContainer = $("<div>", {id: entityId + contentTag + "CommentsContainer"});
-		commentsContainer.append(commentsList);
-		container.append(commentsContainer);
 	} else if (viewType == "feed") {
 		container.append(createFeedList(entityId, contentTag));
 	}
@@ -114,8 +105,6 @@ function appendContent(list, entityId, contentTag, defaultViewType) {
 			appendGrid(entityId, contentTag, list);
 		} else if (defaultViewType == "filmstrip") {
 			appendScrollableList(entityId, contentTag, list);
-		} else if (defaultViewType == "comments") {
-			appendCommentsList(entityId, contentTag, list);
 		} else if (defaultViewType == "feed") {
 			appendFeedList(entityId, contentTag, list);
 		}

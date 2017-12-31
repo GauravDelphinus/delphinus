@@ -42,6 +42,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 /* DARK BG COLORS */
 @dark-bg-background-color-normal: rgba(0, 0, 0, 0.5);
+@dark-bg-background-color-strong: #ee4c43;
 @dark-bg-background-color-hover: #ee4c43;
 
 @dark-bg-text-color-normal: #91949d;
@@ -49,6 +50,8 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 @dark-bg-text-color-hover: #ffffff;
 
 /* LIGHT BG COLORS */
+@light-bg-background-color-normal: #ffffff;
+
 @light-bg-text-color-normal: #1a1c21;
 @light-bg-text-color-weak: #676969;
 @light-bg-text-color-ultra-weak: #8b99a0;
@@ -622,6 +625,11 @@ img {
 	border-bottom-right-radius: 5px	
 }
 
+.mediumRoundedCorners {
+	.mediumRoundedTopCorners;
+	.mediumRoundedBottomCorners;
+}
+
 .mediumRoundedTopCorners {
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
@@ -884,6 +892,26 @@ input[type=range] .timelapseRange  {
 	color: @colored-text-color-normal;
 }
 
+/****************************** View Type - Thumbnail / Filmstrip buttons *************************/
+
+.view-type-button {
+	//margin: 1px;
+	background-color: transparent;
+	color: @dark-bg-text-color-normal;
+	padding: 5px 10px;
+	border: 0px;
+}
+
+.view-type-button:hover {
+	//margin: 1px;
+	background-color: @dark-bg-background-color-hover;
+	color: @dark-bg-text-color-hover;
+}
+
+.view-type-button.active {
+	color: @dark-bg-text-color-strong;
+}
+
 /****************************** Alert / Popup *************************/
 
 .alert-message {
@@ -1065,11 +1093,7 @@ input[type=range] .range-setting {
 .commentsList {
 	width: 100%;
 	margin: 0 auto;
-	
-}
-
-.comments-container {
-	background-color: #f6f7f9;
+	background-color: @light-bg-background-color-normal;
 }
 
 .commentsTable {
@@ -1418,6 +1442,28 @@ input[type=range] .range-setting {
 	color: @dark-bg-text-color-normal;
 }
 
+.sidebar-item button {
+	text-align: center;
+	background-color: transparent;
+	padding: 10px 20px 10px 20px;
+	display: block;
+	.text-all-caps;
+	letter-spacing: 1px;
+	color: @dark-bg-text-color-normal;
+	width: 100%;
+	border: 0px;
+}
+
+.sidebar-item button:hover {
+	background-color: @dark-bg-background-color-hover;
+	color: @dark-bg-text-color-strong;
+}
+
+.sidebar-item button.active {
+	background-color: @dark-bg-background-color-hover;
+	color: @dark-bg-text-color-strong;
+}
+
 .sidebarSeparator {
 	
 }
@@ -1497,6 +1543,30 @@ ul.nav li.dropdown.open > a {
 	padding-top: 0px;
 	padding-bottom: 0px;
 }
+
+/************************** Nav Bar (TABS) ***************************/
+
+.nav-tabs>li>a {
+	text-decoration: none;
+	background-color: transparent;
+	color: @dark-bg-text-color-normal;
+}
+
+ul.nav>li>a:hover {
+	background-color: @dark-bg-background-color-hover;
+	color: @dark-bg-text-color-strong;
+}
+
+.nav-tabs>li.active>a {
+	text-decoration: none;
+	background-color: transparent;
+	color: @dark-bg-text-color-strong;
+}
+.nav-tabs>li.active>a:hover {
+	background-color: @dark-bg-background-color-hover;
+	color: @dark-bg-text-color-strong;
+}
+
 
 
 /************************* SPECIFIC FIXES **********************/

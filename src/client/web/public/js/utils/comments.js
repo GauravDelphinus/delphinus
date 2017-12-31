@@ -4,7 +4,7 @@
 	Append the received comments to the container, and also append the new comment element (or Sign in button)
 */
 function createAndAppendCommentsContainer(appendTo, entityId, contentTag, getURL) {
-	var container = createCommentsList(entityId, contentTag);
+	var container = createCommentsList(entityId, contentTag).addClass("mediumRoundedCorners");
 	var holder = j.CommentsContainer(entityId, contentTag).create();
 	holder.append(container);
 

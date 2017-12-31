@@ -18,5 +18,6 @@ function appendNewTab(tabGroupId, id, title) {
 	var div = $("<div>", {id: id, class: "tab-pane fade" + (active ? " in active" : "")});
 	$("#" + tabGroupId + " .tab-content").append(div);
 
+	div.append("<br>"); //add space before first item
 	return div;
 }
