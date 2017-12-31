@@ -2,6 +2,7 @@ function createNewTabGroup(id) {
 	var tabGroup = $("<div>", {id: id});
 	tabGroup.append($("<ul>", {class: "nav nav-tabs", id: id + "Tabs"}));
 	tabGroup.append($("<div>", {class: "tab-content"}));
+	tabGroup.append("<br>");//adding some space at the bottom of the tab
 
 	return tabGroup;
 }

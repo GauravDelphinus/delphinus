@@ -53,6 +53,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 @light-bg-background-color-normal: #ffffff;
 
 @light-bg-text-color-normal: #1a1c21;
+@light-bg-text-color-strong: #000000;
 @light-bg-text-color-weak: #676969;
 @light-bg-text-color-ultra-weak: #8b99a0;
 
@@ -268,12 +269,12 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .button-link:hover {
-	color: @theme-dominant-color;
+	color: @colored-text-color-hover;
 	text-decoration: underline;
 }
 
 .button-link.active {
-	color: @theme-dominant-color;
+	color: @colored-text-color-hover;
 	font-weight: bold;
 	padding: 0px;
 }
@@ -809,15 +810,27 @@ img {
 	background-color: @dark-bg-background-color-normal;
 }
 
-.posted-by {
+.posted-by-name a {
 	color: @dark-bg-text-color-strong;
 	.text-plain-small;
 	.text-bold;
 	text-decoration: none;
 }
 
-.posted-by:hover {
+.posted-by-name a:hover {
+text-decoration: underline;
+}
+
+
+.posted-by-name-light a { //for comments and other containers with light background
+	color: @light-bg-text-color-strong;
+	.text-plain-small;
+	.text-bold;
 	text-decoration: none;
+}
+
+.posted-by-name-light a:hover {
+	text-decoration: underline;
 }
 
 .posted-date {

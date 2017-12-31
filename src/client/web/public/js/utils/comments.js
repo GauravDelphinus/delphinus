@@ -96,7 +96,7 @@ function createCommentElement(data, parentId, contentTag, isReply) {
 	tr.append(tdLeft);
 
 	var tdRight = $("<td>", {class: "commentsRightColumn"});
-	var postedByName = $("<span>", {id: "postedByName"});
+	var postedByName = $("<span>", {id: "postedByName", class: "posted-by-name-light"});
 	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName, class: "posted-by"}));
 	tdRight.append(postedByName);
 

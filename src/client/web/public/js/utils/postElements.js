@@ -237,7 +237,7 @@ function createPostHeaderElement(data, contentTag) {
  	
 	// Posted By Section
 	var postedBy = $("<div>");
-	var postedByName = $("<span>", {id: "postedByName"});
+	var postedByName = $("<span>", {id: "postedByName", class: "posted-by-name"});
 	postedByName.append($("<a>", {href: "/user/" + data.postedByUser.id, text: data.postedByUser.displayName, class: "posted-by"}));
 	var postedByImage = $("<img>", {id: "postedByImage", class: "user-image-medium"});
 	postedByImage.prop("src", data.postedByUser.image);
