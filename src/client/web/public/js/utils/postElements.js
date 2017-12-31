@@ -79,16 +79,15 @@ function createScrollableElement(data, contentTag, compressed = false) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
+	//container for comments, if any
+	element.append(createCommentsContainer(data.id, contentTag));
+
 	element.append(createSocialStatusSectionElement(data, contentTag, !compressed));
 
-	element.append(createSocialStatusSectionElement(data, contentTag));
 	if (!compressed) {
 		element.append(createSocialActionsSectionElement(data, contentTag));
 	}
 	refreshSocialInfo(data, contentTag);
-	
-	//container for comments, if any
-	element.append(createCommentsContainer(data.id, contentTag));
 
 	//container for likers list, if any
 	element.append(createLikersPopupElement(data, contentTag));

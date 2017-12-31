@@ -54,7 +54,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 @light-bg-text-color-ultra-weak: #8b99a0;
 
 /* COLORED TEXT */
-@colored-text-color-normal: #f643cf; /* reddish color */
+@colored-text-color-normal: #f64c3f; /* reddish color */
 @colored-text-color-hover: #d4443e;
 
 .page-background {
@@ -698,7 +698,6 @@ img {
 */
 .feedElement {
 	margin: 0px 0px 20px 0px;
-	//.floatingElement;
 	background-color: transparent;
 }
 
@@ -715,9 +714,25 @@ img {
 /*
 	Scrollable Element - when you click on the FilmStrip view
 */
+/*
 .scrollableElement {
 	margin: 0px 0px 20px 0px;
 	.floatingElement;
+}
+*/
+
+.scrollableElement {
+	margin: 0px 0px 20px 0px;
+	background-color: transparent;
+}
+
+
+.scrollableElement > *:first-child {
+	.mediumRoundedTopCorners;
+}
+
+.scrollableElement > *:last-child {
+	.mediumRoundedBottomCorners;
 }
 
 /* Add left/right margins around the thumbnail elements */
@@ -856,6 +871,7 @@ input[type=range] .timelapseRange  {
 	padding: 10px 10px 10px 10px;
 	background-color: white;
 	text-align: center;
+	color: @colored-text-color-normal;
 }
 
 /****************************** Alert / Popup *************************/

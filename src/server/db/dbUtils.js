@@ -177,5 +177,7 @@ module.exports = {
 	saveActivity : saveActivity,
 	activityPrototype : activityPrototype,
 	entityNodeToClientData: entityNodeToClientData,
-	getPosts: getPosts
+	getPosts: getPosts,
+	sanitizeStringForCypher: sanitizeStringForCypher,
+	escapeSingleQuotes: escapeSingleQuotes
 };

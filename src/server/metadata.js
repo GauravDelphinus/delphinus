@@ -2,6 +2,7 @@
 const dynamicConfig = require("./config/dynamicConfig");
 const dbChallenge = require("./db/dbChallenge");
 const dbEntry = require("./db/dbEntry");
+const dbUser = require("./db/dbUser");
 const config = require("./config");
 const mime = require("mime");
 
