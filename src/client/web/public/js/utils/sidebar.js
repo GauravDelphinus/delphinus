@@ -36,7 +36,7 @@ function createSimpleLinkList(list) {
 	for (var i = 0; i < list.length; i++) {
 		var item = list[i];
 		if (item.type && item.type == "link") {
-			var link = $("<div>", {class: "sidebar-item"});
+			var link = $("<div>", {class: "sidebar-item hoverable"});
 			link.append($("<a>", {href: item.link}).append(item.name));
 			listContent.append(link);
 		}
@@ -163,12 +163,12 @@ function createChallengeCaptionSidebar(challengeId, callback) {
 	var content = $("<div>", {class: "wide-container"});
 	var message = $("<div>", {class: "sidebar-item"}).append($("<p>").append("Let your creative juices flow and create your own caption entry for this challenge now!  It's as simple as Get-Set-Go!"));
 
-	var button = $("<button>").append("Post Caption").addClass("active");
+	var button = $("<button>").append("Post Caption");
 	button.click(function() {
 		window.open("/newentry?challeneId=" + challengeId, "_self");
 	});
 
-	var link = $("<div>", {class: "sidebar-item"}).append(button);
+	var link = $("<div>", {class: "sidebar-item active hoverable"}).append(button);
 	content.append(message).append(link);
 
 	var sidebar = createSidebar("createChallengeCaptionSidebar", "Up for the challenge?", content);

@@ -357,11 +357,6 @@ Create the header element for the main challenge page.
 */
 function createTitleElementForPreview(data, contentTag) {
 	var titleElement = $("<div>", {id: contentTag + data.id + "TitleSection", class: "centerDisplayHeader"});
-	if (data.type == "challenge") {
-		titleElement.addClass("challenge-title");
-	} else if (data.type == "entry") {
-		titleElement.addClass("entry-title");
-	}
 
 	var title = $("<h1>", {class: "main-title"}).append(data.caption);
 	

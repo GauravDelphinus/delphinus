@@ -4,8 +4,8 @@
 @theme-dark-bg-color-normal: rgba(0, 0, 0, 0.5);
 
 //colored background
-@theme-colored-bg-color-normal: #f64c3f;
-@theme-colored-bg-color-strong: #d4443e;
+@theme-colored-bg-color-normal: #d4443e;
+@theme-colored-bg-color-strong: #f64c3f;
 
 //light background
 @theme-light-bg-color-normal: #F5F5F5;
@@ -1354,7 +1354,18 @@ input[type=range] .range-setting {
 }
 
 .sidebar-item a:hover {
-	text-decoration: none;
+	color: @theme-light-fg-color-strong;
+}
+
+//need to set background color hover to separate class hoverable because
+//the last-child needs to be applied to sidebar-item and if we set the hover
+//background color to the a inside the sidebar-item then it won't work
+.sidebar-item.hoverable:hover {
+	color: @theme-light-fg-color-strong;
+	background-color: @theme-colored-bg-color-strong;
+}
+
+.sidebar-item.active {
 	color: @theme-light-fg-color-strong;
 	background-color: @theme-colored-bg-color-normal;
 }
@@ -1372,19 +1383,8 @@ input[type=range] .range-setting {
 	display: block;
 	.text-all-caps;
 	letter-spacing: 1px;
-	color: @theme-light-fg-color-normal;
 	width: 100%;
 	border: 0px;
-}
-
-.sidebar-item button:hover {
-	background-color: @theme-colored-bg-color-normal;
-	color: @theme-light-fg-color-strong;
-}
-
-.sidebar-item button.active {
-	background-color: @theme-colored-bg-color-normal;
-	color: @theme-light-fg-color-strong;
 }
 
 .sidebarSeparator {
