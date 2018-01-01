@@ -1,10 +1,5 @@
 function createMainElement(data, contentTag) {
 	var element = $("<div>", {id: contentTag + data.id + "MainElement", class: "mainElement"});
-	if (data.type == "entry") {
-		element.addClass("entry-element");
-	} else if (data.type == "challenge") {
-		element.addClass("challenge-element");
-	}
 
 	element.append(createTitleElement(data, contentTag));
 
@@ -42,11 +37,6 @@ function createMainElement(data, contentTag) {
 */
 function createSharePreview(data, contentTag) {
 	var element = $("<div>", {id: contentTag + data.id + "SharePreview"});
-	if (data.type == "entry") {
-		element.addClass("entry-element");
-	} else if (data.type == "challenge") {
-		element.addClass("challenge-element");
-	}
 
 	//add trimmed version of title element (for preview)
 	element.append(createTitleElementForPreview(data, contentTag));
@@ -66,11 +56,6 @@ function createSharePreview(data, contentTag) {
 
 function createScrollableElement(data, contentTag, compressed = false) {
 	var element = $("<div>", {id: contentTag + data.id + "ScrollableElement", class: "scrollableElement"});
-	if (data.type == "entry") {
-		element.addClass("entry-element");
-	} else if (data.type == "challenge") {
-		element.addClass("challenge-element");
-	}
 
 	if (data.postedDate) {
 		element.append(createPostHeaderElement(data, contentTag));
@@ -105,11 +90,6 @@ function createScrollableElement(data, contentTag, compressed = false) {
 
 function createFeedElement(data, contentTag) {
 	var element = $("<div>", {id: contentTag + data.id + "FeedElement", class: "feedElement"});
-	if (data.type == "entry") {
-		element.addClass("entry-element");
-	} else if (data.type == "challenge") {
-		element.addClass("challenge-element");
-	}
 
 	if (data.activity && data.activity.type != "post") {
 		element.append(createActivitySectionElement(data, contentTag));
@@ -160,11 +140,6 @@ function createFeedElement(data, contentTag) {
 
 function createThumbnailElement(data, contentTag, createLink) {
 	var element = $("<div>", {class: "thumbnailElement"});
-	if (data.type == "entry") {
-		element.addClass("entry-element");
-	} else if (data.type == "challenge") {
-		element.addClass("challenge-element");
-	}
 
 	if (data.postedDate) {
 		element.append(createPostHeaderElement(data, contentTag));

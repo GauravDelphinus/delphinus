@@ -1,65 +1,28 @@
 /********************************** COLORS AND THEMES *****************************/
-/****
-Theme color ultra-light: #fbeaf3; light: #c81e7e; standard: #9E1F63; dark: #6B1044;
-Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595959;
-****/
 
-/** THEME COLORS **/
+//dark background
+@theme-dark-bg-color-normal: rgba(0, 0, 0, 0.5);
 
-@theme-dominant-color: #8E2800; /* Dominant color for theme, main logo */
-@theme-dominant-color-dark: #BF2A2A;
-@theme-dominant-color-light: #5B1A00;
-@theme-dominant-color-ultra-light: #F6B093; 
+//colored background
+@theme-colored-bg-color-normal: #f64c3f;
+@theme-colored-bg-color-strong: #d4443e;
 
-@theme-contrast-color: #2980B9; /* Contrast color of theme */
-@theme-contrast-color-dark: #1E5D86;
-@theme-contrast-color-light: #679FC5;
-@theme-contrast-color-ultra-light: #CDE7F9;
+//light background
+@theme-light-bg-color-normal: #F5F5F5;
+@theme-light-bg-color-strong: #FFFFFF;
 
-@theme-neutral-color: #f5f5f5; /* Light, neutral color.  Typically page background. */
+//dark foreground
+@theme-dark-fg-color-normal: #1a1c21;
+@theme-dark-fg-color-strong: #000000;
+@theme-dark-fg-color-weak: #888888;
 
-/** GRAYS **/
+//colored foreground
+@theme-colored-fg-color-normal: #f64c3f;
+@theme-colored-fg-color-strong: #d4443e;
 
-@gray-standard: #676969;
-@gray-dark: #595959;
-@gray-ultra-dark: #303030;
-@gray-light: #888888;
-@gray-ultra-light: #d9d9d9;
-
-/** Challenge and Entry colors */
-@challenge-color-ultra-light: #fffcf3;
-@challenge-color-light: #fff6da;
-@entry-color-ultra-light: #f7fcff;
-@entry-color-light: #def2ff;
-
-@theme-dark-fill-color: rgba(0, 0, 0, 0.5);
-@theme-dark-fill-hover-color: #ee4c43;
-
-@theme-light-text-color: #ffffff;
-
-/************************** NEW THEME COLORS - DEC 2017 ***************************************/
-/********************* MAIN THEME SETTINGS **********************/
-
-/* DARK BG COLORS */
-@dark-bg-background-color-normal: rgba(0, 0, 0, 0.5);
-@dark-bg-background-color-strong: #ee4c43;
-@dark-bg-background-color-hover: #ee4c43;
-
-@dark-bg-text-color-normal: #91949d;
-@dark-bg-text-color-strong: #ffffff;
-@dark-bg-text-color-hover: #ffffff;
-
-/* LIGHT BG COLORS */
-@light-bg-background-color-normal: #ffffff;
-
-@light-bg-text-color-normal: #1a1c21;
-@light-bg-text-color-strong: #000000;
-@light-bg-text-color-weak: #676969;
-@light-bg-text-color-ultra-weak: #8b99a0;
-
-/* COLORED TEXT */
-@colored-text-color-normal: #f64c3f; /* reddish color */
-@colored-text-color-hover: #d4443e;
+//light foreground
+@theme-light-fg-color-normal: #91949d;
+@theme-light-fg-color-strong: #ffffff;
 
 .page-background {
 	background-image: url("http://static.tumblr.com/3nghtcy/cRImezufo/low_contrast_linen.png");
@@ -194,14 +157,14 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	Button that has full background color.
 */
 .button-full {
-	background-color: @theme-dominant-color;
+	background-color: @theme-colored-bg-color-normal;
 	color: white;
 	font-size: 16px;
 	.low-top-bottom-margin;
 }
 
 .button-full:hover {
-	background-color: @theme-dominant-color;
+	background-color: @theme-colored-bg-color-strong;
 	color: white;
 	font-size: 16px;
 	.low-top-bottom-margin;
@@ -211,27 +174,27 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 	Button that has no background, but a border.
 */
 .button-line {
-	color: @theme-dominant-color;
+	color: @theme-colored-fg-color-normal;
 	border: 1px;
-	border-color: @theme-dominant-color;
+	border-color: @theme-colored-bg-color-normal;
 	border-style: solid;
 	background: transparent;
 	font-size: 15px;
 }
 
 .button-line:hover {
-	color: @theme-dominant-color;
+	color: @theme-colored-fg-color-normal;
 	border: 1px;
-	border-color: @theme-dominant-color;
+	border-color: @theme-colored-bg-color-normal;
 	border-style: solid;
 	background: transparent;
 	font-size: 15px;
 }
 
 .button-line.active {
-	color: @theme-dominant-color;
+	color: @theme-colored-fg-color-normal;
 	border: 1px;
-	border-color: @theme-dominant-color;
+	border-color: @theme-colored-bg-color-normal;
 	background: transparent;
 	font-size: 15px;
 }
@@ -247,13 +210,13 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .button-empty hover {
-	color: @theme-dominant-color;
-	background-color: @theme-dominant-color;
+	color: @theme-colored-fg-color-normal;
+	background-color: @theme-colored-bg-color-normal;
 	font-size: 15px;
 }
 
 .button-empty.active {
-	color: @theme-dominant-color;
+	color: @theme-colored-fg-color-normal;
 }
 
 /*
@@ -261,7 +224,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 */
 .button-link {
 	background-color: transparent;
-	color: @gray-standard;
+	color: @theme-dark-fg-color-normal;
 	/* padding: 8px; */
 	/* font-size: 1em; */
 	border: none;
@@ -269,41 +232,20 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .button-link:hover {
-	color: @colored-text-color-hover;
+	color: @theme-colored-fg-color-strong;
 	text-decoration: underline;
 }
 
 .button-link.active {
-	color: @colored-text-color-hover;
+	color: @theme-colored-fg-color-strong;
 	font-weight: bold;
 	padding: 0px;
 }
 
-/* 
-	Active Link that has a background hover color.  Used
-	for the Social Actions buttons such as Like, Share, etc.
-*/
-.button-active-link {
-	background-color: transparent;
-	color: @gray-dark;
-	border: none;
-	padding: 8px;
-}
-
-.button-active-link:hover {
-	background-color: @theme-contrast-color-ultra-light;
-	/* background-color: @theme-contrast-color; */
-}
-
-.button-active-link.active {
-	color: @theme-contrast-color;
-	font-weight: bold;
-}
-
 .social-action-button {
 	//margin: 1px;
-	background-color: @dark-bg-background-color-normal;
-	color: @dark-bg-text-color-normal;
+	background-color: @theme-dark-bg-color-normal;
+	color: @theme-light-fg-color-normal;
 	display: table-cell;
 	cursor: pointer;
 	word-wrap: break-word; // for same width effect
@@ -316,8 +258,8 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 }
 
 .social-action-button:hover {
-	background-color: @dark-bg-background-color-hover;
-	color: @dark-bg-text-color-hover;
+	background-color: @theme-colored-bg-color-normal;
+	color: @theme-light-fg-color-strong;
 }
 
 .social-action-button:first-child {
@@ -340,16 +282,16 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 .button-setting:hover {
 	color: white;
-	background: @theme-dominant-color;
+	background: @theme-colored-bg-color-normal;
 	font-size: 1.1em;
-	border: 1px solid @theme-dominant-color;
+	border: 1px solid @theme-colored-bg-color-normal;
 }
 
 .button-setting.active {
 	color: white;
-	background: @theme-dominant-color;
+	background: @theme-colored-bg-color-normal;
 	font-size: 1.1em;
-	border: 1px solid @theme-dominant-color;
+	border: 1px solid @theme-colored-bg-color-normal;
 }
 
 .button-setting.disabled {
@@ -427,7 +369,7 @@ Gray shades: ultra-light: #d9d9d9; light: #a6a6a6; standard: #808080; dark: #595
 
 .secondary-info {
 	.text-plain-small;
-	color: @gray-light;
+	color: @theme-dark-fg-color-weak;
 }
 
 .main-title {
@@ -517,14 +459,6 @@ hr {
 	/* dummy - use standard links */
 }
 
-.link-gray {
-	color: #595959;
-}
-
-.link-gray:hover {
-	color: @theme-contrast-color-dark;
-}
-
 .link-black {
 	color: black;
 }
@@ -533,20 +467,13 @@ hr {
 	color: black;
 }
 
-.link-theme {
-	color: black;
-}
-
-.link-theme:hover{
-	color: @theme-contrast-color-dark;
-}
 /********************************** DRAG / DROP RELATED ******************/
 
 .dropZone {
 	/* position: relative; */
 	display: table;
 
-	border: 5px dotted @theme-dominant-color;
+	border: 5px dotted @theme-colored-bg-color-normal;
 	border-radius: 20px;
 	color: gray;
 	font: 24px/200px arial;
@@ -577,7 +504,6 @@ hr {
 body {
 	font-family: Source Sans Pro,Helvetica,Arial,sans-serif;
 	padding-top: 60px; /* Push content below the navbar */
-	/* background-color: @theme-neutral-color; */
     .page-background;
 
 }
@@ -674,22 +600,6 @@ img {
 
 /***************************** Challenge / Entry / Entity Related *********************/
 
-.challenge-element {
-	background-color: @challenge-color-ultra-light;
-}
-
-.challenge-title {
-	background-color: @challenge-color-light;
-}
-
-.entry-element {
-	background-color: @entry-color-ultra-light;
-}
-
-.entry-title {
-	background-color: @entry-color-light;
-}
-
 .general-element {
 	background-color: white;
 }
@@ -766,14 +676,14 @@ img {
 }
 
 .thumbnailElement.active {
-	background-color: @theme-dominant-color-light;
+	background-color: @theme-colored-bg-color-normal;
 }
 
 /*
 	Hover effect on thumbnail elements
 */
 .elementHover:hover {
-	background-color: @theme-dominant-color-light;
+	background-color: @theme-colored-bg-color-normal;
 	cursor: pointer;
 }
 
@@ -784,20 +694,20 @@ img {
 .activitySection {
 	padding: 10px 10px 10px 10px;
 	margin-bottom: 1px;
-	background-color: @dark-bg-background-color-normal;
-	color: @dark-bg-text-color-normal;
+	background-color: @theme-dark-bg-color-normal;
+	color: @theme-light-fg-color-normal;
 }
 
 .activitySection a {
 	text-decoration: none;
-	color: @dark-bg-text-color-strong;
+	color: @theme-light-fg-color-strong;
 }
 
 .titleSection {
 	padding: 5px 10px;
 	text-align: center;
-	background-color: @dark-bg-background-color-normal;
-	color: @dark-bg-text-color-normal;
+	background-color: @theme-dark-bg-color-normal;
+	color: @theme-light-fg-color-normal;
 }
 
 /*
@@ -807,11 +717,11 @@ img {
 	//margin: 5px 5px 5px 10px; /* Right margin is less to allow the Drop Down menu (caret) to be as right as possible */
 	padding: 10px 5px 10px 10px;
 	position: relative;
-	background-color: @dark-bg-background-color-normal;
+	background-color: @theme-dark-bg-color-normal;
 }
 
 .posted-by-name a {
-	color: @dark-bg-text-color-strong;
+	color: @theme-light-fg-color-strong;
 	.text-plain-small;
 	.text-bold;
 	text-decoration: none;
@@ -823,7 +733,7 @@ text-decoration: underline;
 
 
 .posted-by-name-light a { //for comments and other containers with light background
-	color: @light-bg-text-color-strong;
+	color: @theme-dark-fg-color-strong;
 	.text-plain-small;
 	.text-bold;
 	text-decoration: none;
@@ -836,17 +746,17 @@ text-decoration: underline;
 .posted-date {
 	.text-plain-small;
 	.text-italic;
-	color: @dark-bg-text-color-normal;
+	color: @theme-light-fg-color-normal;
 }
 
 .posted-category {
 	.text-plain-small;
 	.text-italic;
-	color: @dark-bg-text-color-normal;
+	color: @theme-light-fg-color-normal;
 }
 
 .posted-category:hover {
-	color: @dark-bg-text-color-hover;
+	color: @theme-light-fg-color-strong;
 	text-decoration: none;
 }
 
@@ -902,7 +812,7 @@ input[type=range] .timelapseRange  {
 	padding: 10px 10px 10px 10px;
 	background-color: white;
 	text-align: center;
-	color: @colored-text-color-normal;
+	color: @theme-colored-fg-color-normal;
 }
 
 /****************************** View Type - Thumbnail / Filmstrip buttons *************************/
@@ -910,19 +820,19 @@ input[type=range] .timelapseRange  {
 .view-type-button {
 	//margin: 1px;
 	background-color: transparent;
-	color: @dark-bg-text-color-normal;
+	color: @theme-light-fg-color-normal;
 	padding: 5px 10px;
 	border: 0px;
 }
 
 .view-type-button:hover {
 	//margin: 1px;
-	background-color: @dark-bg-background-color-hover;
-	color: @dark-bg-text-color-hover;
+	background-color: @theme-colored-bg-color-normal;
+	color: @theme-light-fg-color-strong;
 }
 
 .view-type-button.active {
-	color: @dark-bg-text-color-strong;
+	color: @theme-light-fg-color-strong;
 }
 
 /****************************** Alert / Popup *************************/
@@ -985,7 +895,7 @@ input[type=range] .timelapseRange  {
     position:absolute;
     background: rgba(0, 0, 0, 0);
     border: 0px;
-   	color: @theme-dominant-color;
+   	color: @theme-colored-fg-color-normal;
     display:none;
 }
 
@@ -1106,7 +1016,7 @@ input[type=range] .range-setting {
 .commentsList {
 	width: 100%;
 	margin: 0 auto;
-	background-color: @light-bg-background-color-normal;
+	background-color: @theme-light-bg-color-strong;
 }
 
 .commentsTable {
@@ -1415,8 +1325,8 @@ input[type=range] .range-setting {
 	letter-spacing: 1px;
 	
 	.mediumRoundedTopCorners;
-	background-color: @dark-bg-background-color-normal;
-	color: @dark-bg-text-color-strong;
+	background-color: @theme-dark-bg-color-normal;
+	color: @theme-light-fg-color-strong;
 }
 
 .sidebarContent {
@@ -1426,7 +1336,7 @@ input[type=range] .range-setting {
 	margin: 1px;
 	.text-plain-small;
 	font-weight: 700;
-	background-color: @dark-bg-background-color-normal;
+	background-color: @theme-dark-bg-color-normal;
 	width: 100%;
 }
 
@@ -1440,19 +1350,19 @@ input[type=range] .range-setting {
 	text-decoration: none;
 	.text-all-caps;
 	letter-spacing: 1px;
-	color: @dark-bg-text-color-normal;
+	color: @theme-light-fg-color-normal;
 }
 
 .sidebar-item a:hover {
 	text-decoration: none;
-	color: @dark-bg-text-color-strong;
-	background-color: @dark-bg-background-color-hover;
+	color: @theme-light-fg-color-strong;
+	background-color: @theme-colored-bg-color-normal;
 }
 
 .sidebar-item p {
 	padding: 10px 20px 10px 20px;
 	margin: 0px;
-	color: @dark-bg-text-color-normal;
+	color: @theme-light-fg-color-normal;
 }
 
 .sidebar-item button {
@@ -1462,19 +1372,19 @@ input[type=range] .range-setting {
 	display: block;
 	.text-all-caps;
 	letter-spacing: 1px;
-	color: @dark-bg-text-color-normal;
+	color: @theme-light-fg-color-normal;
 	width: 100%;
 	border: 0px;
 }
 
 .sidebar-item button:hover {
-	background-color: @dark-bg-background-color-hover;
-	color: @dark-bg-text-color-strong;
+	background-color: @theme-colored-bg-color-normal;
+	color: @theme-light-fg-color-strong;
 }
 
 .sidebar-item button.active {
-	background-color: @dark-bg-background-color-hover;
-	color: @dark-bg-text-color-strong;
+	background-color: @theme-colored-bg-color-normal;
+	color: @theme-light-fg-color-strong;
 }
 
 .sidebarSeparator {
@@ -1504,7 +1414,6 @@ input[type=range] .range-setting {
 
 /* Override bootstrap nav bar */
 .navbar-fixed-top {
-	/* background: @theme-neutral-color; */
 	.page-background;
 }
 
@@ -1520,15 +1429,15 @@ already matches the navbar height */
 }
 
 .navbar-link {
-	color: @theme-light-text-color;
+	color: @theme-light-fg-color-normal;
 }
 
 ul.nav > li > a:hover {
-	background: @theme-dominant-color-ultra-light;
+	background: @theme-colored-bg-color-normal;
 }
 
 ul.nav li.dropdown.open > a {
-	background: @theme-dominant-color-ultra-light;
+	background: @theme-colored-bg-color-normal;
 	padding-top: 0px;
 	padding-bottom: 0px;
 }
@@ -1562,22 +1471,22 @@ ul.nav li.dropdown.open > a {
 .nav-tabs>li>a {
 	text-decoration: none;
 	background-color: transparent;
-	color: @dark-bg-text-color-normal;
+	color: @theme-light-fg-color-normal;
 }
 
 ul.nav>li>a:hover {
-	background-color: @dark-bg-background-color-hover;
-	color: @dark-bg-text-color-strong;
+	background-color: @theme-colored-bg-color-normal;
+	color: @theme-light-fg-color-strong;
 }
 
 .nav-tabs>li.active>a {
 	text-decoration: none;
 	background-color: transparent;
-	color: @dark-bg-text-color-strong;
+	color: @theme-light-fg-color-strong;
 }
 .nav-tabs>li.active>a:hover {
-	background-color: @dark-bg-background-color-hover;
-	color: @dark-bg-text-color-strong;
+	background-color: @theme-colored-bg-color-normal;
+	color: @theme-light-fg-color-strong;
 }
 
 

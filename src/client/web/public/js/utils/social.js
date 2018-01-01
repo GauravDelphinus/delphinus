@@ -695,8 +695,8 @@ function appendLikersList(id, contentTag, list) {
 
 		var row = $("<tr>");
 		var userImage = $("<img>", {src: data.image, class: "user-image-tiny"});
-
-		var userName = $("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.displayName);
+		var userName = $("<span>", {class: "posted-by-name-light"});
+		userName.append($("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.displayName));
 		
 
 		row.append($("<td>", {class: "user-image-column"}).append(userImage));
