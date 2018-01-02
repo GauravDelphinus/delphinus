@@ -27,11 +27,18 @@ function setupTabs() {
 
 function setupSidebars() {
 	if (entry.sourceType == "challengeId") {
-  		createChallengeSidebar(entry.sourceId, function(sidebar) {
-	  		if (sidebar) {
-	  			$("#rightTopSidebar").append(sidebar);
-	  		}
-	  	});
+		//add the challenge sidebar element
+		createChallengeSidebar(entry.sourceId, function(sidebar) {
+			if (sidebar) {
+				$("#rightTopSidebar").append(sidebar);
+				//add another sidebar element to prompt user to post another entry into that challenge
+		  		createChallengeCaptionSidebar(entry.sourceId, function(sidebar) {
+			  		if (sidebar) {
+			  			$("#rightMiddleSidebar").append(sidebar);
+			  		}
+				});
+			}
+		});
   	} else if (entry.sourceType == "designId") {
   		createDesignSidebar(entry.sourceId, function(sidebar) {
   			if (sidebar) {

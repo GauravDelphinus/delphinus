@@ -34,6 +34,14 @@ var routes = function() {
 				{
 					name: "ts", //last fetched timestamp
 					type: "timestamp"
+				},
+				{
+					name: "sortBy",
+					type: ["popularity"]
+				},
+				{
+					name: "limit",
+					type: "number"
 				}
 			];
 
@@ -41,20 +49,43 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
-			dbEntry.getEntries(req.query.postedBy, req.query.challengeId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
-				if (err) {
-					logger.error(err);
-					return res.sendStatus(500);
+			//if sortBy flag is present, then the limit flag must also be present
+			//also, the max limit number is 10
+			if (req.query.sortBy) {
+				if (!req.query.limit || req.query.limit > config.businessLogic.maxCustomSortedLimit) {
+					return res.sendStatus(400);
 				}
 
-				if (!serverUtils.validateData(result, serverUtils.prototypes.entry)) {
-    				return res.sendStatus(500);
-    			}
+				dbEntry.getEntriesSorted(req.query.sortBy, req.query.limit, req.query.postedBy, function(err, result) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
 
-    			var output = {ts: newTimeStamp, list: result};
-    			return res.json(output);
-			});
+					if (!serverUtils.validateData(result, serverUtils.prototypes.entry)) {
+	    				return res.sendStatus(500);
+	    			}
+
+	    			return res.json(result);
+				});
+			} else {
+				var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
+				dbEntry.getEntries(req.query.postedBy, req.query.challengeId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					if (!serverUtils.validateData(result, serverUtils.prototypes.entry)) {
+	    				return res.sendStatus(500);
+	    			}
+
+	    			var output = {ts: newTimeStamp, list: result};
+	    			return res.json(output);
+				});
+			}
+
+			
 		})
 
 		.post(function(req, res){

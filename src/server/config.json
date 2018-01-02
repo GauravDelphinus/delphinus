@@ -72,7 +72,8 @@
 	"businessLogic" : {
 		"minLikesForPopularity" : 2,
 		"minCommentsForPopularity" : 2,
-		"infiniteScrollChunkSize" : 4
+		"infiniteScrollChunkSize" : 4,
+		"maxCustomSortedLimit" : 10
 	},
 	"branding" : {
 		"siteName" : "Captionify.com",

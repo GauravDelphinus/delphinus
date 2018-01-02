@@ -31,6 +31,14 @@ var routes = function() {
 				{
 					name: "ts", //last fetched timestamp
 					type: "timestamp"
+				},
+				{
+					name: "sortBy",
+					type: ["popularity"]
+				},
+				{
+					name: "limit",
+					type: "number"
 				}
 			];
 
@@ -38,20 +46,41 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
-			dbChallenge.getChallenges(req.query.postedBy, req.query.categoryId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
-				if (err) {
-					logger.error(err);
-					return res.sendStatus(500);
+			//if sortBy flag is present, then the limit flag must also be present
+			//also, the max limit number is 10
+			if (req.query.sortBy) {
+				if (!req.query.limit || req.query.limit > config.businessLogic.maxCustomSortedLimit) {
+					return res.sendStatus(400);
 				}
 
-				if (!serverUtils.validateData(result, serverUtils.prototypes.challenge)) {
-    				return res.sendStatus(500);
-    			}
+				dbChallenge.getChallengesSorted(req.query.sortBy, req.query.limit, req.query.postedBy, req.query.categoryId, function(err, result) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
 
-    			var output = {ts: newTimeStamp, list: result};
-    			return res.json(output);
-			});
+					if (!serverUtils.validateData(result, serverUtils.prototypes.challenge)) {
+	    				return res.sendStatus(500);
+	    			}
+
+	    			return res.json(result);
+				});
+			} else { //without sortBy flag, we assume "chunked" output based on timestamp
+				var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
+				dbChallenge.getChallenges(req.query.postedBy, req.query.categoryId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					if (!serverUtils.validateData(result, serverUtils.prototypes.challenge)) {
+	    				return res.sendStatus(500);
+	    			}
+
+	    			var output = {ts: newTimeStamp, list: result};
+	    			return res.json(output);
+				});
+			}
 		})
 
 		.post(function(req, res){

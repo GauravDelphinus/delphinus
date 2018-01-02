@@ -342,6 +342,16 @@ function refreshCommentsList(entityId, contentTag) {
 	});
 }
 
+function createCommentsPopupElement(data, contentTag) {
+	var commentPopupHeader = $("<h2>").append("Comments");
+	var commentPopupBody = createCommentsContainer(data.id, contentTag);
+	var element = createPopupElement(contentTag + data.id + "CommentsPopup", "modal-medium", commentPopupHeader, null, commentPopupBody, function() {
+		showHideCommentsList(data.id, contentTag, false);
+	});
+
+	return element;
+}
+
 //jQuery helper functions to get and create elements
 var j = {
 	createHelperObject: function(entityId, contentTag, type, name) {

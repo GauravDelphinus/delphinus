@@ -16,16 +16,30 @@ function createSidebar(id, heading, content) {
 }
 
 /**
-	Frameless sidebar.  It only has a title, no background.  You simply append the provided
-	content below the title.
+	Create just a sidebar header by itself.
 **/
-function createFramelessSidebar(id, heading, content) {
-	var sidebar = $("<div>", {id: id, class: "framelessSidebar"});
+function createSidebarHeader(id, heading) {
+	var sidebar = $("<div>", {id: id, class: "sidebar"});
 
 	//set the title
 	$(sidebar).append($("<div>", {class: "sidebarHeading"}).append(heading));
 
-	$(sidebar).append(content);
+	return sidebar;
+}
+
+/**
+	Frameless sidebar.  It only has a title, no background.  You simply append the provided
+	content below the title.
+**/
+function createSplitSidebar(id, heading, contentList) {
+	var sidebar = $("<div>", {id: id, class: "framelessSidebar"});
+
+	//set the title
+	$(sidebar).append($("<div>", {class: "split-sidebar-heading"}).append(heading));
+
+	for (var i = 0; i < contentList.length; i++) {
+		$(sidebar).append(contentList[i]);
+	}
 
 	return sidebar;
 }
@@ -96,12 +110,18 @@ function updateRichSidebar(id, heading, list, singleColumn) {
 	}
 }
 
+/**
+	Create a sidebar with the most popular challenges
+**/
 function createPopularChallengesSidebar(callback) {
 	var list = [];
 	$.getJSON("/api/challenges?sortBy=popularity&limit=5", function(list) {
-		var scrollableList = createScrollableList("popularChallengesScrollableList", list, true);
+		var elementList = [];
+		for (var i = 0; i < list.length; i++) {
+			elementList.push(createSidebarElement(list[i], list[i].id + "challenge", true));
+		}
+		var sidebar = createSplitSidebar("PopularChallengesSidebar", "Popular Challenges", elementList);
 
-		var sidebar = createFramelessSidebar("popularChallengesSidebar", "Popular Challenges", scrollableList);
 		return callback(sidebar);
 	})
 	.fail(function() {
@@ -109,12 +129,18 @@ function createPopularChallengesSidebar(callback) {
 	});
 }
 
+/**
+	Create a sidebar with the most popular entries
+**/
 function createPopularEntriesSidebar(callback) {
 	var list = [];
 	$.getJSON("/api/entries?sortBy=popularity&limit=5", function(list) {
-		var scrollableList = createScrollableList("popularEntriesScrollableList", list, true);
+		var elementList = [];
+		for (var i = 0; i < list.length; i++) {
+			elementList.push(createSidebarElement(list[i], list[i].id + "entry", true));
+		}
+		var sidebar = createSplitSidebar("PopularEntriesSidebar", "Popular Entries", elementList);
 
-		var sidebar = createFramelessSidebar("popularEntriesSidebar", "Popular Entries", scrollableList);
 		return callback(sidebar);
 	})
 	.fail(function() {
@@ -122,12 +148,18 @@ function createPopularEntriesSidebar(callback) {
 	});
 }
 
+/**
+	Create a sidebar with the most popular users
+**/
 function createPopularUsersSidebar(callback) {
 	var list = [];
 	$.getJSON("/api/users?sortBy=popularity&limit=5", function(list) {
-		var scrollableList = createScrollableList("popularUsersScrollableList", list, true);
+		var elementList = [];
+		for (var i = 0; i < list.length; i++) {
+			elementList.push(createSidebarElement(list[i], list[i].id + "user", true));
+		}
+		var sidebar = createSplitSidebar("PopularUsersSidebar", "Popular Users", elementList);
 
-		var sidebar = createFramelessSidebar("popularUsersSidebar", "Popular Users", scrollableList);
 		return callback(sidebar);
 	})
 	.fail(function() {
@@ -135,23 +167,33 @@ function createPopularUsersSidebar(callback) {
 	});
 }
 
+/**
+	Createa a sidebar that shows a specific challenge image
+	with a "Posted Under" header text
+**/
 function createChallengeSidebar(challengeId, callback) {
 	if (challengeId != 0) {
-		$.getJSON('/api/challenges/' + challengeId, function(data) {
-			var element = createThumbnailElement(data, "challenge", true);
-			var sidebar = createFramelessSidebar("challengeSidebar", "Challenge", element);
+		$.getJSON('/api/challenges/' + entry.sourceId, function(data) {
+			var element = createSidebarElement(data, "challenge", true);
+			
+			var list = [element];
+			var sidebar = createSplitSidebar(entry.sourceId + "FramelessSidebar", "Posted Under", list);
+
 			return callback(sidebar);
 		}).fail(function() {
 			return callback(null);
 		});
+	} else {
+		return callback(null);
 	}
+
 }
 
 function createDesignSidebar(designId, callback) {
 	if (designId != 0) {
 		$.getJSON('/api/designs/' + designId, function(data) {
 			var element = createThumbnailElement(data, "challenge", true);
-			var sidebar = createFramelessSidebar("challengeSidebar", "Challenge", element);
+			var sidebar = createSplitSidebar("challengeSidebar", "Challenge", element);
 			return callback(sidebar);
 		}).fail(function() {
 			return callback(null);
@@ -165,7 +207,7 @@ function createChallengeCaptionSidebar(challengeId, callback) {
 
 	var button = $("<button>").append("Post Caption");
 	button.click(function() {
-		window.open("/newentry?challeneId=" + challengeId, "_self");
+		window.open("/newentry?challengeId=" + challengeId, "_self");
 	});
 
 	var link = $("<div>", {class: "sidebar-item active hoverable"}).append(button);

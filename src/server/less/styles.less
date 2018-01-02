@@ -672,7 +672,19 @@ img {
 */
 .thumbnailElement {
 	margin: 0px 0px 10px 0px;
-	.floatingElement;
+	background-color: transparent;
+}
+
+.thumbnailElement > *:first-child {
+	.mediumRoundedTopCorners;
+}
+
+.thumbnailElement > a:first-child > img {
+	.mediumRoundedTopCorners;
+}
+
+.thumbnailElement > *:last-child {
+	.mediumRoundedBottomCorners;
 }
 
 .thumbnailElement.active {
@@ -1309,12 +1321,6 @@ input[type=range] .range-setting {
 	background: transparent;
 }
 
-.framelessSidebar {
-	width: 100%;
-	margin: 0px 0px 10px 0px;
-	.floatingElement;
-}
-
 .sidebarHeading {
 	width: 100%; 
 	
@@ -1325,6 +1331,20 @@ input[type=range] .range-setting {
 	letter-spacing: 1px;
 	
 	.mediumRoundedTopCorners;
+	background-color: @theme-dark-bg-color-normal;
+	color: @theme-light-fg-color-strong;
+}
+
+.split-sidebar-heading {
+	width: 100%; 
+	
+	padding: 10px 20px 10px 20px;
+	margin: 1px 1px 10px 1px;
+	.text-plain-medium;
+	.text-bold;
+	letter-spacing: 1px;
+	
+	.mediumRoundedCorners; //rounded corners on all four sides because the heading is split
 	background-color: @theme-dark-bg-color-normal;
 	color: @theme-light-fg-color-strong;
 }

@@ -136,6 +136,65 @@ function getUsers(meId, followedId, followingId, likedEntityId, lastFetchedTimes
 	});
 }
 
+/*
+	Fetch all entries from the DB matching the provided criteria, and sorted by the given sort flag.
+
+	Note: this only supports limited output given the performance hit.  This API returns all in one go,
+	and does not support chunked outputs.
+*/
+function getUsersSorted(sortBy, limit, meId, done) {
+
+	limit = Math.min(limit, config.businessLogic.maxCustomSortedLimit);
+
+	cypherQuery = "MATCH (u:User) ";
+  
+  	/*
+		PRIORITY is WEIGHTED BASED ON THE BELOW RULES:
+
+		Overall Popularity = (Number of Followers x 5) + (Number of Challenges Posted x 4) + (Number of Entries Posted x 3) + (Number of Comments Posted)
+	*/
+	cypherQuery += " WHERE (u.id <> '" + meId + "') " +
+		" WITH u " +
+		" OPTIONAL MATCH (u)<-[:FOLLOWING]-(follower:User) " +
+  		" WITH u, COUNT(follower) AS numFollowers " +
+  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(c:Challenge) " +
+  		" WITH u, numFollowers, COUNT(c) AS numChallenges " +
+  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(e:Entry) " +
+  		" WITH u, numFollowers, numChallenges, COUNT(e) AS numEntries " +
+  		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(comment:Comment) " +
+  		" WITH u, 5 * numFollowers + 4 * numChallenges + 3 * numEntries + COUNT(comment) AS popularity_count " +
+  		" RETURN u, popularity_count " +
+  		" ORDER BY popularity_count DESC LIMIT " + limit + ";";
+
+	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			return done(err, 0);
+		}
+
+		var output = [];
+		for (var i = 0; i < result.data.length; i++) {
+			var data = {};
+
+			var user = result.data[i][0];
+
+			var data = {
+				type: "user",
+	        	id: user.id,
+	        	image: user.image,
+	        	displayName: user.display_name,
+	        	link: config.url.user + user.id
+	        }
+
+	        output.activity = {lastSeen: user.activity_last_seen};
+
+			output.push(data);
+		}
+
+		return done(null, output);
+	});
+}
+
 function followUser(followerId, followedId, follow, done) {
 	if (follow) {
 		var cypherQuery = "MATCH (u1:User {id: '" + followerId + "'}), (u2:User {id: '" + followedId + "'}) " +
@@ -633,6 +692,7 @@ module.exports = {
 	getUser : getUser,
 	getUserSocialInfo : getUserSocialInfo,
 	getUsers: getUsers,
+	getUsersSorted: getUsersSorted,
 	findUser: findUser,
 	saveUser: saveUser,
 	removeAccessForUser: removeAccessForUser,

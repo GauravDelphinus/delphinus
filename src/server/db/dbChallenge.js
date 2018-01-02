@@ -99,22 +99,17 @@ function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 	} 
 
 	if (postedBy) {
-		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " + timestampClause +
-			" WITH e, poster, category, COLLECT(e) AS all_entities " +
-			" UNWIND all_entities AS e " +
-			" RETURN e, poster, category " +
-			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " + timestampClause;
 	} else if (categoryId) {
-		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Challenge)-[:POSTED_IN]->(category:Category {id: '" + categoryId + "'}) " + timestampClause +
-			" WITH e, poster, category " +
-			" RETURN e, poster, category " +
-			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Challenge)-[:POSTED_IN]->(category:Category {id: '" + categoryId + "'}) " + timestampClause;
 	} else {
-		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User) " + timestampClause +
-			" WITH e, poster, category " +
-			" RETURN e, poster, category " + 
-			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User) ";	
 	}
+
+	cypherQuery +=
+		" WITH e, poster, category " +
+		" RETURN e, poster, category " + 
+		" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
 		if (err) {
@@ -139,6 +134,65 @@ function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 		}
 
 		return done(null, output, newTimeStamp);
+	});
+}
+
+/*
+	Fetch all challenges from the DB matching the provided criteria, and sorted by the given sort flag.
+
+	Note: this only supports limited output given the performance hit.  This API returns all in one go,
+	and does not support chunked outputs.
+*/
+function getChallengesSorted(sortBy, limit, postedBy, categoryId, done) {
+
+	limit = Math.min(limit, config.businessLogic.maxCustomSortedLimit);
+
+	var cypherQuery = "";
+
+	if (postedBy) {
+		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) ";
+	} else if (categoryId) {
+		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Challenge)-[:POSTED_IN]->(category:Category {id: '" + categoryId + "'}) ";
+	} else {
+		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User) ";
+	}
+
+	/*
+		PRIORITY is WEIGHTED BASED ON THE BELOW RULES:
+
+		Overall Popularity = (Number of Likes x 5) + (Number of Comments x 2) + (Number of Entries x 10)
+	*/
+	cypherQuery +=
+		" WITH e, poster, category " +
+		" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
+		" WITH e, poster, category, COUNT(u2) AS like_count " + 
+		" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
+		" WITH e, poster, category, like_count, COUNT(comment) as comment_count " + 
+		" OPTIONAL MATCH (entry:Entry)-[:PART_OF]->(e) " +
+		" WITH e, poster, category, 5 * like_count + 2 * comment_count + 10 * COUNT(entry) AS popularity_count " +
+		" RETURN e, poster, category, popularity_count " + 
+		" ORDER BY popularity_count DESC LIMIT " + limit + ";";
+
+	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			return done(err, 0);
+		}
+
+		var output = [];
+		for (var i = 0; i < result.data.length; i++) {
+			var data = {};
+
+			var challenge = result.data[i][0];
+			var poster = result.data[i][1];
+			var category = result.data[i][2];
+
+			data = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
+
+			output.push(data);
+		}
+
+		return done(null, output);
 	});
 }
 
@@ -340,6 +394,7 @@ module.exports = {
 	getChallengeSocialInfo : getChallengeSocialInfo,
 	getChallenge : getChallenge,
 	getChallenges: getChallenges,
+	getChallengesSorted: getChallengesSorted,
 	likeChallenge: likeChallenge,
 	deleteChallenge: deleteChallenge
 };

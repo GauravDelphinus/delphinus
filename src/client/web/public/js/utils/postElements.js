@@ -13,20 +13,18 @@ function createMainElement(data, contentTag) {
 		element.append(createCaptionSectionElement(data, contentTag));
 	}
 
-
-
 	if (data.type == "entry") {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
+	//add popup elements (likers, followers, etc).  Note: Comments are shown 'inline' for Main Element
+	element.append(createLikersPopupElement(data, contentTag));
+	element.append(createFollowersPopupElement(data, contentTag));
 
-
+	//append social status and action bars
 	element.append(createSocialStatusSectionElement(data, contentTag));
 	element.append(createSocialActionsSectionElement(data, contentTag));
 	refreshSocialInfo(data, contentTag);
-
-	//container for likers list, if any
-	element.append(createLikersPopupElement(data, contentTag));
 
 	return element;
 }
@@ -75,15 +73,17 @@ function createScrollableElement(data, contentTag, compressed = false) {
 	//container for comments, if any
 	element.append(createCommentsContainer(data.id, contentTag));
 
+	//add popup elements (likers, followers, etc).  Note: Comments are shown 'inline' for Main Element
+	element.append(createLikersPopupElement(data, contentTag));
+	element.append(createFollowersPopupElement(data, contentTag));
+
+	//add social status and action bars
 	element.append(createSocialStatusSectionElement(data, contentTag, !compressed));
 
 	if (!compressed) {
 		element.append(createSocialActionsSectionElement(data, contentTag));
 	}
 	refreshSocialInfo(data, contentTag);
-
-	//container for likers list, if any
-	element.append(createLikersPopupElement(data, contentTag));
 
 	return element;
 }
@@ -128,9 +128,11 @@ function createFeedElement(data, contentTag) {
 		element.append(createCommentsContainer(data.id, contentTag));
 	}
 
-	//container for likers list, if any
+	//add popup elements (likers, followers, etc).  Note: Comments are shown 'inline' for Main Element
 	element.append(createLikersPopupElement(data, contentTag));
+	element.append(createFollowersPopupElement(data, contentTag));
 
+	//add social status and action bars
 	element.append(createSocialStatusSectionElement(data, contentTag));
 	element.append(createSocialActionsSectionElement(data, contentTag));
 	refreshSocialInfo(data, contentTag);
@@ -152,7 +154,7 @@ function createThumbnailElement(data, contentTag, createLink) {
 		element.append(createEntityImageElement(data, contentTag));
 	}
 
-	if (data.caption && data.type != "entry") {
+	if (data.type != "entry") {
 		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data, contentTag));
 		element.append(link);
 	}
@@ -161,21 +163,49 @@ function createThumbnailElement(data, contentTag, createLink) {
 		element.append(createTimeLapseProgressSectionElement(data, contentTag));
 	}
 
+	//create containers for popup - even comments are shown in popup in case of thumbnail elements due to shortage of space
+	element.append(createCommentsPopupElement(data, contentTag));
+	element.append(createLikersPopupElement(data, contentTag));
+	element.append(createFollowersPopupElement(data, contentTag));
+
+	//add the social status bar, skip the action bar as there is not enough space
 	element.append(createSocialStatusSectionElement(data, contentTag));
-	element.append(createSocialActionsSectionElement(data, contentTag));
 	refreshSocialInfo(data, contentTag);
 
-	//container for comments, if any
-	var commentPopupHeader = $("<h2>").append("Comments");
-	var commentPopupBody = createCommentsContainer(data.id, contentTag);
-	element.append(createPopupElement(contentTag + data.id + "CommentsPopup", "modal-medium", commentPopupHeader, null, commentPopupBody, function() {
-		showHideCommentsList(data.id, contentTag, false);
-	}));
+	return element;
+}
 
-	//container for likers list, if any
+/*
+	Create a simple version of the thumbnail element to be displayed on the sidebars
+	Should not include the SocialStatusActions bar.
+*/
+function createSidebarElement(data, contentTag, createLink) {
+	var element = $("<div>", {class: "thumbnailElement"});
+
+	if(createLink) {
+		var imageLink = $("<a>", {href: data.link}).append(createEntityImageElement(data, contentTag));
+		element.append(imageLink);
+	} else {
+		element.append(createEntityImageElement(data, contentTag));
+	}
+
+	if (data.postedDate) {
+		element.append(createPostHeaderElement(data, contentTag));
+	}
+
+	if (data.caption && data.type != "entry") {
+		var link = $("<a>", {href: data.link}).append(createCaptionSectionElement(data, contentTag));
+		element.append(link);
+	}
+
+	//create containers for popup
+	element.append(createCommentsPopupElement(data, contentTag));
 	element.append(createLikersPopupElement(data, contentTag));
-
 	element.append(createFollowersPopupElement(data, contentTag));
+
+	//add the social status bar, skip the action bar as there is not enough space
+	element.append(createSocialStatusSectionElement(data, contentTag));
+	refreshSocialInfo(data, contentTag);
 
 	return element;
 }
@@ -256,7 +286,8 @@ function createPostHeaderElement(data, contentTag) {
 function createCaptionSectionElement(data, contentTag) {
 	// Caption (if available)
 	var captionSection = $("<div>", {class: "captionSection", id: contentTag + data.id + "CaptionSection"});
-	var caption = $("<span>", {class: "text-plain-large", text: data.caption});
+
+	var caption = $("<span>", {class: "text-plain-large", text: (data.type == "user" ? data.displayName: data.caption)});
 	captionSection.append(caption);
 
 	return captionSection;

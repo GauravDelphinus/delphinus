@@ -92,21 +92,17 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 	} 
 
 	if (postedBy) {
-		cypherQuery += " MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " + timestampClause +
-			" WITH e, poster, labels(source) AS source_labels, source " +
-			" RETURN e, poster, source_labels, source " +
-			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+		cypherQuery += " MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) " + timestampClause;
 	} else if (challengeId) {
-		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Entry)-[:PART_OF]->(source:Challenge {id: '" + challengeId + "'}) " + timestampClause +
-			" WITH e, poster, labels(source) AS source_labels, source " +
-			" RETURN e, poster, source_labels, source " +
-			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Entry)-[:PART_OF]->(source:Challenge {id: '" + challengeId + "'}) " + timestampClause;
 	} else {
-		cypherQuery += " MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User) " + timestampClause +
-			" WITH e, poster, labels(source) AS source_labels, source " +
-			" RETURN e, poster, source_labels, source " + 
-			" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
+		cypherQuery += " MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User) " + timestampClause;
 	}
+
+	cypherQuery +=
+		" WITH e, poster, labels(source) AS source_labels, source " +
+		" RETURN e, poster, source_labels, source " + 
+		" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
 		if (err) {
@@ -133,6 +129,62 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 		}
 
 		return done(null, output, newTimeStamp);
+	});
+}
+
+/*
+	Fetch all entries from the DB matching the provided criteria, and sorted by the given sort flag.
+
+	Note: this only supports limited output given the performance hit.  This API returns all in one go,
+	and does not support chunked outputs.
+*/
+function getEntriesSorted(sortBy, limit, postedBy, done) {
+
+	limit = Math.min(limit, config.businessLogic.maxCustomSortedLimit);
+
+	var cypherQuery = "";
+
+	if (postedBy) {
+		cypherQuery += " MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User {id: '" + postedBy + "'}) ";
+	} else {
+		cypherQuery += " MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User) ";
+	}
+
+	/*
+		PRIORITY is WEIGHTED BASED ON THE BELOW RULES:
+
+		Overall Popularity = (Number of Likes x 5) + (Number of Comments x 2)
+	*/
+	cypherQuery +=
+		" WITH e, poster, labels(source) AS source_labels, source " +
+		" OPTIONAL MATCH (u2:User)-[:LIKES]->(e) " + 
+		" WITH e, poster, source_labels, source, COUNT(u2) AS like_count " + 
+		" OPTIONAL MATCH (comment:Comment)-[:POSTED_IN]->(e) " + 
+		" WITH e, poster, source_labels, source, 5 * like_count + 2 * COUNT(comment) AS popularity_count " + 
+		" RETURN e, poster, source_labels, source, popularity_count " + 
+		" ORDER BY popularity_count DESC LIMIT " + limit + ";";
+
+	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			return done(err, 0);
+		}
+
+		var output = [];
+		for (var i = 0; i < result.data.length; i++) {
+			var data = {};
+
+			var entry = result.data[i][0];
+			var poster = result.data[i][1];
+			var sourceLabel = result.data[i][2];
+			var source = result.data[i][3];
+
+			data = dbUtils.entityNodeToClientData("Entry", entry, poster, null, sourceLabel, source);
+
+			output.push(data);
+		}
+
+		return done(null, output);
 	});
 }
 
@@ -496,6 +548,7 @@ module.exports = {
 	getEntry: getEntry,
 	getEntrySocialInfo: getEntrySocialInfo,
 	getEntries: getEntries,
+	getEntriesSorted: getEntriesSorted,
 	deleteEntry: deleteEntry,
 	likeEntry: likeEntry
 };
