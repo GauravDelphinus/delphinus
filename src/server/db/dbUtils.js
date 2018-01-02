@@ -165,6 +165,8 @@ function sanitizeStringForCypher(str) {
 	return out;
 }
 
+
+
 var activityPrototype = {
 	"entityId" : "id",
 	"type" : ["post", "comment", "like"],

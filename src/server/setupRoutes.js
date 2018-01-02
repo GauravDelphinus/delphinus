@@ -86,7 +86,7 @@ function setupRenderRoutes(app) {
 
 			if (!serverUtils.validateData(data.challenge, serverUtils.prototypes.challenge) ||
 				!serverUtils.validateData(data.metadata, serverUtils.prototypes.metadata)) {
-				return res.sendStatus(500);
+				return res.render("error", {redirectURL: "/challenges"});
 			}
 
 			data.user = normalizeUser(req.user);
@@ -112,12 +112,12 @@ function setupRenderRoutes(app) {
 		metadata.getEntryMetadata(req.params.entryId, function(err, data) {
 			if (err) {
 				logger.error("Error retrieving metadata for entry id: " + req.params.entryId + ", err: " + err);
-				return res.render("error", {redirectURL: "/"});
+				return res.render("error", {redirectURL: "/entries"});
 			}
 
 			if (!serverUtils.validateData(data.entry, serverUtils.prototypes.entry) ||
 				!serverUtils.validateData(data.metadata, serverUtils.prototypes.metadata)) {
-				return res.sendStatus(500);
+				return res.render("error", {redirectURL: "/entries"});
 			}
 
 			data.user = normalizeUser(req.user);
@@ -151,19 +151,19 @@ function setupRenderRoutes(app) {
         	metadata.getUserMetadata(req.user.id, function(err, data) {
 				if (err) {
 					logger.error("Error retrieving metadata for user id: " + req.user.id + ", err: " + err);
-					return res.render("error", {redirectURL: "/"});
+					return res.render("error", {redirectURL: "/users"});
 				}
 
 				if (!serverUtils.validateData(data.userInfo, serverUtils.prototypes.user) ||
 					!serverUtils.validateData(data.metadata, serverUtils.prototypes.metadata)) {
-					return res.sendStatus(500);
+					return res.render("error", {redirectURL: "/users"});
 				}
 
 				data.user = normalizeUser(req.user);
 				res.render("user", data);
 			});
 		} else {
-			return res.render("error", {redirectURL: "/"});
+			return res.render("error", {redirectURL: "/users"});
         }
 	});
 
@@ -172,12 +172,12 @@ function setupRenderRoutes(app) {
 		metadata.getUserMetadata(req.params.userID, function(err, data) {
 			if (err) {
 				logger.error("Error retrieving metadata for user id: " + req.params.userID + ", err: " + err);
-				return res.render("error", {redirectURL: "/"});
+				return res.render("error", {redirectURL: "/users"});
 			}
 
 			if (!serverUtils.validateData(data.userInfo, serverUtils.prototypes.user) ||
 				!serverUtils.validateData(data.metadata, serverUtils.prototypes.metadata)) {
-				return res.sendStatus(500);
+				return res.render("error", {redirectURL: "/users"});
 			}
 
 			data.user = normalizeUser(req.user);

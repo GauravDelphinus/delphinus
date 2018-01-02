@@ -589,6 +589,20 @@ module.exports = {
 	},
 
 	/*
+		Sanitize image path before we look up the path to determine image type
+		In particular, if the image has a parameter list (starting with a ?), then strip that off
+	*/
+	sanitizeImagePathForParsing: function(path) {
+		var parameterIndex = path.indexOf("?");
+		var output = path;
+		if (parameterIndex != -1) {
+			output = path.slice(0, parameterIndex);
+		}
+
+		return output;
+	},
+
+	/*
 		Prototypes used for validating output sent back to client from server.
 		Note that this acts like a filter - if a property is not present in the actual data
 		it will *not* catch it, but if it is present it will make sure to match and validate
@@ -811,5 +825,6 @@ function findAndIncrementSmallest(indices, feedsArray) {
 	//console.log("returning smallest as " + smallest.id + ", created = " + smallest.compareDate);
 	return smallest;
 }
+
 
 

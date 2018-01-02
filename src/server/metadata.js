@@ -5,6 +5,8 @@ const dbEntry = require("./db/dbEntry");
 const dbUser = require("./db/dbUser");
 const config = require("./config");
 const mime = require("mime");
+const logger = require("./logger");
+const serverUtils = require("./serverUtils");
 
 /*
 	Get Metadata associated with the given challenge, along with the
@@ -98,7 +100,7 @@ function getUserMetadata(userId, done) {
 			pageTitle : "User: " + user.displayName + " | " + config.branding.siteName,
 			pageURL : dynamicConfig.hostname + config.url.user + user.id,
 			pageDescription : "Captionify User Profile for " + user.displayName,
-			imageType : mime.lookup(user.image),
+			imageType : mime.lookup(serverUtils.sanitizeImagePathForParsing(user.image)),
 			authorName : config.branding.siteName
 		};
 

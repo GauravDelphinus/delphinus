@@ -3,7 +3,7 @@ const dataUtils = require("../dataUtils");
 const config = require("../config");
 const serverUtils = require("../serverUtils");
 const logger = require("../logger");
-
+const error = require("../error");
 
 function getUser(userId, done) {
 	var cypherQuery = "MATCH (u:User{id: '" + userId + "'}) WITH u " +
@@ -13,7 +13,7 @@ function getUser(userId, done) {
 		if (err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-        	return done(new DBResultError(cypherQuery, 1, result.data.length));
+        	return done(new error.DBResultError(cypherQuery, 1, result.data.length));
         }
 
         var user = result.data[0];
@@ -49,7 +49,7 @@ function getUserSocialInfo(userId, meId, done) {
 		if (err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-        	return done(new DBResultError(cypherQuery, 1, result.data.length));
+        	return done(new error.DBResultError(cypherQuery, 1, result.data.length));
         }
 
         var user = result.data[0][0];
@@ -204,7 +204,7 @@ function followUser(followerId, followedId, follow, done) {
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.data.length));
 	        }
 
 	        return done(null, result.data.length == 1);
@@ -217,7 +217,7 @@ function followUser(followerId, followedId, follow, done) {
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.data.length));
 	        }
 
 			return done(null, result.data.length == 0);
