@@ -103,7 +103,7 @@ function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 	} else if (categoryId) {
 		cypherQuery += " MATCH (poster:User)<-[:POSTED_BY]-(e:Challenge)-[:POSTED_IN]->(category:Category {id: '" + categoryId + "'}) " + timestampClause;
 	} else {
-		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User) ";	
+		cypherQuery += " MATCH (category:Category)<-[:POSTED_IN]-(e:Challenge)-[:POSTED_BY]->(poster:User) " + timestampClause;	
 	}
 
 	cypherQuery +=
