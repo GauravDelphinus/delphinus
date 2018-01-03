@@ -21,7 +21,8 @@
 @theme-colored-fg-color-strong: #d4443e;
 
 //light foreground
-@theme-light-fg-color-normal: #91949d;
+@theme-light-fg-color-normal: #E0E0E0;
+@theme-light-fg-color-weak: #91949d;
 @theme-light-fg-color-strong: #ffffff;
 
 .page-background {
@@ -256,6 +257,7 @@
 	cursor: pointer;
 	font-size: @theme-font-size-small;
 	text-transform: uppercase;
+	letter-spacing: 1px;
 	word-wrap: break-word; // for same width effect
 	padding: 10px 0px 10px 0px;
 	width: 100%;
@@ -1474,7 +1476,7 @@ ul.nav li.dropdown.open > a {
 .nav-tabs>li>a {
 	text-decoration: none;
 	background-color: transparent;
-	color: @theme-light-fg-color-normal;
+	color: @theme-light-fg-color-weak;
 	font-size: @theme-font-size-normal;
 	font-weight: bold;
 }
