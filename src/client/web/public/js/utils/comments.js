@@ -102,7 +102,7 @@ function createCommentElement(data, parentId, contentTag, isReply) {
 
 	tdRight.append("  ");
 
-	var commentText = $("<span>", {class: "commentText text-plain-small", text: data.text});
+	var commentText = $("<span>", {class: "commentText", text: data.text});
 	tdRight.append(commentText);
 
 	tdRight.append("<br>");

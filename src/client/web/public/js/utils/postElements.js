@@ -322,14 +322,14 @@ function createMainImageElement(data) {
 }
 
 function createTextElement(data) {
-	var textElement = $("<div>", {class: "commentText text-plain-small"});
+	var textElement = $("<div>", {class: "commentText"});
 	textElement.text(data.text);
 	return textElement;
 }
 
 function createActivitySectionElement(data, contentTag) {
 	var activitySection = $("<div>", {id: contentTag + data.id + "ActivitySection", class: "activitySection"});
-	var activityText = $("<span>", {id: contentTag + data.id + "ActivityText", class: "text-plain-small"});
+	var activityText = $("<span>", {id: contentTag + data.id + "ActivityText"});
 
 	if (data.activity) {
 		if (data.activity.type == "like") {

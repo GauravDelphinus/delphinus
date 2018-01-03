@@ -1,7 +1,7 @@
 
 function createSocialStatusSectionForComment(data, parentId, contentTag, isReply) {
 	var socialStatusSection = $("<div>", {class: "socialStatusSectionSimple"});
-	var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "button-link text-plain-small separator"}).append("Like");
+	var likeButton = $("<button>", {id: contentTag + data.id + "LikeButton", type: "button", class: "button-link separator"}).append("Like");
 	socialStatusSection.append(likeButton);
 
 	
@@ -31,7 +31,7 @@ function createSocialStatusSectionForComment(data, parentId, contentTag, isReply
 	
 	});
 
-	var replyButton = $("<button>", {id: contentTag + data.id + "ReplyButton", type: "button", class: "button-link text-plain-small separator-small"}).append("Reply");
+	var replyButton = $("<button>", {id: contentTag + data.id + "ReplyButton", type: "button", class: "button-link separator-small"}).append("Reply");
 	socialStatusSection.append(replyButton);
 	replyButton.click(function(e) {
 		if (user) {
@@ -56,7 +56,7 @@ function createSocialStatusSectionForComment(data, parentId, contentTag, isReply
 	if (user && user.id == data.postedByUser.id) {
 		socialStatusSection.append(createSeparatorElement("dot", "separator-small"));
 
-		var deleteButton = $("<button>", {id: contentTag + data.id + "DeleteButton", type: "button", class: "button-link text-plain-small separator-small"}).append("Delete");
+		var deleteButton = $("<button>", {id: contentTag + data.id + "DeleteButton", type: "button", class: "button-link separator-small"}).append("Delete");
 		socialStatusSection.append(deleteButton);
 		deleteButton.click(function(e) {
 			var result = confirm("Are you sure you want to delete this comment permanently?");
@@ -191,7 +191,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 
 	// For Challenges and Entries
 	if (data.type == "challenge" || data.type == "entry") {
-		var likeButton = $("<button>", {id: contentTag + data.id + "LikesButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		var likeButton = $("<button>", {id: contentTag + data.id + "LikesButton", type: "button", class: "button-link separator-medium"});
 		likeButton.append($("<span>", {id: contentTag + data.id + "NumLikes", text: "0"}));
 		likeButton.append($("<span>", {text: " Likes"}));
 		likeButton.hide();
@@ -205,7 +205,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	
 	if (data.type == "challenge" || data.type == "entry") {
 
-		var shareButton = $("<button>", {id: contentTag + data.id + "SharesButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		var shareButton = $("<button>", {id: contentTag + data.id + "SharesButton", type: "button", class: "button-link separator-medium"});
 		shareButton.append($("<span>", {id: contentTag + data.id + "NumShares", text: "0"}));
 		shareButton.append($("<span>", {text: " Shares"}));
 		shareButton.hide();
@@ -215,7 +215,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	
 	if (data.type == "challenge" || data.type == "entry") {
 
-		var commentButton = $("<button>", {id: contentTag + data.id + "CommentsButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		var commentButton = $("<button>", {id: contentTag + data.id + "CommentsButton", type: "button", class: "button-link separator-medium"});
 		commentButton.append($("<span>", {id: contentTag + data.id + "NumComments", text: "0"}));
 		commentButton.append($("<span>", {text: " Comments"}));
 		commentButton.hide();
@@ -230,7 +230,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	// For challenges only
 	if (data.type == "challenge") {
 
-		var entriesButton = $("<button>", {id: contentTag + data.id + "EntriesButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		var entriesButton = $("<button>", {id: contentTag + data.id + "EntriesButton", type: "button", class: "button-link separator-medium"});
 		entriesButton.append($("<span>", {id: contentTag + data.id + "NumEntries", text: "0"}));
 		entriesButton.append($("<span>", {text: " Entries"}));
 		entriesButton.hide();
@@ -250,7 +250,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 
 	// For Users
 	if (data.type == "user") {
-		var followersButton = $("<button>", {id: contentTag + data.id + "FollowersButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		var followersButton = $("<button>", {id: contentTag + data.id + "FollowersButton", type: "button", class: "button-link separator-medium"});
 		followersButton.append($("<span>", {id: contentTag + data.id + "NumFollowers", text: "0"}));
 		followersButton.append($("<span>", {text: " Followers"}));
 		followersButton.hide();
@@ -260,7 +260,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 		});
 		socialStatus.append(followersButton);
 
-		var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "button-link separator-medium"});
 		followingButton.append($("<span>", {id: data.id + "NumFollowing", text: "0"}));
 		followingButton.append($("<span>", {text: " Following"}));
 		followingButton.hide();
@@ -272,7 +272,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	}
 
 	if (data.type == "user") {
-		var postsButton = $("<button>", {id: contentTag + data.id + "PostsButton", type: "button", class: "button-link text-plain-small separator-medium"});
+		var postsButton = $("<button>", {id: contentTag + data.id + "PostsButton", type: "button", class: "button-link separator-medium"});
 		postsButton.append($("<span>", {id: contentTag + data.id + "NumPosts", text: "0"}));
 		postsButton.append($("<span>", {text: " Posts"}));
 		postsButton.hide();

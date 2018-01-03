@@ -29,6 +29,12 @@
 	background-repeat: repeat;
 }
 
+/********************************* FONT SIZE AND WEIGHT **************************/
+
+@theme-font-size-small: 13px;
+@theme-font-size-normal: 15px;
+@theme-font-size-large: 17px;
+
 /********************************* CENTER DISPLAY **************************/
 /*
 	The Center Display shows a centered container with a rounded
@@ -57,8 +63,8 @@
 }
 
 .centerDisplayTitle {
-	.text-plain-large;
-	.text-bold;
+	font-size: @theme-font-size-large;
+	font-weight: bold;
 }
 
 .centerDisplayFull {
@@ -73,12 +79,12 @@
 
 .centerDisplayHeader {
 	text-align: center;
-	.text-plain-large;
-	.text-bold;
+	font-size: @theme-font-size-large;
+	font-weight: bold;
 }
 
 .centerDisplayFooter {
-	.text-plain-small;
+	font-size: @theme-font-size-small;
 	text-align: center;
 }
 
@@ -97,8 +103,8 @@
 }
 
 .centerDisplayCaptionSmall{
-	.text-plain-medium;
-	.text-bold;
+	font-size: @theme-font-size-normal;
+	font-weight: bold;
 	color: black;
 	text-align: left; /* override left align from centerDisplayContent */
 	margin-top: 10px;
@@ -248,8 +254,10 @@
 	color: @theme-light-fg-color-normal;
 	display: table-cell;
 	cursor: pointer;
+	font-size: @theme-font-size-small;
+	text-transform: uppercase;
 	word-wrap: break-word; // for same width effect
-	padding: 10px;
+	padding: 10px 0px 10px 0px;
 	width: 100%;
 }
 
@@ -258,7 +266,7 @@
 }
 
 .social-action-button:hover {
-	background-color: @theme-colored-bg-color-normal;
+	background-color: @theme-colored-bg-color-strong;
 	color: @theme-light-fg-color-strong;
 }
 
@@ -339,26 +347,6 @@
 
 /********************************** GENERAL - TEXT ***********************/
 
-.text-plain-small {
-	font-size: 13px;
-}
-
-.text-plain-medium {
-	font-size: 15px;
-}
-
-.text-plain-large {
-	font-size: 17px;
-}
-
-.text-italic {
-	font-style: italic;
-}
-
-.text-bold {
-	font-weight: bold;
-}
-
 .text-small-caps {
 	font-variant: small-caps;
 }
@@ -368,13 +356,8 @@
 }
 
 .secondary-info {
-	.text-plain-small;
+	font-size: @theme-font-size-small;
 	color: @theme-dark-fg-color-weak;
-}
-
-.main-title {
-	.text-plain-large;
-	.text-bold;
 }
 
 /********************************* GENERAL - HR *********************/
@@ -734,8 +717,8 @@ img {
 
 .posted-by-name a {
 	color: @theme-light-fg-color-strong;
-	.text-plain-small;
-	.text-bold;
+	font-size: @theme-font-size-small;
+	font-weight: bold;
 	text-decoration: none;
 }
 
@@ -746,8 +729,8 @@ text-decoration: underline;
 
 .posted-by-name-light a { //for comments and other containers with light background
 	color: @theme-dark-fg-color-strong;
-	.text-plain-small;
-	.text-bold;
+	font-size: @theme-font-size-small;
+	font-weight: bold;
 	text-decoration: none;
 }
 
@@ -756,14 +739,14 @@ text-decoration: underline;
 }
 
 .posted-date {
-	.text-plain-small;
-	.text-italic;
+	font-size: @theme-font-size-small;
+	font-style: italic;
 	color: @theme-light-fg-color-normal;
 }
 
 .posted-category {
-	.text-plain-small;
-	.text-italic;
+	font-size: @theme-font-size-small;
+	font-style: italic;
 	color: @theme-light-fg-color-normal;
 }
 
@@ -839,7 +822,7 @@ input[type=range] .timelapseRange  {
 
 .view-type-button:hover {
 	//margin: 1px;
-	background-color: @theme-colored-bg-color-normal;
+	background-color: @theme-colored-bg-color-strong;
 	color: @theme-light-fg-color-strong;
 }
 
@@ -1326,8 +1309,8 @@ input[type=range] .range-setting {
 	
 	padding: 10px 20px 10px 20px;
 	margin: 1px;
-	.text-plain-medium;
-	.text-bold;
+	font-size: @theme-font-size-normal;
+	font-weight: bold;
 	letter-spacing: 1px;
 	
 	.mediumRoundedTopCorners;
@@ -1340,8 +1323,8 @@ input[type=range] .range-setting {
 	
 	padding: 10px 20px 10px 20px;
 	margin: 1px 1px 10px 1px;
-	.text-plain-medium;
-	.text-bold;
+	font-size: @theme-font-size-normal;
+	font-weight: bold;
 	letter-spacing: 1px;
 	
 	.mediumRoundedCorners; //rounded corners on all four sides because the heading is split
@@ -1354,7 +1337,7 @@ input[type=range] .range-setting {
 
 .sidebar-item {
 	margin: 1px;
-	.text-plain-small;
+	font-size: @theme-font-size-small;
 	font-weight: 700;
 	background-color: @theme-dark-bg-color-normal;
 	width: 100%;
@@ -1492,10 +1475,12 @@ ul.nav li.dropdown.open > a {
 	text-decoration: none;
 	background-color: transparent;
 	color: @theme-light-fg-color-normal;
+	font-size: @theme-font-size-normal;
+	font-weight: bold;
 }
 
-ul.nav>li>a:hover {
-	background-color: @theme-colored-bg-color-normal;
+ul.nav-tabs>li>a:hover {
+	background-color: @theme-colored-bg-color-strong;
 	color: @theme-light-fg-color-strong;
 }
 
@@ -1505,7 +1490,7 @@ ul.nav>li>a:hover {
 	color: @theme-light-fg-color-strong;
 }
 .nav-tabs>li.active>a:hover {
-	background-color: @theme-colored-bg-color-normal;
+	background-color: @theme-colored-bg-color-strong;
 	color: @theme-light-fg-color-strong;
 }
 

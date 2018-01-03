@@ -238,16 +238,16 @@ function setupProfileTab(profileType) {
 		var title = $("<div>", {class: "sectionTitle"}).append("Manage your social networks");
 		tabDiv.append(title);
 
-		var connectedStatus = $("<span>", {class: "text-plain-small text-bold"}).append("Connected");
-		var disconnectedStatus = $("<span>", {class: "text-plain-small text-bold"}).append("Not Connected");
+		var connectedStatus = $("<span>").append("Connected");
+		var disconnectedStatus = $("<span>").append("Not Connected");
 		
 		var facebookLogo = $("<span>").append($("<img>", {src: "/images/social/facebook_share.png"}));
-		var connectFacebook = $("<a>", {class: "text-plain-small text-bold", href: "/auth/facebook"}).append("Connect");
-		var disconnectFacebook = $("<a>", {class: "text-plain-small text-bold", href: "/auth/facebook/logout"}).append("Disconnect");
+		var connectFacebook = $("<a>", {href: "/auth/facebook"}).append("Connect");
+		var disconnectFacebook = $("<a>", {href: "/auth/facebook/logout"}).append("Disconnect");
 
 		var twitterLogo = $("<span>").append($("<img>", {src: "/images/social/twitter_share.png"}));
-		var connectTwitter = $("<a>", {class: "text-plain-small text-bold", href: "/auth/twitter"}).append("Connect");
-		var disconnectTwitter = $("<a>", {class: "text-plain-small text-bold", href: "/auth/twitter/logout"}).append("Disconnect");
+		var connectTwitter = $("<a>", {href: "/auth/twitter"}).append("Connect");
+		var disconnectTwitter = $("<a>", {href: "/auth/twitter/logout"}).append("Disconnect");
 
 		var table = $("<table>", {width: "100%"});
 
