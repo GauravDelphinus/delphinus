@@ -881,9 +881,9 @@ input[type=range] .timelapseRange  {
 /* Buttons that show when you hover over the image */
 .buttonOverImage {
     position:absolute;
-    background: rgba(0, 0, 0, 0);
+    background: rgba(0, 0, 0, 0.5);
     border: 0px;
-  	color: white;
+  	color: @theme-colored-fg-color-normal;
     display:none;
 }
 
@@ -916,6 +916,7 @@ input[type=range] .timelapseRange  {
   	margin:0 auto;
   	padding: 0px;
   	text-align: center;
+  	color: @theme-light-fg-color-strong;
 }
 
 /* Actual text box that contains the user's profile name */
@@ -925,14 +926,15 @@ input[type=range] .timelapseRange  {
 	font-size: 2em;
 	font-weight: bold;
 	text-align: center;
-	border-style: dotted;
-	border-color: rgba(0, 0, 0, 0);
-	border-width: 0.25px;
-	background-color: rgba(0, 0, 0, 0);
+	background-color: transparent;
+	border: 0px;
 }
 
 .displayNameHover:hover {
-	border-color: black;
+	border-color: @theme-light-fg-color-strong;
+	border-width: 0.25px;
+	border-style: dotted;
+	border-color: @theme-light-fg-color-normal;
 }
 
 .profileNameHover:hover input {
