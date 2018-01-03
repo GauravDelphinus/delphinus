@@ -431,11 +431,25 @@ function updatePosts(contentTag, entityId, numPosts) {
 function updateFacebookLink(contentTag, entityId, facebookLink) {
 	$("#" + contentTag + entityId + "FacebookButton").show();
 	$("#" + contentTag + entityId + "FacebookButton").data("facebookLink", facebookLink);
+
+	//detach the link and reattach at the end of the social actions section (this is to allow the css rules around rounded corners to work correctly)
+	//this is somewhat of hack since this couldn't work via css - see https://stackoverflow.com/questions/5275098/a-css-selector-to-get-last-visible-div
+	var element = $("#" + contentTag + entityId + "FacebookButton");
+	var parent = element.parent();
+	var element = element.detach();
+	parent.append(element);
 }
 
 function updateTwitterLink(contentTag, entityId, twitterLink) {
 	$("#" + contentTag + entityId + "TwitterButton").show();
 	$("#" + contentTag + entityId + "TwitterButton").data("twitterLink", twitterLink);
+
+	//detach the link and reattach at the end of the social actions section (this is to allow the css rules around rounded corners to work correctly)
+	//this is somewhat of hack since this couldn't work via css - see https://stackoverflow.com/questions/5275098/a-css-selector-to-get-last-visible-div
+	var element = $("#" + contentTag + entityId + "TwitterButton");
+	var parent = element.parent();
+	var element = element.detach();
+	parent.append(element);
 }
 
 function createSocialActionsSectionElement(data, contentTag, full /* show full status */) {
