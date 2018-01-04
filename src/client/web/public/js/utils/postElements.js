@@ -287,7 +287,7 @@ function createCaptionSectionElement(data, contentTag) {
 	// Caption (if available)
 	var captionSection = $("<div>", {class: "captionSection", id: contentTag + data.id + "CaptionSection"});
 
-	var caption = $("<span>", {class: "text-plain-large", text: (data.type == "user" ? data.displayName: data.caption)});
+	var caption = $("<span>", {text: (data.type == "user" ? data.displayName: data.caption)});
 	captionSection.append(caption);
 
 	return captionSection;
