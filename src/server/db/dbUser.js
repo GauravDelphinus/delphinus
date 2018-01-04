@@ -4,6 +4,7 @@ const config = require("../config");
 const serverUtils = require("../serverUtils");
 const logger = require("../logger");
 const error = require("../error");
+const shortid = require("shortid");
 
 function getUser(userId, done) {
 	var cypherQuery = "MATCH (u:User{id: '" + userId + "'}) WITH u " +
@@ -539,7 +540,7 @@ function saveUser (user, next) {
 				cypherQuery += ", location: '" + user.location + "'";
 			}
 
-			if (user.lastSeen) {
+			if (user.activity && user.activity.lastSeen) {
 				cypherQuery += ", activity_last_seen: " + user.activity.lastSeen + "";
 			}
 
