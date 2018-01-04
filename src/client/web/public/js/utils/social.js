@@ -181,6 +181,13 @@ function refreshSocialInfo(data, contentTag) {
 			}
 		}
 
+		//if there are no visible social-status-buttons then just hide the SocialStatusSection
+		if ($("#" + contentTag + data.id + "SocialStatusSection .social-status-button:visible").length) {
+			$("#" + contentTag + data.id + "SocialStatusSection").show();
+		} else {
+			$("#" + contentTag + data.id + "SocialStatusSection").hide();
+		}
+
 		//update the rounded corners for the social action buttons
 		//this is somewhat of hack since this couldn't work via css - see https://stackoverflow.com/questions/5275098/a-css-selector-to-get-last-visible-div
 		$("#" + contentTag + data.id + "SocialActionsSection .social-action-button").removeClass("mediumRoundedBottomLeftCorner").removeClass("mediumRoundedBottomRightCorner");
@@ -197,7 +204,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 
 	// For Challenges and Entries
 	if (data.type == "challenge" || data.type == "entry") {
-		var likeButton = $("<button>", {id: contentTag + data.id + "LikesButton", type: "button", class: "button-link separator-medium"});
+		var likeButton = $("<button>", {id: contentTag + data.id + "LikesButton", type: "button", class: "social-status-button separator-medium"});
 		likeButton.append($("<span>", {id: contentTag + data.id + "NumLikes", text: "0"}));
 		likeButton.append($("<span>", {text: " Likes"}));
 		likeButton.hide();
@@ -211,7 +218,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	
 	if (data.type == "challenge" || data.type == "entry") {
 
-		var shareButton = $("<button>", {id: contentTag + data.id + "SharesButton", type: "button", class: "button-link separator-medium"});
+		var shareButton = $("<button>", {id: contentTag + data.id + "SharesButton", type: "button", class: "social-status-button separator-medium"});
 		shareButton.append($("<span>", {id: contentTag + data.id + "NumShares", text: "0"}));
 		shareButton.append($("<span>", {text: " Shares"}));
 		shareButton.hide();
@@ -221,7 +228,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	
 	if (data.type == "challenge" || data.type == "entry") {
 
-		var commentButton = $("<button>", {id: contentTag + data.id + "CommentsButton", type: "button", class: "button-link separator-medium"});
+		var commentButton = $("<button>", {id: contentTag + data.id + "CommentsButton", type: "button", class: "social-status-button separator-medium"});
 		commentButton.append($("<span>", {id: contentTag + data.id + "NumComments", text: "0"}));
 		commentButton.append($("<span>", {text: " Comments"}));
 		commentButton.hide();
@@ -236,7 +243,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	// For challenges only
 	if (data.type == "challenge") {
 
-		var entriesButton = $("<button>", {id: contentTag + data.id + "EntriesButton", type: "button", class: "button-link separator-medium"});
+		var entriesButton = $("<button>", {id: contentTag + data.id + "EntriesButton", type: "button", class: "social-status-button separator-medium"});
 		entriesButton.append($("<span>", {id: contentTag + data.id + "NumEntries", text: "0"}));
 		entriesButton.append($("<span>", {text: " Entries"}));
 		entriesButton.hide();
@@ -256,7 +263,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 
 	// For Users
 	if (data.type == "user") {
-		var followersButton = $("<button>", {id: contentTag + data.id + "FollowersButton", type: "button", class: "button-link separator-medium"});
+		var followersButton = $("<button>", {id: contentTag + data.id + "FollowersButton", type: "button", class: "social-status-button separator-medium"});
 		followersButton.append($("<span>", {id: contentTag + data.id + "NumFollowers", text: "0"}));
 		followersButton.append($("<span>", {text: " Followers"}));
 		followersButton.hide();
@@ -266,7 +273,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 		});
 		socialStatus.append(followersButton);
 
-		var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "button-link separator-medium"});
+		var followingButton = $("<button>", {id: data.id + "FollowingButton", type: "button", class: "social-status-button separator-medium"});
 		followingButton.append($("<span>", {id: data.id + "NumFollowing", text: "0"}));
 		followingButton.append($("<span>", {text: " Following"}));
 		followingButton.hide();
@@ -278,7 +285,7 @@ function createSocialStatusSectionElement(data, contentTag, showBorder = true) {
 	}
 
 	if (data.type == "user") {
-		var postsButton = $("<button>", {id: contentTag + data.id + "PostsButton", type: "button", class: "button-link separator-medium"});
+		var postsButton = $("<button>", {id: contentTag + data.id + "PostsButton", type: "button", class: "social-status-button separator-medium"});
 		postsButton.append($("<span>", {id: contentTag + data.id + "NumPosts", text: "0"}));
 		postsButton.append($("<span>", {text: " Posts"}));
 		postsButton.hide();
