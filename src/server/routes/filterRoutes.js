@@ -98,7 +98,7 @@ var routes = function() {
 
 			var validationParams = [
 				{
-					name: "source",
+					name: "sourceType",
 					type: ["challengeId", "imageURL", "dataURI", "designId"],
 					required: "yes"
 				},
@@ -121,6 +121,10 @@ var routes = function() {
 				{
 					name: "dataURI",
 					type: "imageData"
+				},
+				{
+					name: "caption",
+					type: "string"
 				}
 			];
 
@@ -215,7 +219,7 @@ var routes = function() {
 								if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
 									return res.sendStatus(500);
 								}
-								
+																	
 								return res.json(jsonObj);
 							}
 						});

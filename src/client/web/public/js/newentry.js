@@ -310,8 +310,9 @@ function showArtifactStep() {
 
 					list.push(data);
 				}
-
-				var grid = createGrid("presetArtifacts", list, 3, true, true, defaultSelectionID, function(id) {
+				var grid = createGrid("", "presetArtifacts");
+				$("#presetArtifactSection").empty().append(grid);
+				grid = appendGrid("", "presetArtifacts", list, true, true, defaultSelectionID, function(id) {
 					switchStepOptions("artifact", "preset", id);
 					
 					$(window).scrollTop(0);

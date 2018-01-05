@@ -697,6 +697,7 @@ function applyBorder(imArgs, borderWidth, borderColor) {
 	really any change done.
 **/
 function writeImage(sourceImage, targetImage, imArgs, next) {
+	//logger.debug("****************** writeImage, imArgs: " + JSON.stringify(imArgs));
 	if (imArgs.length > 0) {
 		execFile("convert", imArgs, (error, stdout, stderr) => {
 			if (error) {

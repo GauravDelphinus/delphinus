@@ -1,14 +1,14 @@
 ////**************************** GRID / THUMBNAIL VIEW ********************************
 
 //Create an empty grid table for hosting content
-function createGrid(entityId, contentTag, numCols, allowHover, allowSelection, defaultSelectedID, selectionCallback) {
+function createGrid(entityId, contentTag) {
 	var table = $("<table>", {id: entityId + contentTag + "GridTable"});
 
 	return table;
 }
 
 //Append content to an existing grid table
-function appendGrid(entityId, contentTag, list, allowSelection = false, allowHover = false, defaultSelectedID = 0) {
+function appendGrid(entityId, contentTag, list, allowSelection = false, allowHover = false, defaultSelectedID = 0, selectionCallback = null) {
 	var table = $("#" + entityId + contentTag + "GridTable");
 
 	var rowCount = $("#" + entityId + contentTag + "GridTable tr").length;
@@ -24,7 +24,7 @@ function appendGrid(entityId, contentTag, list, allowSelection = false, allowHov
 		} else if (list.length % 2 == 0) {
 			numCols = 2;
 		} else {
-			numCols = list.length;
+			numCols = 2;
 		}
 	}
 	
@@ -49,7 +49,9 @@ function appendGrid(entityId, contentTag, list, allowSelection = false, allowHov
 					element.click({id: data.id, element: element}, function(e) {
 						$("#" + contentTag + " .thumbnailElement").removeClass("active"); //unselect all first
 						e.data.element.addClass("active"); //now make the selection
-						selectionCallback(e.data.id);
+						if (selectionCallback) {
+							selectionCallback(e.data.id);
+						}
 					});
 				}
 
