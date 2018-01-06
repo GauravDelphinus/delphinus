@@ -141,8 +141,9 @@ var routes = function() {
 				created: req.body.created,
 				title: req.body.caption,
 				userId: req.user.id,
-				sourceType: req.body.source,
-				sourceData: req.body.sourceData
+				sourceType: req.body.sourceType,
+				sourceData: req.body.sourceData,
+				steps: req.body.steps
 			};
 
 			dbEntry.createEntry(entryInfo, function(err, result) {

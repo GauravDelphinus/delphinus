@@ -72,6 +72,7 @@ function setupHandlers() {
 	//handler for caption text box
 	$("#bannerText").on('keyup', function (e) {
 	    if (e.keyCode == 13) {
+	    	$("#steps").show();
 	    	setupArtifactStep();
 	    }
 	});
@@ -314,8 +315,6 @@ function setupFilterStep() {
 /**************************** (5) DECORATION STEP **********************************************/
 
 function setupDecorationStep() {
-	setupPresetAndCustomOptions("#decorationOptionsButton", "#presetDecorationSection", "#customDecorationSection", "preset");
-
 	setupBorderToggleSection();
 }
 
@@ -483,6 +482,14 @@ function setupColorButton(buttonID) {
     });
 }
 
+/**
+	Fetch the preset value for the given type.
+
+	This will return the last user selected value during this session.
+
+	presetType: one of artifact, filter, layout or decoration
+	defaultValue: a default value to be returned if no previous setting was found
+**/
 function fetchPresetValue(presetType, defaultValue) {
 	var value = "";
 	var map = $("body").data("selectedPresets");
@@ -501,6 +508,14 @@ function fetchPresetValue(presetType, defaultValue) {
 	return value;
 }
 
+/**
+	Save the provided preset value for the given presetType
+
+	presetType: one of artifact, filter, layout or decoration
+	presetOptionID: value to be set
+
+	NOTE: This should match a valid value listed in presets.json
+**/
 function savePresetValue(presetType, presetOptionID) {
 	var map = $("body").data("selectedPresets");
 	if (map == undefined) {
@@ -508,181 +523,6 @@ function savePresetValue(presetType, presetOptionID) {
 	}
 	map.set(presetType, presetOptionID);
 	$("body").data("selectedPresets", map);
-}
-/*
-	Switch between Preset and Custom options mode.
-
-	Note that these modes are mutually exclusive.
-*/
-function switchStepOptions(stepType, optionType, presetOptionID) {
-	if (optionType == "preset") {
-		//Switch to Preset mode.  Make sure to turn of Custom mode buttons, if any are still enabled.
-		switch (stepType) {
-			case "artifact":
-				$("#artifactOptionsButton").data("state", "preset");
-				$("#presetArtifactSection").data("selectedPresetID", presetOptionID);
-				$("#customArtifactSection button:not(.featureToggleButton), #customArtifactSection input, #customArtifactSection select ").prop("disabled", true);
-				$("#customArtifactSection .featureToggleButton").removeClass("active").text("OFF");
-				break;
-			case "layout":
-				$("#layoutOptionsButton").data("state", "preset");
-				$("#presetLayoutSection").data("selectedPresetID", presetOptionID);
-				$("#customLayoutSection button:not(.featureToggleButton), #customLayoutSection input, #customLayoutSection select ").prop("disabled", true);
-				$("#customLayoutSection .featureToggleButton").removeClass("active").text("OFF");
-				break;
-			case "filter":
-				$("#filterOptionsButton").data("state", "preset");
-				$("#presetFilterSection").data("selectedPresetID", presetOptionID);
-				$("#customFilterSection button:not(.featureToggleButton), #customFilterSection input, #customFilterSection select ").prop("disabled", true);
-				$("#customFilterSection .featureToggleButton").removeClass("active").text("OFF");
-				break;
-			case "decoration":
-				$("#decorationOptionsButton").data("state", "preset");
-				$("#presetDecorationSection").data("selectedPresetID", presetOptionID);
-				$("#customDecorationSection button:not(.featureToggleButton), #customDecorationSection input, #customDecorationSection select ").prop("disabled", true);
-				$("#customDecorationSection .featureToggleButton").removeClass("active").text("OFF");
-				break;
-		}
-		
-	} else if (optionType == "custom") {
-		//Switch to Custom mode.
-		switch (stepType) {
-			case "artifact":
-				$("#artifactOptionsButton").data("state", "custom");
-				break;
-			case "layout":
-				$("#layoutOptionsButton").data("state", "custom");
-				break;
-			case "filter":
-				$("#filterOptionsButton").data("state", "custom");
-				break;
-			case "decoration":
-				$("#decorationOptionsButton").data("state", "custom");
-				break;
-		}
-	}
-
-	applyChanges(false);
-}
-
-/*
-	Handlers for the Options button that switches between Preset and Custom mode.
-*/
-function setupPresetAndCustomOptions(optionsButtonId, presetSectionID, customSectionID, defaultSection) {
-	$(optionsButtonId).data("state", defaultSection);
-	$(optionsButtonId).click(function() {
-		if ($(presetSectionID).is(":visible")) {
-			$(presetSectionID).hide();
-			$(customSectionID).show();
-
-			$(this).text("Hide custom options");
-		} else if ($(customSectionID).is(":visible")) {
-			$(presetSectionID).show();
-			$(customSectionID).hide();
-
-			$(this).text("Show custom options");
-		}
-	});
-}
-
-/*
-	Create a range input, with min and max specified, and set
-	a label or caption with the currently selected value.
-*/
-function createRangeSection(caption, rangeInputID, min, max, value, step) {
-	var rangeSection = $("<div>", {class: "settingsRangeWithValue"});
-	var captionElement = $("<div>", {id: rangeInputID + "Caption"}).append(caption + ": " + value);
-	var input = $("<input>", {id: rangeInputID, type: "range", min: min, max: max, value: value, step: step});
-	input.change(function() {
-		$("#" + rangeInputID + "Caption").text(caption + ": " + $("#" + this.id).val());
-	});
-	
-	var rangeInputWithMinMax = $("<div>").append($("<span>").append(min + " ")).append(input).append($("<span>").append(" " + max));
-
-	rangeSection.append(captionElement).append(rangeInputWithMinMax);
-	return rangeSection;
-}
-
-/*
-function showHideSection(valueToMatch, listOfValuesAndSectionIds) {
-	for (var i = 0; i < listOfValuesAndSectionIds.length; i++) {
-		if (valueToMatch == listOfValuesAndSectionIds[i].value) {
-			$(listOfValuesAndSectionIds[i].id).show();
-		} else {
-			$(listOfValuesAndSectionIds[i].id).hide();
-		}
-	}
-}
-*/
-
-/*
-	Setup general rules for a custom section that has a main feature
-	toggle button, and other feature items that are dependent
-	on that toggle.
-
-	Also, the assumption is that this main feature toggle is mutually
-	exclusive to the presets settings, which means that if the toggle
-	is ON, the presets should be switched off.
-*/
-function setupGeneralRulesForToggleSection(mainFeatureButtonId, changeElementIds, clickElementIds, stepType) {
-	var allElementIds = changeElementIds.concat(clickElementIds);
-
-	enableDisableItems(allElementIds, $(mainFeatureButtonId).hasClass("active"));
-
-	setupMainFeatureToggle(mainFeatureButtonId, allElementIds, stepType);
-}
-
-/*
-	Enable or Disable the list of provided items.
-*/
-function enableDisableItems(elementIds, enable) {
-	for (var i = 0; i < elementIds.length; i++) {
-		$(elementIds[i]).prop("disabled", !enable);
-	}
-}
-
-/*
-	Activate or Deactive the list of provided items.
-*/
-function activateDeactivateItems(elementIds, activate) {
-	for (var i = 0; i < elementIds.length; i++) {
-		if (activate) {
-			$(elementIds[i]).addClass("active");
-		} else {
-			$(elementIds[i]).removeClass("active");
-		}
-	}
-}
-
-/*
-	Handle toggle for main feature button.
-
-	Also, takes care of enabling/disabling other items that are dependent on the 
-	main feature button
-*/
-function setupMainFeatureToggle(mainFeatureButtonId, otherFeatureElementIds, stepType) {
-	//first, toggle the main feature button
-	var mainFeatureButton = $(mainFeatureButtonId);
-	mainFeatureButton.click(function() {
-		if ($(this).hasClass("active")) {
-			//already ON, switch OFF
-			$(this).removeClass("active");
-			$(this).text("OFF");
-			enableDisableItems(otherFeatureElementIds, false);
-
-			//deactivate the items since the main feature toggle is OFF
-			//activateDeactivateItems(otherFeatureElementIds, false);
-		} else {
-			//already OFF, switch ON
-			$(this).addClass("active");
-			$(this).text("ON");
-			enableDisableItems(otherFeatureElementIds, true);
-
-			//Switch on custom options mode, since at least one toggle feature has been turned ON
-			switchStepOptions(stepType, "custom", null);
-		}
-	});
-
 }
 
 /*
@@ -697,50 +537,6 @@ function setChangeCallback(callback, changeElementIds, clickElementIds) {
 	for (var i = 0; i < clickElementIds.length; i++) {
 		$(clickElementIds[i]).click({callback: null}, callback);
 	}
-}
-
-/*
-	Given the button list, set them to be toggleable
-	with the 'active' class mutually exclusively of each
-	other.
-
-	This assumes that the buttons are all siblings of
-	each other in the DOM hierarchy.
-*/
-function setMutuallyExclusiveButtons(buttonIdList) {
-	var selector = "";
-	for (var i = 0; i < buttonIdList.length; i++) {
-		if (i > 0) {
-			selector += ", ";
-		}
-		selector += buttonIdList[i];
-	}
-	$(selector).click(function() {
-		$(this).toggleClass('active').siblings().not(this).removeClass('active');
-	});
-}
-
-function getCurrentStep() {
-	if ($("#captionSection").is(":visible")) {
-		return "caption";
-	} else if ($("#layoutSection").is(":visible")) {
-		return "layout";
-	} else if ($("#filterSection").is(":visible")) {
-		return "filter";
-	} else if ($("#artifactSection").is(":visible")) {
-		return "artifact";
-	} else if ($("#decorationSection").is(":visible")) {
-		return "decoration";
-	} else if ($("#postSection").is(":visible")) {
-		return "post";
-	}
-}
-
-function parseEntry(entry) {
-	$("#entry").empty();
-	$("#entry").append($("<img>").attr("src", entry.image));
-	$("#entry").append($("<p>").text(entry.caption));
-	$("#entry").append($("<p>").text(entry.created));
 }
 
 /*****************************************************************************************/
@@ -845,7 +641,6 @@ function constructJSONObject(jsonObj) {
 
 	decoration.border.width = $("#borderWidth").val();
 	decoration.border.color = $("#borderColor").css("background-color");
-
 
 	if (!$.isEmptyObject(artifact)) {
 		jsonObj.steps.decorations = [];

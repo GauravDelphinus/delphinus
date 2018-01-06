@@ -19,38 +19,38 @@ module.exports = {
 				var layout = {};
 				step.layouts.push(layout);
 
-				if (steps.layouts[i].type == "custom") {
-					step.layouts[i].type = "custom";
-
-					if (steps.layouts[i].size) {
-						step.layouts[i].size = steps.layouts[i].size;
-						singleStepList.push(cloneObject(step));
-					}
-
-					if (steps.layouts[i].crop) {
-						step.layouts[i].crop = steps.layouts[i].crop;
-						singleStepList.push(cloneObject(step));
-					}
-
-					if (steps.layouts[i].mirror) {
-						step.layouts[i].mirror = steps.layouts[i].mirror;
-						singleStepList.push(cloneObject(step));
-					}
-
-					if (steps.layouts[i].rotation) {
-						step.layouts[i].rotation = steps.layouts[i].rotation;
-						singleStepList.push(cloneObject(step));
-					}
-
-					if (steps.layouts[i].shear) {
-						step.layouts[i].shear = steps.layouts[i].shear;
-						singleStepList.push(cloneObject(step));
-					}
-				} else if (steps.layouts[i].type == "preset") {
-					step.layouts[i].type = "preset";
-					step.layouts[i].preset = steps.layouts[i].preset;
+				if (steps.layouts[i].size) {
+					step.layouts[i].size = steps.layouts[i].size;
 					singleStepList.push(cloneObject(step));
 				}
+
+				/* Future use
+				if (steps.layouts[i].crop) {
+					step.layouts[i].crop = steps.layouts[i].crop;
+					singleStepList.push(cloneObject(step));
+				}
+
+				if (steps.layouts[i].mirror) {
+					step.layouts[i].mirror = steps.layouts[i].mirror;
+					singleStepList.push(cloneObject(step));
+				}
+
+				if (steps.layouts[i].rotation) {
+					step.layouts[i].rotation = steps.layouts[i].rotation;
+					singleStepList.push(cloneObject(step));
+				}
+
+				if (steps.layouts[i].shear) {
+					step.layouts[i].shear = steps.layouts[i].shear;
+					singleStepList.push(cloneObject(step));
+				}
+				*/
+
+				if (steps.layouts[i].preset) {
+					step.layouts[i].preset = steps.layouts[i].preset;
+				}
+				
+				singleStepList.push(cloneObject(step));
 			}
 		}
 
@@ -61,73 +61,72 @@ module.exports = {
 				var filter = {};
 				step.filters.push(filter);
 
-				if (steps.filters[i].type == "custom") {
-					step.filters[i].type = "custom";
+				/* Future use
+				if (steps.filters[i].settings) {
+					step.filters[i].settings = steps.filters[i].settings;
+					singleStepList.push(cloneObject(step));
+				}
 
-					if (steps.filters[i].settings) {
-						step.filters[i].settings = steps.filters[i].settings;
+				if (steps.filters[i].effects) {
+					step.filters[i].effects = {};
+
+					if (steps.filters[i].effects.paint) {
+						step.filters[i].effects.paint = steps.filters[i].effects.paint;
 						singleStepList.push(cloneObject(step));
 					}
 
-					if (steps.filters[i].effects) {
-						step.filters[i].effects = {};
-
-						if (steps.filters[i].effects.paint) {
-							step.filters[i].effects.paint = steps.filters[i].effects.paint;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.grayscale) {
-							step.filters[i].effects.grayscale = steps.filters[i].effects.grayscale;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.mosaic) {
-							step.filters[i].effects.mosaic = steps.filters[i].effects.mosaic;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.negative) {
-							step.filters[i].effects.negative = steps.filters[i].effects.negative;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.solarize) {
-							step.filters[i].effects.solarize = steps.filters[i].effects.solarize;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.monochrome) {
-							step.filters[i].effects.monochrome = steps.filters[i].effects.monochrome;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.swirl) {
-							step.filters[i].effects.swirl = steps.filters[i].effects.swirl;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.wave) {
-							step.filters[i].effects.wave = steps.filters[i].effects.wave;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.spread) {
-							step.filters[i].effects.spread = steps.filters[i].effects.spread;
-							singleStepList.push(cloneObject(step));
-						}
-
-						if (steps.filters[i].effects.charcoal) {
-							step.filters[i].effects.charcoal = steps.filters[i].effects.charcoal;
-							singleStepList.push(cloneObject(step));
-						}
+					if (steps.filters[i].effects.grayscale) {
+						step.filters[i].effects.grayscale = steps.filters[i].effects.grayscale;
+						singleStepList.push(cloneObject(step));
 					}
 
-				} else if (steps.filters[i].type == "preset") {
-					step.filters[i].type = "preset";
-					step.filters[i].preset = steps.filters[i].preset;
-					singleStepList.push(cloneObject(step));
+					if (steps.filters[i].effects.mosaic) {
+						step.filters[i].effects.mosaic = steps.filters[i].effects.mosaic;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.negative) {
+						step.filters[i].effects.negative = steps.filters[i].effects.negative;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.solarize) {
+						step.filters[i].effects.solarize = steps.filters[i].effects.solarize;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.monochrome) {
+						step.filters[i].effects.monochrome = steps.filters[i].effects.monochrome;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.swirl) {
+						step.filters[i].effects.swirl = steps.filters[i].effects.swirl;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.wave) {
+						step.filters[i].effects.wave = steps.filters[i].effects.wave;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.spread) {
+						step.filters[i].effects.spread = steps.filters[i].effects.spread;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.charcoal) {
+						step.filters[i].effects.charcoal = steps.filters[i].effects.charcoal;
+						singleStepList.push(cloneObject(step));
+					}
 				}
+				*/
+
+				if (steps.filters[i].preset) {
+					step.filters[i].preset = steps.filters[i].preset;
+				}
+				
+				singleStepList.push(cloneObject(step));
 			}
 		}
 
@@ -138,18 +137,16 @@ module.exports = {
 				var artifact = {};
 				step.artifacts.push(artifact);
 
-				if (steps.artifacts[i].type == "custom") {
-					step.artifacts[i].type = "custom";
-
-					if (steps.artifacts[i].banner) {
-						step.artifacts[i].banner = steps.artifacts[i].banner;
-						singleStepList.push(cloneObject(step));
-					}
-				} else if (steps.artifacts[i].type == "preset") {
-					step.artifacts[i].type = "preset";
-					step.artifacts[i].preset = steps.artifacts[i].preset;
+				if (steps.artifacts[i].banner) {
+					step.artifacts[i].banner = steps.artifacts[i].banner;
 					singleStepList.push(cloneObject(step));
 				}
+
+				if (steps.artifacts[i].preset) {
+					step.artifacts[i].preset = steps.artifacts[i].preset;
+				}
+				
+				singleStepList.push(cloneObject(step));
 			}
 		}
 
@@ -160,18 +157,16 @@ module.exports = {
 				var decoration = {};
 				step.decorations.push(decoration);
 
-				if (steps.decorations[i].type == "custom") {
-					step.decorations[i].type = "custom";
-
-					if (steps.decorations[i].border) {
-						step.decorations[i].border = steps.decorations[i].border;
-						singleStepList.push(cloneObject(step));
-					}
-				} else if (steps.decorations[i].type == "preset") {
-					step.decorations[i].type = "preset";
-					step.decorations[i].preset = steps.decorations[i].preset;
+				if (steps.decorations[i].border) {
+					step.decorations[i].border = steps.decorations[i].border;
 					singleStepList.push(cloneObject(step));
 				}
+
+				if (steps.decorations[i].preset) {
+					step.decorations[i].preset = steps.decorations[i].preset;
+				}
+				
+				singleStepList.push(cloneObject(step));
 			}
 		}
 

@@ -660,7 +660,7 @@ function applyBorder(imArgs, borderWidth, borderColor) {
 	really any change done.
 **/
 function writeImage(sourceImage, targetImage, imArgs, next) {
-	//logger.debug("****************** writeImage, imArgs: " + JSON.stringify(imArgs));
+	//logger.debug("****************** writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 	if (imArgs.length > 0) {
 		execFile("convert", imArgs, (error, stdout, stderr) => {
 			if (error) {
@@ -682,9 +682,9 @@ function writeImage(sourceImage, targetImage, imArgs, next) {
 **/
 function compositeImage(sourceImage, targetImage, imArgs, next) {
 	if (imArgs.length > 0) {
-		logger.debug("calling composite with imArgs: " + JSON.stringify(imArgs));
+		//logger.debug("calling composite with imArgs: " + JSON.stringify(imArgs));
 		execFile("composite", imArgs, (error, stdout, stderr) => {
-			logger.debug("output of composite: error: " + error);
+			//logger.debug("output of composite: error: " + error);
 			if (error) {
 		    	next(error, null);
 		  	} else {

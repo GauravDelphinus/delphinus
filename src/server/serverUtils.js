@@ -191,6 +191,7 @@ module.exports = {
 		} else if (type == "imageType") {
 			if (!(value == "image/png" || value == "image/jpeg" || value == "image/gif")) {
 				logger.errorIf(logError, "Invalid Image Type '" + value + "' received for param: '" + name + "'");
+				throw new Error("");
 				return false;
 			}
 		} else if (type == "dataURI") {

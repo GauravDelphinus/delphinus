@@ -6,6 +6,9 @@ var config = require("../config");
 var mime = require("mime");
 var logger = require("../logger");
 var error = require("../error");
+var filterUtils = require("../filterUtils");
+var async = require("async");
+var imageProcessor = require("../imageProcessor");
 
 /*
 	Get Info about an Entry by looking up the DB
@@ -198,7 +201,8 @@ function createEntry(entryInfo, done) {
 	var entryData = {
 		sourceType: entryInfo.sourceType,
 		sourceData: entryInfo.sourceData,
-		userId: entryInfo.userId
+		userId: entryInfo.userId,
+		id: entryInfo.id
 	};
 
 	createImagesForEntry(entryData, entryInfo.steps, entryInfo.title, function(err, info) {
@@ -206,23 +210,31 @@ function createEntry(entryInfo, done) {
 			return done(err);
 		}
 
-		entryInfo.imageType = info.imageType;
+		var nodeInfo = {
+			id: entryInfo.id,
+			created : entryInfo.created,
+			title : entryInfo.title,
+			userId : entryInfo.userId,
+			imageType: info.imageType,
+			sourceId : info.sourceId //this should have been settled by createImagesForEntry, even for independent images
+		};
 		if (entryInfo.sourceType == "imageURL" || entryInfo.sourceType == "dataURI") {
-			entryInfo.sourceType = "independentImageId";
+			nodeInfo.sourceType = "independentImageId";
+		} else {
+			nodeInfo.sourceType = entryInfo.sourceType; //challengeId or designId
 		}
-		entryInfo.sourceId = info.sourceId;
 
-		createEntryNode(entryInfo, function(err, nodeInfo) {
+		createEntryNode(nodeInfo, function(err, output) {
 			if (err) {
 				return done(err);
 			}
 
-			createFilterNodesForEntry(nodeInfo.id, entryInfo.steps, function(err) {
+			createFilterNodesForEntry(output.id, entryInfo.steps, function(err) {
 				if (err) {
 					return done(err);
 				}
 
-				return done(null, {id: nodeInfo.id});
+				return done(null, {id: output.id});
 			});
 		});
 	});
@@ -324,8 +336,7 @@ function createImagesForEntry(entryData, steps, caption, done) {
 
 	filterUtils.processImageDataForEntry(entryData, true, function(err, info) {
 		if (err) {
-			logger.error("Error in processImageDataForEntry: " + err);
-			return res.sendStatus(500);
+			return done(err);
 		}
 
 		//now, generate the image(s)
@@ -346,17 +357,16 @@ function createImagesForEntry(entryData, steps, caption, done) {
 			}
 
 			//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
-			var entryImagePath = global.appRoot + config.path.entryImages + id + "." + mime.extension(info.imageType);
-			//serverUtils.copyFile(imagePaths[imagePaths.length - 1], entryImagePath, function(err) {
+			var entryImagePath = global.appRoot + config.path.entryImages + entryData.id + "." + mime.extension(info.imageType);
 			imageProcessor.addWatermarkToImage(imagePaths[imagePaths.length - 1], entryImagePath, function(err) {
 				if (err) {
 					return done(new Error("Error creating the final Entry Image: " + err));
 				}
 
-				var output = {imageType: info.imageType};
-				if (req.body.source == "dataURI" || req.body.source == "imageURL") {
-					output.independentImageId = info.sourceId;
-				}
+				var output = {
+					imageType: info.imageType,
+					sourceId: info.sourceId
+				};
 
 				return done(null, output);
 			});
@@ -437,7 +447,7 @@ function createFilterNodesForEntry(entryId, steps, done) {
 
 		cypherQuery += " return e;";
 
-		db.cypherQuery(cypherQuery, function(err, result){
+		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 			if(err) {
 				return done(err);
 			} else if (result.data.length != 1) {
@@ -538,7 +548,8 @@ var entryPrototype = {
 	"title" : "string",
 	"userId" : "id", //id of user who is posting this entry
 	"sourceType" : ["challengeId", "designId", "independentImageId"],
-	"sourceId" : "id"
+	"sourceId" : "id",
+	"imageType": "imageType"
 }
 
 
