@@ -1,6 +1,12 @@
 $(document).ready(function(){
 	setupMainItem();
 
+	setupSteps();
+
+	setupNavigation();
+
+	$("#apply").click(postEntry);
+
 	createLoginHeader();
 
 	setupHandlers();
@@ -69,13 +75,6 @@ function setupHandlers() {
 	dropZone.addEventListener('dragover', handleDragOver, false);
 	dropZone.addEventListener('drop', handleFileDropped, false);
 
-	//handler for caption text box
-	$("#bannerText").on('keyup', function (e) {
-	    if (e.keyCode == 13) {
-	    	setupArtifactStep();
-	    }
-	});
-
 	//handler for file Browse button
 	document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
@@ -84,23 +83,6 @@ function setupHandlers() {
 
 		$("#selectDesignSection").show();
 		$("#selectImageSection").hide();
-	});
-
-	//post button
-	$("#apply").click(postEntry);
-
-	//handlers for the tabs
-	$('a[data-toggle="tab"]').on('shown.bs.tab', function (e) {
-		var target = $(e.target).attr("href") // activated tab
-		if (target == "#artifactSection") {
-			setupArtifactStep();
-		} else if (target == "#layoutSection") {
-			setupLayoutStep();
-		} else if (target == "#filterSection") {
-			setupFilterStep();
-		} else if (target == "#decorationSection") {
-			setupDecorationStep();
-		}
 	});
 }
 
@@ -142,11 +124,6 @@ function switchToStepsView(imagePath, imageTitle) {
 	$("#bannerText").focus();
 }
 
-/**
-	Decide what to show - if challengeId is available, pull the details
-	to show the original image.  Otherwise, ask user to browse for a new image
-	or to select a design.
-**/
 function setupMainItem() {
 	if (challengeId != 0) {
 		//since we have the challenge Id, this is a Challenge Entry workflow
@@ -183,15 +160,97 @@ function setImageHeight() {
 	var offset = $("#newentryimage").offset();
 	var windowHeight = window.innerHeight;
 	if ($("#newentryimage").height() > $("#newentryimage").width()) {
-		//it's a portrait image, so try to adjust the height to fit about half way into the visible area of the window
-		var desiredHeight = windowHeight / 2;
+		//it's a portrait image, so try to adjust the height to fit in the visible window area
+		var desiredHeight = windowHeight - offset.top - 10;
 		$("#newentryimage").height(desiredHeight);
 	}
 }
 
+/*
+	Set up handlers for the Navigation / Step Wizard (buttons 1-6).
+*/
+function setupNavigation() {
+	var navListItems = $('div.stepwizard-header div a'),
+          allWells = $('.setup-content'),
+          allNextBtn = $('.nextBtn');
+
+	allWells.hide();
+
+	navListItems.click(function (e) {
+		e.preventDefault();
+		var $target = $($(this).attr('href')),
+			$item = $(this);
+
+		if (!$item.hasClass('disabled')) {
+	          navListItems.removeClass('btn-primary').addClass('btn-default');
+	          $item.addClass('btn-primary');
+	          allWells.hide();
+	          $target.show();
+	          showStep($target.prop("id"));
+	          $target.find('input:eq(0)').focus();
+		}
+	});
+
+	//show the first step
+	$('div.stepwizard-header div a.btn-primary').trigger('click');
+
+	$("#prevButton").click(function() {
+		var currentStep = getCurrentStep();
+		var previousStepLink = $('div.stepwizard-header div a[href="#' + currentStep + 'Section"]').parent().prev();
+		previousStepLink.children("a").removeAttr('disabled').trigger('click');
+	});
+
+	$("#nextButton").click(function() {
+		var currentStep = getCurrentStep();
+		var nextStepLink = $('div.stepwizard-header div a[href="#' + currentStep + 'Section"]').parent().next();
+		nextStepLink.children("a").removeAttr('disabled').trigger('click');
+	});
+}
+
+function setupSteps() {
+	setupArtifactStep();
+
+	setupLayoutStep();
+
+	setupFilterStep();
+
+	setupDecorationStep();
+}
+
+/*
+	Switch to the specified step.
+*/
+function showStep(stepId) {
+	if (stepId == "captionSection") {
+		showCaptionStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "hidden");
+	} else if (stepId == "artifactSection") {
+		$("#postSection").show();
+		showArtifactStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "visible");
+	} else if (stepId == "layoutSection") {
+		showLayoutStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "visible");
+	} else if (stepId == "filterSection") {
+		showFilterStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "visible");
+	} else if (stepId == "decorationSection") {
+		showDecorationStep();
+		$("#nextButton").css("visibility", "visible");
+		$("#prevButton").css("visibility", "visible");
+	} else if (stepId == "postSection") {
+		showPostStep();
+		$("#nextButton").css("visibility", "hidden");
+		$("#prevButton").css("visibility", "visible");
+	}
+}
 
 function changeCallback(event) {
-	applyChanges(true, null);
+	applyChanges(null);
 }
 
 /**************************** (1) CAPTION STEP **********************************************/
@@ -206,36 +265,172 @@ function setupCaptionStep() {
 
 /**************************** (2) ARTIFACT STEP **********************************************/
 
-var defaultArtifactPresetSelectionID = "bannerBottom"; //NOTE: must match one of the values in presets.json
+var defaultArtifactPresetSelectionID = "bannerBottomBlack";
 
 /*
-	Show the Artifact Step - first time setup
+	Show the Artifact Step - either by navitating using the Next/Previous buttons,
+	or by clicking the step button directly.
 
 	This will refresh the thumbnail list from the server.
 */
+function showArtifactStep() {
+	$("#stepTitle").text("Place your caption in the entry image")
+
+	if ($("#presetArtifactSection").is(":visible")) {
+		//default selection
+		var defaultSelectionID = $("#presetArtifactSection").data("selectedPresetID");
+		if (defaultSelectionID == undefined) {
+			defaultSelectionID = defaultArtifactPresetSelectionID;
+			$("#presetArtifactSection").data("selectedPresetID", defaultSelectionID);
+		}
+
+		$.getJSON('/api/filters?type=artifact' + "&artifactType=preset", function(result) {
+			if (result.length > 0) {
+				var list = [];
+				for (var i = 0; i < result.length; i++) {
+					var a = result[i];
+					//var u = result[i][1];
+
+					var data = {};
+					data.id = a.id;
+					data.caption = a.name;
+					data.image = "/images/static/progress.gif";
+
+					var jsonObj = {};
+					constructJSONObject(jsonObj);
+					if (!jsonObj.steps.artifacts) {
+						jsonObj.steps.artifacts = [{}];
+					}
+					jsonObj.steps.artifacts[0].type = "preset";
+					jsonObj.steps.artifacts[0].preset = a.id;
+					jsonObj.steps.artifacts[0].banner = {text: $("#bannerText").prop("value")};
+					generateChanges(a.id, jsonObj, function(id, data) {
+						$("#presetArtifacts" + id + "EntityImage").prop("src", data.imageData);
+					});
+
+					list.push(data);
+				}
+				var grid = createGrid("", "presetArtifacts");
+				$("#presetArtifactSection").empty().append(grid);
+				grid = appendGrid("", "presetArtifacts", list, true, true, defaultSelectionID, function(id) {
+					switchStepOptions("artifact", "preset", id);
+					
+					$(window).scrollTop(0);
+				});
+				$("#presetArtifactSection").empty().append(grid);
+
+				//apply changes to reflect default selection
+				applyChanges();
+			}
+		})
+		.fail(function() {
+			window.location.replace("/error");
+		});
+	}
+}
+
 function setupArtifactStep() {
-	//set up the custom settings
+	setupPresetAndCustomOptions("#artifactOptionsButton", "#presetArtifactSection", "#customArtifactSection", "preset");
+
+	setupBannerToggleSection();
+}
+
+function setupBannerToggleSection() {
+	var changeElementIds = [
+		"#bannerColorButton", 
+		"#bannerTextFontSize",
+		"#bannerTextFontName",
+		"#bannerTextColorButton"
+		];
+
+	var clickElementIds = [
+		"#topBannerButton",
+		"#bottomBannerButton",
+		"#aboveBannerButton",
+		"#belowBannerButton",
+		"#transparentBannerButton",
+		];
+
+	setupGeneralRulesForToggleSection("#bannerEnabledButton", changeElementIds, clickElementIds, "artifact");
+
+	setMutuallyExclusiveButtons(["#topBannerButton", "#bottomBannerButton", "#aboveBannerButton", "#belowBannerButton"]);
+
 	setupColorButton("#bannerColorButton");
 	setupColorButton("#bannerTextColorButton");
-	setChangeCallback(changeCallback, ["#bannerTextFontSize"], []);
 
-	createPresetsView("artifact", "#presetArtifactSection", defaultArtifactPresetSelectionID, "presets");
+	clickElementIds.push("#bannerEnabledButton");
+	setChangeCallback(changeCallback, changeElementIds, clickElementIds);
 }
+
+
 
 /**************************** (3) LAYOUT STEP **********************************************/
 
-var defaultLayoutPresetSelectionID = "originalLayout"; //NOTE: must match one of the values in presets.json
+function showLayoutStep() {
+	$("#stepTitle").text("Tweak the layout of your entry")
+
+	if ($("#presetLayoutSection").is(":visible")) {
+		//default selection
+		var defaultSelectionID = $("#presetLayoutSection").data("selectedPresetID");
+		$.getJSON('/api/filters?type=layout' + "&layoutType=preset", function(result) {
+			if (result.length > 0) {
+				var list = [];
+				for (var i = 0; i < result.length; i++) {
+					var l = result[i];
+					//var u = result[i][1];
+
+					var data = {};
+					data.id = l.id;
+					data.caption = l.name;
+					data.image = "/images/static/progress.gif";
+		
+					data.socialStatus = {};
+					data.socialStatus.numLikes = 121;
+					data.socialStatus.numShares = 23;
+					data.socialStatus.numComments = 45;
+
+					data.link = "/layout/" + l.id;
+
+					var jsonObj = {};
+					constructJSONObject(jsonObj);
+					if (!jsonObj.steps.layouts) {
+						jsonObj.steps.layouts = [{}];
+					}
+					jsonObj.steps.layouts[0].type = "preset";
+					jsonObj.steps.layouts[0].preset = l.id;
+					generateChanges(l.id, jsonObj, function(id, data) {
+						$("#presetLayouts" + id + "EntityImage").prop("src", data.imageData);
+					});
+
+					list.push(data);
+				}
+
+				var grid = createGrid("presetLayouts", list, 3, true, true, defaultSelectionID, function(id) {
+					switchStepOptions("layout", "preset", id);
+
+					$(window).scrollTop(0);
+				});
+				$("#presetLayoutSection").empty().append(grid);
+
+				applyChanges(); //for default selection
+			}
+		})
+		.fail(function() {
+			window.location.replace("/error");
+		});
+	}
+}
 
 function setupLayoutStep() {
-	//setupCropToggleSection();
+	setupPresetAndCustomOptions("#layoutOptionsButton", "#presetLayoutSection", "#customLayoutSection", "preset");
 
-	//setupMirrorToggleSection();
+	setupCropToggleSection();
 
-	//setupRotationToggleSection();
+	setupMirrorToggleSection();
 
-	// setupShearToggleSection();
+	setupRotationToggleSection();
 
-	createPresetsView("layout", "#presetLayoutSection", defaultLayoutPresetSelectionID, "presets");
+	setupShearToggleSection();
 }
 
 function setupCropToggleSection() {
@@ -269,7 +464,7 @@ function setupCropToggleSection() {
 		//first switch off crop and bring image back to original size
 		jQuery.data(document.body, "cropData", null);
 
-		applyChanges(false, function() {
+		applyChanges(function() {
 			startCrop(cropData);
 		});
 	});
@@ -439,7 +634,7 @@ function showFilterStep() {
 				});
 				$("#presetFilterSection").empty().append(grid);
 
-				applyChanges(false); //for default selection
+				applyChanges(); //for default selection
 			}
 		})
 		.fail(function() {
@@ -634,7 +829,7 @@ function showDecorationStep() {
 				});
 				$("#presetDecorationSection").empty().append(grid);
 
-				applyChanges(false); //for default selection
+				applyChanges(); //for default selection
 			}
 		})
 		.fail(function() {
@@ -666,154 +861,6 @@ function showPostStep() {
 /*****************************************************************************************/
 /**************************** COMMON ROUTINES / HELPER FUNCTIONS **********************************************/
 
-/**
-	Create/initialize the Presets view for hosting preset thumbnais of artifacts, filters, etc.
-
-	presetType: one of artifact, filter, decoration or layout
-	presetSectionID: id of the preset section for that preset type (including the # symbol)
-	defaultPresetID: the ID of the default preset value for that presetType
-	contentTag: a content tag (string) to uniquely identify this presets view
-	Note: this should be called only once
-**/
-function createPresetsView(presetType, presetSectionID, defaultPresetID, contentTag) {
-	//default selection
-	var defaultSelectionID = fetchPresetValue(presetType, defaultPresetID);
-
-	createPresetsViewInternal(presetType, contentTag, defaultSelectionID, function(err, presetsView) {
-		if (err) {
-			window.location.replace("/error");
-			return;
-		}
-
-		$(presetSectionID).empty().append(presetsView);
-
-		//apply changes to reflect default selection
-		applyChanges(false);
-	});
-
-}
-
-/**
-	Refresh the Presets view for hosting preset thumbnais of artifacts, filters, etc.
-
-	presetType: one of artifact, filter, decoration or layout
-	presetSectionID: id of the preset section for that preset type (including the # symbol)
-
-	Note: this assumes that the view is already created and only the thumbnails need to be refreshed
-	due to a chance in the selections by the user
-**/
-function refreshPresetsView(presetType, presetSectionID) {
-	var images = $(presetSectionID + " img");
-	$(images).each(function(index) {
-		var image = $(this);
-		var presetId = $(image).attr("id");
-		//update the server with the step information and update the image that is received
-		var jsonObj = constructJSONObjectWithPreset(presetType, presetId);
-
-		generateChanges(presetId, jsonObj, function(id, data) {
-			$("img#" + id).prop("src", data.imageData);
-		});
-	});
-}
-
-/**
-	Construct the JSON object with all the currently selected settings
-
-	Also, add the preset infromation to the object
-**/
-function constructJSONObjectWithPreset(presetType, presetId) {
-	//construct the jsonObj representing the current steps
-	var jsonObj = {};
-	constructJSONObject(jsonObj);
-
-	if (presetType == "artifact") {
-		if (!jsonObj.steps.artifacts) {
-			jsonObj.steps.artifacts = [{}];
-		}
-
-		jsonObj.steps.artifacts[0].preset = presetId;
-	} else if (presetType == "layout") {
-		if (!jsonObj.steps.layouts) {
-			jsonObj.steps.layouts = [{}];
-		}
-
-		jsonObj.steps.layouts[0].preset = presetId;
-	} else if (presetType == "filter") {
-		if (!jsonObj.steps.filters) {
-			jsonObj.steps.filters = [{}];
-		}
-
-		jsonObj.steps.filters[0].preset = presetId;
-	} else if (presetType == "decoration") {
-		if (!jsonObj.steps.decorations) {
-			jsonObj.steps.decorations = [{}];
-		}
-
-		jsonObj.steps.decorations[0].preset = presetId;		
-	}
-
-	return jsonObj;
-}
-
-/**
-	Helper function that creates the presets view for the given presetType (filter, artifact, etc.)
-	It also gets the preset images from the server and updates them, and handles the selection event
-	on specific preset images.
-**/
-function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, callback) {
-
-	//fetch presets for the given type
-	$.getJSON('/api/filters?stepType=' + presetType + "&type=preset", function(presetsList) {
-
-		if (presetsList.length > 0) {
-			var list = [];
-			for (var i = 0; i < presetsList.length; i++) {
-				var a = presetsList[i];
-
-				var data = {};
-				data.id = a.id;
-				data.caption = a.name;
-				data.image = "/images/static/progress.gif"; //start by showing the progress image
-
-				var jsonObj = constructJSONObjectWithPreset("artifact", a.id);
-				
-				//update the server with the step information and update the image that is received
-				generateChanges(a.id, jsonObj, function(id, data) {
-					$("img#" + id).prop("src", data.imageData);
-				});
-
-				list.push(data);
-			}
-
-			//create the strip view with the given list, and handle the selection event
-			var presetsView = createHorizontalStrip("createEntry", contentTag, list, true, true, defaultSelectionID, function(id) {
-				//save the preset value for later use
-				savePresetValue(presetType, id);
-				
-				//apply the changes based on the new selection
-				applyChanges(false);
-			});
-
-			if (presetsView) {
-				//append the presets view to the section
-				//$("#presetArtifactSection").empty().append(presetsView);
-
-				//apply changes to reflect default selection
-				//applyChanges();
-				return callback(null, presetsView);
-			} else {
-				//showAlert("There appears to be a problem fetching data from the server.  Please try refreshing the page.", 2);
-				return callback(new Error("Error fetching data from server"));
-			}
-		} else {
-			return callback(new Error("Error fetching data from server"));
-		}
-	})
-	.fail(function() {
-		return callback(new Error("Error fetching data from server"));
-	});
-}
-
 /*
 	Set up the color button using the bootstrap-colorpicker module.
 	Refer: https://farbelous.github.io/bootstrap-colorpicker/
@@ -821,36 +868,10 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 function setupColorButton(buttonID) {
 	$(buttonID).colorpicker().on('changeColor', function(e) {
         $(buttonID).css("background", e.color.toString("rgba"));
-        applyChanges(true);
+        applyChanges();
     });
 }
 
-function fetchPresetValue(presetType, defaultValue) {
-	var value = "";
-	var map = $("body").data("selectedPresets");
-	if (map == undefined) {
-		map = new Map();
-	}
-
-	if (!map.has(presetType)) {
-		map.set(presetType, defaultValue);
-		$("body").data("selectedPresets", map);
-		value = defaultValue;
-	} else {
-		value = map.get(presetType);
-	}
-		
-	return value;
-}
-
-function savePresetValue(presetType, presetOptionID) {
-	var map = $("body").data("selectedPresets");
-	if (map == undefined) {
-		map = new Map();
-	}
-	map.set(presetType, presetOptionID);
-	$("body").data("selectedPresets", map);
-}
 /*
 	Switch between Preset and Custom options mode.
 
@@ -904,7 +925,7 @@ function switchStepOptions(stepType, optionType, presetOptionID) {
 		}
 	}
 
-	applyChanges(false);
+	applyChanges();
 }
 
 /*
@@ -1133,12 +1154,13 @@ function constructJSONObject(jsonObj) {
 	/// LAYOUT
 	
 	var layout = {};
-	var presetValue = $("#presetLayoutSection").data("selectedPresetID");
-	if (presetValue != undefined) {
-		layout.preset = presetValue;
-	}
-	
-	if ($("#layoutOptionsButton").data("state") == "custom") {
+	if ($("#layoutOptionsButton").data("state") == "preset") {
+		var presetValue = $("#presetLayoutSection").data("selectedPresetID");
+		if (presetValue != undefined) {
+			layout.type = "preset";
+			layout.preset = presetValue;
+		}
+	} else if ($("#layoutOptionsButton").data("state") == "custom") {
 		layout.type = "custom";
 		
 		//crop
@@ -1272,19 +1294,15 @@ function constructJSONObject(jsonObj) {
 
 	// ARTIFACTS
 	var artifact = {};
-	//if ($("#artifactOptionsButton").data("state") == "preset") {
-		var presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
+	if ($("#artifactOptionsButton").data("state") == "preset") {
+		var presetValue = $("#presetArtifactSection").data("selectedPresetID");
 		if (presetValue != undefined) {
+			artifact.type = "preset";
 			artifact.preset = presetValue;
 		}
 
 		artifact.banner = {caption: $("#bannerText").prop("value")}; //this is only there to allow server to account for caption text when generating image hashes
-		artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
-		artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
-		artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
 
-		console.log("added, artifact: " + JSON.stringify(artifact));
-		/*
 	} else if ($("#artifactOptionsButton").data("state") == "custom") {
 			artifact.type = "custom";
 
@@ -1305,7 +1323,6 @@ function constructJSONObject(jsonObj) {
 			artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
 			artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
 	}
-	*/
 
 
 	if (!$.isEmptyObject(artifact)) {
@@ -1374,10 +1391,9 @@ function generateChanges(id, jsonObj, done) {
 	Apply changes based on current selection on the main preview image.
 */
 var applyFailCount = 0;
-function applyChanges(refreshPresets, done) {
+function applyChanges(done) {
 	var jsonObj = {};
 	
-	console.log("applyChanges called with refreshPresets = " + refreshPresets);
 	constructJSONObject(jsonObj);
 	$.ajax({
 		type: "POST",
@@ -1395,28 +1411,13 @@ function applyChanges(refreshPresets, done) {
 			applyFailCount ++;
 			if (applyFailCount == 1) {
 				//try one more time
-				applyChanges(refreshPresets, done);
+				applyChanges(done);
 			} else {
 				//if more than once, redirect to error page and restart
 				window.location.replace("/error");
 			}
 		}
 	});
-
-	if (refreshPresets) {
-		//find the currently visible tab
-		var activeTabId = $("#steps ul.nav-tabs li.active").attr("id");
-		console.log("activeTabId: " + activeTabId);
-		if (activeTabId == "artifactTab") {
-			refreshPresetsView("artifact", "#presetArtifactSection", defaultArtifactPresetSelectionID, "presets");
-		} else if (activeTabId == "layoutTab") {
-			refreshPresetsView("layout", "#presetLayoutSection", defaultLayoutPresetSelectionID, "presets");
-		} else if (activeTabId == "filterTab") {
-			refreshPresetsView("filter", "#presetFilterSection", defaultFilterPresetSelectionID, "presets");
-		} else if (activeTabId == "decorationTab") {
-			refreshPresetsView("decoration", "#presetDecorationSection", defaultDecorationPresetSelectionID, "presets");
-		}
-	}
 }
 
 /*

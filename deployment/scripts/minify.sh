@@ -76,6 +76,7 @@ uglifyjs ${SOURCE_JS_FOLDER}/containers/feed.js \
 	${SOURCE_JS_FOLDER}/containers/filmstrip.js \
 	${SOURCE_JS_FOLDER}/containers/container.js \
 	${SOURCE_JS_FOLDER}/containers/tabs.js \
+	${SOURCE_JS_FOLDER}/containers/horizontalStrip.js \
 	${SOURCE_JS_FOLDER}/containers/thumbnail.js -o ${MIN_JS_FOLDER}/containers.min.js ${MINIFY_FLAGS}
 
 #First Convert LESS to CSS, and then directly minify it

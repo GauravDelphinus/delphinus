@@ -292,7 +292,8 @@
 	color: black;
 	border: 1px solid #808080;
 	background: #d9d9d9;
-	font-size: 1.1em;
+	font-size: @theme-font-size-small;
+	padding: 3px 4px;
 }
 
 .button-setting:hover {
@@ -684,9 +685,17 @@ img {
 /*
 	Hover effect on thumbnail elements
 */
+
+.elementHover {
+	padding: 10px;
+}
 .elementHover:hover {
 	background-color: @theme-colored-bg-color-normal;
 	cursor: pointer;
+}
+
+.elementHover.active {
+	background-color: @theme-colored-bg-color-normal;
 }
 
 /*
@@ -977,20 +986,22 @@ input[type=range] .timelapseRange  {
 
 .settingsSubBlock {
 	padding: 10px 10px;
-	width: 100%;
 	clear: both;
-	display: table;
+	display: inline-block;
+}
+
+.settingsSubBlock:not(:first-child) {
+	margin-left: 10px;
+}
+
+.settingsSubBlock > * {
+	margin: 2px;
 }
 
 .settingsSubBlockCaption {
-	font-size: 1.1em;
+	font-size: @theme-font-size-normal;
 	font-weight: bold;
-	color: gray;
-	width: 30%;
-	display: inline-block;
-	overflow: hidden;
-	/* display: table-cell;
-	vertical-align: middle; */
+	color: @theme-dark-fg-color-normal;
 }
 
 .settingsSubBlockElements {

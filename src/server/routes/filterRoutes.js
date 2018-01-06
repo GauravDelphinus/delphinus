@@ -22,24 +22,12 @@ var routes = function() {
 
 			var validationParams = [
 				{
-					name: "type",
+					name: "stepType",
 					required: "yes",
 					type: ["filter", "layout", "artifact", "decoration"]
 				},
 				{
-					name: "filterType",
-					type: ["preset"]
-				},
-				{
-					name: "layoutType",
-					type: ["preset"]
-				},
-				{
-					name: "artifactType",
-					type: ["preset"]
-				},
-				{
-					name: "decorationType",
+					name: "type",
 					type: ["preset"]
 				}
 			];
@@ -51,22 +39,25 @@ var routes = function() {
 			var prototype;
 			var cypherQuery;
 
-			if (req.query.type == "filter" && req.query.filterType && req.query.filterType == "preset") {
-				cypherQuery = "MATCH (f:Filter {filter_type : 'preset'}) RETURN f;";
-				prototype = serverUtils.prototypes.filter;
-			} else if (req.query.type == "layout" && req.query.layoutType && req.query.layoutType == "preset") {
-				cypherQuery = "MATCH (l:Layout {layout_type : 'preset'}) RETURN l;";
-				prototype = serverUtils.prototypes.layout;
-			} else if (req.query.type == "artifact" && req.query.artifactType && req.query.artifactType == "preset") {
-				cypherQuery = "MATCH (a:Artifact {artifact_type : 'preset'}) RETURN a;";
-				prototype = serverUtils.prototypes.artifact;
-			} else if (req.query.type == "decoration" && req.query.decorationType && req.query.decorationType == "preset") {
-				cypherQuery = "MATCH (d:Decoration {decoration_type : 'preset'}) RETURN d;";
-				prototype = serverUtils.prototypes.decoration;
-			} else {
-				logger.error("Invalid request received");
-				return res.sendStatus(400);
+			if (req.query.type && req.query.type == "preset") {
+				if (req.query.stepType == "filter") {
+					cypherQuery = "MATCH (f:Filter {filter_type : 'preset'}) RETURN f;";
+					prototype = serverUtils.prototypes.filter;
+				} else if (req.query.stepType == "layout") {
+					cypherQuery = "MATCH (l:Layout {layout_type : 'preset'}) RETURN l;";
+					prototype = serverUtils.prototypes.layout;
+				} else if (req.query.stepType == "artifact") {
+					cypherQuery = "MATCH (a:Artifact {artifact_type : 'preset'}) RETURN a;";
+					prototype = serverUtils.prototypes.artifact;
+				} else if (req.query.stepType == "decoration") {
+					cypherQuery = "MATCH (d:Decoration {decoration_type : 'preset'}) RETURN d;";
+					prototype = serverUtils.prototypes.decoration;
+				} else {
+					logger.error("Invalid request received");
+					return res.sendStatus(400);
+				}
 			}
+			
 
 			dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 				if(err) {

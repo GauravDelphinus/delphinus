@@ -486,25 +486,32 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 
 		var artifact = artifacts[i];
 
-		if (artifact.type == "preset") {
-			applyPresetArtifact(size, artifact.preset, caption, imArgs);
-		} else if (artifact.type == "custom") {
-			if (artifact.banner) {
-				var backgroundColor = normalizeColorToIM(artifact.banner.backgroundColor);
-				if (artifact.banner.backgroundColor == "transparent") {
-					backgroundColor = "none";
-				}
-
-				if (artifact.banner.location == "bottom") {
-					applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, "south", parseInt(artifact.banner.fontSize), artifact.banner.fontName);
-				} else if (artifact.banner.location == "top") {
-					applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, "north", parseInt(artifact.banner.fontSize), artifact.banner.fontName);
-				} else if (artifact.banner.location == "below") { //changes size of image
-					applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, "south", parseInt(artifact.banner.fontSize), artifact.banner.fontName, "south");
-				} else if (artifact.banner.location == "above") { //changes size of image
-					applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, "north", parseInt(artifact.banner.fontSize), artifact.banner.fontName, "north");
+		logger.debug("artifact.banner: " + JSON.stringify(artifact.banner));
+		if (artifact.banner) {
+			var placement = "south", extent = null;
+			if (artifact.preset) {
+				if (artifact.preset == "bannerBottom") {
+					placement = "south";
+				} else if (artifact.preset == "bannerTop") {
+					placement = "north";
+				} else if (artifact.preset == "bannerCenter") {
+					placement = "center";
+				} else if (artifact.preset == "bannerAbove") {
+					placement = "north";
+					extent = "north";
+				} else if (artifact.preset == "bannerBelow") {
+					placement = "south";
+					extent = "south";
 				}
 			}
+
+			var backgroundColor = normalizeColorToIM(artifact.banner.backgroundColor);
+			if (artifact.banner.backgroundColor == "transparent") {
+				backgroundColor = "none";
+			}
+
+			//finally, apply the caption
+			applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, placement, parseInt(artifact.banner.fontSize), artifact.banner.fontName, extent);
 		}
 	}
 }
@@ -811,6 +818,7 @@ function normalizeColorToIM(color) {
 	Convert the passed in font to a font name that is recognized by ImageMagick.
 **/
 function normalizeFontNameToIM(fontName) {
+	fontName = "arial";
 	return fontName; // TODO
 }
 
