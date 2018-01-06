@@ -2,6 +2,7 @@
 
 //dark background
 @theme-dark-bg-color-normal: rgba(0, 0, 0, 0.5);
+@theme-dark-bg-color-weak: rgba(0, 0, 0, 0.1);
 
 //colored background
 @theme-colored-bg-color-normal: #d4443e;
@@ -60,7 +61,7 @@
 	margin: 10px auto;
 	border: 2px dotted gray;
 	border-radius: 20px;
-	padding: 20px;
+	padding: 10px 20px;
 	background-color: @theme-light-bg-color-normal;
 }
 
@@ -98,7 +99,7 @@
 
 .centerDisplayCaption {
 	margin: 0 auto;
-	font-size: 1.3em;
+	font-size: @theme-font-size-normal;
 	font-weight: bold;
 	color: black;
 	text-align: left; /* override left align from centerDisplayContent */
@@ -151,13 +152,18 @@
 
 /********************************** ALIGNMENT MODIFIERS *****************************/
 
-.vertical-center {
+.vertical-center-container {
 	vertical-align: middle;
 }
 
-.horizontal-center {
+.horizontal-center-container {
 	text-align: center;
 }
+
+.horizontal-center-child {
+	margin: 0 auto;
+}
+
 /********************************** GENERAL - INPUT ELEMENTS *****************************/
 
 
@@ -1492,7 +1498,8 @@ ul.nav li.dropdown.open > a {
 
 /************************** Nav Bar (TABS) ***************************/
 
-.nav-tabs>li>a {
+//Dark BG tabs (e.g., entry of challenge page) --------------------------------------------
+.nav-tabs.dark-bg>li>a {
 	text-decoration: none;
 	background-color: transparent;
 	color: @theme-light-fg-color-weak;
@@ -1500,22 +1507,49 @@ ul.nav li.dropdown.open > a {
 	font-weight: bold;
 }
 
-ul.nav-tabs>li>a:hover {
+ul.nav-tabs.dark-bg>li>a:hover {
 	background-color: @theme-colored-bg-color-strong;
 	color: @theme-light-fg-color-strong;
 }
 
-.nav-tabs>li.active>a {
+.nav-tabs.dark-bg>li.active>a {
 	text-decoration: none;
 	background-color: transparent;
 	color: @theme-light-fg-color-strong;
 }
-.nav-tabs>li.active>a:hover {
+.nav-tabs.dark-bg>li.active>a:hover {
 	background-color: @theme-colored-bg-color-strong;
 	color: @theme-light-fg-color-strong;
 }
 
+//Light BG tabs (e.g., new entry workflow for presets )--------------------------------------------
+.nav-tabs.light-bg>li>a {
+	text-decoration: none;
+	background-color: transparent;
+	color: @theme-dark-fg-color-weak;
+	font-size: @theme-font-size-normal;
+	font-weight: bold;
+}
 
+ul.nav-tabs.light-bg>li>a:hover {
+	background-color: @theme-colored-bg-color-strong;
+	color: @theme-dark-fg-color-strong;
+}
+
+.nav-tabs.light-bg>li.active>a {
+	text-decoration: none;
+	background-color: transparent;
+	color: @theme-dark-fg-color-strong;
+}
+.nav-tabs.light-bg>li.active>a:hover {
+	background-color: @theme-colored-bg-color-strong;
+	color: @theme-dark-fg-color-strong;
+}
+
+//Dark BG tab pane - e.g., in the new entry workflow -------------
+.tab-content.dark-bg>.tab-pane {
+	background-color: @theme-dark-bg-color-weak;
+}
 
 /************************* SPECIFIC FIXES **********************/
 

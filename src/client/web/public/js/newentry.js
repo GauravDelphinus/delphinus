@@ -169,12 +169,11 @@ function setupMainItem() {
 	$("#newentryimage").on("load", function() {
 		$("#newentryimage").data("naturalWidth", this.naturalWidth);
 		$("#newentryimage").data("naturalHeight", this.naturalHeight);
-		setImageHeight(); //adjust height
+		setImageHeight();
 	});
 
 	//listen to window resize events
 	$(window).bind('resize', setImageHeight);
-    setImageHeight();
 }
 
 /*
