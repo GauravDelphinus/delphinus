@@ -1,6 +1,6 @@
 //Append content to an existing grid table
 function createHorizontalStrip(entityId, contentTag, list, allowSelection = false, allowHover = false, defaultSelectedID = 0, selectionCallback = null) {
-	var table = $("<table>", {id: entityId + contentTag + "HorizontalStrip"});
+	var table = $("<table>", {id: entityId + contentTag + "HorizontalStrip", class: "horizontal-strip"});
 	
 	var numRows = 1;
 	var numCols = list.length;
@@ -12,7 +12,7 @@ function createHorizontalStrip(entityId, contentTag, list, allowSelection = fals
 	for (var row = 0; row < numRows; row ++) {
 		var tr = $("<tr>");
 		for (var col = 0; col < numCols; col ++) {
-			var td = $("<td>", {class: "gridCell", width: tdWidth + "%"});
+			var td = $("<td>", {class: "horizontal-strip-td"});
 			if (i < list.length) {
 				var data = list[i++];
 				var element = createHorizontalStripElement(data, contentTag);
@@ -53,7 +53,7 @@ function createHorizontalStripElement(data, contentTag) {
 	var imageElement = $("<img>", {id: data.id, src: data.image});
 	element.append(imageElement);
 
-	var captionSection = $("<div>", {class: "captionSection", id: contentTag + data.id + "CaptionSection"});
+	var captionSection = $("<div>", {class: "horizontal-strip-item-caption", id: contentTag + data.id + "CaptionSection"});
 
 	var caption = $("<span>", {text: data.caption});
 	captionSection.append(caption);

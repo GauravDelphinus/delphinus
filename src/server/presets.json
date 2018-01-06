@@ -1,10 +1,10 @@
 {
 	"presetLayout" : {
-		"originalLayout" : "Original layout",
-		"rotateClock90White" : "Rotate 90 Clockwise",
-		"rotateAnticlock90White" : "Rotate 90 Anticlockwise",
-		"flipVertical" : "Flip Vertical",
-		"flipHorizontal" : "Flip Horizontal"
+		"originalLayout" : "Original",
+		"rotateClock90White" : "Rotate \u27f3",
+		"rotateAnticlock90White" : "Rotate \u27f2",
+		"flipVertical" : "Flip \u2195",
+		"flipHorizontal" : "Flip \u2194"
 	},
 	"presetFilter" : {
 		"noFilter" : "No Filter",
@@ -14,11 +14,11 @@
 		"whirlpool" : "Whirlpool"
 	},
 	"presetArtifact" : {
-		"bannerBottom" : "Banner at Bottom",
-		"bannerTop" : "Banner at Top",
-		"bannerCenter" : "Banner at Center",
-		"bannerBelow" : "Banner below",
-		"bannerAbove" : "Banner above"
+		"bannerBottom" : "Bottom",
+		"bannerTop" : "Top",
+		"bannerCenter" : "Center",
+		"bannerBelow" : "Below",
+		"bannerAbove" : "Above"
 	},
 	"presetDecoration" : {
 		"noBorder" : "No border",

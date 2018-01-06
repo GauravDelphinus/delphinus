@@ -693,7 +693,7 @@ img {
 */
 
 .elementHover {
-	padding: 10px;
+	padding: 5px;
 }
 .elementHover:hover {
 	background-color: @theme-colored-bg-color-normal;
@@ -1438,6 +1438,31 @@ input[type=range] .range-setting {
 
 .sidebarItemDescription {
 	padding: 5px;
+}
+
+/************************** Horizontal Strip (e.g. presets) ***************************/
+
+.horizontal-strip-container {
+	white-space:nowrap;
+    overflow-x:scroll;
+}
+
+.horizontal-strip {
+	display:inline-block
+}
+
+.horizontal-strip-td {
+	padding: 0px;
+}
+
+.horizontal-strip img {
+	height: 100px;
+}
+
+.horizontal-strip-item-caption {
+	background: transparent;
+	font-size: @theme-font-size-normal;
+	color: @theme-dark-fg-color-strong;
 }
 
 /************************** Nav Bar (Top) ***************************/
