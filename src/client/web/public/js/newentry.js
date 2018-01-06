@@ -227,13 +227,7 @@ function setupArtifactStep() {
 var defaultLayoutPresetSelectionID = "originalLayout"; //NOTE: must match one of the values in presets.json
 
 function setupLayoutStep() {
-	//setupCropToggleSection();
-
-	//setupMirrorToggleSection();
-
-	//setupRotationToggleSection();
-
-	// setupShearToggleSection();
+	setupCropToggleSection();
 
 	createPresetsView("layout", "#presetLayoutSection", defaultLayoutPresetSelectionID, "presets");
 }
@@ -241,10 +235,6 @@ function setupLayoutStep() {
 function setupCropToggleSection() {
 	/*************************** CROP SECTION *****************************/
 	/**********************************************************************/
-
-	// Logic Specific to this section
-
-	setupGeneralRulesForToggleSection("#cropEnabledButton", [], ["#resetCropButton", "#editCropButton"], "layout");
 
 	$("#saveCropButton").click(function() {
 		var cropData = $("#newentryimage").cropper("getData");
@@ -274,7 +264,7 @@ function setupCropToggleSection() {
 		});
 	});
 
-	setChangeCallback(changeCallback, [], ["#resetCropButton", "#cropEnabledButton", "#saveCropButton"]);
+	setChangeCallback(changeCallback, [], ["#resetCropButton", "#saveCropButton"]);
 }
 
 
@@ -295,6 +285,7 @@ function startCrop(cropData) {
 
 	//disable everything else until we're out of the crop mode
 	$("#steps").hide();
+	$("#captionSection").hide();
 	$("#cropLabel").show();
 
 }
@@ -306,7 +297,9 @@ function endCrop() {
 	$("#newentryimage").cropper("destroy");
 	$(".imageSection").removeClass("imageSectionHover");
 
+	//restore back the original view - show the caption, the steps, adn hide the crop label
 	$("#steps").show();
+	$("#captionSection").show();
 	$("#cropLabel").hide();
 }
 
@@ -689,6 +682,9 @@ function createPresetsView(presetType, presetSectionID, defaultPresetID, content
 
 		//apply changes to reflect default selection
 		applyChanges(false);
+
+		//refresh the thumbnails in the presets view
+		refreshPresetsView(presetType, presetSectionID);
 	});
 
 }
@@ -774,13 +770,6 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 				data.id = a.id;
 				data.caption = a.name;
 				data.image = "/images/static/progress.gif"; //start by showing the progress image
-
-				var jsonObj = constructJSONObjectWithPreset("artifact", a.id);
-				
-				//update the server with the step information and update the image that is received
-				generateChanges(a.id, jsonObj, function(id, data) {
-					$("img#" + id).prop("src", data.imageData);
-				});
 
 				list.push(data);
 			}
@@ -1133,23 +1122,19 @@ function constructJSONObject(jsonObj) {
 	/// LAYOUT
 	
 	var layout = {};
-	var presetValue = $("#presetLayoutSection").data("selectedPresetID");
+	var presetValue = fetchPresetValue("layout", defaultLayoutPresetSelectionID);
 	if (presetValue != undefined) {
 		layout.preset = presetValue;
 	}
 	
-	if ($("#layoutOptionsButton").data("state") == "custom") {
-		layout.type = "custom";
-		
-		//crop
-		if ($("#cropEnabledButton").hasClass("active")) {
-			var cropData = jQuery.data(document.body, "cropData");
+	//crop
+	var cropData = jQuery.data(document.body, "cropData");
 
-			if (cropData) {
-				layout.crop = {x: cropData.x, y: cropData.y, width: cropData.width, height: cropData.height};
-			}
-		}
+	if (cropData) {
+		layout.crop = {x: cropData.x, y: cropData.y, width: cropData.width, height: cropData.height};
+	}
 
+		/* Future support
 		//flip
 		if ($("#mirrorEnabledButton").hasClass("active")) {
 			if ($("#flipHorizontalButton").hasClass("active")) {
@@ -1183,7 +1168,7 @@ function constructJSONObject(jsonObj) {
 				layout.shear.color = $("#shearColorButton").css("background-color");
 			}
 		}
-	}
+		*/
 
 	if (!$.isEmptyObject(layout)) {
 		jsonObj.steps.layouts = [];
@@ -1283,7 +1268,6 @@ function constructJSONObject(jsonObj) {
 		artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
 		artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
 
-		console.log("added, artifact: " + JSON.stringify(artifact));
 		/*
 	} else if ($("#artifactOptionsButton").data("state") == "custom") {
 			artifact.type = "custom";
@@ -1406,7 +1390,6 @@ function applyChanges(refreshPresets, done) {
 	if (refreshPresets) {
 		//find the currently visible tab
 		var activeTabId = $("#steps ul.nav-tabs li.active").attr("id");
-		console.log("activeTabId: " + activeTabId);
 		if (activeTabId == "artifactTab") {
 			refreshPresetsView("artifact", "#presetArtifactSection", defaultArtifactPresetSelectionID, "presets");
 		} else if (activeTabId == "layoutTab") {

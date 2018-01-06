@@ -1,29 +1,14 @@
 //Append content to an existing grid table
 function createHorizontalStrip(entityId, contentTag, list, allowSelection = false, allowHover = false, defaultSelectedID = 0, selectionCallback = null) {
 	var table = $("<table>", {id: entityId + contentTag + "HorizontalStrip"});
-
-	var rowCount = $("#" + entityId + contentTag + "HorizontalStrip tr").length;
-	var numCols = 0;
-	if (rowCount > 0) {
-		numCols = table.find("tr:first td").length;
-	} else {
-		//this is the first row
-		if (list.length % 4 == 0) {
-			numCols = 4;
-		} else if (list.length % 3 == 0) {
-			numCols = 3;
-		} else if (list.length % 2 == 0) {
-			numCols = 2;
-		} else {
-			numCols = 5;
-		}
-	}
 	
-	
+	var numRows = 1;
+	var numCols = list.length;
 	var tdWidth = 100 / numCols;
 
 	var i = 0;
-	var numRows = (list.length / numCols) + (((list.length % numCols) > 0) ? 1 : 0);
+
+
 	for (var row = 0; row < numRows; row ++) {
 		var tr = $("<tr>");
 		for (var col = 0; col < numCols; col ++) {

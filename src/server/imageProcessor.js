@@ -112,38 +112,40 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
 
 		var layout = layouts[i];
 
-		if (layout.type == "preset") {
+		if (layout.crop) {
+			layoutArgs.push("-crop");
+			layoutArgs.push(layout.crop.width + "x" + layout.crop.height + "+" + layout.crop.x + "+" + layout.crop.y);
+		}
+
+		if (layout.preset) {
 			applyPresetLayout(layout.preset, layoutArgs);
-		} else if (layout.type == "custom") {
-			if (layout.crop) {
-				layoutArgs.push("-crop");
-				layoutArgs.push(layout.crop.width + "x" + layout.crop.height + "+" + layout.crop.x + "+" + layout.crop.y);
+		}
+
+		/* Future support
+		if (layout.mirror) {
+			if (layout.mirror == "flop") {
+				layoutArgs.push("-flop");
 			}
 
-			if (layout.mirror) {
-				if (layout.mirror == "flop") {
-					layoutArgs.push("-flop");
-				}
-
-				if (layout.mirror == "flip") {
-					layoutArgs.push("-flip");
-				}
-			}
-
-			if (layout.rotation) {
-				layoutArgs.push("-background");
-				layoutArgs.push(layout.rotation.color);
-				layoutArgs.push("-rotate");
-				layoutArgs.push(layout.rotation.degrees);
-			}
-
-			if (layout.shear) {
-				layoutArgs.push("-background");
-				layoutArgs.push(layout.shear.color);
-				layoutArgs.push("-shear");
-				layoutArgs.push(layout.shear.xDegrees + "x" + layout.shear.yDegrees);
+			if (layout.mirror == "flip") {
+				layoutArgs.push("-flip");
 			}
 		}
+
+		if (layout.rotation) {
+			layoutArgs.push("-background");
+			layoutArgs.push(layout.rotation.color);
+			layoutArgs.push("-rotate");
+			layoutArgs.push(layout.rotation.degrees);
+		}
+
+		if (layout.shear) {
+			layoutArgs.push("-background");
+			layoutArgs.push(layout.shear.color);
+			layoutArgs.push("-shear");
+			layoutArgs.push(layout.shear.xDegrees + "x" + layout.shear.yDegrees);
+		}
+		*/
 	}
 
 	if (layoutArgs.length > 0) {
