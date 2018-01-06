@@ -303,338 +303,15 @@ function endCrop() {
 	$("#cropLabel").hide();
 }
 
-function setupMirrorToggleSection() {
-	/*************************** FLIP SECTION *****************************/
-	/**********************************************************************/
-
-	setupGeneralRulesForToggleSection("#mirrorEnabledButton", [], ["#flipHorizontalButton", "#flipVerticalButton"], "layout");
-
-	setMutuallyExclusiveButtons(["#flipHorizontalButton", "#flipVerticalButton"]);
-
-	setChangeCallback(changeCallback, [], ["#mirrorEnabledButton", "#flipVerticalButton", "#flipHorizontalButton"]);
-}
-
-function setupRotationToggleSection() {
-	/*************************** ROTATE SECTION *****************************/
-	/************************************************************************/
-
-	setupGeneralRulesForToggleSection("#rotationEnabledButton", [], ["#resetRotationButton", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton", "#rotateColorButton"], "layout");
-	
-	$("#anticlockwise10RotationButton, #anticlockwise90RotationButton, #clockwise90RotationButton, #clockwise10RotationButton").click(function() {
-		var rotationData = jQuery.data(document.body, "rotationData");
-		if (!rotationData) {
-			rotationData = {degrees: 0};
-		}
-
-		if (this.id == "anticlockwise10RotationButton") {
-			rotationData.degrees -= 10;
-		} else if (this.id == "anticlockwise90RotationButton") {
-			rotationData.degrees -= 90;
-		} else if (this.id == "clockwise90RotationButton") {
-			rotationData.degrees += 90;
-		} else if (this.id == "clockwise10RotationButton") {
-			rotationData.degrees += 10;
-		}
-		
-		jQuery.data(document.body, "rotationData", rotationData);
-	});
-
-	$("#resetRotationButton").click(function() {
-		jQuery.data(document.body, "rotationData", null);
-	});
-
-	setupColorButton("#rotateColorButton");
-
-	setChangeCallback(changeCallback, ["#rotateColorButton"], ["#rotationEnabledButton", "#resetRotationButton", "#anticlockwise10RotationButton", "#anticlockwise90RotationButton", "#clockwise90RotationButton", "#clockwise10RotationButton"]);
-
-}
-
-function setupShearToggleSection() {
-	/*************************** SHEAR SECTION ******************************/
-	/************************************************************************/
-
-	setupGeneralRulesForToggleSection("#shearEnabledButton", [], ["#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton", "#shearColorButton"], "layout");
-	
-	$("#negative10ShearXButton, #positive10ShearXButton, #negative10ShearYButton, #positive10ShearYButton").click(function() {
-		var shearData = jQuery.data(document.body, "shearData");
-		if (!shearData) {
-			shearData = {xDegrees: 0, yDegrees: 0};
-		}
-
-		if (this.id == "negative10ShearXButton") {
-			shearData.xDegrees -= 10;
-		} else if (this.id == "positive10ShearXButton") {
-			shearData.xDegrees += 10;
-		} else if (this.id == "negative10ShearYButton") {
-			shearData.yDegrees -= 10;
-		} else if (this.id == "positive10ShearYButton") {
-			shearData.yDegrees += 10;
-		}
-		
-		jQuery.data(document.body, "shearData", shearData);
-	});
-
-	$("#resetShearButton").click(function() {
-		jQuery.data(document.body, "shearData", null);
-	});
-
-	setupColorButton("#shearColorButton");
-
-	setChangeCallback(changeCallback, ["#shearColorButton"], ["#shearEnabledButton", "#resetShearButton", "#negative10ShearXButton", "#positive10ShearXButton", "#negative10ShearYButton", "#positive10ShearYButton"]);
-}
-
 /**************************** (4) FILTER STEP **********************************************/
 
-function showFilterStep() {
-	$("#stepTitle").text("Apply a really cool filter to your entry!")
-
-	if ($("#presetFilterSection").is(":visible")) {
-		//default selection
-		var defaultSelectionID = $("#presetFilterSection").data("selectedPresetID");
-
-		$.getJSON('/api/filters?type=filter' + "&filterType=preset", function(result) {
-			if (result.length > 0) {
-				var list = [];
-				for (var i = 0; i < result.length; i++) {
-					var f = result[i];
-					//var u = result[i][1];
-
-					var data = {};
-					data.id = f.id;
-					data.caption = f.name;
-					data.image = "/images/static/progress.gif";
-		
-					data.socialStatus = {};
-					data.socialStatus.numLikes = 121;
-					data.socialStatus.numShares = 23;
-					data.socialStatus.numComments = 45;
-
-					data.link = "/filter/" + f.id;
-
-					var jsonObj = {};
-					constructJSONObject(jsonObj);
-					if (!jsonObj.steps.filters) {
-						jsonObj.steps.filters = [{}];
-					}
-					jsonObj.steps.filters[0].type = "preset";
-					jsonObj.steps.filters[0].preset = f.id;
-					generateChanges(f.id, jsonObj, function(id, data) {
-						$("#presetFilters" + id + "EntityImage").prop("src", data.imageData);
-					});
-
-					list.push(data);
-				}
-
-				var grid = createGrid("presetFilters", list, 3, true, true, defaultSelectionID, function(id) {
-					switchStepOptions("filter", "preset", id);
-
-					$(window).scrollTop(0);
-				});
-				$("#presetFilterSection").empty().append(grid);
-
-				applyChanges(false); //for default selection
-			}
-		})
-		.fail(function() {
-			window.location.replace("/error");
-		});
-	}
-}
+var defaultFilterPresetSelectionID = "noFilter"; //NOTE: must match one of the values in presets.json
 
 function setupFilterStep() {
-	setupPresetAndCustomOptions("#filterOptionsButton", "#presetFilterSection", "#customFilterSection", "preset");
-
-	setupGrayscaleToggleSection();
-
-	setupMonochromeToggleSection();
-
-	setupNegativeToggleSection();
-
-	setupSolarizeToggleSection();
-
-	setupSpreadToggleSection();
-
-	setupSwirlToggleSection();
-
-	setupWaveToggleSection();
-
-	setupCharcoalToggleSection();
-
-	setupMosaicToggleSection();
-
-	setupPaintToggleSection();
-
-	setupContrastToggleSection();
-
-	setupBrightnessToggleSection();
-
-	setupHueToggleSection();
-
-	setupSaturationToggleSection();
-}
-
-function setupGrayscaleToggleSection() {
-	setupGeneralRulesForToggleSection("#grayscaleEnabledButton", [], [], "filter");
-
-	setChangeCallback(changeCallback, [], ["#grayscaleEnabledButton"]);
-}
-
-function setupMonochromeToggleSection() {
-	setupGeneralRulesForToggleSection("#monochromeEnabledButton", [], [], "filter");
-
-	setChangeCallback(changeCallback, [], ["#monochromeEnabledButton"]);
-}
-
-function setupNegativeToggleSection() {
-	setupGeneralRulesForToggleSection("#negativeEnabledButton", [], [], "filter");
-
-	setChangeCallback(changeCallback, [], ["#negativeEnabledButton"]);
-}
-
-function setupSolarizeToggleSection() {
-	setupGeneralRulesForToggleSection("#solarizeEnabledButton", ["#solarizeRangeInput"], [], "filter");
-
-	$("#solarizeSection").append(createRangeSection("Solarize factor", "solarizeRangeInput", 0, 100, 100, 5));
-
-	setChangeCallback(changeCallback, ["#solarizeRangeInput"], ["#solarizeEnabledButton"]);
-}
-
-function setupSpreadToggleSection() {
-	setupGeneralRulesForToggleSection("#spreadEnabledButton", ["#spreadRangeInput"], [], "filter");
-
-	$("#spreadSection").append(createRangeSection("Spread radius", "spreadRangeInput", 0, 100, 0, 5));
-
-	setChangeCallback(changeCallback, ["#spreadRangeInput"], ["#spreadEnabledButton"]);
-}
-
-function setupSwirlToggleSection() {
-	setupGeneralRulesForToggleSection("#swirlEnabledButton", ["#swirlRangeInput"], [], "filter");
-
-	$("#swirlSection").append(createRangeSection("Swirl radius", "swirlRangeInput", 0, 100, 0, 5));
-
-	setChangeCallback(changeCallback, ["#swirlRangeInput"], ["#swirlEnabledButton"]);
-}
-
-function setupWaveToggleSection() {
-	setupGeneralRulesForToggleSection("#waveEnabledButton", ["#waveAmplitudeRangeInput", "#waveLengthRangeInput"], [], "filter");
-
-	$("#waveSection").append(createRangeSection("Wave amplitude", "waveAmplitudeRangeInput", 0, 100, 0, 5));
-	$("#waveSection").append(createRangeSection("Wave length", "waveLengthRangeInput", 0, 100, 100, 5));
-
-	setChangeCallback(changeCallback, ["#waveAmplitudeRangeInput", "#waveLengthRangeInput"], ["#waveEnabledButton"]);
-}
-
-function setupCharcoalToggleSection() {
-	setupGeneralRulesForToggleSection("#charcoalEnabledButton", ["#charcoalRangeInput"], [], "filter");
-
-	$("#charcoalSection").append(createRangeSection("Charcoal factor", "charcoalRangeInput", 0, 20, 0, 1));
-
-	setChangeCallback(changeCallback, ["#charcoalRangeInput"], ["#charcoalEnabledButton"]);
-}
-
-function setupMosaicToggleSection() {
-	setupGeneralRulesForToggleSection("#mosaicEnabledButton", [], [], "filter");
-
-	setChangeCallback(changeCallback, [], ["#mosaicEnabledButton"]);
-}
-
-function setupPaintToggleSection() {
-	setupGeneralRulesForToggleSection("#paintEnabledButton", ["#paintRangeInput"], [], "filter");
-
-	$("#paintSection").append(createRangeSection("Paint radius", "paintRangeInput", 0, 100, 0, 5));
-
-	setChangeCallback(changeCallback, ["#paintRangeInput"], ["#paintEnabledButton"]);
-}
-
-function setupContrastToggleSection() {
-	setupGeneralRulesForToggleSection("#contrastEnabledButton", ["#contrastRangeInput"], [], "filter");
-
-	$("#contrastSection").append(createRangeSection("Contrast", "contrastRangeInput", -100, 100, 0, 5));
-
-	setChangeCallback(changeCallback, ["#contrastRangeInput"], ["#contrastEnabledButton"]);
-}
-
-function setupBrightnessToggleSection() {
-	setupGeneralRulesForToggleSection("#brightnessEnabledButton", ["#brightnessRangeInput"], [], "filter");
-
-	$("#brightnessSection").append(createRangeSection("Brightness", "brightnessRangeInput", -100, 100, 0, 5));
-
-	setChangeCallback(changeCallback, ["#brightnessRangeInput"], ["#brightnessEnabledButton"]);
-}
-
-function setupHueToggleSection() {
-	setupGeneralRulesForToggleSection("#hueEnabledButton", ["#hueRangeInput"], [], "filter");
-
-	$("#hueSection").append(createRangeSection("Hue", "hueRangeInput", -100, 100, 0, 5));
-
-	setChangeCallback(changeCallback, ["#hueRangeInput"], ["#hueEnabledButton"]);
-}
-
-function setupSaturationToggleSection() {
-	setupGeneralRulesForToggleSection("#saturationEnabledButton", ["#saturationRangeInput"], [], "filter");
-
-	$("#saturationSection").append(createRangeSection("Saturation", "saturationRangeInput", -100, 100, 0, 5));
-
-	setChangeCallback(changeCallback, ["#saturationRangeInput"], ["#saturationEnabledButton"]);
+	createPresetsView("filter", "#presetFilterSection", defaultFilterPresetSelectionID, "presets");
 }
 
 /**************************** (5) DECORATION STEP **********************************************/
-
-function showDecorationStep() {
-	$("#stepTitle").text("Apply some final touches to your entry with a border!")
-
-	if ($("#presetDecorationSection").is(":visible")) {
-		//default selection
-		var defaultSelectionID = $("#presetDecorationSection").data("selectedPresetID");
-
-		$.getJSON('/api/filters?type=decoration' + "&decorationType=preset", function(result) {
-			if (result.length > 0) {
-				var list = [];
-				for (var i = 0; i < result.length; i++) {
-					var d = result[i];
-					//var u = result[i][1];
-
-					var data = {};
-					data.id = d.id;
-					data.caption = d.name;
-					data.image = "/images/static/progress.gif";
-		
-					data.socialStatus = {};
-					data.socialStatus.numLikes = 121;
-					data.socialStatus.numShares = 23;
-					data.socialStatus.numComments = 45;
-
-					data.link = "/decoration/" + d.id;
-
-					var jsonObj = {};
-					constructJSONObject(jsonObj);
-					if (!jsonObj.steps.decorations) {
-						jsonObj.steps.decorations = [{}];
-					}
-					jsonObj.steps.decorations[0].type = "preset";
-					jsonObj.steps.decorations[0].preset = d.id;
-					generateChanges(d.id, jsonObj, function(id, data) {
-						$("#presetDecorations" + id + "EntityImage").prop("src", data.imageData);
-					});
-
-					list.push(data);
-				}
-
-				var grid = createGrid("presetDecorations", list, 3, true, true, defaultSelectionID, function(id) {
-					switchStepOptions("decoration", "preset", id);
-
-					$(window).scrollTop(0);
-				});
-				$("#presetDecorationSection").empty().append(grid);
-
-				applyChanges(false); //for default selection
-			}
-		})
-		.fail(function() {
-			window.location.replace("/error");
-		});
-	}
-}
 
 function setupDecorationStep() {
 	setupPresetAndCustomOptions("#decorationOptionsButton", "#presetDecorationSection", "#customDecorationSection", "preset");
@@ -643,17 +320,9 @@ function setupDecorationStep() {
 }
 
 function setupBorderToggleSection() {
-	setupGeneralRulesForToggleSection("#borderEnabledButton", ["#borderWidth", "#borderColor"], [], "decoration");
-
 	setupColorButton("#borderColor");
 
-	setChangeCallback(changeCallback, ["#borderColor", "#borderWidth"], ["#borderEnabledButton"]);
-}
-
-/**************************** (6) POST STEP **********************************************/
-
-function showPostStep() {
-	$("#stepTitle").text("You're all set!")
+	setChangeCallback(changeCallback, ["#borderColor", "#borderWidth"], []);
 }
 
 /*****************************************************************************************/
@@ -1119,7 +788,24 @@ function constructJSONObject(jsonObj) {
 
 	jsonObj.steps = {}; // the main object that encapsulates filters, layouts, etc.
 
-	/// LAYOUT
+	// ARTIFACTS -------------------------------------
+	var artifact = {};
+	var presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
+	if (presetValue != undefined) {
+		artifact.preset = presetValue;
+	}
+
+	artifact.banner = {caption: $("#bannerText").prop("value")}; //this is only there to allow server to account for caption text when generating image hashes
+	artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
+	artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
+	artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
+
+	if (!$.isEmptyObject(artifact)) {
+		jsonObj.steps.artifacts = [];
+		jsonObj.steps.artifacts.push(artifact);
+	}
+
+	/// LAYOUT -----------------------------------------
 	
 	var layout = {};
 	var presetValue = fetchPresetValue("layout", defaultLayoutPresetSelectionID);
@@ -1134,188 +820,32 @@ function constructJSONObject(jsonObj) {
 		layout.crop = {x: cropData.x, y: cropData.y, width: cropData.width, height: cropData.height};
 	}
 
-		/* Future support
-		//flip
-		if ($("#mirrorEnabledButton").hasClass("active")) {
-			if ($("#flipHorizontalButton").hasClass("active")) {
-				layout.mirror = "flop";
-			}
-
-			if ($("#flipVerticalButton").hasClass("active")) {
-				layout.mirror = "flip";
-			}
-		}
-
-		//rotation
-		if ($("#rotationEnabledButton").hasClass("active")) {
-			var rotationData = jQuery.data(document.body, "rotationData");
-
-			if (rotationData) {
-				layout.rotation = {};
-				layout.rotation.degrees = rotationData.degrees;
-				layout.rotation.color = $("#rotateColorButton").css("background-color");
-			}
-		}
-
-		//shear
-		if ($("#shearEnabledButton").hasClass("active")) {
-			var shearData = jQuery.data(document.body, "shearData");
-
-			if (shearData) {
-				layout.shear = {};
-				layout.shear.xDegrees = shearData.xDegrees;
-				layout.shear.yDegrees = shearData.yDegrees;
-				layout.shear.color = $("#shearColorButton").css("background-color");
-			}
-		}
-		*/
-
 	if (!$.isEmptyObject(layout)) {
 		jsonObj.steps.layouts = [];
 		jsonObj.steps.layouts.push(layout);
 	}
 
-	/// FILTERS
+	/// FILTERS ----------------------------------------
 	var filter = {};
 
-	if ($("#filterOptionsButton").data("state") == "preset") { // PRESET FILTER
-		var presetValue = $("#presetFilterSection").data("selectedPresetID");
-		if (presetValue != undefined) {
-			filter.type = "preset";
-			filter.preset = presetValue;
-		}
-	} else if ($("#filterOptionsButton").data("state") == "custom") { // CUSTOM FILTER
-		filter.type = "custom";
-
-		// Antique
-		if ($("#grayscaleEnabledButton").hasClass("active")) {
-			filter.grayscale = "on";
-		}
-
-		if ($("#monochromeEnabledButton").hasClass("active")) {
-			filter.monochrome = "on";
-		}
-
-		if ($("#negativeEnabledButton").hasClass("active")) {
-			filter.negative = "on";
-		}
-
-		if ($("#solarizeEnabledButton").hasClass("active")) {
-			filter.solarize = {threshold: $("#solarizeRangeInput").val()};
-		}
-
-		// Distortion
-		if ($("#spreadEnabledButton").hasClass("active")) {
-			filter.spread = {amount : $("#spreadRangeInput").val()};
-		}
-
-		if ($("#swirlEnabledButton").hasClass("active")) {
-			filter.swirl = {degrees: $("#swirlRangeInput").val()};
-		}
-
-		if ($("#waveEnabledButton").hasClass("active")) {
-			filter.wave = {amplitude : $("#waveAmplitudeRangeInput").val(), wavelength: $("#waveLengthRangeInput").val()};
-		}
-
-		// Artistic
-		if ($("#charcoalEnabledButton").hasClass("active")) {
-			filter.charcoal = {factor: $("#charcoalRangeInput").val()};
-		}
-
-		if ($("#mosaicEnabledButton").hasClass("active")) {
-			filter.mosaic = "on";
-		}
-
-		if ($("#paintEnabledButton").hasClass("active")) {
-			filter.paint = {radius: $("#paintRangeInput").val() };
-		}
-
-		// Contrast/Brigthness/Color
-		if ($("#contrastEnabledButton").hasClass("active")) {
-			filter.contrast = {value: $("#contrastRangeInput").val()};
-		}
-
-		if ($("#brightnessEnabledButton").hasClass("active")) {
-			filter.brightness = {value: $("#brightnessRangeInput").val()};
-		}
-
-		if ($("#hueEnabledButton").hasClass("active")) {
-			filter.hue = {value: $("#hueRangeInput").val()};
-		}
-
-		if ($("#saturationEnabledButton").hasClass("active")) {
-			filter.saturation = {value: $("#saturationRangeInput").val()};
-		}
+	var presetValue = fetchPresetValue("filter", defaultFilterPresetSelectionID);
+	if (presetValue != undefined) {
+		filter.preset = presetValue;
 	}
-
 	
 	if (!$.isEmptyObject(filter)) {
 		jsonObj.steps.filters = [];
 		jsonObj.steps.filters.push(filter);
 	}
 	
-
-	// ARTIFACTS
-	var artifact = {};
-	//if ($("#artifactOptionsButton").data("state") == "preset") {
-		var presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
-		if (presetValue != undefined) {
-			artifact.preset = presetValue;
-		}
-
-		artifact.banner = {caption: $("#bannerText").prop("value")}; //this is only there to allow server to account for caption text when generating image hashes
-		artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
-		artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
-		artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
-
-		/*
-	} else if ($("#artifactOptionsButton").data("state") == "custom") {
-			artifact.type = "custom";
-
-			artifact.banner = {caption: $("#bannerText").prop("value")}; //this is only there to allow server to account for caption text when generating image hashes
-
-			if ($("#topBannerButton").hasClass("active")) {
-				artifact.banner.location = "top";
-			} else if ($("#bottomBannerButton").hasClass("active")) {
-				artifact.banner.location = "bottom";
-			} else if ($("#aboveBannerButton").hasClass("active")) {
-				artifact.banner.location = "above";
-			} else if ($("#belowBannerButton").hasClass("active")) {
-				artifact.banner.location = "below";
-			}
-
-			artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
-			artifact.banner.fontName = $("#bannerTextFontName").val();
-			artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
-			artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
-	}
-	*/
-
-
-	if (!$.isEmptyObject(artifact)) {
-		jsonObj.steps.artifacts = [];
-		jsonObj.steps.artifacts.push(artifact);
-	}
-	
-	// DECORATIONS
+	// DECORATIONS -------------------------------------
 	var decoration = {};
 
-	if ($("#decorationOptionsButton").data("state") == "preset") {
-		var presetValue = $("#presetDecorationSection").data("selectedPresetID");
-		if (presetValue != undefined) {
-			decoration.type = "preset";
-			decoration.preset = presetValue;
-		}
-	} else if ($("#decorationOptionsButton").data("state") == "custom") {
-		decoration.type = "custom";
+	decoration.border = {};
 
-		if ($("#borderEnabledButton").hasClass("active")) {
-			decoration.border = {};
+	decoration.border.width = $("#borderWidth").val();
+	decoration.border.color = $("#borderColor").css("background-color");
 
-			decoration.border.width = $("#borderWidth").val();
-			decoration.border.color = $("#borderColor").css("background-color");
-		}
-	}
 
 	if (!$.isEmptyObject(artifact)) {
 		jsonObj.steps.decorations = [];

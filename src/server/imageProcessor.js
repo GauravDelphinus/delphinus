@@ -190,6 +190,9 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
 **/
 function applyPresetLayout(presetLayout, imArgs) {
 	switch (presetLayout) {
+		case "originalLayout":
+			//do nothing;
+			break;
 		case "rotateClock90White":
 			imArgs.push("-rotate");
 			imArgs.push(90);
@@ -320,9 +323,10 @@ function applyFilters (image, filters, imArgs) {
 		// So the format here skips the custom/preset/user_defined level in the object hierarchy.
 		//console.log("filter is: " + JSON.stringify(filter));
 
-		if (filter.type == "preset") {
-			applyPresetFilter(filter.preset, imArgs);
-		} else if (filter.type == "custom") {
+		applyPresetFilter(filter.preset, imArgs);
+
+			/* Future use
+		if (filter.type == "custom") {
 			//Antique -------------
 			if (filter.grayscale == "on") {
 				//image.colorspace("GRAY");
@@ -405,6 +409,7 @@ function applyFilters (image, filters, imArgs) {
 				imArgs.push("100," + absoluteToPercentageChangeSigned(parseInt(filter.saturation.value)) + ",100");
 			}
 		}
+		*/
 	}
 }
 
@@ -414,6 +419,9 @@ function applyFilters (image, filters, imArgs) {
 **/
 function applyPresetFilter(presetFilter, imArgs) {
 	switch (presetFilter) {
+		case "noFilter":
+			//do nothing
+			break;
 		case "rainyDay":
 			imArgs.push("-wave");
 			imArgs.push("5x100");
@@ -488,7 +496,6 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 
 		var artifact = artifacts[i];
 
-		logger.debug("artifact.banner: " + JSON.stringify(artifact.banner));
 		if (artifact.banner) {
 			var placement = "south", extent = null;
 			if (artifact.preset) {
@@ -515,53 +522,6 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 			//finally, apply the caption
 			applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, placement, parseInt(artifact.banner.fontSize), artifact.banner.fontName, extent);
 		}
-	}
-}
-
-/**
-	Apply the provided preset artifacts on top of the ImageMagick arguments
-	list, and use the provided size and bannerText for the same.
-**/
-function applyPresetArtifact(size, presetArtifact, bannerText, imArgs) {
-	switch (presetArtifact) {
-		case "bannerBottomWhite":
-			applyCaption(imArgs, size, "#FFF8", "black", bannerText, "south");
-			break;
-		case "bannerBottomBlack":
-			applyCaption(imArgs, size, "#0008", "white", bannerText, "south");
-			break;
-		case "bannerBottomBlackTransparent":
-			applyCaption(imArgs, size, "#0000", "black", bannerText, "south");
-			break;
-		case "bannerBottomWhiteTransparent":
-			applyCaption(imArgs, size, "#0000", "white", bannerText, "south");
-			break;
-		case "bannerTopWhite":
-			applyCaption(imArgs, size, "#FFF8", "black", bannerText, "north");
-			break;
-		case "bannerTopBlack":
-			applyCaption(imArgs, size, "#0008", "white", bannerText, "north");
-			break;
-		case "bannerTopBlackTransparent":
-			applyCaption(imArgs, size, "#0000", "black", bannerText, "north");
-			break;
-		case "bannerTopWhiteTransparent":
-			applyCaption(imArgs, size, "#0000", "white", bannerText, "north");
-			break;
-		case "bannerCenterWhite":
-			applyCaption(imArgs, size, "#FFF8", "black", bannerText, "center");
-			break;
-		case "bannerCenterBlack":
-			applyCaption(imArgs, size, "#0008", "white", bannerText, "center");
-			break;
-		case "bannerCenterBlackTransparent":
-			applyCaption(imArgs, size, "#0000", "black", bannerText, "center");
-			break;
-		case "bannerCenterWhiteTransparent":
-			applyCaption(imArgs, size, "#0000", "white", bannerText, "center");
-			break;
-		default:
-			break;
 	}
 }
 
@@ -642,14 +602,8 @@ function applyDecorations (image, decorations, imArgs) {
 	for (var i = 0; i < numDecorations; i++) {
 		var decoration = decorations[i];
 
-		if (decoration.type == "preset") {
-			applyPresetDecoration(decoration.preset, imArgs);
-		} else if (decoration.type == "custom") {
-			if (decoration.border) {
-				//image.borderColor(decoration.border.color);
-				//image.border(decoration.border.width, decoration.border.width);
-				applyBorder(imArgs, decoration.border.width, decoration.border.color);
-			}
+		if (decoration.border && decoration.border.width > 0) {
+			applyBorder(imArgs, decoration.border.width, decoration.border.color);
 		}
 	}
 
