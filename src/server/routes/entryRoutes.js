@@ -94,7 +94,7 @@ var routes = function() {
 				POST a new entry node, and link it to the source (Challenge, Design, or IndependentImage)
 			**/
 
-			logger.debug("POST received on /api/entries, req.body: " + JSON.stringify(req.body));
+			logger.debug("POST received on /api/entries, req.body: " + JSON.stringify(serverUtils.makeObjectPrintFriendly(req.body)));
 
 			var validationParams = [
 				{
@@ -137,7 +137,6 @@ var routes = function() {
 			}
 			
 			var entryInfo = {
-				id: shortid.generate(),
 				created: req.body.created,
 				title: req.body.caption,
 				userId: req.user.id,

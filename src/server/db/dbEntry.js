@@ -9,9 +9,15 @@ var error = require("../error");
 var filterUtils = require("../filterUtils");
 var async = require("async");
 var imageProcessor = require("../imageProcessor");
+var shortid = require("shortid");
+var dbIndependentImage = require("./dbIndependentImage");
 
 /*
 	Get Info about an Entry by looking up the DB
+
+	entryId: id of the entry node
+
+	return output prototype: serverUtils.prototypes.entry
 */
 function getEntry(entryId, done) {
 	var cypherQuery = "MATCH (source)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'})-[:POSTED_BY]->(poster:User) " +
@@ -36,6 +42,14 @@ function getEntry(entryId, done) {
 	});
 }
 
+/**
+	Get the Social Info associated with an entry
+
+	entryId: id of the entry node
+	meId: id of the currently logged in user, or 0 if not logged in
+
+	return output prototype: serverUtils.prototypes.entrySocialInfo
+**/
 function getEntrySocialInfo(entryId, meId, done) {
 	var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) " +
 		" WITH e " + 
@@ -81,6 +95,15 @@ function getEntrySocialInfo(entryId, meId, done) {
 	Fetch all entries from the DB matching the provided criteria.
 
 	Note that info is returned in chunks of size config.businessLogic.chunkSize
+
+	postedBy: id of user who posted the entry, or null/undefined if not desired to match search
+	challengeId: id of challenge in which the entry was posted, or null/undefined if not desired to match search
+	lastFetchedTimestamp: timestamp to be used for sending the next chunk of data.  Results should have a timestapm LESS than this.  If 0, ignore timestamp
+
+	return output: array whose elements match the serverUtils.prototypes.entry
+	return timestamp: new timestamp that will be passed back to client for use to fetch next chunk
+
+	Note: this API will never return more than config.businessLogic.infiniteScrollChunkSize items (this is server defined)
 */
 function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 
@@ -138,10 +161,18 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 /*
 	Fetch all entries from the DB matching the provided criteria, and sorted by the given sort flag.
 
-	Note: this only supports limited output given the performance hit.  This API returns all in one go,
-	and does not support chunked outputs.
+	sortBy: currently supported values: 'popularity'
+	limit: max. number of results to return
+	postedBy: id of user who posted the entry, null or undefined if not specified
+
+	Note: this only supports returning a max config.businessLogic.maxCustomSortedLimit results.  
+	This API returns all in one go, and does not support chunked outputs.
 */
 function getEntriesSorted(sortBy, limit, postedBy, done) {
+
+	if (sortBy != 'popularity') {
+		return done(new Error("Invalid sortBy field: " + sortBy));
+	}
 
 	limit = Math.min(limit, config.businessLogic.maxCustomSortedLimit);
 
@@ -191,8 +222,25 @@ function getEntriesSorted(sortBy, limit, postedBy, done) {
 	});
 }
 
+/**
+	Create a new Entry (including images, nodes, etc.)
 
+	entryInfo: {
+		created: timestamp when the entry was created
+		title: string representing the caption associated with the entry
+		userId: id of user who created this entry
+		sourceType: one of "challengeId", "designId", "imageURL" or "dataURI"
+		sourceData: actual source data that matches the sourceType (e.g., in case of challengeId it should be a valid id of a challenge,
+			and in case of imageURL it should be a valid URL that represents an image, and a dataURI should be a valid dataURI block)
+		steps: an array that represents the filter steps that need to be applied to this image.
+	}
+
+	return output: {
+		id: id of the newly created entry
+	}
+**/
 function createEntry(entryInfo, done) {
+	var id = shortid.generate();
 
 	if (!entryInfo.steps) {
 		return done(new Error("Entry Steps missing"));
@@ -202,27 +250,27 @@ function createEntry(entryInfo, done) {
 		sourceType: entryInfo.sourceType,
 		sourceData: entryInfo.sourceData,
 		userId: entryInfo.userId,
-		id: entryInfo.id
+		id: id,
+		created: entryInfo.created,
+		steps: entryInfo.steps,
+		title: entryInfo.title
 	};
 
-	createImagesForEntry(entryData, entryInfo.steps, entryInfo.title, function(err, info) {
+	createImagesForEntry(entryData, function(err, info) {
 		if (err) {
+			throw new Error(err);
 			return done(err);
 		}
 
 		var nodeInfo = {
-			id: entryInfo.id,
+			id: id,
 			created : entryInfo.created,
 			title : entryInfo.title,
 			userId : entryInfo.userId,
 			imageType: info.imageType,
+			sourceType: info.sourceType, //this should be one of 'challengeId', 'designId' or 'independentImageId'
 			sourceId : info.sourceId //this should have been settled by createImagesForEntry, even for independent images
 		};
-		if (entryInfo.sourceType == "imageURL" || entryInfo.sourceType == "dataURI") {
-			nodeInfo.sourceType = "independentImageId";
-		} else {
-			nodeInfo.sourceType = entryInfo.sourceType; //challengeId or designId
-		}
 
 		createEntryNode(nodeInfo, function(err, output) {
 			if (err) {
@@ -240,31 +288,45 @@ function createEntry(entryInfo, done) {
 	});
 }
 
+/**
+	Create an Entry Node with the provided information
+
+	entryInfo: {
+		id: id of this new entry
+		created : timestamp when the entry was created
+		title : the caption for the entry
+		userId : id of the user who created this entry
+		imageType: mime type of the image associated with the entry
+		sourceType: one of "challengeId", "designId" or "independentImageId"
+		sourceId : the id of the corresponding sourceType
+	}
+
+	return output: {
+		id: id of the newly created node
+	}
+**/
 function createEntryNode(entryInfo, done) {
 	if (!serverUtils.validateData(entryInfo, entryPrototype)) {
 		return done(new Error("Invalid entry info"));
 	}
 
-	var cypherQuery = " MATCH (u:User {id: '" + entryInfo.userId + "'}) CREATE (e:Entry {" +
-					"id: '" + entryInfo.id + "', " + 
-					"caption: '" + dbUtils.sanitizeStringForCypher(entryInfo.title) + "', " + 
-					"created : " + entryInfo.created + ", " + 
-					"image_type: '" + entryInfo.imageType + "' " +
-					"})-[r:POSTED_BY]->(u) ";
+	var cypherQuery = " MATCH (u:User {id: '" + entryInfo.userId + "'}) ";
 
 	if (entryInfo.sourceType == "challengeId") { //link to challenge
-		cypherQuery = "MATCH (c:Challenge {id: '" + entryInfo.sourceId + "'}) " +
-					cypherQuery +
-					", (c)<-[:PART_OF]-(e) RETURN e;";
+		cypherQuery += ", (source:Challenge {id: '" + entryInfo.sourceId + "'}) ";
 	} else if (entryInfo.sourceType == "designId") {// link to design
-		cypherQuery = "MATCH (d:Design {id: '" + entryInfo.sourceId + "'}) " +
-					cypherQuery +
-					", (d)<-[:PART_OF]-(e) RETURN e;";
+		cypherQuery += ", (source:Design {id: '" + entryInfo.sourceId + "'}) ";
 	} else if (entryInfo.sourceType == "independentImageId") {// link to Independent Image
-		cypherQuery = "MATCH (i:IndependentImage {id: '" + entryInfo.sourceId + "'}) " +
-					cypherQuery +
-					", (d)<-[:PART_OF]-(e) RETURN e;";
+		cypherQuery += ", (source:IndependentImage {id: '" + entryInfo.sourceId + "'}) ";
 	}
+
+	cypherQuery +=
+		" CREATE (source)<-[:PART_OF]-(e:Entry {" +
+		"id: '" + entryInfo.id + "', " + 
+		"caption: '" + dbUtils.sanitizeStringForCypher(entryInfo.title) + "', " + 
+		"created : " + entryInfo.created + ", " + 
+		"image_type: '" + entryInfo.imageType + "' " +
+		"})-[r:POSTED_BY]->(u) RETURN e;";
 
 	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
 		if(err) {
@@ -332,22 +394,42 @@ function createEntryNode(entryInfo, done) {
 
 
 */
-function createImagesForEntry(entryData, steps, caption, done) {
 
-	filterUtils.processImageDataForEntry(entryData, true, function(err, info) {
+/**
+	Create all the images for the entry, such as the step images and the final image
+
+	entryData: {
+		id: id of this entry
+		sourceType: one of "challengeId", "designId", "imageURL" or "dataURI"
+		sourceData: actual source data that matches the sourceType
+		userId: id of user who created this entry
+		created: timestamp when the entry was created
+		steps: steps associated with the entry
+		title: caption for the entry
+	}
+
+	return output: {
+		imageType: mime type of image associated with the entry
+		sourceType: one of "challengeId", "designId" or "independentImageId"
+		sourceId: id of the source of the entry (e.g., challenge id, or design Id, or independentImage id)
+	}
+**/
+function createImagesForEntry(entryData, done) {
+
+	processImageDataForEntry(entryData, true, function(err, info) {
 		if (err) {
 			return done(err);
 		}
 
 		//now, generate the image(s)
-		var singleStepList = filterUtils.extractSingleStepList(steps);
+		var singleStepList = filterUtils.extractSingleStepList(entryData.steps);
 		var applySingleStepToImageFunctions = [];
 
 		for (var i = 0; i < singleStepList.length; i++) {
 			var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
 			var targetImagePath = global.appRoot + config.path.cacheImages + info.sourceId + "-" + hash + "." + mime.extension(info.imageType);
 
-			applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, info.sourceImagePath, targetImagePath, info.imageType, singleStepList[i], dbUtils.escapeSingleQuotes(caption)));
+			applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, info.sourceImagePath, targetImagePath, info.imageType, singleStepList[i], dbUtils.escapeSingleQuotes(entryData.title)));
 		}
 
 		var imagePaths = []; //list of image paths for each sub step
@@ -365,6 +447,7 @@ function createImagesForEntry(entryData, steps, caption, done) {
 
 				var output = {
 					imageType: info.imageType,
+					sourceType: info.sourceType,
 					sourceId: info.sourceId
 				};
 
@@ -374,6 +457,12 @@ function createImagesForEntry(entryData, steps, caption, done) {
 	});
 }
 
+/**
+	Create the filter nodes for the various steps associated with an entry
+
+	entryId: id of the entry
+	steps: steps associated with the entry
+**/
 function createFilterNodesForEntry(entryId, steps, done) {
 	var createFilterNodesFunctions = []; // array of functions that will create the Filter Nodes
 
@@ -542,6 +631,164 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 	}
 }
 
+/**
+	Process the entry data and extract image related information
+	This will prep for any details needed to create an entry
+
+	entryData: {
+		id: id of this entry
+		sourceType: one of "challengeId", "designId", "imageURL" or "dataURI"
+		sourceData: actual source data that matches the sourceType
+		userId: id of user who created this entry
+		created: timestamp when the entry was created
+		steps: steps associated with the entry
+		title: caption for the entry
+	}
+
+	createNodesIfNotFound - true if we want to create the independnetImage nodes along the way (in case we're ready to create the entry)
+		false if we only want to generate temporary images and no nodes (e.g., previewing an image or presets and not yet ready to post the entry)
+
+	return output: {
+		sourceImagePath: path that has the entry's source image (e.g., challenge, design or independent image) saved into it
+		sourceFileIsTemp: whether the source file represented by sourceImagePath is temp or persistent (indication for whether it needs to be deleted later)
+		imageType: mime type of image
+		sourceType: one of "challengeId", "designId", or "independentImageId" 
+		sourceId: actual id associated with the sourceType
+	}
+**/
+function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
+	//logger.debug("processImageDataForEntry: entryData: " + JSON.stringify(serverUtils.makeObjectPrintFriendly(entryData)) + ", createNodesIfNotFound = " + createNodesIfNotFound);
+	async.waterfall([
+	    function(callback) {
+	    	if (entryData.sourceType == "challengeId") {
+	    		var challengeId = entryData.sourceData;
+				if (!challengeId) {
+					logger.error("Challenge ID missing.");
+					return callback(new Error("Challenge ID Missing."));
+				}
+
+				dataUtils.getImageDataForChallenge(challengeId, function(err, imageData){
+					if (err) {
+						return callback(err);
+					}
+
+					var sourceImagePath = global.appRoot + config.path.challengeImagesRaw + challengeId + "." + mime.extension(imageData.imageType);
+					//var hash = this.generateHash(JSON.stringify(steps));
+					//var targetImageName = entryData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
+					//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
+					//var targetImageUrl = config.url.cacheImages + targetImageName;
+
+					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: imageData.imageType, sourceType: "challengeId", sourceId: challengeId});
+				});
+			} else {
+				return callback(null, null);
+			}
+	    },
+	    function(info, callback) {
+	    	if (info == null && entryData.sourceType == "imageURL") {
+	    		var imageURL = entryData.sourceData;
+	    		if (!imageURL) {
+	    			logger.error("Missing Image URL.");
+	    			return callback(new Error("Missing Image URL"));
+	    		}
+
+	    		if (createNodesIfNotFound) {
+	    			dataUtils.createIndependentImageNode(entryData.sourceType, imageURL, entryData.userId, function(err, data) {
+		    			if (err) {
+		    				return callback(err);
+		    			}
+
+		    			var sourceImagePath = global.appRoot + config.path.independentImagesRaw + data.id + "." + mime.extension(data.imageType);
+		    			return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: data.imageType, sourceType: "independentImageId", sourceId: data.id});
+		    		});
+	    		} else {
+	    			serverUtils.downloadImage(imageURL, null, function(err, outputPath) {
+	    				if (err) {
+	    					return callback(err);
+	    				}
+
+	    				var extension = imageURL.split('.').pop();
+	    				var imageType = mime.lookup(extension);
+	    				return callback(null, {sourceImagePath: outputPath, sourceFileIsTemp: true, imageType: imageType, sourceType: null, sourceId: 0});
+	    			});
+	    		}
+	    	} else {
+	    		return callback(null, info);
+	    	}
+	    },
+	    function(info, callback) {
+	    	if (info == null && entryData.sourceType == "dataURI") {
+	    		var dataURI = entryData.sourceData;
+	    		if (!dataURI) {
+	    			logger.error("Missing Image URI");
+	    			return callback(new Error("Missing Image URI"));
+	    		}
+
+				if (createNodesIfNotFound) {
+
+					var independentImageInfo = {
+						sourceType: "dataURI",
+						sourceData: entryData.sourceData,
+						userId: entryData.userId,
+						created: entryData.created
+					};
+
+					dbIndependentImage.createIndependentImage(independentImageInfo, function(err, output) {
+						if (err) {
+							return callback(err);
+						}
+
+						return callback(null, {sourceImagePath: output.imagePath, sourceFileIsTemp: false, imageType: output.imageType, sourceType: "independentImageId", sourceId: output.id});
+					});
+	    		} else {
+	    			serverUtils.writeImageFromDataURI(dataURI, null, function(err, outputPath) {
+	    				if (err) {
+	    					return callback(err);
+	    				}
+
+	    				var parseDataURI = require("parse-data-uri");
+						var parsed = parseDataURI(dataURI);
+	    				return callback(null, {sourceImagePath: outputPath, sourceFileIsTemp: true, imageType: parsed.mimeType, sourceType: null, sourceId: 0});
+	    			});
+	    		}
+	    	} else {
+	    		return callback(null, info);
+	    	}
+	    },
+	    function(info, callback) {
+	    	if (info == null && entryData.sourceType == "designId") {
+	    		var designId = entryData.sourceData;
+	    		if (!designId ) {
+	    			logger.error("Missing Design ID");
+	    			return callback(new Error("Missing Design ID"));
+	    		}
+
+	    		dataUtils.getImageDataForDesign(designId, function(err, imageData){
+					if (err) {
+						return callback(err);
+					}
+
+					var sourceImagePath = global.appRoot + config.path.designImagesRaw + imageData.categoryId + "/" + designId + "." + mime.extension(imageData.imageType);
+
+					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: "image/jpeg", sourceType: "designId", sourceId: imageData.id});
+				});
+	    	} else {
+	    		return callback(null, info);
+	    	}
+	    }
+	], function (err, info) {
+		if (err) {
+			logger.error("Some error encountered: " + err);
+			return next(err, null);
+		} else if (info == null) {
+			logger.error("Info is null, meaning none of the inputs were valid.");
+			return next(new Error("Info is null, meaning none of the inputs were valid."), null);
+		}
+
+		return next(0, info);
+	});
+}
+
 var entryPrototype = {
 	"id" : "id",
 	"created" : "timestamp",
@@ -552,8 +799,6 @@ var entryPrototype = {
 	"imageType": "imageType"
 }
 
-
-
 module.exports = {
 	createEntry: createEntry,
 	getEntry: getEntry,
@@ -561,5 +806,6 @@ module.exports = {
 	getEntries: getEntries,
 	getEntriesSorted: getEntriesSorted,
 	deleteEntry: deleteEntry,
-	likeEntry: likeEntry
+	likeEntry: likeEntry,
+	processImageDataForEntry: processImageDataForEntry
 };

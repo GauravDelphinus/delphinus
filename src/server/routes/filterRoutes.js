@@ -9,6 +9,7 @@ var execFile = require("child_process").execFile;
 var filterUtils = require("../filterUtils");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
+var dbEntry = require("../db/dbEntry");
 
 var routes = function() {
 
@@ -135,7 +136,7 @@ var routes = function() {
 
     			var entryData = req.body;
     			entryData.userId = req.user.id;
-    			filterUtils.processImageDataForEntry(entryData, false, function(err, info) {
+    			dbEntry.processImageDataForEntry(entryData, false, function(err, info) {
     				if (err) {
     					logger.error("processImageDataForEntry: some error occurred: " + err);
     					return res.sendStatus(500);

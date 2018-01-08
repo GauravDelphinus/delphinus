@@ -445,67 +445,6 @@ module.exports = {
 
 	},
 
-	createIndependentImageNode: function(source, imageData, userId, callback) {
-		//create a new independent image node
-		var id = shortid.generate();
-		var created = (new Date()).getTime();
-		var imageType;
-
-		if (source == "dataURI") {
-			var parseDataURI = require("parse-data-uri");
-			var parsed = parseDataURI(imageData);
-			imageType = parsed.mimeType;
-		} else if (source == "imageURL") {
-			var extension = imageData.split('.').pop();
-		   	imageType = mime.lookup(extension);
-		}
-
-		var cypherQuery = "MATCH(u:User {id: '" + userId + "'}) CREATE (i:IndependentImage {" +
-			"id: '" + id + "'," +
-			"image_type : '" + imageType + "'," + 
-			"created : '" + created + "' " + 
-			"})-[r:POSTED_BY]->(u) RETURN i;";
-	
-		var output = {
-			id: id,
-			imageType: imageType,
-			created: created
-		};
-
-		this.myDB.cypherQuery(cypherQuery, function(err, result){
-			if(err) {
-				logger.dbError(err, cypherQuery);
-				return callback(err);
-			} else if (result.data.length != 1) {
-				logger.dbResultError(cypherQuery, 1, result.data.length);
-				return callback(new Error("cypherQuery returned invalid response."));
-			}
-
-			//now create the image
-			var sourceImagePath = config.path.independentImages + id + "." + mime.extension(imageType);
-
-			if (source == "imageURL") {
-				serverUtils.downloadImage(imageData, sourceImagePath, function(err, outputFile) {
-					if (err) {
-						return callback(err);
-					}
-
-					return callback(0, output);
-				});
-			} else if (source == "dataURI") {
-				serverUtils.writeImageFromDataURI(imageData, sourceImagePath, function(err, outputFile) {
-					if (err) {
-						return callback(err);
-					}
-
-					return callback(0, output);
-				});
-			} else {
-				return callback(new Error("Invalid Image Source: " + source));
-			}
-		});
-	},
-
 	/**
 		Normalize / expand the steps array such that all indirect references
 		(such as filter node ids, etc.) are resolved to actual settings that can 
