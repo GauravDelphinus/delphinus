@@ -3,6 +3,7 @@ var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 var config = require("../config");
 var dataUtils = require("../dataUtils");
+var dbDesign = require("../db/dbDesign");
 
 var routes = function() {
 	var designRouter = express.Router();
@@ -24,41 +25,13 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			var cypherQuery = "MATCH (d:Design)";
+			dbDesign.getDesigns(req.query.category, function(err, result) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
 
-			if (req.query.category) {
-				cypherQuery += "-[:BELONGS_TO]->(c:DesignCategory {id: '" + req.query.category + "'}) ";
-			} else {
-				cypherQuery += "-[:BELONGS_TO]->(c:DesignCategory) ";
-			}
-
-			cypherQuery += " RETURN d, c;";
-
-			dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
-    			if(err) {
-    				logger.dbError(err, cypherQuery);
-    				return res.sendStatus(500);
-    			} else if (result.data.length <= 0) {
-    				logger.dbResultError(cypherQuery, "> 0", result.data.length);
-    				return res.sendStatus(500);
-    			}
-
-    			var output = {};
-    			for (var i = 0; i < result.data.length; i++) {
-    				let designName = result.data[i][0].name;
-    				let designId = result.data[i][0].id;
-    				let presetArtifactId = result.data[i][0].presetArtifactId;
-    				let categoryName = result.data[i][1].name;
-    				let categoryId = result.data[i][1].id;
-
-
-    				if (!output.hasOwnProperty(categoryId)) {
-    					output[categoryId] = {name: categoryName, designList: []};
-    				}
-    				output[categoryId].designList.push({name: designName, id: designId, image: config.url.designImages + categoryId + "/" + designId + ".jpeg", presetArtifactId: presetArtifactId});
-    			}
-
-    			return res.json(output);
+    			return res.json(result);
 			});
 		});
 

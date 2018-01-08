@@ -1,43 +1,43 @@
 {
 	"abstract" : ["Abstract", 
 		{
-			"blueMarine" : ["Blue Marine", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"coloredRows": ["Colored Rows", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"colorWaterMix" : ["Color Water Mix", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"darkPurpleLight" : ["Dark Purple Light", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"goldenLight" : ["Golden Light", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"goldSparkle" : ["Gold Sparkle", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"pinkWhirlpool" : ["Pink Whirlpool", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"colorWaves" : ["Color Waves", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"goldenCircles" : ["Golden Circles", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"goldenDrops" : ["Golden Drops", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"smokeBlue" : ["Smoke Blue", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}]
+			"blueMarine" : ["Blue Marine", {"defaultPresetArtifactId": "bannerCenter"}],
+			"coloredRows": ["Colored Rows", {"defaultPresetArtifactId": "bannerCenter"}],
+			"colorWaterMix" : ["Color Water Mix", {"defaultPresetArtifactId": "bannerCenter"}],
+			"darkPurpleLight" : ["Dark Purple Light", {"defaultPresetArtifactId": "bannerCenter"}],
+			"goldenLight" : ["Golden Light", {"defaultPresetArtifactId": "bannerCenter"}],
+			"goldSparkle" : ["Gold Sparkle", {"defaultPresetArtifactId": "bannerCenter"}],
+			"pinkWhirlpool" : ["Pink Whirlpool", {"defaultPresetArtifactId": "bannerCenter"}],
+			"colorWaves" : ["Color Waves", {"defaultPresetArtifactId": "bannerCenter"}],
+			"goldenCircles" : ["Golden Circles", {"defaultPresetArtifactId": "bannerCenter"}],
+			"goldenDrops" : ["Golden Drops", {"defaultPresetArtifactId": "bannerCenter"}],
+			"smokeBlue" : ["Smoke Blue", {"defaultPresetArtifactId": "bannerCenter"}]
 		}
 	],
 	"nature" : ["Nature",
 		{
-			"ocean" : ["Ocean", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"autumnLeaves" : ["Autumn Leaves", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"autumnLeavesGold" : ["Autumn Leaves Gold", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"clouds" : ["Clouds", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"goldLeaves" : ["Gold Leaves", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"greenLeaves" : ["Green Leaves", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"waterDrops" : ["Water Drops", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}]
+			"ocean" : ["Ocean", {"defaultPresetArtifactId": "bannerCenter"}],
+			"autumnLeaves" : ["Autumn Leaves", {"defaultPresetArtifactId": "bannerCenter"}],
+			"autumnLeavesGold" : ["Autumn Leaves Gold", {"defaultPresetArtifactId": "bannerCenter"}],
+			"clouds" : ["Clouds", {"defaultPresetArtifactId": "bannerCenter"}],
+			"goldLeaves" : ["Gold Leaves", {"defaultPresetArtifactId": "bannerCenter"}],
+			"greenLeaves" : ["Green Leaves", {"defaultPresetArtifactId": "bannerCenter"}],
+			"waterDrops" : ["Water Drops", {"defaultPresetArtifactId": "bannerCenter"}]
 		}
 	],
 	"texture" : ["Texture", 
 		{
-			"creamTexture" : ["Cream Texture", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"redTexture" : ["Red Texture", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"brownFabric" : ["Brown Fabric", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"colorTexture" : ["Color Texture", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"plasterPattern" : ["Plaster Pattern", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"redFabric" : ["Red Fabric", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"textileGold" : ["Textile Gold", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"waterColor" : ["Water Color", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"whiteFur" : ["White Fur", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"whiteSand" : ["White Sand", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}],
-			"woodCracks" : ["Wood Cracks", {"defaultPresetArtifactId": "bannerCenterWhiteTransparent"}]
+			"creamTexture" : ["Cream Texture", {"defaultPresetArtifactId": "bannerCenter"}],
+			"redTexture" : ["Red Texture", {"defaultPresetArtifactId": "bannerCenter"}],
+			"brownFabric" : ["Brown Fabric", {"defaultPresetArtifactId": "bannerCenter"}],
+			"colorTexture" : ["Color Texture", {"defaultPresetArtifactId": "bannerCenter"}],
+			"plasterPattern" : ["Plaster Pattern", {"defaultPresetArtifactId": "bannerCenter"}],
+			"redFabric" : ["Red Fabric", {"defaultPresetArtifactId": "bannerCenter"}],
+			"textileGold" : ["Textile Gold", {"defaultPresetArtifactId": "bannerCenter"}],
+			"waterColor" : ["Water Color", {"defaultPresetArtifactId": "bannerCenter"}],
+			"whiteFur" : ["White Fur", {"defaultPresetArtifactId": "bannerCenter"}],
+			"whiteSand" : ["White Sand", {"defaultPresetArtifactId": "bannerCenter"}],
+			"woodCracks" : ["Wood Cracks", {"defaultPresetArtifactId": "bannerCenter"}]
 		}
 	]
 }

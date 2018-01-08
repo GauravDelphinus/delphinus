@@ -8,6 +8,7 @@ $(document).ready(function(){
 
 function setupDesignSection() {
 	
+	//fetch the list of designs to be shown to the user
 	$.getJSON('/api/designs/', function(result) {
 		$("#designCategories").data("designData", result);
 		for (key in result) {
@@ -32,6 +33,12 @@ function checkDesign(designObj) {
 	return (designObj.id == this);
 }
 
+/**
+	Refresh the design thumbnail view.
+
+	This is called the first time this is set up, and every time the user
+	makes or deselects a design category
+**/
 function refreshDesignView() {
 	//first, find the select categories
 	var selectedDesignList = [];
@@ -45,8 +52,7 @@ function refreshDesignView() {
 		}
 	}
 
-	//create the grid view with these designs
-	var grid = createGrid("presetDesignGrid", selectedDesignList, 3, true, true, null, function(selectedDesignId) {
+	var grid = createSimpleGrid(0, "presetDesignGrid", selectedDesignList, 4, function(selectedDesignId) {
 
 		//find the selected design, and use that image to pass to the new caption workflow
 		var selectedDesignObj = selectedDesignList.find(checkDesign, selectedDesignId);
@@ -55,8 +61,6 @@ function refreshDesignView() {
 
 		switchToStepsView(selectedDesignObj.image, selectedDesignObj.name);
 	});
-
-	//refresh the grid list
 	$("#presetDesignList").empty().append(grid);
 }
 

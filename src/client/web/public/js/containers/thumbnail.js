@@ -78,3 +78,56 @@ function refreshThumbnailView(contentTag) {
 	var grid = createGrid(contentTag, list, 3, false, false, null, null);
 	$("#" + contentTag + "Container").append(grid);
 }
+
+/**
+	Create a simple grid
+
+	Supports: Image, caption, selection (no link)
+
+	Tight design. Supports hover
+**/
+function createSimpleGrid(entityId, contentTag, list, numCols, selectionCallback) {
+	var table = $("<table>", {id: entityId + contentTag + "GridTable"});
+	
+	var tdWidth = 100 / numCols;
+
+	var i = 0;
+	var numRows = (list.length / numCols) + (((list.length % numCols) > 0) ? 1 : 0);
+	for (var row = 0; row < numRows; row ++) {
+		var tr = $("<tr>");
+		for (var col = 0; col < numCols; col ++) {
+			var td = $("<td>", {width: tdWidth + "%"});
+			if (i < list.length) {
+				var data = list[i++];
+				var element = createSimpleThumbnail(data.id, data.name, data.image);
+
+				element.addClass("elementHover");
+
+
+				element.click({id: data.id}, function(e) {
+					selectionCallback(e.data.id);
+				});
+
+				td.append(element);
+			}
+			tr.append(td);
+		}
+		table.append(tr);
+	}
+
+	return table;
+}
+
+/**
+	Simple thumbnail used by the simple grid
+
+**/
+function createSimpleThumbnail(id, caption, imagesrc) {
+	var element = $("<div>");
+	var imageElement = $("<img>", {id: id + "SimpleThumbnailImage", class: "simple-thumbnail-image", src: imagesrc});
+	var captionElement = $("<div>", {class: "simple-thumbnail-caption"}).append(caption);
+	element.append(imageElement).append(captionElement);
+	return element;
+}
+
+
