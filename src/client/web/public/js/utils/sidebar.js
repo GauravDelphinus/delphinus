@@ -220,15 +220,17 @@ function createChallengeCaptionSidebar(challengeId, callback) {
 
 function createIndependentCaptionSidebar(callback) {
 	var content = $("<div>", {class: "wide-container"});
-	var message = $("<p>", {class: "text-plain-medium"}).append("Let your creative juices flow and create your own caption entry now!  Choose your own image or select among some cool background designs!");
-	var button = $("<button>", {class: "btn btn-lg button-full"}).append("Create Caption");
-	content.append(message).append(button);
-
-	var sidebar = createSidebar("createCaptionSidebar", "Like this caption?", content);
-
+	var message = $("<div>", {class: "sidebar-item"}).append($("<p>").append("Let your creative juices flow and create your own caption entry now!  Choose your own image or select among some cool background designs!"));
+	
+	var button = $("<button>").append("Create Caption");
 	button.click(function() {
 		window.open("/newentry", "_self");
 	});
+
+	var link = $("<div>", {class: "sidebar-item active hoverable"}).append(button);
+	content.append(message).append(link);
+
+	var sidebar = createSidebar("createCaptionSidebar", "Like this caption?", content);
 
 	return callback(sidebar);
 }

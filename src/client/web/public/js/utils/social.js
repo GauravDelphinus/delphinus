@@ -127,34 +127,40 @@ function refreshSocialInfo(data, contentTag) {
 		getURL = "/api/comments/" + data.id + "/social";
 	}
 	$.getJSON(getURL, function(socialInfo) {
+		var showSocialStatusSection = false;
 		if (socialInfo.likes) {
 			if (socialInfo.likes.amLiking) {
 				updateAmLiking(contentTag, data.id, socialInfo.likes.amLiking);
 			}
 
 			if (socialInfo.likes.numLikes) {
+				showSocialStatusSection = true;
 				updateLikes(contentTag, data.id, socialInfo.likes.numLikes);
 			}
 		}
 
 		if (socialInfo.comments) {
 			if (socialInfo.comments.numComments) {
+				showSocialStatusSection = true;
 				updateComments(contentTag, data.id, socialInfo.comments.numComments);
 			}
 		}
 
 		if (socialInfo.entries) {
 			if (socialInfo.entries.numEntries) {
+				showSocialStatusSection = true;
 				updateEntries(contentTag, data.id, socialInfo.entries.numEntries);
 			}
 		}
 
 		if (socialInfo.follows) {
 			if (socialInfo.follows.numFollowers) {
+				showSocialStatusSection = true;
 				updateFollowers(contentTag, data.id, socialInfo.follows.numFollowers);
 			}
 
 			if (socialInfo.follows.numFollowing) {
+				showSocialStatusSection = true;
 				updateFollowing(contentTag, data.id, socialInfo.follows.numFollowing);
 			}
 
@@ -165,6 +171,7 @@ function refreshSocialInfo(data, contentTag) {
 
 		if (socialInfo.posts) {
 			if (socialInfo.posts.numPosts) {
+				showSocialStatusSection = true;
 				updatePosts(contentTag, data.id, socialInfo.posts.numPosts);
 			}
 		}
@@ -182,7 +189,7 @@ function refreshSocialInfo(data, contentTag) {
 		}
 
 		//if there are no visible social-status-buttons then just hide the SocialStatusSection
-		if ($("#" + contentTag + data.id + "SocialStatusSection .social-status-button:visible").length) {
+		if (showSocialStatusSection) {
 			$("#" + contentTag + data.id + "SocialStatusSection").show();
 		} else {
 			$("#" + contentTag + data.id + "SocialStatusSection").hide();

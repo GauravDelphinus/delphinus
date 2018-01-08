@@ -365,7 +365,9 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 	        //now, reset the activity in the challenge, since the person no longer likes this challenge
 	        var activityInfo = {
 	        	entityId: challengeId,
-	        	type: "post"
+	        	type: "post",
+	        	timestamp: timestamp,
+	        	userId: userId
 	        }
 	        dbUtils.saveActivity(activityInfo, function(err, id) {
 	        	if (err) {

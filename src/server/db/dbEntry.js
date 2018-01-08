@@ -575,6 +575,7 @@ function deleteEntry(entryId, done) {
 */
 function likeEntry(entryId, like, userId, timestamp, done) {
 	if (like) {
+		
 		var cypherQuery = "MATCH (u:User {id: '" + userId + "'}), (c:Entry {id: '" + entryId + "'}) " +
 			" CREATE (u)-[r:LIKES {created: '" + timestamp + "'}]->(c) " +
 			" RETURN r;";
@@ -603,7 +604,8 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 
 		});
 	} else {
-		var cypherQuery = "MATCH (u:User {id: '" + req.user.id + "'})-[r:LIKES]->(c:Entry {id: '" + entryId + "'}) " +
+
+		var cypherQuery = "MATCH (u:User {id: '" + userId + "'})-[r:LIKES]->(c:Entry {id: '" + entryId + "'}) " +
 			" DELETE r " +
 			" RETURN COUNT(r);";
 
@@ -617,7 +619,9 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 	        //now, reset the activity in the entry, since the person no longer likes this entry
 	        var activityInfo = {
 	        	entityId: entryId,
-	        	type: "post"
+	        	type: "post",
+	        	timestamp: timestamp,
+	        	userId: userId
 	        }
 	        dbUtils.saveActivity(activityInfo, function(err, id) {
 	        	if (err) {

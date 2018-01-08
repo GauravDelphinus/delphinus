@@ -2,6 +2,7 @@ const serverUtils = require("../serverUtils");
 const dataUtils = require("../dataUtils");
 const config = require("../config");
 const mime = require("mime");
+const logger = require("../logger");
 
 /*
 	Add a record of activity to the Challenge or Entry.  Activity could
