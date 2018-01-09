@@ -76,8 +76,11 @@ module.exports = {
 				//value is an array with two elements.  First element is the design name, and second is an object of the form {"defaultPresetArtifactId" : "presetArtifactName"}.  Refer designs.json
 				let designName = designObj[key][0];
 				let presetArtifactId = designObj[key][1].defaultPresetArtifactId;
+				let captionTextSize = designObj[key][1].captionTextSize;
+				let captionTextColor = designObj[key][1].captionTextColor;
+				let captionBackgroundColor = designObj[key][1].captionBackgroundColor;
 
-				functions.push(async.apply(createNodeForDesign, this.myDB, designId, designName, categoryId, presetArtifactId));
+				functions.push(async.apply(createNodeForDesign, this.myDB, designId, designName, categoryId, presetArtifactId, captionTextSize, captionTextColor, captionBackgroundColor));
 			}
 		}
 
@@ -775,7 +778,7 @@ function createNodeForDesignCategory(db, categoryId, categoryName, callback) {
 	}
 }
 
-function createNodeForDesign(db, designId, designName, categoryId, presetArtifactId, callback) {
+function createNodeForDesign(db, designId, designName, categoryId, presetArtifactId, captionTextSize, captionTextColor, captionBackgroundColor, callback) {
 	if (designId && designName) {
 		//first check to make sure the image file exists
 		serverUtils.fileExists(global.appRoot + config.path.designImagesRaw + categoryId + "/" + designId + ".jpeg", function(err) {
@@ -783,7 +786,14 @@ function createNodeForDesign(db, designId, designName, categoryId, presetArtifac
 				return callback(err, 0);
 			}
 
-			var cypherQuery = "MATCH (c:DesignCategory {id: '" + categoryId + "'}) MERGE (d:Design {id: '" + designId + "'})-[:BELONGS_TO]->(c) SET d.name = '" + designName + "' , d.presetArtifactId = '" + presetArtifactId + "' RETURN d;";
+			var cypherQuery = "MATCH (c:DesignCategory {id: '" + categoryId + "'}) " +
+				" MERGE (d:Design {id: '" + designId + "'})-[:BELONGS_TO]->(c) " + 
+				" SET d.name = '" + designName + "' , " + 
+				" d.caption_preset_id = '" + presetArtifactId + "', " + 
+				" d.caption_default_text_size = '" + captionTextSize + "', " + 
+				" d.caption_default_text_color = '" + captionTextColor + "', " + 
+				" d.caption_default_background_color = '" + captionBackgroundColor + "' " + 
+				" RETURN d;";
 
 			db.cypherQuery(cypherQuery, function(err, result) {
 				if (err) {

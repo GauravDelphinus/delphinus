@@ -26,9 +26,14 @@ function getDesigns(designCategory, done) {
 		for (var i = 0; i < result.data.length; i++) {
 			let designName = result.data[i][0].name;
 			let designId = result.data[i][0].id;
-			let presetArtifactId = result.data[i][0].preset_artifact_id;
 			let categoryName = result.data[i][1].name;
 			let categoryId = result.data[i][1].id;
+
+			//fetch preset values for caption
+			let presetArtifactId = result.data[i][0].caption_preset_id;
+			let captionTextSize = result.data[i][0].caption_default_text_size;
+			let captionTextColor = result.data[i][0].caption_default_text_color;
+			let captionBackgroundColor = result.data[i][0].caption_default_background_color;
 
 
 			if (!output.hasOwnProperty(categoryId)) {
@@ -38,7 +43,10 @@ function getDesigns(designCategory, done) {
 				name: designName, 
 				id: designId, 
 				image: config.url.designImages + categoryId + "/" + designId + ".jpeg", 
-				presetArtifactId: presetArtifactId
+				presetArtifactId: presetArtifactId,
+				captionTextSize: captionTextSize,
+				captionTextColor: captionTextColor,
+				captionBackgroundColor: captionBackgroundColor
 			});
 		}
 

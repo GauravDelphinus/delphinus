@@ -1,43 +1,43 @@
 {
 	"abstract" : ["Abstract", 
 		{
-			"blueMarine" : ["Blue Marine", {"defaultPresetArtifactId": "bannerCenter"}],
-			"coloredRows": ["Colored Rows", {"defaultPresetArtifactId": "bannerCenter"}],
-			"colorWaterMix" : ["Color Water Mix", {"defaultPresetArtifactId": "bannerCenter"}],
-			"darkPurpleLight" : ["Dark Purple Light", {"defaultPresetArtifactId": "bannerCenter"}],
-			"goldenLight" : ["Golden Light", {"defaultPresetArtifactId": "bannerCenter"}],
-			"goldSparkle" : ["Gold Sparkle", {"defaultPresetArtifactId": "bannerCenter"}],
-			"pinkWhirlpool" : ["Pink Whirlpool", {"defaultPresetArtifactId": "bannerCenter"}],
-			"colorWaves" : ["Color Waves", {"defaultPresetArtifactId": "bannerCenter"}],
-			"goldenCircles" : ["Golden Circles", {"defaultPresetArtifactId": "bannerCenter"}],
-			"goldenDrops" : ["Golden Drops", {"defaultPresetArtifactId": "bannerCenter"}],
-			"smokeBlue" : ["Smoke Blue", {"defaultPresetArtifactId": "bannerCenter"}]
+			"blueMarine" : ["Blue Marine", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"coloredRows": ["Colored Rows", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"colorWaterMix" : ["Color Water Mix", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"darkPurpleLight" : ["Dark Purple Light", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"goldenLight" : ["Golden Light", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"goldSparkle" : ["Gold Sparkle", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"pinkWhirlpool" : ["Pink Whirlpool", {"defaultPresetArtifactId": "bannerBottom", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"colorWaves" : ["Color Waves", {"defaultPresetArtifactId": "bannerBottom", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"goldenCircles" : ["Golden Circles", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"goldenDrops" : ["Golden Drops", {"defaultPresetArtifactId": "bannerBottom", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"smokeBlue" : ["Smoke Blue", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}]
 		}
 	],
 	"nature" : ["Nature",
 		{
-			"ocean" : ["Ocean", {"defaultPresetArtifactId": "bannerCenter"}],
-			"autumnLeaves" : ["Autumn Leaves", {"defaultPresetArtifactId": "bannerCenter"}],
-			"autumnLeavesGold" : ["Autumn Leaves Gold", {"defaultPresetArtifactId": "bannerCenter"}],
-			"clouds" : ["Clouds", {"defaultPresetArtifactId": "bannerCenter"}],
-			"goldLeaves" : ["Gold Leaves", {"defaultPresetArtifactId": "bannerCenter"}],
-			"greenLeaves" : ["Green Leaves", {"defaultPresetArtifactId": "bannerCenter"}],
-			"waterDrops" : ["Water Drops", {"defaultPresetArtifactId": "bannerCenter"}]
+			"ocean" : ["Ocean", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"autumnLeaves" : ["Autumn Leaves", {"defaultPresetArtifactId": "bannerBottom", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"autumnLeavesGold" : ["Autumn Leaves Gold", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"clouds" : ["Clouds", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"goldLeaves" : ["Gold Leaves", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"greenLeaves" : ["Green Leaves", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"waterDrops" : ["Water Drops", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}]
 		}
 	],
 	"texture" : ["Texture", 
 		{
-			"creamTexture" : ["Cream Texture", {"defaultPresetArtifactId": "bannerCenter"}],
-			"redTexture" : ["Red Texture", {"defaultPresetArtifactId": "bannerCenter"}],
-			"brownFabric" : ["Brown Fabric", {"defaultPresetArtifactId": "bannerCenter"}],
-			"colorTexture" : ["Color Texture", {"defaultPresetArtifactId": "bannerCenter"}],
-			"plasterPattern" : ["Plaster Pattern", {"defaultPresetArtifactId": "bannerCenter"}],
-			"redFabric" : ["Red Fabric", {"defaultPresetArtifactId": "bannerCenter"}],
-			"textileGold" : ["Textile Gold", {"defaultPresetArtifactId": "bannerCenter"}],
-			"waterColor" : ["Water Color", {"defaultPresetArtifactId": "bannerCenter"}],
-			"whiteFur" : ["White Fur", {"defaultPresetArtifactId": "bannerCenter"}],
-			"whiteSand" : ["White Sand", {"defaultPresetArtifactId": "bannerCenter"}],
-			"woodCracks" : ["Wood Cracks", {"defaultPresetArtifactId": "bannerCenter"}]
+			"creamTexture" : ["Cream Texture", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"redTexture" : ["Red Texture", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"brownFabric" : ["Brown Fabric", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"colorTexture" : ["Color Texture", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"plasterPattern" : ["Plaster Pattern", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"redFabric" : ["Red Fabric", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"textileGold" : ["Textile Gold", {"defaultPresetArtifactId": "bannerBottom", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"waterColor" : ["Water Color", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"whiteFur" : ["White Fur", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"whiteSand" : ["White Sand", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#000000", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}],
+			"woodCracks" : ["Wood Cracks", {"defaultPresetArtifactId": "bannerCenter", "captionTextSize" : "100", "captionTextColor" : "#FFFFFF", "captionBackgroundColor" : "rgba(0, 0, 0, 0)"}]
 		}
 	]
 }

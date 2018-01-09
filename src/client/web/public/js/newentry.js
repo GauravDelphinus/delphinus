@@ -57,7 +57,12 @@ function refreshDesignView() {
 		//find the selected design, and use that image to pass to the new caption workflow
 		var selectedDesignObj = selectedDesignList.find(checkDesign, selectedDesignId);
 		designId = selectedDesignId; //set design Id to the selected design (see constructJSONObject)
+		
+		//set defaults so they can be picked up by the new entry caption workflow
 		defaultArtifactPresetSelectionID = selectedDesignObj.presetArtifactId;
+		$("#bannerTextFontSize").val(selectedDesignObj.captionTextSize);
+		$("#bannerColorButton").css("background-color", selectedDesignObj.captionBackgroundColor);
+		$("#bannerTextColorButton").css("background-color", selectedDesignObj.captionTextColor);
 
 		switchToStepsView(selectedDesignObj.image, selectedDesignObj.name);
 	});
