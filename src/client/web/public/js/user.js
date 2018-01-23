@@ -145,7 +145,6 @@ function setupImageHandlers(profileType) {
 		cleanupAndHideCarousel();
 
 		$("#dropzone").show();
-		$("#browseImage").show();
 		$("#newImage").hide();
 		$("#saveImage").hide();
 		$("#setImage").hide();
@@ -413,7 +412,6 @@ function handleFileSelected(data, path, title) {
   $("#profileImage").show();
 
   $("#dropzone").hide();
-  $("#browseImage").hide();
   $("#newImage").show();
   $("#saveImage").show();
 }
