@@ -603,7 +603,6 @@ function createEntry(entryInfo, done) {
 
 	createImagesForEntry(entryData, function(err, info) {
 		if (err) {
-			throw new Error(err);
 			return done(err);
 		}
 
