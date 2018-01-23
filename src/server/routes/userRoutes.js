@@ -160,7 +160,7 @@ var routes = function() {
 							var parsed = parseDataURI(req.body.imageData);
 				        
 							var buffer = parsed.data;
-							var targetImagePath = global.appRoot + config.path.userImages + req.params.userId + mime.extension(parsed.mimeType);
+							var targetImagePath = global.appRoot + config.path.userImages + req.params.userId + "." + mime.extension(parsed.mimeType);
 
 							var fs = require('fs');
 
@@ -170,7 +170,7 @@ var routes = function() {
 									callback(new Error("Failed to write file: " + targetImagePath), null);
 								}
 								
-								user.image = config.url.userImages + req.params.userId + mime.extension(parsed.mimeType);
+								user.image = config.url.userImages + req.params.userId + "." + mime.extension(parsed.mimeType);
 
 								callback(null, user);
 							});
@@ -282,7 +282,7 @@ var routes = function() {
 };
 
 function updateUserInDB(res, user, next) {
-	dbuser.saveUser(user, function(err) {
+	dbUser.saveUser(user, function(err) {
 		next(err);
 	});
 }
