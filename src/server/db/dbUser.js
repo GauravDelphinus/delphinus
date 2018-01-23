@@ -1,16 +1,16 @@
 
-const dataUtils = require("../dataUtils");
 const config = require("../config");
 const serverUtils = require("../serverUtils");
 const logger = require("../logger");
 const error = require("../error");
 const shortid = require("shortid");
+const dbUtils = require("./dbUtils");
 
 function getUser(userId, done) {
 	var cypherQuery = "MATCH (u:User{id: '" + userId + "'}) WITH u " +
   		" RETURN u;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -46,7 +46,7 @@ function getUserSocialInfo(userId, meId, done) {
   		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
   		" RETURN u, numFollowers, numFollowing, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following), (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -104,9 +104,8 @@ function getUsers(meId, followedId, followingId, likedEntityId, lastFetchedTimes
   		" RETURN u " +
   		" ORDER BY u.activity_last_seen DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 
@@ -167,9 +166,8 @@ function getUsersSorted(sortBy, limit, meId, done) {
   		" RETURN u, popularity_count " +
   		" ORDER BY popularity_count DESC LIMIT " + limit + ";";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 
@@ -201,7 +199,7 @@ function followUser(followerId, followedId, follow, done) {
 		var cypherQuery = "MATCH (u1:User {id: '" + followerId + "'}), (u2:User {id: '" + followedId + "'}) " +
 			" CREATE (u1)-[r:FOLLOWING]->(u2) " +
 			" RETURN r;";
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -214,7 +212,7 @@ function followUser(followerId, followedId, follow, done) {
 		var cypherQuery = "MATCH (u1:User {id: '" + followerId + "'})-[r:FOLLOWING]->(u2:User {id: '" + followedId + "'}) " +
 			" DELETE r " +
 			" RETURN COUNT(r);";
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -274,9 +272,8 @@ function findUser (query, callback) {
 
 	findUserQuery += " RETURN u;";
 
-	dataUtils.getDB().cypherQuery(findUserQuery, function(err, result) {
+	dbUtils.runQuery(findUserQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, findUserQuery);
 			return callback(err, null);
 		}
 
@@ -635,9 +632,8 @@ function saveUser (user, next) {
 			cypherQuery += "});";
 		}
 
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err) {
+		dbUtils.runQuery(cypherQuery, function(err) {
 			if (err) {
-				logger.dbError(err, cypherQuery);
 				return next(err, null);
 			}
 
@@ -656,7 +652,7 @@ function createUserNode(user, done) {
 		"u.image = '" + user.image + "', " +
 		"u.activity_last_seen = " + user.activity.lastSeen + " RETURN u;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err) {
+	dbUtils.runQuery(cypherQuery, function(err) {
 		if (err) {
 			return done(err);
 		}
@@ -676,7 +672,7 @@ function removeAccessForUser(userId, provider, callback) {
 	cypherQuery += removeQuery;
 	cypherQuery += " RETURN u;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err) {
+	dbUtils.runQuery(cypherQuery, function(err) {
 		callback(err);
 	});
 

@@ -1,7 +1,6 @@
 var express = require("express");
 var passport = require("passport");
 var config = require("../config");
-var dataUtils = require("../dataUtils");
 var logger = require("../logger");
 
 var routes = function() {

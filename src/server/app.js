@@ -9,6 +9,7 @@ const logger = require("./logger");
 const helmet = require("helmet");
 const dbChallenge = require("./db/dbChallenge");
 const setupRoutes = require("./setupRoutes");
+const dbInit = require("./db/dbInit");
 
 process.on('uncaughtException', function (error) {
    logger.error(error);
@@ -22,12 +23,10 @@ module.exports = function(callback) {
 
 	const serverUtils = require("./serverUtils");
 
-	const dataUtils = require("./dataUtils");
-
 	// Initialize the Neo4j Graph Database
 	const db = new neo4j("http://neo4j:mypassword@localhost:7474");
 
-	dataUtils.initializeDB(db, function(err) {
+	dbInit.initializeDB(db, function(err) {
 		if (err) {
 			return callback(err);
 		}

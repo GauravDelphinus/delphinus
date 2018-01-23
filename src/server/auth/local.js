@@ -1,6 +1,5 @@
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
-var dataUtils = require("../dataUtils");
 var config = require('../config');
 var dbUser = require("../db/dbUser");
 

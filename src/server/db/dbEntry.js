@@ -1,6 +1,4 @@
-require("../error");
 var serverUtils = require("../serverUtils");
-var dataUtils = require("../dataUtils");
 var dbUtils = require("./dbUtils");
 var config = require("../config");
 var mime = require("mime");
@@ -11,6 +9,8 @@ var async = require("async");
 var imageProcessor = require("../imageProcessor");
 var shortid = require("shortid");
 var dbIndependentImage = require("./dbIndependentImage");
+var dbChallenge = require("./dbChallenge");
+var dbDesign = require("./dbDesign");
 
 /*
 	Get Info about an Entry by looking up the DB
@@ -24,7 +24,7 @@ function getEntry(entryId, done) {
 		" WITH e, poster, source, labels(source) AS source_labels " + 
 		" RETURN e, poster, source_labels, source;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -61,7 +61,7 @@ function getEntrySocialInfo(entryId, meId, done) {
 		" WITH e, like_count, comment_count, COUNT(like) AS amLiking " +
 		" RETURN like_count, comment_count, amLiking;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -130,9 +130,8 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 		" RETURN e, poster, source_labels, source " + 
 		" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 
@@ -157,6 +156,353 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 		return done(null, output, newTimeStamp);
 	});
 }
+
+/**
+	Extract the entry data, including the source image information
+
+	entryId: id of the entry
+
+	return output: {
+		prototype: serverUtils.prototypes.entry
+		plus these values:
+		sourceImagePath: source image path
+		sourceImageUrl: source image url
+	}
+**/
+function getEntrySourceImageData(entryId, next) {
+
+	this.getEntry(entryId, function(err, entry) {
+		if (err) {
+			return next(err);
+		}
+
+		if (entry.sourceType == "challengeId") {
+			entry.sourceImagePath = global.appRoot + config.path.challengeImages + entry.sourceId + "." + mime.extension(entry.imageType);
+			entry.sourceImageUrl = config.url.challengeImages + sourceId + "." + mime.extension(entry.imageType);
+			return next(null, entry);
+		} else if (entry.sourceType == "designId") {
+			getImageDataForDesign(entry.sourceId, function(err, designData) {
+    			if (err) {
+    				return next(err, null);
+    			}
+
+    			entry.sourceImagePath = global.appRoot + config.path.designImagesRaw + entry.sourceId + designData.categoryId + "." + mime.extension(entry.imageType);
+    			entry.sourceImageUrl = config.url.designImages + designData.categoryId + "/" + entry.sourceId + "." + mime.extension(entry.imageType);
+    			return next(null, entry);
+    		});
+		} else if (entry.sourceType == "independentImageId") {
+			entry.sourceImagePath = global.appRoot + config.path.independentImages + entry.sourceId + "." + mime.extension(entry.imageType);
+    		entry.sourceImageUrl = config.url.independentImages + entry.sourceId + "." + mime.extension(entry.imageType);
+    		
+    		return next(null, entry);
+		}
+	});
+}
+
+/**
+	Given an Entry ID, fetch the details of the image
+	that forms this entry.  This includes:
+	- Original Image from the Challenge
+	- List of steps to be performed on the image
+
+	Returns an object of this form:
+	{
+		imagePath : "/path/to/original/image/from/server/root",
+		steps : "steps to perform"
+	}
+**/
+function getEntryImageData(entryId, next) {
+
+	this.getEntrySourceImageData(entryId, function(err, entry) {
+		if (err) {
+			return next(err);
+		}
+
+    	var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'})-[u:USES]->(s) RETURN LABELS(s),s ORDER BY u.order;";
+		dbUtils.runQuery(cypherQuery, function(err, result){
+			if(err) {
+				return next(err, null);
+			}
+
+			var steps = {};
+			var filters = [], layouts = [], artifacts = [], decorations = [];
+
+			// Now construct the filters array in the JSON format
+			for (var i = 0; i < result.data.length; i++) {
+				var stepFromDB = result.data[i];
+
+				if (stepFromDB[0][0] == "Filter") {
+					var filterFromDB = stepFromDB[1];
+
+					var filter = {};
+    				filter.effects = {};
+
+    				if (filterFromDB.filter_type == "preset") {
+    					filter.type = "preset";
+
+    					filter.preset = filterFromDB.id;
+
+    				} else if (filterFromDB.filter_type == "user_defined" || filterFromDB.filter_type == "custom") {
+    					
+    					filter.type = filterFromDB.filter_type;
+
+    					filter.effects = {};
+
+    					if (filterFromDB.effects_paint == "on") {
+    						filter.effects.paint = {};
+    						filter.effects.paint.radius = filterFromDB.effects_paint_radius;
+    					}
+    					if (filterFromDB.effects_grayscale == "on") {
+    						filter.effects.grayscale = "on";
+    					}
+    					if (filterFromDB.effects_charcoal == "on") {
+    						filter.effects.charcoal = {};
+    						filter.effects.charcoal.factor = filterFromDB.effects_charcoal_factor;
+    					}
+    					if (filterFromDB.effects_mosaic == "on") {
+    						filter.effects.mosaic = "on";
+    					}
+    					if (filterFromDB.effects_negative == "on") {
+    						filter.effects.negative = "on";
+    					}
+    					if (filterFromDB.effects_solarize == "on") {
+    						filter.effects.solarize = {};
+    						filter.effects.solarize.threshold = filterFromDB.effects_solarize_threshold;
+    					}
+    					if (filterFromDB.effects_monochrome == "on") {
+    						filter.effects.monochrome = "on";
+    					}
+    					if (filterFromDB.effects_swirl == "on") {
+    						filter.effects.swirl = {};
+    						filter.effects.swirl.degrees = filterFromDB.effects_swirl_degrees;
+    					}
+    					if (filterFromDB.effects_wave == "on") {
+    						filter.effects.wave = {};
+    						filter.effects.wave.amplitude = filterFromDB.effects_wave_amplitude;
+    						filter.effects.wave.wavelength = filterFromDB.effects_wave_wavelength;
+    					}
+    					if (filterFromDB.effects_spread == "on") {
+    						filter.effects.spread = {};
+    						filter.effects.spread.amount = filterFromDB.effects_spread_amount;
+    					}
+
+    					// ADD MORE
+
+    					filter.settings = {};
+
+    					if (filterFromDB.settings_brightness == "on") {
+    						filter.settings.brightness = { value: filterFromDB.settings_brightness_value};
+    					}
+    					if (filterFromDB.settings_hue == "on") {
+    						filter.settings.hue = { value: filterFromDB.settings_hue_value};
+    					}
+    					if (filterFromDB.settings_saturation == "on") {
+    						filter.settings.saturation = { value: filterFromDB.settings_saturation_value};
+    					}
+    					if (filterFromDB.settings_contrast == "on") {
+    						filter.settings.contrast = { value: filterFromDB.settings_contrast_value};
+    					}
+    				} else {
+    					return next(new Error("Invalid type '" + filterFromDB.filter_type + "' found for filterFromDB.filter_type"), null);
+    				}
+
+    				filters.push(filter);
+
+				} else if (stepFromDB[0][0] == "Layout") {
+					var layoutFromDB = stepFromDB[1];
+
+					var layout = {};
+
+    				if (layoutFromDB.layout_type == "preset") {
+    					layout.type = "preset";
+
+    					layout.preset = layoutFromDB.id;
+
+    				} else if (layoutFromDB.layout_type == "user_defined" || layoutFromDB.layout_type == "custom") {
+    					
+    					layout.type = layoutFromDB.layout_type;
+
+    					if (layoutFromDB.mirror_flip == "on") {
+    						layout.mirror = "flip";
+    					} else if (layoutFromDB.mirror_flop == "on") {
+    						layout.mirror = "flop";
+    					}
+
+    					if (layoutFromDB.crop == "on") {
+    						layout.crop = {};
+    						layout.crop.x = parseInt(layoutFromDB.crop_x);
+    						layout.crop.y = parseInt(layoutFromDB.crop_y);
+    						layout.crop.width = parseInt(layoutFromDB.crop_width);
+    						layout.crop.height = parseInt(layoutFromDB.crop_height);
+    					}
+
+    					if (layoutFromDB.rotation == "on") {
+    						layout.rotation = {};
+    						layout.rotation.degrees = parseInt(layoutFromDB.rotation_degrees);
+    						layout.rotation.color = layoutFromDB.rotation_color;
+    					}
+
+    					if (layoutFromDB.shear == "on") {
+    						layout.shear = {};
+    						layout.shear.xDegrees = parseInt(layoutFromDB.shear_xDegrees);
+    						layout.shear.yDegrees = parseInt(layoutFromDB.shear_yDegrees);
+    					}
+    				} else {
+    					return next(new Error("Invalid type '" + layoutFromDB.layout_type + "' found for layoutFromDB.layout_type"), null);
+    				}
+
+    				layouts.push(layout);
+
+				} else if (stepFromDB[0][0] == "Artifact") {
+					var artifactFromDB = stepFromDB[1];
+
+					var artifact = {};
+
+					if (artifactFromDB.artifact_type == "preset") {
+						artifact.type = "preset";
+
+						artifact.preset = artifactFromDB.id;			
+					} else if (artifactFromDB.artifact_type == "user_defined" || artifactFromDB.artifact_type == "custom") {
+						artifact.type = artifactFromDB.artifact_type;
+
+						if (artifactFromDB.banner == "on") { //actual banner text is stored in entry.caption
+							artifact.banner = {};
+							artifact.banner.location = artifactFromDB.banner_location;
+							artifact.banner.fontSize = parseInt(artifactFromDB.banner_fontSize);
+							artifact.banner.fontName = artifactFromDB.banner_fontName;
+							artifact.banner.backgroundColor = artifactFromDB.banner_backgroundColor;
+							artifact.banner.textColor = artifactFromDB.banner_textColor;
+						}
+					} else {
+    					return next(new Error("Invalid type '" + artifactFromDB.artifact_type + "' found for artifactFromDB.artifact_type"), null);
+    				}
+
+					artifacts.push(artifact);
+
+				} else if (stepFromDB[0][0] == "Decoration") {
+					var decorationFromDB = stepFromDB[1];
+
+					var decoration = {};
+
+					if (decorationFromDB.decoration_type == "preset") {
+						decoration.type = "preset";
+
+						decoration.preset = decorationFromDB.id;
+					} else if (decorationFromDB.decoration_type == "user_defined" || decorationFromDB.decoration_type == "custom") {
+						decoration.type = decorationFromDB.decoration_type;
+
+						if (decorationFromDB.border == "on") {
+							decoration.border = {};
+
+							decoration.border.width = parseInt(decorationFromDB.border_width);
+							decoration.border.color = decorationFromDB.border_color;
+						}
+					} else {
+    					return next(new Error("Invalid type '" + decorationFromDB.decoration_type + "' found for decorationFromDB.decoration_type"), null);
+    				}
+
+					decorations.push(decoration);
+				}
+				
+				if (filters.length > 0) {
+					steps.filters = filters;
+				}
+
+				if (layouts.length > 0) {
+					steps.layouts = layouts;
+				}
+
+				if (artifacts.length > 0) {
+					steps.artifacts = artifacts;
+				}
+
+				if (decorations.length > 0) {
+					steps.decorations = decorations;
+				}
+				
+			}
+
+			return next(0, { "sourceType": entry.sourceType, "sourceId" : entry.sourceId, "soureImagePath" : entry.sourceImagePath, "sourceImageUrl" : entry.sourceImageUrl, "imageType" : entry.imageType, "steps" : steps, "caption" : entry.caption});
+		});
+
+    });
+}
+
+/*
+getImageSourceForEntry: function(entryId, next) {
+
+	this.getEntry(entryId, function(err, entry) {
+		if (err) {
+			return next(err);
+		}
+
+		if (entry.sourceType == "challengeId") {
+			entry.sourceImagePath = global.appRoot + config.path.challengeImages + sourceId + "." + mime.extension(entry.imageType);
+		} else if (entry.sourceType == "designId") {
+			entry.sourceImagePath = global.appRoot + config.path.designImagesRaw + sourceId + "." + mime.extension(entry.imageType);
+		} else if (entry.sourceType == "independentImageId") {
+			entry.sourceImagePath = global.appRoot + config.path.independentImages + sourceId + "." + mime.extension(entry.imageType);
+		}
+		
+	});
+
+	let myDB = this.myDB;
+	var getImageDataForDesign = this.getImageDataForDesign.bind(this);
+
+	// First get the original image from the challenge
+	//var fetchChallengeQuery = "MATCH (c:Challenge)<-[:PART_OF]-(e:Entry {id: '" + entryId + "'}) RETURN c.id, c.image_type;"
+
+	//now check what kind of entry this is - challenge, design or independent image
+    var cypherQuery = "MATCH (e:Entry {id: '" + entryId + "'}) " +
+    						" OPTIONAL MATCH (c:Challenge)<-[:PART_OF]-(e) " +
+    						" WITH e, c, COUNT(c) AS c_count " +
+    						" OPTIONAL MATCH (d:Design)<-[:PART_OF]-(e) " +
+    						" WITH e, c, c_count, d, COUNT(d) AS d_count " +
+    						" OPTIONAL MATCH (i:IndependentImage)<-[:PART_OF]-(e) " +
+    						" WITH e, c, c_count, d, d_count, i, COUNT(i) AS i_count " +
+    						" RETURN e.image_type, e.caption, c, c_count, d, d_count, i, i_count;";
+    myDB.cypherQuery(cypherQuery, function(err, result) {
+    	if (err) {
+    		return next(err, null);
+    	} else if (result.data.length != 1) {
+    		return next(new Error("cypherQuery: " + cypherQuery + ", expected 1 result, found: " + result.data.length));
+    	}
+
+    	var imageType = result.data[0][0];
+    	var imageCaption = result.data[0][1];
+    	var source = "";
+    	var sourceId = "";
+    	var sourceImagePath = "";
+    	var sourceImageUrl = "";
+    	if (result.data[0][3] > 0) {
+    		source = "challengeId";
+    		sourceId = result.data[0][2].id;
+    		sourceImagePath = global.appRoot + config.path.challengeImages + sourceId + "." + mime.extension(imageType);
+    		sourceImageUrl = config.url.challengeImages + sourceId + "." + mime.extension(imageType);
+    		return next(null, {source: source, sourceId: sourceId, sourceImagePath: sourceImagePath, sourceImageUrl: sourceImageUrl, imageType: imageType, imageCaption:imageCaption});
+    	} else if (result.data[0][5] > 0) {
+    		source = "designId";
+    		sourceId = result.data[0][4].id;
+    		
+    		getImageDataForDesign(sourceId, function(err, designData) {
+    			if (err) {
+    				return next(err, null);
+    			}
+
+    			sourceImagePath = global.appRoot + config.path.designImagesRaw + sourceId + designData.categoryId + "." + mime.extension(imageType);
+    			sourceImageUrl = config.url.designImages + designData.categoryId + "/" + sourceId + "." + mime.extension(imageType);
+    			return next(null, {source: source, sourceId: sourceId, sourceImagePath: sourceImagePath, sourceImageUrl: sourceImageUrl, imageType: imageType, imageCaption:imageCaption});
+    		});
+    	} else if (result.data[0][7] > 0) {
+    		source = "independentImageId";
+    		sourceId = result.data[0][6].id;
+    		sourceImagePath = global.appRoot + config.path.independentImages + sourceId + "." + mime.extension(imageType);
+    		sourceImageUrl = config.url.independentImages + sourceId + "." + mime.extension(imageType);
+    		return next(null, {source: source, sourceId: sourceId, sourceImagePath: sourceImagePath, sourceImageUrl: sourceImageUrl, imageType: imageType, imageCaption:imageCaption});
+    	}
+    });
+}
+*/
 
 /*
 	Fetch all entries from the DB matching the provided criteria, and sorted by the given sort flag.
@@ -198,9 +544,8 @@ function getEntriesSorted(sortBy, limit, postedBy, done) {
 		" RETURN e, poster, source_labels, source, popularity_count " + 
 		" ORDER BY popularity_count DESC LIMIT " + limit + ";";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 
@@ -328,7 +673,7 @@ function createEntryNode(entryInfo, done) {
 		"image_type: '" + entryInfo.imageType + "' " +
 		"})-[r:POSTED_BY]->(u) RETURN e;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -472,7 +817,7 @@ function createFilterNodesForEntry(entryId, steps, done) {
 				var layout = steps.layouts[i];
 
 				if (layout.type == "preset" || layout.type == "custom") {
-					createFilterNodesFunctions.push(async.apply(dataUtils.createLayoutNode, layout));
+					createFilterNodesFunctions.push(async.apply(dbFilter.createLayoutNode, layout));
 				}
 			}
 		}
@@ -482,7 +827,7 @@ function createFilterNodesForEntry(entryId, steps, done) {
 				var filter = steps.filters[i];
 
 				if (filter.type == "preset" || filter.type == "custom") {
-					createFilterNodesFunctions.push(async.apply(dataUtils.createFilterNode, filter));
+					createFilterNodesFunctions.push(async.apply(dbFilter.createFilterNode, filter));
 				}
 			}
 		}
@@ -492,7 +837,7 @@ function createFilterNodesForEntry(entryId, steps, done) {
 				var artifact = steps.artifacts[i];
 
 				if (artifact.type == "preset" || artifact.type == "custom") {
-					createFilterNodesFunctions.push(async.apply(dataUtils.createArtifactNode, artifact));
+					createFilterNodesFunctions.push(async.apply(dbFilter.createArtifactNode, artifact));
 				}
 			}
 		}
@@ -502,7 +847,7 @@ function createFilterNodesForEntry(entryId, steps, done) {
 				var decoration = steps.decorations[i];
 
 				if (decoration.type == "preset" || decoration.type == "custom") {
-					createFilterNodesFunctions.push(async.apply(dataUtils.createDecorationNode, decoration));
+					createFilterNodesFunctions.push(async.apply(dbFilter.createDecorationNode, decoration));
 				}
 			}
 		}
@@ -536,7 +881,7 @@ function createFilterNodesForEntry(entryId, steps, done) {
 
 		cypherQuery += " return e;";
 
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 			if(err) {
 				return done(err);
 			} else if (result.data.length != 1) {
@@ -557,7 +902,7 @@ function deleteEntry(entryId, done) {
 		" OPTIONAL MATCH (e)<-[:POSTED_IN*1..2]-(comment:Comment) " +
 		" DETACH DELETE comment, e;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		}
@@ -580,7 +925,7 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 			" CREATE (u)-[r:LIKES {created: '" + timestamp + "'}]->(c) " +
 			" RETURN r;";
 
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -609,7 +954,7 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 			" DELETE r " +
 			" RETURN COUNT(r);";
 
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -671,18 +1016,14 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 					return callback(new Error("Challenge ID Missing."));
 				}
 
-				dataUtils.getImageDataForChallenge(challengeId, function(err, imageData){
+				dbChallenge.getChallenge(challengeId, function(err, challenge){
 					if (err) {
 						return callback(err);
 					}
 
-					var sourceImagePath = global.appRoot + config.path.challengeImagesRaw + challengeId + "." + mime.extension(imageData.imageType);
-					//var hash = this.generateHash(JSON.stringify(steps));
-					//var targetImageName = entryData.challengeId + "-" + hash + "." + mime.extension(imageData.imageType);
-					//var targetImagePath = global.appRoot + config.path.cacheImages + targetImageName;
-					//var targetImageUrl = config.url.cacheImages + targetImageName;
+					var sourceImagePath = global.appRoot + config.path.challengeImagesRaw + challengeId + "." + mime.extension(challenge.imageType);
 
-					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: imageData.imageType, sourceType: "challengeId", sourceId: challengeId});
+					return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: challenge.imageType, sourceType: "challengeId", sourceId: challengeId});
 				});
 			} else {
 				return callback(null, null);
@@ -697,7 +1038,7 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 	    		}
 
 	    		if (createNodesIfNotFound) {
-	    			dataUtils.createIndependentImageNode(entryData.sourceType, imageURL, entryData.userId, function(err, data) {
+	    			dbIndependentImage.createIndependentImageNode(entryData.sourceType, imageURL, entryData.userId, function(err, data) {
 		    			if (err) {
 		    				return callback(err);
 		    			}
@@ -767,7 +1108,7 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 	    			return callback(new Error("Missing Design ID"));
 	    		}
 
-	    		dataUtils.getImageDataForDesign(designId, function(err, imageData){
+	    		dbDesign.getImageDataForDesign(designId, function(err, imageData){
 					if (err) {
 						return callback(err);
 					}
@@ -809,6 +1150,7 @@ module.exports = {
 	getEntrySocialInfo: getEntrySocialInfo,
 	getEntries: getEntries,
 	getEntriesSorted: getEntriesSorted,
+	getEntryImageData: getEntryImageData,
 	deleteEntry: deleteEntry,
 	likeEntry: likeEntry,
 	processImageDataForEntry: processImageDataForEntry

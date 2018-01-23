@@ -1,5 +1,4 @@
 var express = require("express");
-var dataUtils = require("../dataUtils");
 var tmp = require("tmp");
 var path = require("path");
 var config = require("../config");

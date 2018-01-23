@@ -1,5 +1,4 @@
 var express = require("express");
-var dataUtils = require("../dataUtils");
 var fs = require("fs");
 var config = require("../config");
 var async = require("async");
@@ -10,7 +9,8 @@ var filterUtils = require("../filterUtils");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 var dbEntry = require("../db/dbEntry");
-
+var dbUtils = require("../db/dbUtils");
+var filterUtils = require("../filterUtils");
 var routes = function() {
 
 	var filterRouter = express.Router();
@@ -60,9 +60,8 @@ var routes = function() {
 			}
 			
 
-			dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+			dbUtils.runQuery(cypherQuery, function(err, result){
 				if(err) {
-					logger.dbError(err, cypherQuery);
 					return res.sendStatus(500);
 				} else if (result.data.length <= 0) {
     				logger.dbResultError(cypherQuery, "> 0", result.data.length);
@@ -129,7 +128,7 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			dataUtils.normalizeSteps(req.body.steps, function(err, steps){
+			filterUtils.normalizeSteps(req.body.steps, function(err, steps){
     			if (err) {
     				return res.sendStatus(500);
     			}
@@ -238,7 +237,7 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			dataUtils.getImageDataForEntry(req.params.entryId, function(err, imageData){
+			dbEntry.getEntryImageData(req.params.entryId, function(err, imageData){
 				if (err) {
 					logger.error("getImageDataForEntry, entry: " + req.params.entryId + ": " + err);
 					return res.sendStatus(500);
@@ -246,7 +245,7 @@ var routes = function() {
 
 				var sourceImagePath = imageData.sourceImagePath;
 
-	    		dataUtils.normalizeSteps(imageData.steps, function(err, steps){
+	    		filterUtils.normalizeSteps(imageData.steps, function(err, steps){
 	    			if (err) {
 	    				logger.error("normalizeSteps, steps: " + imageDate.steps + ": " + err);
 	    				return res.sendStatus(500);

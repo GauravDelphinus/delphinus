@@ -1,7 +1,6 @@
 var express = require("express");
 var config = require("../config");
 var shortid = require("shortid");
-var dataUtils = require("../dataUtils");
 var mime = require("mime");
 var imageProcessor = require("../imageProcessor");
 var logger = require("../logger");

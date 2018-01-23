@@ -1,6 +1,5 @@
 require("../error");
 var serverUtils = require("../serverUtils");
-var dataUtils = require("../dataUtils");
 var dbUtils = require("./dbUtils");
 var config = require("../config");
 var mime = require("mime");
@@ -15,7 +14,7 @@ function getChallenge(challengeId, done) {
 		" WITH c, category, poster " +
 		" RETURN c, poster, category;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -48,7 +47,7 @@ function getChallengeSocialInfo(challengeId, meId, done) {
 		" WITH c, like_count, comment_count, entry_count, COUNT(like) AS amLiking " +
 		" RETURN like_count, comment_count, entry_count, amLiking;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -111,9 +110,8 @@ function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 		" RETURN e, poster, category " + 
 		" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 
@@ -173,9 +171,8 @@ function getChallengesSorted(sortBy, limit, postedBy, categoryId, done) {
 		" RETURN e, poster, category, popularity_count " + 
 		" ORDER BY popularity_count DESC LIMIT " + limit + ";";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 
@@ -196,8 +193,35 @@ function getChallengesSorted(sortBy, limit, postedBy, categoryId, done) {
 	});
 }
 
+/**
+	Create the node for the given Challenge Category
+
+	nodeInfo: prototype this.categoryPrototype
+
+	return output: {
+		id: id of the created node
+	}
+
+**/
+function createCategoryNode(nodeInfo, callback) {
+	if (!serverUtils.validateData(nodeInfo, categoryPrototype)) {
+		return done(new Error("Invalid category info"));
+	}
+
+	var cypherQuery = " MERGE (c:Category {id: '" + nodeInfo.id + "'}) " +
+		" ON CREATE SET c.name = '" + nodeInfo.name + "' RETURN c;";
+		
+	dbUtils.runQuery(cypherQuery, function(err, result){
+		if(err) {
+			return callback(err);
+		}
+
+		return callback(0, {id: result.data[0].id});
+	});
+}
+
 /*
-	Create the challenge node given the information provided
+	Create the challenge given the information provided
 */
 function createChallenge(challengeInfo, done) {
 	createImageForChallenge(challengeInfo.id, challengeInfo.imageDataURI, function(err, info) {
@@ -269,7 +293,7 @@ function createChallengeNode(challengeInfo, done) {
 		"title : '" + dbUtils.sanitizeStringForCypher(challengeInfo.title) + "'" +
 		"})-[r:POSTED_BY]->(u), (n)-[:POSTED_IN]->(category) RETURN n;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -305,7 +329,7 @@ function deleteChallenge(challengeId, done) {
 		" OPTIONAL MATCH(e)<-[:POSTED_IN*1..2]-(entryComment:Comment) " +
 		" DETACH DELETE challengeComment, entryComment, c, e;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		}
@@ -327,7 +351,7 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 			" CREATE (u)-[r:LIKES {created: '" + timestamp + "'}]->(c) " +
 			" RETURN r;";
 
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -355,7 +379,7 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 			" DELETE r " +
 			" RETURN COUNT(r);";
 
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -391,6 +415,11 @@ var challengePrototype = {
 	"category" : "category" //id of category this challenge belongs to
 }
 
+var categoryPrototype = {
+	"id" : "category",
+	"name" : "string"
+}
+
 module.exports = {
 	createChallenge: createChallenge,
 	getChallengeSocialInfo : getChallengeSocialInfo,
@@ -398,5 +427,6 @@ module.exports = {
 	getChallenges: getChallenges,
 	getChallengesSorted: getChallengesSorted,
 	likeChallenge: likeChallenge,
-	deleteChallenge: deleteChallenge
+	deleteChallenge: deleteChallenge,
+	createCategoryNode: createCategoryNode
 };

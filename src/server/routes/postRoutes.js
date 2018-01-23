@@ -2,7 +2,6 @@ var express = require("express");
 var serverUtils = require("../serverUtils");
 var logger = require("../logger");
 var async = require("async");
-var dataUtils = require("../dataUtils");
 var dbUtils = require("../db/dbUtils");
 
 var routes = function() {

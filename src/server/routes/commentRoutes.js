@@ -4,7 +4,6 @@ var shortid = require("shortid");
 var config = require("../config");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
-var dataUtils = require("../dataUtils");
 var dbUtils = require("../db/dbUtils");
 var dbComment = require("../db/dbComment");
 

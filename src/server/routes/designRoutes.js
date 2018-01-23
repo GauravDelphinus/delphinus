@@ -2,7 +2,6 @@ var express = require("express");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 var config = require("../config");
-var dataUtils = require("../dataUtils");
 var dbDesign = require("../db/dbDesign");
 
 var routes = function() {

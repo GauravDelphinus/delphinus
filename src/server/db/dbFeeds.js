@@ -1,7 +1,7 @@
-const dataUtils = require("../dataUtils");
 const logger = require("../logger");
 const config = require("../config");
 const mime = require("mime");
+const dbUtils = require("./dbUtils");
 
 function createMainFeed(userId, lastFetchedTimestamp, done) {
 
@@ -48,9 +48,8 @@ function createMainFeed(userId, lastFetchedTimestamp, done) {
 		" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 	}
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 

@@ -1,6 +1,5 @@
 
 var express = require("express");
-var dataUtils = require("../dataUtils");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
 var error = require("../error");

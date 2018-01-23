@@ -1,11 +1,11 @@
 
-const dataUtils = require("./dataUtils");
 const dbChallenge = require("./db/dbChallenge");
 const dbEntry = require("./db/dbEntry");
 const serverUtils = require("./serverUtils");	
 const logger = require("./logger");
 const metadata = require("./metadata");
 const querystring = require("querystring");
+const dbUtils = require("./db/dbUtils");
 
 module.exports = function(app) {
 	setupAPIRoutes(app);

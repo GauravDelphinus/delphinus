@@ -5,8 +5,8 @@ var mime = require("mime");
 var fs = require("fs");
 var serverUtils = require("./serverUtils");
 var shortid = require("shortid");
-var dataUtils = require("./dataUtils");
-var dbIndependentImage = require("./db/dbIndependentImage");	
+var dbIndependentImage = require("./db/dbIndependentImage");
+var dbUtils = require("./db/dbUtils");	
 
 module.exports = {
 	extractSingleStepList : function(steps) {
@@ -189,6 +189,14 @@ module.exports = {
 	return hash;
 	},
 
+	/**
+		Normalize / expand the steps array such that all indirect references
+		(such as filter node ids, etc.) are resolved to actual settings that can 
+		be processed by the Image Processor.
+	**/
+	normalizeSteps: function (steps, next) {
+		next(0, steps);
+	}
 	
 };
 

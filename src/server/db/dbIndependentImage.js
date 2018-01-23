@@ -1,6 +1,5 @@
 require("../error");
 var serverUtils = require("../serverUtils");
-var dataUtils = require("../dataUtils");
 var dbUtils = require("./dbUtils");
 var config = require("../config");
 var mime = require("mime");
@@ -128,7 +127,7 @@ function createIndependentImageNode(nodeInfo, callback) {
 		"})-[r:POSTED_BY]->(u) RETURN i;";
 
 	logger.dbDebug(cypherQuery);
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			logger.dbError(err, cypherQuery);
 			return callback(err);
@@ -143,5 +142,6 @@ function createIndependentImageNode(nodeInfo, callback) {
 }
 
 module.exports = {
-	createIndependentImage: createIndependentImage
+	createIndependentImage: createIndependentImage,
+	createIndependentImageNode: createIndependentImageNode
 };

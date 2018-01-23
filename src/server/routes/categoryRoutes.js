@@ -1,8 +1,7 @@
 var express = require("express");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
-var dataUtils = require("../dataUtils");
-
+var dbUtils = require("../db/dbUtils");
 var routes = function() {
 	var categoryRouter = express.Router();
 
@@ -33,9 +32,8 @@ var routes = function() {
 
 			cypherQuery += " RETURN c;";
 
-			dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+			dbUtils.runQuery(cypherQuery, function(err, result){
     			if(err) {
-    				logger.dbError(err, cypherQuery);
     				return res.sendStatus(500);
     			} else if (result.data.length <= 0) {
     				logger.dbResultError(cypherQuery, "> 0", result.data.length);

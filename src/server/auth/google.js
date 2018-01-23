@@ -1,6 +1,5 @@
 var passport = require('passport');
 var GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
-var dataUtils = require("../dataUtils");
 var config = require('../config');
 var dynamicConfig = require("../config/dynamicConfig");
 var logger = require("../logger");

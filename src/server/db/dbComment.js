@@ -1,7 +1,6 @@
 require("../error");
 var serverUtils = require("../serverUtils");
 var logger = require("../logger");
-var dataUtils = require("../dataUtils");
 var dbUtils = require("../db/dbUtils");
 var error = require("../error");
 
@@ -14,7 +13,7 @@ function getComment(commentId, done) {
 		" RETURN c, poster;";
 
 	logger.dbDebug(cypherQuery);
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -64,9 +63,8 @@ function getComments(postedBy, entityId, done) {
 
 	cypherQuery += " RETURN c, poster ORDER BY c.created;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
-			logger.dbError(err, cypherQuery);
 			return done(err, 0);
 		}
 
@@ -108,7 +106,7 @@ function getCommentSocialInfo(commentId, meId, done) {
 		" WITH c, like_count, COUNT(like) AS amLiking " +
 		" RETURN like_count, amLiking;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -141,7 +139,7 @@ function createComment(commentInfo, done) {
 		"text : '" + dbUtils.sanitizeStringForCypher(commentInfo.text) + "'" + 
 		"})-[:POSTED_IN]->(e), (u)<-[r:POSTED_BY]-(c) RETURN c, u;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -176,7 +174,7 @@ function deleteComment(commentId, done) {
 		" OPTIONAL MATCH (c)<-[:POSTED_IN*1..2]-(comment:Comment) " +
 		" DETACH DELETE comment, c;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		}
@@ -196,7 +194,7 @@ function likeComment(commentId, like, userId, timestamp, done) {
 			" CREATE (u)-[r:LIKES {created: '" + timestamp + "'}]->(c) " +
 			" RETURN r;";
 
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
@@ -210,7 +208,7 @@ function likeComment(commentId, like, userId, timestamp, done) {
 			" DELETE r " +
 			" RETURN COUNT(r);";
 
-		dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {

@@ -1,6 +1,5 @@
 var passport = require('passport');
 var FacebookStrategy = require('passport-facebook').Strategy;
-var dataUtils = require("../dataUtils");
 var config = require('../config');
 var logger = require("../logger");
 var dynamicConfig = require("../config/dynamicConfig");

@@ -1,8 +1,8 @@
 const serverUtils = require("../serverUtils");
-const dataUtils = require("../dataUtils");
 const config = require("../config");
 const mime = require("mime");
 const logger = require("../logger");
+const dbInit = require("./dbInit");
 
 /*
 	Add a record of activity to the Challenge or Entry.  Activity could
@@ -30,7 +30,7 @@ function saveActivity(activityInfo, done) {
 
 	cypherQuery += " RETURN e;";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result){
+	this.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
@@ -72,7 +72,7 @@ function getPosts(postedBy, lastFetchedTimestamp, done) {
 		" RETURN labels(e), e, poster, category " +
 		" ORDER BY e.activity_timestamp DESC LIMIT " + config.businessLogic.infiniteScrollChunkSize + ";";
 
-	dataUtils.getDB().cypherQuery(cypherQuery, function(err, result) {
+	this.runQuery(cypherQuery, function(err, result) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
 			return done(err, 0);
@@ -166,7 +166,15 @@ function sanitizeStringForCypher(str) {
 	return out;
 }
 
-
+function runQuery(cypherQuery, callback) {
+	dbInit.getDB().cypherQuery(cypherQuery, function(err, result) {
+		if (err) {
+			logger.dbError(err, cypherQuery);
+			return callback(err);
+		}
+		return callback(null, result);
+	});
+}
 
 var activityPrototype = {
 	"entityId" : "id",
@@ -176,11 +184,16 @@ var activityPrototype = {
 	"commentId" : "id"
 }
 
-module.exports = {
+var functions = {
 	saveActivity : saveActivity,
 	activityPrototype : activityPrototype,
 	entityNodeToClientData: entityNodeToClientData,
 	getPosts: getPosts,
 	sanitizeStringForCypher: sanitizeStringForCypher,
-	escapeSingleQuotes: escapeSingleQuotes
+	escapeSingleQuotes: escapeSingleQuotes,
+	runQuery: runQuery
 };
+
+for(var key in functions) {
+    module.exports[key] = functions[key];
+}
