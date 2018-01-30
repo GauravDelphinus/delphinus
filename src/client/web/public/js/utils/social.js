@@ -361,19 +361,19 @@ function showHideFollowersList(userId, contentTag, show) {
 	//comments list is currently hidden, so fetch comments and show the list
 	if (show) {
 		if ($("#" + contentTag + userId + "FollowersContainer").is(":empty")) { 
-			$.getJSON("/api/users/?followedId=" + userId + "&sortBy=lastSeen", function(list) {
-				var followersList = createFollowersList(userId, contentTag, list);
-				$("#" + contentTag + userId + "FollowersContainer").empty().append(followersList);
-			})
-			.fail(function() {
-				//eat this
+			var followersList = createFollowersList(userId, contentTag);
+			$("#" + contentTag + userId + "FollowersContainer").empty().append(followersList);
+
+			fetchNextBatch("/api/users/?followedId=" + userId, function(list) {
+				appendFollowersList(userId, contentTag, list);
+			}, function (err) {
+				if (!err) {
+					//done
+					if ($("#" + contentTag + userId + "FollowersPopup").length) {
+						$("#" + contentTag + userId + "FollowersPopup").show();
+					}
+				}
 			});
-
-		}
-
-		//if we're showing the followers list on a popup, then show the popup
-		if ($("#" + contentTag + userId + "FollowersPopup").length) {
-			$("#" + contentTag + userId + "FollowersPopup").show();
 		}
 
 		//make sure the tab is 'active', not just 'shown'
@@ -739,7 +739,6 @@ function appendLikersList(id, contentTag, list) {
 		var userImage = $("<img>", {src: data.image, class: "user-image-tiny"});
 		var userName = $("<span>", {class: "posted-by-name-light"});
 		userName.append($("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.displayName));
-		
 
 		row.append($("<td>", {class: "user-image-column"}).append(userImage));
 		row.append($("<td>", {class: "user-name-column"}).append(userName));
@@ -760,67 +759,30 @@ function createLikersList(id, contentTag) {
 	return container;
 }
 
-function createFollowersList(id, contentTag, list) {
-	var container = $("<div>", {id: contentTag + id + "FollowersList", class: "followersList", "data-id": id});
-
-	var table = $("<table width='100%'>");
+function appendFollowersList(id, contentTag, list) {
+	var table = $("#" + contentTag + id + "FollowersList table");
 
 	for (var i = 0; i < list.length; i++) {
 		var data = list[i];
 
 		var row = $("<tr>");
 		var userImage = $("<img>", {src: data.image, class: "user-image-tiny"});
-
-		var userName = $("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.caption);
-		var followButton = $("<button>", {type: "button", id: contentTag + data.id + "FollowButton", class: "btn button-full-width "});
-		if (data.socialStatus.follows.amFollowing) {
-			//already following
-			followButton.append($("<span>", {class: "glyphicon glyphicon-ok"})).append(" Following");
-			followButton.addClass("button-full");
-			followButton.attr("disabled", "disabled"); // no need to be clickable as already following
-		} else {
-			followButton.append($("<span>", {class: "glyphicon glyphicon-plus"})).append(" Follow");
-			followButton.addClass("button-line");
-			followButton.click(
-			
-
-				(function(id) {
-				return function(e) {
-
-					if (!user) {
-						//not logged in, so redirect to login page
-						window.open("/auth", "_self");
-					}
-					sendFollow(id, true, function(err, followResult) {
-						if (err) {
-							//eat this
-						} else {
-							if (followResult) {
-								//now following
-								var button = $("#" + contentTag + id + "FollowButton");
-								button.empty();
-								button.append($("<span>", {class: "glyphicon glyphicon-ok"})).append(" Following");
-								button.removeClass("button-line");
-								button.addClass("button-full");
-								button.attr("disabled", "disabled"); // no need to be clickable as already following
-							}
-						}
-					});
-				}
-			})(data.id));
-		}
+		var userName = $("<span>", {class: "posted-by-name-light"});
+		userName.append($("<a>", {class: "link-gray", href: "/user/" + data.id}).append(data.displayName));
 
 		row.append($("<td>", {class: "user-image-column"}).append(userImage));
 		row.append($("<td>", {class: "user-name-column"}).append(userName));
-		if (user && user.id == data.id) {
-			//it's me, so don't show the button!
-			row.append($("<td>"));
-		} else {
-			row.append($("<td>").append(followButton));
-		}
 
 		table.append(row);
 	}
+
+	return table;
+}
+
+function createFollowersList(id, contentTag, list) {
+	var container = $("<div>", {id: contentTag + id + "FollowersList", class: "followersList", "data-id": id});
+
+	var table = $("<table width='100%'>");
 
 	container.append(table);
 

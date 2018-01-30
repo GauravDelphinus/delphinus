@@ -146,7 +146,6 @@ function getUsers(meId, followedId, followingId, likedEntityId, lastFetchedTimes
 	and does not support chunked outputs.
 */
 function getUsersSorted(sortBy, limit, meId, done) {
-
 	limit = Math.min(limit, config.businessLogic.maxCustomSortedLimit);
 
 	cypherQuery = "MATCH (u:User) ";

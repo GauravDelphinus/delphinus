@@ -41,6 +41,10 @@ var routes = function() {
 				{
 					name: "limit",
 					type: "number"
+				},
+				{
+					name: "excludeMe",
+					type: ["true", "false"]
 				}
 			];
 
@@ -48,7 +52,7 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			var meId = (req.user) ? (req.user.id) : (0);
+			var meId = (req.user && req.query.excludeMe && (req.query.excludeMe == "true")) ? (req.user.id) : (0);
 
 			//if sortBy flag is present, then the limit flag must also be present
 			//also, the max limit number is 10
