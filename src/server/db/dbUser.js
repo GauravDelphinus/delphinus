@@ -182,6 +182,7 @@ function getUsersSorted(sortBy, limit, meId, done) {
 	        	id: user.id,
 	        	image: user.image,
 	        	displayName: user.display_name,
+	        	caption: user.display_name, //used as caption in some cases
 	        	link: config.url.user + user.id
 	        }
 
