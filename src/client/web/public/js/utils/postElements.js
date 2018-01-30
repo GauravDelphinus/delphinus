@@ -63,7 +63,8 @@ function createScrollableElement(data, contentTag, compressed = false) {
 	element.append(imageLink);
 
 	if (data.caption && data.type != "entry") {
-		element.append(createCaptionSectionElement(data, contentTag));
+		var captionLink = $("<a>", {class: "link-no-hover", href: data.link}).append(createCaptionSectionElement(data, contentTag));
+		element.append(captionLink);
 	}
 
 	if (data.type == "entry") {
