@@ -55,6 +55,7 @@ module.exports = function () {
                 user.google = {};
                 user.google.id = profile.id;
                 user.google.token = accessToken;
+                user.google.profileLink = "https://plus.google.com/u/0/" + profile.id;
                 user.google.emails = [];
                 for (var i = 0; i < profile.emails.length; i++) {
                     user.google.emails.push(profile.emails[i].value);

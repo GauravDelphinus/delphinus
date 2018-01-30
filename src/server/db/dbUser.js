@@ -63,6 +63,9 @@ function getUserSocialInfo(userId, meId, done) {
 		if (user.facebook_profile_link) {
 			output.facebook = {profileLink: user.facebook_profile_link};
 		}
+		if (user.google_profile_link) {
+			output.google = {profileLink: user.google_profile_link};
+		}
 
 		var numFollowers = result.data[0][1];
 		var numPosts = result.data[0][3];
@@ -317,6 +320,7 @@ function findUser (query, callback) {
 				user.google.token = userFromDB.google_token;
 				user.google.emails = userFromDB.google_emails;
 				user.google.images = userFromDB.google_images;
+				user.google.profileLink = userFromDB.google_profile_link;
 			}
 
 			if (userFromDB.twitter_id) {
@@ -429,6 +433,10 @@ function saveUser (user, next) {
 
 				if (user.google.displayName) {
 					setValues.push(" u.google_display_name = '" + user.google.displayName + "'");
+				}
+
+				if (user.google.profileLink) {
+					setValues.push(" u.google_profile_link = '" + user.google.profileLink + "'");
 				}
 			}
 
@@ -561,6 +569,10 @@ function saveUser (user, next) {
 
 				if (user.google.displayName) {
 					cypherQuery += ", google_display_name: '" + user.google.displayName + "'";
+				}
+
+				if (user.google.profileLink) {
+					cypherQuery += ", google_profile_link: '" + user.google.profileLink + "'";
 				}
 			}
 

@@ -188,6 +188,12 @@ function refreshSocialInfo(data, contentTag) {
 			}
 		}
 
+		if (socialInfo.google) {
+			if (socialInfo.google.profileLink) {
+				updateGoogleLink(contentTag, data.id, socialInfo.google.profileLink);
+			}
+		}
+
 		//if there are no visible social-status-buttons then just hide the SocialStatusSection
 		if (showSocialStatusSection) {
 			$("#" + contentTag + data.id + "SocialStatusSection").show();
@@ -458,6 +464,11 @@ function updateTwitterLink(contentTag, entityId, twitterLink) {
 	$("#" + contentTag + entityId + "TwitterButton").data("twitterLink", twitterLink);
 }
 
+function updateGoogleLink(contentTag, entityId, googleLink) {
+	$("#" + contentTag + entityId + "GoogleButton").show();
+	$("#" + contentTag + entityId + "GoogleButton").data("googleLink", googleLink);
+}
+
 function createSocialActionsSectionElement(data, contentTag, full /* show full status */) {
 	var socialActionsSection = $("<div>", {id: contentTag + data.id + "SocialActionsSection", class: "socialActionsSection"});
 
@@ -613,6 +624,17 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 
 		twitterButton.click(function() {
 			window.open($("#" + contentTag + data.id + "TwitterButton").data("twitterLink"), "_blank");
+		});
+	}
+
+	if (data.type == "user") {
+		var googleButton = $("<div>", {id: contentTag + data.id + "GoogleButton", class: "social-action-button"});
+		googleButton.append($("<i>", {class: "fa fa-google"})).append(" Google");
+		socialActionsSection.append(googleButton);
+		googleButton.hide();
+
+		googleButton.click(function() {
+			window.open($("#" + contentTag + data.id + "GoogleButton").data("googleLink"), "_blank");
 		});
 	}
 

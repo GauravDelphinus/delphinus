@@ -748,6 +748,9 @@ module.exports = {
 			"twitter" : {
 				"profileLink" : "url"
 			},
+			"google" : {
+				"profileLink" : "url"
+			},
 			"follows" : {
 				"numFollowers" : "number",
 				"numFollowing" : "number",
