@@ -313,7 +313,7 @@ function updateComments(contentTag, entityId, numComments) {
 
 function createSignInToCommentElement() {
 	var signInToCommentElement = $("<div>", {class: "full-width-center-content"});
-	var newCommentLink = $("<a>", {href: "/auth/", class: "btn btn-link", text: "Sign in to add a new comment"});
+	var newCommentLink = $("<a>", {href: "/auth/", text: "Sign in to add a new comment"});
 	signInToCommentElement.append(newCommentLink);
 	return signInToCommentElement;
 }
