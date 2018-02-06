@@ -107,9 +107,6 @@ function setupTabRedirection(id) {
 	$('.nav-tabs a').on('shown.bs.tab', function (e) {
 	    window.location.hash = e.target.hash;
 	});
-
-	var element = document.getElementById(id + "Tabs");
-	element.scrollIntoView(true);
 }
 
 /*
