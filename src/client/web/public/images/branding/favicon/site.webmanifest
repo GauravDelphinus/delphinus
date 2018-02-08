@@ -1,8 +1,9 @@
 {
     "name": "",
+    "short_name": "",
     "icons": [
         {
-            "src": "/android-chrome-72x72.png",
+            "src": "/images/branding/favicon/android-chrome-72x72.png",
             "sizes": "72x72",
             "type": "image/png"
         }
