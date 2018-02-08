@@ -475,7 +475,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	// LIKE BUTTON ---------------------------------
 	if (data.type == "challenge" || data.type == "entry") {
 		var likeButton = $("<div>", {id: contentTag + data.id + "LikeButton", class: "social-action-button"});
-		likeButton.append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append(" Like");
+		likeButton.append($("<i>", {class: "far fa-thumbs-up", "aria-hidden" : "true"})).append(" Like");
 		socialActionsSection.append(likeButton);
 
 		var restURL;
@@ -512,7 +512,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	// COMMENT BUTTON ---------------------------------
 	if (data.type == "challenge" || data.type == "entry") {
 		var commentButton = $("<div>", {id: contentTag + data.id + "CommentButton", class: "social-action-button"});
-		commentButton.append($("<span>", {class: "glyphicon glyphicon-comment glyphiconAlign"})).append(" Comment");
+		commentButton.append($("<i>", {class: "far fa-comment", "aria-hidden" : "true"})).append(" Comment");
 		socialActionsSection.append(commentButton);
 		
 		commentButton.click(function(e) {
@@ -523,17 +523,17 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	// SHARE BUTTON ---------------------------------
 	if (data.type == "challenge" || data.type == "entry") {
 		var shareButton = $("<div>", {id: contentTag + data.id + "ShareButton"});
-		shareButton.append($("<span>", {class: "glyphicon glyphicon-share-alt glyphiconAlign"})).append(" Share");
+		shareButton.append($("<i>", {class: "fas fa-share", "aria-hidden" : "true"})).append(" Share");
 		
 		var menu = createMenu(shareButton);
 		menu.addClass("social-action-button");
-		var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append($("<i>", {class: "fa fa-facebook", "aria-hidden" : "true"})).append("Share on Facebook");
+		var facebookButton = $("<button>", {class: "button-empty", type: "button"}).append($("<i>", {class: "fab fa-fw fa-facebook-f", "aria-hidden" : "true"})).append(" Share on Facebook");
 		appendMenuItemButton(menu, facebookButton);
 		facebookButton.click(function() {
 			window.location.replace("/share?id=" + data.id + "&type=" + data.type + "&target=facebook" + "&referrer=" + encodeURIComponent(getFullPathForCurrentPage()));
 		});
 
-		var twitterButton = $("<button>", {class: "button-empty", type: "button"}).append("Share on Twitter");
+		var twitterButton = $("<button>", {class: "button-empty", type: "button"}).append($("<i>", {class: "fab fa-fw fa-twitter", "aria-hidden" : "true"})).append(" Share on Twitter");
 		appendMenuItemButton(menu, twitterButton);
 		twitterButton.click(function() {
 			window.location.replace("/share?id=" + data.id + "&type=" + data.type + "&target=twitter" + "&referrer=" + encodeURIComponent(getFullPathForCurrentPage()));
@@ -545,7 +545,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	// TIME LAPSE BUTTON
 	if (data.type == "entry") {
 		var timelapseButton = $("<div>", {id: contentTag + data.id + "TimelapseButton", class: "social-action-button"});
-		timelapseButton.append($("<span>", {class: "glyphicon glyphicon-play-circle glyphiconAlign"})).append(" Timelapse");
+		timelapseButton.append($("<i>", {class: "fas fa-play", "aria-hidden" : "true"})).append(" Timelapse");
 		socialActionsSection.append(timelapseButton);
 
 		timelapseButton.click(function(e) {
@@ -561,7 +561,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	// ADD ENTRY BUTTON ---------------------------------
 	if (data.type == "challenge") {
 		var addEntryButton = $("<div>", {id: contentTag + data.id + "AddEntryButton", class: "social-action-button"});
-		addEntryButton.append($("<span>", {class: "glyphicon glyphicon-flag glyphiconAlign"})).append(" Captionify");
+		addEntryButton.append($("<i>", {class: "far fa-edit", "aria-hidden" : "true"})).append(" Captionify");
 		socialActionsSection.append(addEntryButton);
 
 		addEntryButton.click(function(e) {
