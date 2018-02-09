@@ -2,7 +2,6 @@ require("../init")();
 
 var chai = require("chai");
 var chaiHttp = require("chai-http");
-var dataUtils = require("../dataUtils");
 
 var app = require("../app");
 var logger = require("../logger");
