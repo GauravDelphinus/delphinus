@@ -571,7 +571,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 	
 	// FOLLOW BUTTON ---------------------------------
 	if (data.type == "user" && (!user || user.id != data.id)) {
-		var followButton = $("<div>", {id: contentTag + data.id + "FollowButton", class: "social-action-button"}).append($("<span>", {class: "glyphicon glyphicon-thumbs-up glyphiconAlign"})).append($("<span>", {id: contentTag + data.id + "FollowText"}));
+		var followButton = $("<div>", {id: contentTag + data.id + "FollowButton", class: "social-action-button"}).append($("<i>", {class: "fas fa-fw fa-user-plus", "aria-hidden" : "true"})).append($("<span>", {id: contentTag + data.id + "FollowText"}));
 		
 		socialActionsSection.append(followButton);
 
@@ -607,7 +607,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 
 	if (data.type == "user") {
 		var facebookButton = $("<div>", {id: contentTag + data.id + "FacebookButton", class: "social-action-button"});
-		facebookButton.append($("<i>", {class: "fa fa-facebook"})).append(" Facebook");
+		facebookButton.append($("<i>", {class: "fab fa-fw fa-facebook-f", "aria-hidden" : "true"})).append(" Facebook");
 		socialActionsSection.append(facebookButton);
 		facebookButton.hide();
 
@@ -618,7 +618,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 
 	if (data.type == "user") {
 		var twitterButton = $("<div>", {id: contentTag + data.id + "TwitterButton", class: "social-action-button"});
-		twitterButton.append($("<i>", {class: "fa fa-twitter"})).append(" Twitter");
+		twitterButton.append($("<i>", {class: "fab fa-fw fa-twitter", "aria-hidden" : "true"})).append(" Twitter");
 		socialActionsSection.append(twitterButton);
 		twitterButton.hide();
 
@@ -629,7 +629,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 
 	if (data.type == "user") {
 		var googleButton = $("<div>", {id: contentTag + data.id + "GoogleButton", class: "social-action-button"});
-		googleButton.append($("<i>", {class: "fa fa-google"})).append(" Google");
+		googleButton.append($("<i>", {class: "fab fa-fw fa-google", "aria-hidden" : "true"})).append(" Google");
 		socialActionsSection.append(googleButton);
 		googleButton.hide();
 
