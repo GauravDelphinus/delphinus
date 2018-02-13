@@ -250,6 +250,11 @@ function setupRenderRoutes(app) {
 		}
 		res.render("share", params);
 	});
+
+	//************ HELP page **************************************************
+	app.get("/help", function(req, res) {
+		res.render("help");
+	});
 }
 
 function normalizeUser(user) {
