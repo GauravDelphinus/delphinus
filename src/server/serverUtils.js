@@ -257,6 +257,12 @@ module.exports = {
 				logger.errorIf(logError, "Invalid Category '" + value + "' received for param '" + name + "'");
 				return false;
 			}
+		} else if (type == "email") {
+			var re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    		if (!re.test(String(value).toLowerCase())) {
+				logger.errorIf(logError, "Invalid Email '" + value + "' received for param '" + name + "'");
+				return false;
+			}
 		} else if (type == "filter") {
 			var filters = require("./presets").presetFilter;
 			if (!filters.hasOwnProperty(value)) {

@@ -53,6 +53,9 @@ function setupAPIRoutes(app) {
 
 	const designRouter = require("./routes/designRoutes")();
 	app.use("/api/designs", designRouter);
+
+	const contactRouter = require("./routes/contactRoutes")();
+	app.use("/api/contact", contactRouter);
 }
 
 /*
