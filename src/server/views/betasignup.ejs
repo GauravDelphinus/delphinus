@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Beta Signup | Captionify.com</title>
+    <% include ./favicon_header %>
+  
+<link rel="stylesheet" href="/third-party/bootstrap/css/bootstrap.min.css">
+<link rel="stylesheet" href="/third-party/font-awesome/css/fontawesome-all.min.css">
+<link rel="stylesheet" type="text/css" href="/css/styles.min.css">
+<style>
+        body        { padding-top:80px; }
+    </style>
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-46129625-3"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-46129625-3');
+</script>
+</head>
+<body>
+
+<div class="centerDisplay">
+	<div class="centerDisplayHeader">
+		<img src="/images/branding/captionify_logo_medium.png">
+		<p class="centerDisplayTitle">Sign up for our beta now!</p>
+		<hr>
+	</div>
+	<div class="centerDisplayContent">
+
+	    <!-- LOGIN FORM -->
+	    <form action="/contact" method="post">
+	        <div class="form-group">
+	           	<p class="centerDisplayCaption">Your Name:</p>
+	            <input type="text" class="form-control" name="name">
+	        </div>
+	        <div class="form-group">
+	            <p class="centerDisplayCaption">Your Email:</p>
+	            <input type="text" class="form-control" name="email">
+	        </div>
+
+	        <button type="submit" class="btn button-full">Sign up for Beta</button>
+	    </form>
+	    
+    </div>
+    <div class="centerDisplayFooter">
+    	<hr>
+    	<p>Return to the <a href="/">home page</a>.</p>
+    </div>
+
+</div>
+
+</body>
+</html>

@@ -72,6 +72,10 @@ function setupRenderRoutes(app) {
 		}
 	});
 
+	app.get("/betasignup", function(req, res) {
+		res.render("betasignup");
+	}
+
 	//******** CHALLENGES related routes *******************************
 
 	//render the page for all challenges matching an optional category
