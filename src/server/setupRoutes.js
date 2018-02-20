@@ -64,7 +64,12 @@ function setupRenderRoutes(app) {
 
 	//********* HOME PAGE **********************************************
 	app.get("/", function(req, res) {
-		res.render("index", {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
+		require("dotenv").config();
+		if (process.env.HOMEPAGE_REDIRECT) {
+			res.render(process.env.HOMEPAGE_REDIRECT, {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
+		} else {
+			res.render("index", {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
+		}
 	});
 
 	//******** CHALLENGES related routes *******************************
