@@ -27,7 +27,7 @@ var routes = function() {
 			}
 
 			//TODO add code for sending email
-			return res.sendStatus(200);
+			return res.status(201).json({});
 		})
 
 	return contactRouter;

@@ -13,11 +13,14 @@ $(document).ready(function(){
 		data: JSON.stringify(jsonObj)
 	})
 	.done(function(data, textStatus, jqXHR) {
-		//if the challenge was posted successfully, redirect to the newly created challenge page
-    	window.location.replace("/");
+		showAlert("Thank you for your interest, you will hear from us shortly!", 2, function() {
+			window.location.replace("/");
+		});	
 	})
 	.fail(function(jqXHR, textStatus, errorThrown) {
-		window.location.replace("/");
+		showAlert("Oops, looks like there's a problem with your submission.  Please try again later.", 2, function() {
+			window.location.replace("/");
+		});
 	});
 	});
 });
