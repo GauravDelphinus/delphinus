@@ -79,6 +79,10 @@ function setupRenderRoutes(app) {
 		res.render("betasignup");
 	});
 
+	app.get("/contact", function(req, res) {
+		res.render("contact");
+	});
+
 	//******** CHALLENGES related routes *******************************
 
 	//render the page for all challenges matching an optional category

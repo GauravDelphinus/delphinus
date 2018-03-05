@@ -85,5 +85,8 @@
 		},
 		"siteTitle" : "Caption everything!",
 		"siteDescription" : "Participate in challenges, capture your thoughts and ideas.  Caption everything!"
+	},
+	"contact" : {
+		"email": "ezeeideas@gmail.com"	
 	}
 }

@@ -1,6 +1,7 @@
 var express = require("express");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
+var config = require("../config");
 
 var routes = function() {
 	var contactRouter = express.Router();
@@ -19,6 +20,16 @@ var routes = function() {
 					name: "email",
 					type: "email",
 					required: "yes"
+				},
+				{
+					name: "subject",
+					required: "yes",
+					type: "string"
+				},
+				{
+					name: "message",
+					type: "string",
+					required: "yes"
 				}
 			];
 
@@ -26,7 +37,30 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			//TODO add code for sending email
+			//send email - refer https://nodemailer.com/transports/sendmail/
+			var nodemailer = require('nodemailer');
+
+			var transporter = nodemailer.createTransport({
+			  sendmail: true,
+			  newline: "unix",
+			  path: "sendmail"
+			});
+
+			var mailOptions = {
+			  from: "\"" + req.body.name + "\" " + req.body.email,
+			  to: config.contact.email,
+			  subject: req.body.subject,
+			  text: req.body.message
+			};
+
+			transporter.sendMail(mailOptions, function(error, info){
+				if (error) {
+			  		logger.error("Failed to sent email - " + error + ", mailOptions: " + JSON.stringify(mailOptions));
+				} else {
+			    	logger.info("Email sent successfully!");
+				}
+			});
+
 			return res.status(201).json({});
 		})
 

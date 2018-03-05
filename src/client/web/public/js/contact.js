@@ -2,7 +2,9 @@ $(document).ready(function(){
 	$("#submitButton").click(function() {
 		var jsonObj = {
 			name: $("#nameText").val(),
-			email: $("#emailText").val()
+			email: $("#emailText").val(),
+			subject: $("#subjectText").val(),
+			message: $("#messageText").val()
 		};
 
 		$.ajax({
@@ -13,7 +15,7 @@ $(document).ready(function(){
 		data: JSON.stringify(jsonObj)
 	})
 	.done(function(data, textStatus, jqXHR) {
-		showAlert("Thank you for your interest, you will hear from us shortly!", 2, function() {
+		showAlert("Thank you for your message!", 2, function() {
 			window.location.replace("/");
 		});	
 	})
