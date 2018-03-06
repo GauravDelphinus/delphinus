@@ -83,6 +83,10 @@ function setupRenderRoutes(app) {
 		res.render("contact");
 	});
 
+	app.get("/privacy", function(req, res) {
+		res.render("privacy");
+	});
+
 	//******** CHALLENGES related routes *******************************
 
 	//render the page for all challenges matching an optional category
