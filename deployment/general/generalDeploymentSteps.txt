@@ -132,10 +132,10 @@ TODO: Explore a more secure way to authenticate, using key pairs
 (2) Configure custom Database Path for Neo4j
 (a) sudo vi /etc/neo4j/neo4j.config #edit the configuration file
 (b) Find the line below and change the database directory as below:
-dbms.directories.data=/var/www/production/data
+dbms.directories.data=/var/www/production/data/db
 (c) Set the appropriate permissions on the database folder.
-	sudo mkdir /var/www/production/data/databases
-	chmod 777 -R /var/www/production/data/databases
+	sudo mkdir /var/www/production/data/db/databases
+	chmod 777 -R /var/www/production/data/db/databases
 
 (3) Configure Neo4j to allow Remote Web Admin Access
 (a) sudo vi /etc/neo4j/neo4j.conf #Edit the /etc/neo4j/neo4j.conf configuration file

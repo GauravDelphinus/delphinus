@@ -83,7 +83,7 @@ ln -s ${PROJECT_ROOT}/../current/src/client/web/public/pages ${PROJECT_ROOT}/../
 # /cacheImages  				${PROJECT_ROOT}/../public/cacheImages		${PROJECT_ROOT}/../data/cacheImages
 # /images 						${PROJECT_ROOT}/../public/images 			${PROJECT_ROOT}/../current/src/client/web/public/images
 # /third-party					${PROJECT_ROOT}/../public/third-party 		${PROJECT_ROOT}/../current/src/client/web/public/third-party
-# /pages 						${PROJECT_ROOT}/../public/pages 			${PROJECT_ROOT}/../current/src/client/web/public/pages
+# /pages 						${PROJECT_ROOT}/../public/pages 			${PROJECT_ROOT}/../current/src/client/web/public/pages	
 
 
 
