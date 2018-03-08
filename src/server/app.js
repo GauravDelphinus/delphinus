@@ -23,8 +23,13 @@ module.exports = function(callback) {
 
 	const serverUtils = require("./serverUtils");
 
+	require("dotenv").config();
+	if (!process.env.NEO4J_USERNAME || !process.env.NEO4J_PASSWORD || !process.env.NEO4J_HOSTNAME) {
+		return callback(new Error("Missing NEO4J authentication fields in the .env file, or .env file missing"));
+	}
+
 	// Initialize the Neo4j Graph Database
-	const db = new neo4j("http://neo4j:mypassword@localhost:7474");
+	const db = new neo4j("http://" + process.env.NEO4J_USERNAME + ":" + process.env.NEO4J_PASSWORD + "@" + process.env.NEO4J_HOSTNAME);
 
 	dbInit.initializeDB(db, function(err) {
 		if (err) {
