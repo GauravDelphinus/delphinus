@@ -124,18 +124,24 @@ If the output is just "data" then we need to format using the following command
 
 (1) Set up password / authentication for Neo4j
 (a) sudo neo4j-admin set-initial-password mypassword #Set Neo4j Database password (match with my code in app.js)
-(b) curl -H "Content-Type: application/json" -X POST -d '{"password":"mypassword"}' -u neo4j:neo4j http://localhost:7474/user/neo4j/password #change password
+(b) (may not be required - see step 4) curl -H "Content-Type: application/json" -X POST -d '{"password":"mypassword"}' -u neo4j:neo4j http://localhost:7474/user/neo4j/password #change password
 
-Note: this needs to be done twice, since the initial password needs to be changed (for security purposes)
-TODO: Explore a more secure way to authenticate, using key pairs
+Note: this needs to be done twice, since the initial password needs to be changed (for security purposes) (see step 4)
 
-(2) Configure custom Database Path for Neo4j
+(2) Configure custom Database and Log Path for Neo4j
 (a) sudo vi /etc/neo4j/neo4j.config #edit the configuration file
-(b) Find the line below and change the database directory as below:
+(b) Find the line below and change the database and log directories as below:
 dbms.directories.data=/var/www/production/data/db
-(c) Set the appropriate permissions on the database folder.
-	sudo mkdir /var/www/production/data/db/databases
-	chmod 777 -R /var/www/production/data/db/databases
+dbms.directories.logs=/var/www/production/data/log/neo4j
+
+Note: Make sure the same keys are not present elsewhere in the file - comment out any other duplicate key settings by adding a #
+
+(c) Set the appropriate permissions on the database folder - change ownership to neo4j user since node doesn't need to read/write to this folder directly.
+	(if needed) sudo mkdir /var/www/production/data/db
+	sudo chown neo4j /var/www/production/data/db
+
+	(if needed) sudo mkdir -p /var/www/production/data/log/neo4j
+	sudo chown neo4j /var/www/production/data/log/neo4j
 
 (3) Configure Neo4j to allow Remote Web Admin Access
 (a) sudo vi /etc/neo4j/neo4j.conf #Edit the /etc/neo4j/neo4j.conf configuration file
@@ -148,6 +154,11 @@ dbms.directories.data=/var/www/production/data/db
 
 (e) Disable Bolt in the web admin interface.  Go to Settings > BOLT + ROUTING > Check "Do not use bolt"
 (f) In the web admin interfae, enter :server connect, and enter the neo4j login credentials, and it should be connected
+
+(4) Change the temp password to the actual password via the web admin interface (it should prompt to change)
+	:server connect
+	or
+	:server change-password
 
 ####################################################################
 # PREPARE GITHUB PUBLIC/PRIVATE KEYS FOR CLONING SILENTLY

@@ -32,9 +32,10 @@ fi
 # 
 
 mkdir ${PROJECT_ROOT}/../data;
-mkdir ${PROJECT_ROOT}/../data/db; # holds the Neo4j db files
+mkdir ${PROJECT_ROOT}/../data/db; # holds the Neo4j db files (configured in /etc/neo4j/neo4j.conf)
 mkdir ${PROJECT_ROOT}/../data/tmp; # temporary storage
 mkdir ${PROJECT_ROOT}/../data/log;  # all application logs (refer logger.js)
+mkdir ${PROJECT_ROOT}/../data/log/neo4j;  # neo4j logs (this is configured in /etc/neo4j/neo4j.conf)
 mkdir ${PROJECT_ROOT}/../data/cacheImages; # all cache images.  By its very nature, this can be deleted/purged if we run out of space.
 mkdir ${PROJECT_ROOT}/../data/cacheImagesRaw; # cache images that don't have watermarks (e.g., intermediate filter steps)
 mkdir ${PROJECT_ROOT}/../data/contentImages; # all content images that have watermarks (for public use)
