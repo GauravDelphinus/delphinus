@@ -97,7 +97,7 @@ module.exports = {
 		host : 'localhost',
 		ref  : 'origin/master',
 		repo : 'git@github.com:ezeeideas/delphinus.git',
-		path : '/var/www/staging'
+		path : '/var/www/appserver/staging'
 
 		//'post-setup': "mkdir ../data; mkdir ../data/tmp; mkdir ../data/log; mkdir ../data/contentImages; mkdir ../data/cacheImages; mkdir ../data/contentImages/challenges; mkdir ../data/contentImages/entries; mkdir ../data/contentImages/users; mkdir ../data/contentImages/designs; mkdir ../data/db; mkdir ../public; mkdir ../public/js; mkdir ../public/css; mkdir ln -s ../data/contentImages ../public/contentImages; ln -s ../current/src/client/web/public/images/designs ../public/designImages; ln -s ../data/cacheImages ../public/cacheImages; ln -s ../current/src/client/web/public/images ../public/images; ln -s ../current/src/client/web/public/third-party ../public/third-party;",
 		//'post-deploy' : '../../deployment/minify.sh ../current/src/client/web/public/js ../public/js ../current/src/client/web/public/css ../public/css; npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging'
@@ -105,10 +105,10 @@ module.exports = {
   	},
   	staging : {
 		user : 'node',
-		host : 'ec2-18-221-25-182.us-east-2.compute.amazonaws.com',
+		host : 'ec2-18-218-112-190.us-east-2.compute.amazonaws.com',
 		ref  : 'origin/master',
 		repo : 'git@github.com:ezeeideas/delphinus.git',
-		path : '/var/www/staging',
+		path : '/var/www/appserver/staging',
 
 		'post-setup': '../current/deployment/scripts/setup_dirs.sh',
 		'post-deploy' : '../current/deployment/scripts/minify.sh --sourcejsfolder ../current/src/client/web/public/js --minjsfolder ../public/js --sourcelessfolder ../current/src/server/less --mincssfolder ../public/css; npm install --prefix ./src/server&& pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env staging'
@@ -118,7 +118,7 @@ module.exports = {
     	host : 'ec2-18-217-43-93.us-east-2.compute.amazonaws.com',
 		ref  : 'origin/master',
 		repo : 'git@github.com:ezeeideas/delphinus.git',
-		path : '/var/www/production',
+		path : '/var/www/appserver/production',
 
 		'post-setup': '../current/deployment/scripts/setup_dirs.sh',
 		'post-deploy' : '../current/deployment/scripts/minify.sh --sourcejsfolder ../current/src/client/web/public/js --minjsfolder ../public/js --sourcelessfolder ../current/src/server/less --mincssfolder ../public/css; npm install --prefix ./src/server && pm2 startOrRestart ./deployment/aws/ecosystem.config.js --env production'
