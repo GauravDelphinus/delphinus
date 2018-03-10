@@ -11,20 +11,22 @@ module.exports = {
       script    : 'index.js',
       cwd: "src/server",
       "log_date_format"  : "YYYY-MM-DD HH:mm Z",
+      //couldn't find a way to configure staging/production specific log paths
+      //so commenting this out for now and relying on default location at ~/.pm2/logs on server
+      //refer: http://pm2.keymetrics.io/docs/usage/application-declaration/#log-files
+
+      //"error_file" : "/var/log/captionify_error.log",
+      //"out_file"   : "/var/log/captionify_out.log",
+      //"pid_file"   : "/var/log/captionify.pid", 
+
       env: {
         NODE_ENV: 'development'
       },
       env_production : {
-        NODE_ENV: 'production',
-        "error_file" : "/var/www/appserver/production/data/log/pm2_error.log",
-      	"out_file"   : "/var/www/appserver/production/data/log/pm2_out.log",
-      	"pid_file"   : "/var/www/appserver/production/data/log/pm2.pid"
+        NODE_ENV: 'production'
       },
       env_staging : {
-      	NODE_ENV: 'staging',
-      	"error_file" : "/var/www/appserver/staging/data/log/pm2_error.log",
-      	"out_file"   : "/var/www/appserver/staging/data/log/pm2_out.log",
-      	"pid_file"   : "/var/www/appserver/staging/data/log/pm2.pid"
+      	NODE_ENV: 'staging'
       },
       "exec_mode": "fork",
   	  "instances": 1
