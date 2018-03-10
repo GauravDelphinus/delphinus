@@ -11,10 +11,10 @@ var logLevel = "";
 
 var env = process.env.NODE_ENV;
 if (env === "production") {
-	logFileName = "debug.log";
+	logFileName = "node_debug.log";
 	logLevel = "debug"; // restrict production logging to info and above
 } else {
-	logFileName = "debug.log";
+	logFileName = "node_debug.log";
 	logLevel = "debug"; // staging and dev logging can be debug and above
 }
 
