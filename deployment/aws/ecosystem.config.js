@@ -18,10 +18,16 @@ module.exports = {
         NODE_ENV: 'development'
       },
       env_production : {
-        NODE_ENV: 'production'
+        NODE_ENV: 'production',
+        "error_file" : "/var/www/appserver/production/data/log/pm2_error.log",
+      	"out_file"   : "/var/www/appserver/production/data/log/pm2_out.log",
+      	"pid_file"   : "/var/www/appserver/production/data/log/pm2.pid"
       },
       env_staging : {
-      	NODE_ENV: 'staging'
+      	NODE_ENV: 'staging',
+      	"error_file" : "/var/www/appserver/staging/data/log/pm2_error.log",
+      	"out_file"   : "/var/www/appserver/staging/data/log/pm2_out.log",
+      	"pid_file"   : "/var/www/appserver/staging/data/log/pm2.pid"
       },
       "exec_mode": "fork",
   	  "instances": 1
