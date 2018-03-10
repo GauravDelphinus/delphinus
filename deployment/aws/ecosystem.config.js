@@ -13,7 +13,7 @@ module.exports = {
       "log_date_format"  : "YYYY-MM-DD HH:mm Z",
       "error_file" : "/var/log/captionify_error.log",
       "out_file"   : "/var/log/captionify_out.log",
-      "pid_file"   : "/var/log/captionify.pid",
+      "pid_file"   : "/var/log/captionify.pid", 
       env: {
         NODE_ENV: 'development'
       },
