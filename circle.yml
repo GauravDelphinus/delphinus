@@ -14,7 +14,9 @@ dependencies:
     - sudo npm install -g pm2@latest
     - ../../deployment/scripts/setup_dirs.sh
     - ../../deployment/scripts/setup_env.sh
-    - node index.js
+    - node ./index.js:
+        background: true
+    - sleep 5
 deployment:
   production:
     branch: master
