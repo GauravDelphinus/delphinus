@@ -2,6 +2,7 @@ require("../init")();
 
 var chai = require("chai");
 var chaiHttp = require("chai-http");
+var request = require("request");
 
 var app = require("../app");
 var logger = require("../logger");
@@ -35,6 +36,17 @@ describe("HTTP Routes", function() {
 	it("dummy test", function() {
 		assert.equal("true", "true");
 	});
+
+	it("should return 200", function(done) {
+		request.get("http://localhost:8080/api/challenges", function(err, res, body) {
+			if (err) {
+				logger.error(err);
+			}
+			assert.equal(res.statusCode, 200);
+			logger.debug("body: " + body);
+			done();
+		});
+	});
 	
 	/*
 	//call before running any tests in this block
@@ -55,6 +67,8 @@ describe("HTTP Routes", function() {
     	//potentially, remove the db stuff that was added
     	done();
     });
+
+
 
 	describe("Challenge Routes", function() {		
 		describe("GET /api/challenges?sortBy=dateCreated", function() {
