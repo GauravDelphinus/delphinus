@@ -428,5 +428,6 @@ module.exports = {
 	getChallengesSorted: getChallengesSorted,
 	likeChallenge: likeChallenge,
 	deleteChallenge: deleteChallenge,
-	createCategoryNode: createCategoryNode
+	createCategoryNode: createCategoryNode,
+	createChallengeNode: createChallengeNode
 };

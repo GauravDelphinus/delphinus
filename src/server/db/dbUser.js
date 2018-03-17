@@ -664,11 +664,29 @@ function createUserNode(user, done) {
 		"u.image = '" + user.image + "', " +
 		"u.activity_last_seen = " + user.activity.lastSeen + " RETURN u;";
 
-	dbUtils.runQuery(cypherQuery, function(err) {
+	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
 			return done(err);
 		}
 		return done(null, {id: result.id});
+	});
+}
+
+/*
+	Delete the matching user node from the DB
+*/
+function deleteUser(userId, done) {
+
+	var cypherQuery = " MATCH (u:User {id: '" + userId + "'}) " +
+		" OPTIONAL MATCH (u)<-[:POSTED_BY*1..2]-(comment:Comment) " +
+		" DETACH DELETE comment, u;";
+
+	dbUtils.runQuery(cypherQuery, function(err, result){
+		if(err) {
+			return done(err);
+		}
+
+		return done(null);
 	});
 }
 
@@ -706,5 +724,7 @@ module.exports = {
 	saveUser: saveUser,
 	removeAccessForUser: removeAccessForUser,
 	followUser: followUser,
-	userPrototypeBasic : userPrototypeBasic
+	userPrototypeBasic : userPrototypeBasic,
+	createUserNode: createUserNode,
+	deleteUser: deleteUser
 };

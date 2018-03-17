@@ -1,5 +1,14 @@
+/**
+	Sanity tests to make sure all HTTP routes are working as expected.
+
+	Not testing detailed business logic, but just that the endpoints are up and running.
+
+	For detailed tests, refer the relevant test files.
+**/
+
 require("../init")();
 
+var dbInit = require("../db/dbInit");
 var chai = require("chai");
 var chaiHttp = require("chai-http");
 var request = require("request");
@@ -14,22 +23,6 @@ chai.use(chaiHttp);
 
 var server = null;
 
-/*
-before(function(done) { //higher level - called only once for all tests
-	// Initialize app and store in 'server' variable
-	this.timeout(15000); //need this since init of app can take a bit of time
-	app(function(err, appServer) {
-		if (err) {
-			logger.error("Fatal Error.  Node JS App NOT STARTED.  " + err);
-			return done(err);
-		}
-
-		server = appServer;
-		return done();
-	});
-});
-*/
-
 describe("HTTP Routes", function() {
 	this.timeout(10000);
 
@@ -37,14 +30,47 @@ describe("HTTP Routes", function() {
 		assert.equal("true", "true");
 	});
 
-	it("should return 200", function(done) {
-		request.get("http://localhost:8080/api/challenges", function(err, res, body) {
-			if (err) {
-				logger.error(err);
-			}
-			assert.equal(res.statusCode, 200);
-			logger.debug("body: " + body);
-			done();
+	describe("Client Endpoints", function() {
+		it("/ should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+	});
+	
+	describe("API Endpoints", function() {
+		it("/api/challenges should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/api/entries should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/api/entries", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/api/users should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/api/users", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
 		});
 	});
 	

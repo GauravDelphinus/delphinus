@@ -2,6 +2,8 @@ const async = require("async");
 const dbUtils = require("./dbUtils");
 const dbChallenge = require("./dbChallenge");
 const dbDesign = require("./dbDesign");
+const dbUser = require("./dbUser");
+const dbEntry = require("./dbEntry");
 
 module.exports = {
 	initializeDB :function(db, callback) {
@@ -121,6 +123,35 @@ module.exports = {
 			var entry = data.entries[i];
 
 			functions.push(async.apply(dbEntry.createEntryNode, entry));
+		}
+
+		async.series(functions, function(err) {
+			callback(err);
+		});
+	},
+
+	deleteDataFromDB: function(data, callback) {
+		var functions = [];
+
+		//Create users
+		for (var i = 0; i < data.users.length; i++) {
+			var user = data.users[i];
+
+			functions.push(async.apply(dbUser.deleteUser, user.id));
+		}
+
+		//Create challenges
+		for (let i = 0; i < data.challenges.length; i++) {
+			var challenge = data.challenges[i];
+
+			functions.push(async.apply(dbChallenge.deleteChallenge, challenge.id));
+		}
+
+		//Create entries
+		for (let i = 0; i < data.entries.length; i++) {
+			var entry = data.entries[i];
+
+			functions.push(async.apply(dbEntry.deleteEntry, entry.id));
 		}
 
 		async.series(functions, function(err) {

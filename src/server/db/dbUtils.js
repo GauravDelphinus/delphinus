@@ -167,7 +167,9 @@ function sanitizeStringForCypher(str) {
 }
 
 function runQuery(cypherQuery, callback) {
-	dbInit.getDB().cypherQuery(cypherQuery, function(err, result) {
+	const dbInit = require("./dbInit");
+	var db = dbInit.getDB();
+	db.cypherQuery(cypherQuery, function(err, result) {
 		if (err) {
 			logger.dbError(err, cypherQuery);
 			return callback(err);

@@ -1152,5 +1152,6 @@ module.exports = {
 	getEntryImageData: getEntryImageData,
 	deleteEntry: deleteEntry,
 	likeEntry: likeEntry,
-	processImageDataForEntry: processImageDataForEntry
+	processImageDataForEntry: processImageDataForEntry,
+	createEntryNode: createEntryNode
 };
