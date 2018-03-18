@@ -1,155 +1,91 @@
 /**
-	Sanity tests to make sure all HTTP routes are working as expected.
-
-	Not testing detailed business logic, but just that the endpoints are up and running.
-
-	For detailed tests, refer the relevant test files.
+	Test challenges and the business logic around challenges
 **/
 
 var dbInit = require("../db/dbInit");
 var request = require("request");
 var assert = require("chai").assert;
+var config = require("../config");
+var serverUtils = require("../serverUtils");
+var logger = require("../logger");
 
-describe("Sanity Tests", function() {
+describe("Challenges", function() {
 	this.timeout(10000);
 
-	it("dummy test", function() {
-		assert.equal("true", "true");
-	});
-
-	describe("Page Endpoints", function() {
-		it("/ should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/", function(err, res, body) {
+	describe("Getting Challenges", function() {
+		//no parameters should default to a chunk being returned
+		it("/api/challenges should return a max limit of challenges", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
+
+				var body = JSON.parse(body);
 				assert.equal(res.statusCode, 200);
+				assert.isArray(body.list);
+				assert.isAtMost(body.list.length, config.businessLogic.infiniteScrollChunkSize); //should only send in chunks
+				assert.isTrue(serverUtils.validateData(body.list, serverUtils.prototypes.challenge)); //validate format
 				return done();
 			});
 		});
 
-		it("/privacy should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/privacy", function(err, res, body) {
+		//limit parameter only takes effect if sortBy parameter is also set, otherwise it is ignored
+		it("/api/challenges?limit=2 should return a max limit of challenges", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges?limit=2", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
+
+				var body = JSON.parse(body);
 				assert.equal(res.statusCode, 200);
+				assert.isArray(body.list);
+				assert.isAtMost(body.list.length, config.businessLogic.infiniteScrollChunkSize); //should only send in chunks
+				assert.isTrue(serverUtils.validateData(body.list, serverUtils.prototypes.challenge)); //validate format
 				return done();
 			});
 		});
 
-		it("/contact should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/contact", function(err, res, body) {
+		//sortBy without limit should return 400
+		it("/api/challenges?sortBy=popularity without limit parameter should return 400", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges?sortBy=popularity", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
-				assert.equal(res.statusCode, 200);
+
+				assert.equal(res.statusCode, 400);
 				return done();
 			});
 		});
 
-		it("/auth should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/auth", function(err, res, body) {
+		//sortBy with limit greater than config.businessLogic.maxCustomSortedLimit should return 400
+		it("/api/challenges?sortBy=popularity with limit greater than config.businessLogic.maxCustomSortedLimit should return 400", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges?sortBy=popularity&limit=20", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
-				assert.equal(res.statusCode, 200);
+
+				assert.equal(res.statusCode, 400);
 				return done();
 			});
 		});
 
-		it("/newchallenge should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/newchallenge", function(err, res, body) {
+		//sortBy with limit less than or equal to config.businessLogic.maxCustomSortedLimit should return a valid chunk
+		it("/api/challenges?sortBy=popularity with limit less than or equal to config.businessLogic.maxCustomSortedLimit should return a valid chunk", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges?sortBy=popularity&limit=2", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
-				assert.equal(res.statusCode, 200);
-				return done();
-			});
-		});
 
-		it("/newentry should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/newentry", function(err, res, body) {
-				if (err) {
-					return done(err);
-				}
+				var body = JSON.parse(body);
 				assert.equal(res.statusCode, 200);
+				assert.isArray(body);
+				assert.isAtMost(body.length, 2); //should only send in 2 chunks max
+				assert.isTrue(serverUtils.validateData(body, serverUtils.prototypes.challenge)); //validate format
 				return done();
 			});
 		});
 	});
 	
-	describe("API Endpoints", function() {
-		it("/api/feeds should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/feeds", function(err, res, body) {
-				if (err) {
-					return done(err);
-				}
-				assert.equal(res.statusCode, 200);
-				return done();
-			});
-		});
-
-		it("/api/challenges should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/challenges", function(err, res, body) {
-				if (err) {
-					return done(err);
-				}
-				assert.equal(res.statusCode, 200);
-				return done();
-			});
-		});
-
-		it("/api/entries should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/entries", function(err, res, body) {
-				if (err) {
-					return done(err);
-				}
-				assert.equal(res.statusCode, 200);
-				return done();
-			});
-		});
-
-		it("/api/users should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/users", function(err, res, body) {
-				if (err) {
-					return done(err);
-				}
-				assert.equal(res.statusCode, 200);
-				return done();
-			});
-		});
-
-		it("/api/posts should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/posts", function(err, res, body) {
-				if (err) {
-					return done(err);
-				}
-				assert.equal(res.statusCode, 200);
-				return done();
-			});
-		});
-
-		it("/api/comments should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/comments", function(err, res, body) {
-				if (err) {
-					return done(err);
-				}
-				assert.equal(res.statusCode, 200);
-				return done();
-			});
-		});
-
-		it("/api/designs should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/designs", function(err, res, body) {
-				if (err) {
-					return done(err);
-				}
-				assert.equal(res.statusCode, 200);
-				return done();
-			});
-		});
-	});
 	
 	/*
 	//call before running any tests in this block

@@ -42,7 +42,6 @@ var routes = function() {
     				return res.sendStatus(500);
     			}
 
-    			logger.debug("sending back to client: " + JSON.stringify(result));
     			return res.json(result);
 			});
 		})
