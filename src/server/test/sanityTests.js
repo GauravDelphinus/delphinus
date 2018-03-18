@@ -23,16 +23,66 @@ chai.use(chaiHttp);
 
 var server = null;
 
-describe("HTTP Routes", function() {
+describe("Sanity Tests", function() {
 	this.timeout(10000);
 
 	it("dummy test", function() {
 		assert.equal("true", "true");
 	});
 
-	describe("Client Endpoints", function() {
+	describe("Page Endpoints", function() {
 		it("/ should return 200", function(done) {
 			request.get(process.env.HOSTNAME + "/", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/privacy should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/privacy", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/contact should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/contact", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/auth should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/auth", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/newchallenge should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/newchallenge", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/newentry should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/newentry", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -43,6 +93,16 @@ describe("HTTP Routes", function() {
 	});
 	
 	describe("API Endpoints", function() {
+		it("/api/feeds should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/api/feeds", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
 		it("/api/challenges should return 200", function(done) {
 			request.get(process.env.HOSTNAME + "/api/challenges", function(err, res, body) {
 				if (err) {
@@ -65,6 +125,36 @@ describe("HTTP Routes", function() {
 
 		it("/api/users should return 200", function(done) {
 			request.get(process.env.HOSTNAME + "/api/users", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/api/posts should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/api/posts", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/api/comments should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/api/comments", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+				assert.equal(res.statusCode, 200);
+				return done();
+			});
+		});
+
+		it("/api/designs should return 200", function(done) {
+			request.get(process.env.HOSTNAME + "/api/designs", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
