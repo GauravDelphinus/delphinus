@@ -194,13 +194,25 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			dbChallenge.deleteChallenge(req.params.challengeId, function(err) {
-    			if(err) {
-    				logger.error(err);
-    				return res.sendStatus(500);
-    			}
+			var meId = (req.user) ? (req.user.id) : (0);
+			dbChallenge.canDeleteChallenge(req.params.challengeId, meId, function(err, canDelete) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
+				
+				if (canDelete) {
+					dbChallenge.deleteChallenge(req.params.challengeId, function(err) {
+		    			if(err) {
+		    				logger.error(err);
+		    				return res.sendStatus(500);
+		    			}
 
-    			return res.sendStatus(204);
+		    			return res.sendStatus(204);
+					});
+				}
+				
+				return res.sendStatus(401); //unauthorized
 			});
 		});
 

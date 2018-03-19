@@ -5,6 +5,7 @@ var config = require("../config");
 var mime = require("mime");
 var logger = require("../logger");
 var imageProcessor = require("../imageProcessor");
+var error = require("../error");
 
 /*
 	Get info about a Challenge by looking up the DB
@@ -18,7 +19,7 @@ function getChallenge(challengeId, done) {
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-			return done(new DBResultError(cypherQuery, 1, result.data.length));
+			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
 		}
 
 		var challenge = result.data[0][0];
@@ -319,6 +320,21 @@ function createChallengeNode(challengeInfo, done) {
 }
 
 /*
+	Find out if the given user has the permissions to delete
+	the given challenge
+*/
+function canDeleteChallenge(challengeId, userId, done) {
+	getChallenge(challengeId, function(err, challenge) {
+		if (err) {
+			return done(err);
+		}
+
+		//only the person who posted the challenge can delete it
+		return done(null, challenge.postedByUser.id == userId);
+	});
+}
+
+/*
 	Delete the matching challenge node from the DB
 */
 function deleteChallenge(challengeId, done) {
@@ -429,5 +445,6 @@ module.exports = {
 	likeChallenge: likeChallenge,
 	deleteChallenge: deleteChallenge,
 	createCategoryNode: createCategoryNode,
-	createChallengeNode: createChallengeNode
+	createChallengeNode: createChallengeNode,
+	canDeleteChallenge: canDeleteChallenge
 };

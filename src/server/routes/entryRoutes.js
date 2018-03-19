@@ -213,13 +213,25 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			dbEntry.deleteEntry(req.params.entryId, function(err) {
-    			if(err) {
-    				logger.error(err);
-    				return res.sendStatus(500);
-    			}
+			var meId = (req.user) ? (req.user.id) : (0);
+			dbChallenge.canDeleteEntry(req.params.entryId, meId, function(err, canDelete) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
+				
+				if (canDelete) {
+					dbEntry.deleteEntry(req.params.entryId, function(err) {
+		    			if(err) {
+		    				logger.error(err);
+		    				return res.sendStatus(500);
+		    			}
 
-    			return res.sendStatus(204);
+		    			return res.sendStatus(204);
+					});
+				}
+				
+				return res.sendStatus(401); //unauthorized
 			});
 		});
 

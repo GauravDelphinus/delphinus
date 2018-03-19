@@ -893,6 +893,21 @@ function createFilterNodesForEntry(entryId, steps, done) {
 }
 
 /*
+	Find out if the given user has the permissions to delete
+	the given entry
+*/
+function canDeleteEntry(entryId, userId, done) {
+	getEntry(entryId, function(err, entry) {
+		if (err) {
+			return done(err);
+		}
+
+		//only the person who posted the challenge can delete it
+		return done(null, entry.postedByUser.id == userId);
+	});
+}
+
+/*
 	Delete the matching entry node (and associated dependencies) from the DB
 */
 function deleteEntry(entryId, done) {

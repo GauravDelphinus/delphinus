@@ -86,137 +86,82 @@ describe("Challenges", function() {
 		});
 	});
 	
+	describe("Getting a specific challenge", function() {
+
+		it("/api/challenges/:challengeId with a valid challenge should return the specific challenge details", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges/" + "HkQawQ4PW", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+
+				var body = JSON.parse(body);
+				assert.equal(res.statusCode, 200);
+				assert.isTrue(serverUtils.validateData(body, serverUtils.prototypes.challenge)); //validate format
+				assert.equal(body.type, "challenge");
+				assert.equal(body.id, "HkQawQ4PW");
+				assert.equal(body.imageType, "image/jpeg");
+				assert.equal(body.image, "/contentImages/challenges/HkQawQ4PW.jpeg");
+				assert.equal(body.postedDate, "1501996987212");
+				assert.equal(body.caption, "My First Challenge Title");
+				assert.equal(body.link, "/challenge/HkQawQ4PW");
+				assert.equal(body.categoryID, "motivation");
+				assert.equal(body.postedByUser.id, "GkQawQ3PW");
+				return done();
+			});
+		});
+
+		it("/api/challenges/:challengeId with an invalid challenge should return 500", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges/" + "GkQawQ4PW", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
+
+				assert.equal(res.statusCode, 500);
+				return done();
+			});
+		});
+	});
 	
-	/*
-	//call before running any tests in this block
-	before(function(done) {
-		//initialize DB
-		var testData = require("./testData");
-		dataUtils.initializeDBWithData(testData, function(err) {
-			if (err) {
-				//DB couldn't be initialized.
-				done(err);
-			}
-			done();
-		});
-    });
+	describe("Deleting a specific challenge", function() {
 
-	//call after running all tests in this block
-    after(function(done) {
-    	//potentially, remove the db stuff that was added
-    	done();
-    });
+		it("/api/challenges/:challengeId should return 401 for a valid challenge (since we are not logged in and user does not match)", function(done) {
+			request.delete(process.env.HOSTNAME + "/api/challenges/" + "HkQawQ4PW", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
 
-
-
-	describe("Challenge Routes", function() {		
-		describe("GET /api/challenges?sortBy=dateCreated", function() {
-			it("should return list of all challenges sorted by dateCreated", function(done) {
-				chai.request(server)
-				.get("/api/challenges?sortBy=dateCreated")
-				.end(function(err, res) {
-					assert.equal(res.status, 200);
-					assert.isArray(res.body);
-					assert.isAtLeast(res.body.length, 3);
-					done();
-				});
+				assert.equal(res.statusCode, 401);
+				return done();
 			});
 		});
 
-		describe("GET /api/challenges?sortBy=popularity", function() {
-			it("should return list of all challenges sorted by popularity", function(done) {
-				chai.request(server)
-				.get("/api/challenges?sortBy=popularity")
-				.end(function(err, res) {
-					assert.equal(res.status, 200);
-					assert.isArray(res.body);
-					assert.isAtLeast(res.body.length, 3);
-					done();
-				});
-			});
-		});
+		it("/api/challenges/:challengeId should return 500 if the challenge is not valid", function(done) {
+			request.delete(process.env.HOSTNAME + "/api/challenges/" + "GkQawQ4PW", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
 
-		describe("GET /api/challenges", function() {
-			it("should return status 400 because of missing required query parameter: sortBy", function(done) {
-				chai.request(server)
-				.get("/api/challenges")
-				.end(function(err, res) {
-					assert.equal(res.status, 400);
-					assert.isObject(res.body); //object contains the 400 status message - see http://expressjs.com/en/api.html#res.sendStatus
-					done();
-				});
-			});
-		});
-
-		describe("GET /api/challenges/:challengeId", function() {
-			it("should return the specific challenge details", function(done) {
-				chai.request(server)
-				.get("/api/challenges/HkQawQ4PW")
-				.end(function(err, res) {
-					assert.equal(res.status, 200);
-					assert.isObject(res.body);
-					assert.equal(res.body.type, "challenge");
-					assert.equal(res.body.caption, "My First Challenge Title");
-					done();
-				});
+				assert.equal(res.statusCode, 500);
+				return done();
 			});
 		});
 	});
 
-	describe("Entry Routes", function() {		
-		describe("GET /api/entries?sortBy=dateCreated", function() {
-			it("should return list of all entries sorted by dateCreated", function(done) {
-				chai.request(server)
-				.get("/api/entries?sortBy=dateCreated")
-				.end(function(err, res) {
-					assert.equal(res.status, 200);
-					assert.isArray(res.body);
-					assert.isAtLeast(res.body.length, 4);
-					done();
-				});
-			});
-		});
+	describe("Getting the social info for a specific challenge", function() {
 
-		describe("GET /api/entries?sortBy=popularity", function() {
-			it("should return list of all entries sorted by popularity", function(done) {
-				chai.request(server)
-				.get("/api/entries?sortBy=popularity")
-				.end(function(err, res) {
-					assert.equal(res.status, 200);
-					assert.isArray(res.body);
-					assert.isAtLeast(res.body.length, 4);
-					done();
-				});
-			});
-		});
+		it("/api/challenges/:challengeId/social with a valid challenge should return the social info", function(done) {
+			request.get(process.env.HOSTNAME + "/api/challenges/" + "HkQawQ4PW" + "/social", function(err, res, body) {
+				if (err) {
+					return done(err);
+				}
 
-		describe("GET /api/entries", function() {
-			it("should return status 400 because of missing required query parameter: sortBy", function(done) {
-				chai.request(server)
-				.get("/api/entries")
-				.end(function(err, res) {
-					assert.equal(res.status, 400);
-					assert.isObject(res.body); //object contains the 400 status message - see http://expressjs.com/en/api.html#res.sendStatus
-					done();
-				});
-			});
-		});
-
-		describe("GET /api/entries/:entryId", function() {
-			it("should return the specific entry details", function(done) {
-				chai.request(server)
-				.get("/api/entries/NkQbwW4PK")
-				.end(function(err, res) {
-					assert.equal(res.status, 200);
-					assert.isObject(res.body);
-					assert.equal(res.body.type, "entry");
-					assert.equal(res.body.caption, "My Fourth Entry Caption");
-					done();
-				});
+				var body = JSON.parse(body);
+				assert.equal(res.statusCode, 200);
+				assert.isTrue(serverUtils.validateData(body, serverUtils.prototypes.challengeSocialInfo)); //validate format
+				return done();
 			});
 		});
 	});
-	*/
 });
 
 
