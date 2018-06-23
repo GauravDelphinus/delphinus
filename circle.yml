@@ -11,6 +11,7 @@ dependencies:
   post:
     - sudo apt-get update
     - sudo apt-get install npm
+    - npm config set strict-ssl false
     - sudo npm install -g pm2@latest
     - ../../deployment/scripts/setup_dirs.sh
     - ../../deployment/scripts/setup_env.sh
