@@ -1020,6 +1020,7 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 	}
 **/
 function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
+
 	//logger.debug("processImageDataForEntry: entryData: " + JSON.stringify(serverUtils.makeObjectPrintFriendly(entryData)) + ", createNodesIfNotFound = " + createNodesIfNotFound);
 	async.waterfall([
 	    function(callback) {
@@ -1030,6 +1031,7 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 					return callback(new Error("Challenge ID Missing."));
 				}
 
+				let dbChallenge = require("./dbChallenge");
 				dbChallenge.getChallenge(challengeId, function(err, challenge){
 					if (err) {
 						return callback(err);
@@ -1051,6 +1053,7 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 	    			return callback(new Error("Missing Image URL"));
 	    		}
 
+	    		let dbIndependentImage = require("./dbIndependentImage");
 	    		if (createNodesIfNotFound) {
 	    			dbIndependentImage.createIndependentImageNode(entryData.sourceType, imageURL, entryData.userId, function(err, data) {
 		    			if (err) {
@@ -1092,6 +1095,7 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 						created: entryData.created
 					};
 
+					let dbIndependentImage = require("./dbIndependentImage");
 					dbIndependentImage.createIndependentImage(independentImageInfo, function(err, output) {
 						if (err) {
 							return callback(err);
@@ -1122,6 +1126,7 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 	    			return callback(new Error("Missing Design ID"));
 	    		}
 
+	    		let dbDesign = require("./dbDesign");
 	    		dbDesign.getImageDataForDesign(designId, function(err, imageData){
 					if (err) {
 						return callback(err);
@@ -1165,6 +1170,7 @@ module.exports = {
 	getEntries: getEntries,
 	getEntriesSorted: getEntriesSorted,
 	getEntryImageData: getEntryImageData,
+	getEntrySourceImageData: getEntrySourceImageData,
 	deleteEntry: deleteEntry,
 	likeEntry: likeEntry,
 	processImageDataForEntry: processImageDataForEntry,
