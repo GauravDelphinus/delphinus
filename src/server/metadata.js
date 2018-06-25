@@ -100,7 +100,7 @@ function getUserMetadata(userId, done) {
 			pageTitle : "User: " + user.displayName + " | " + config.branding.siteName,
 			pageURL : dynamicConfig.hostname + config.url.user + user.id,
 			pageDescription : "Captionify User Profile for " + user.displayName,
-			imageType : mime.lookup(serverUtils.sanitizeImagePathForParsing(user.image)),
+			imageType : serverUtils.getMimeTypeForImage(user.image),
 			authorName : config.branding.siteName
 		};
 

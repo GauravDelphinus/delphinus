@@ -179,7 +179,6 @@ module.exports = {
 				//if "oneoftypes" is not the first array element, then interpret all elements as values that need to be matched directly
 				if (type.indexOf(value) == -1) {
 					logger.errorIf(logError, "Invalid value '" + value + "' received for param: '" + name + "', expected among " + JSON.stringify(type));
-					throw new Error("");
 					return false;
 				}
 			}
@@ -191,7 +190,6 @@ module.exports = {
 		} else if (type == "imageType") {
 			if (!(value == "image/png" || value == "image/jpeg" || value == "image/gif")) {
 				logger.errorIf(logError, "Invalid Image Type '" + value + "' received for param: '" + name + "'");
-				throw new Error("");
 				return false;
 			}
 		} else if (type == "dataURI") {
@@ -224,7 +222,6 @@ module.exports = {
 		} else if (type == "number") {
 			if (isNaN(parseFloat(value))) {
 				logger.errorIf(logError, "Invalid value '" + value + "' received for param '" + name + "' - Not a number");
-				//throw new Error("");
 				return false;
 			}
 		} else if (type == "timestamp") {
@@ -233,7 +230,6 @@ module.exports = {
 
 			if (!isValidDate) {
 				logger.errorIf(logError, "Invalid value '" + value + "' received for param '" + name + "' - Not a valid timestamp");
-				throw new Error("");
 				return false;
 			}
 		} else if (type == "url") {
@@ -296,20 +292,17 @@ module.exports = {
 		//logger.debug("validateObjectWithPrototype: object: " + JSON.stringify(object) + ", prototype: " + JSON.stringify(prototype));
 		if (typeof object !== 'object' || typeof prototype !== 'object') {
 			logger.error("validateObjectWithPrototype: either one of object or prototype are not a valid object");
-			throw new Error("");
 			return false;
 		}
 
 		for (var key in object) {
 			if (!prototype.hasOwnProperty(key)) {
 				logger.error("prototype doesn't have the key: " + key);
-				throw new Error("");
 				return false;
 			}
 
 			if (object[key] == undefined) {
 				logger.error("object[key] is undefined, for key = " + key + ", object = " + JSON.stringify(object));
-				throw new Error("");
 				return false;
 			}
 
@@ -605,8 +598,21 @@ module.exports = {
 		if (parameterIndex != -1) {
 			output = path.slice(0, parameterIndex);
 		}
-
 		return output;
+	},
+
+	/*
+		Return mime type for a given image path
+	*/
+	getMimeTypeForImage: function(path) {
+		let mime = require("mime");
+
+		let mimeType = mime.lookup(path);
+		if (mimeType == 'application/octet-stream') {
+			//special handling - in Facebook, the path is without an extension, default to jpeg
+			mimeType = "image/jpeg";
+		}
+		return mimeType;
 	},
 
 	/*
