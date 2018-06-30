@@ -549,6 +549,10 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		socialActionsSection.append(timelapseButton);
 
 		timelapseButton.click(function(e) {
+			if (isCurrentlyTimelapsing(data.id)) {
+				return;
+			}
+
 			$.getJSON('/api/filters/timelapse/' + data.id, function(imageData) {
 				startTimelapse(data.id, contentTag, imageData);
 			})
