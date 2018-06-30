@@ -256,7 +256,6 @@ function setupArtifactStep() {
 	artifact: {
 		type: "custom",
 		banner: {
-			fontSize: <number>,
 			backgroundColor: #ff00aa, (hex color code)
 			textColor: #ff00aa, (hex color code)
 			fontName: "arial" (fixed for now)
@@ -275,7 +274,6 @@ function generateArtifactObject() {
 		} else { //custom
 			artifact.type = "custom";
 			artifact.banner = {};
-			artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
 			artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
 			artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
 			artifact.banner.fontName = "arial"; //font names not supported for now

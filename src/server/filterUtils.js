@@ -253,7 +253,6 @@ module.exports = {
 			artifact: {
 				type: "custom",
 				banner: {
-					fontSize: <number>,
 					backgroundColor: #ff00aa, (hex color code)
 					textColor: #ff00aa, (hex color code)
 					fontName: "arial" (fixed for now)
@@ -279,11 +278,6 @@ module.exports = {
 			{
 				name: "location",
 				type: ["top", "bottom", "center", "above", "below"],
-				required: "yes"
-			},
-			{
-				name: "fontSize",
-				type: "number",
 				required: "yes"
 			},
 			{

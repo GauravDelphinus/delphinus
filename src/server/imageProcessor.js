@@ -425,7 +425,7 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 				}
 
 				//finally, apply the caption
-				applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, placement, parseInt(artifact.banner.fontSize), artifact.banner.fontName, extent);
+				applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, placement, artifact.banner.fontName, extent);
 			}
 		}
 	}
@@ -454,16 +454,17 @@ function applyPresetCaption(imArgs, size, caption, preset) {
 		placement = "south";
 		extent = "south";
 	}
-	var fontSize = size.height / 7;
-	applyCaption(imArgs, size, backgroundColor, foregroundColor, caption, placement, fontSize, null, extent);
+
+	applyCaption(imArgs, size, backgroundColor, foregroundColor, caption, placement, null, extent);
 }
 
 /**
 	Helper function to apply the given caption information on top of the provided
 	ImageMagick arguments list.  Be very careful with the order of arguments!
 **/
-function applyCaption(imArgs, size, background, foreground, caption, placement, fontSize, fontName, extent) {
+function applyCaption(imArgs, size, background, foreground, caption, placement, fontName, extent) {
 	var labelHeight = size.height / 5;
+	var labelWidth = size.width * 0.9;
 
 	//extend the image size in case the user has decided to place the banner above or below the image
 	if (extent) {
@@ -488,10 +489,6 @@ function applyCaption(imArgs, size, background, foreground, caption, placement, 
 	imArgs.push(foreground);
 
 	//font related arguments
-	if (fontSize) {
-		imArgs.push("-pointsize");
-		imArgs.push(fontSize);
-	}
 	if (fontName) {
 		var imFontName = normalizeFontNameToIM(fontName);
 		imArgs.push("-font");
@@ -502,7 +499,7 @@ function applyCaption(imArgs, size, background, foreground, caption, placement, 
 	imArgs.push("-gravity");
 	imArgs.push("center");
 	imArgs.push("-size");
-	imArgs.push(size.width + "x" + labelHeight);
+	imArgs.push(labelWidth + "x" + labelHeight);
 	imArgs.push("caption:" + caption);
 	imArgs.push("-gravity");
 	imArgs.push(placement);

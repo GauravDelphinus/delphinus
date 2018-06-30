@@ -15,7 +15,6 @@ const shortid = require("shortid");
 	artifact: {
 		type: "custom",
 		banner: {
-			fontSize: <number>,
 			backgroundColor: #ff00aa, (hex color code)
 			textColor: #ff00aa, (hex color code)
 			fontName: "arial" (fixed for now)
@@ -38,7 +37,6 @@ function createArtifactNode(artifact, callback) {
 		if (artifact.banner) {
 			cypherQuery += ", banner : 'on'";
 			cypherQuery += ", banner_location : '" + artifact.banner.location + "'";
-			cypherQuery += ", banner_fontSize : '" + artifact.banner.fontSize + "'";
 			cypherQuery += ", banner_fontName : '" + artifact.banner.fontName + "'";
 			cypherQuery += ", banner_backgroundColor : '" + artifact.banner.backgroundColor + "'";
 			cypherQuery += ", banner_textColor : '" + artifact.banner.textColor + "'";
@@ -77,7 +75,6 @@ function getArtifactFromNode(artifactFromDB) {
 		if (artifactFromDB.banner == "on") { //actual banner text is stored in entry.caption
 			artifact.banner = {};
 			artifact.banner.location = artifactFromDB.banner_location;
-			artifact.banner.fontSize = parseInt(artifactFromDB.banner_fontSize);
 			artifact.banner.fontName = artifactFromDB.banner_fontName;
 			artifact.banner.backgroundColor = artifactFromDB.banner_backgroundColor;
 			artifact.banner.textColor = artifactFromDB.banner_textColor;
