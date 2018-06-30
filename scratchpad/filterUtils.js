@@ -14,37 +14,6 @@ module.exports = {
 
 		var step = {};
 
-		// Extract ARTIFACTS -----------------------------------------------
-		if (steps.artifacts) {
-			step.artifacts = [];
-
-			for (let i = 0; i < steps.artifacts.length; i++) {
-				var artifact = {};
-				step.artifacts.push(artifact);
-
-				if (steps.artifacts[i].type == "preset") {
-					step.artifacts[i].type = "preset";
-
-					if (steps.artifacts[i].preset) {
-						step.artifacts[i].preset = steps.artifacts[i].preset;
-						//Adding caption to account for that in hash generation
-						step.artifacts[i].banner = { caption: title};
-						singleStepList.push(cloneObject(step));
-					}
-				} else if (steps.artifacts[i].type == "custom") {
-					step.artifacts[i].type = "custom";
-
-					if (steps.artifacts[i].banner) {
-						step.artifacts[i].banner = steps.artifacts[i].banner;
-						//Adding caption to account for that in hash generation
-						step.artifacts[i].banner.caption = title;
-						singleStepList.push(cloneObject(step));
-					}
-				}	
-			}
-		}
-
-		// Extract LAYOUTS -----------------------------------------------
 		if (steps.layouts) {
 			step.layouts = [];
 			for (let i = 0; i < steps.layouts.length; i++) {
@@ -76,17 +45,93 @@ module.exports = {
 					}
 				}
 
+				/*
+				if (steps.layouts[i].size) {
+					step.layouts[i].size = steps.layouts[i].size;
+					singleStepList.push(cloneObject(step));
+				} */
+
+				/* Future use
+
+				if (steps.layouts[i].shear) {
+					step.layouts[i].shear = steps.layouts[i].shear;
+					singleStepList.push(cloneObject(step));
+				}
+				*/
+
+				
+				
 				singleStepList.push(cloneObject(step));
 			}
 		}
 
-		// Extract FILTERS -----------------------------------------------
 		if (steps.filters) {
 			step.filters = [];
 
 			for (let i = 0; i < steps.filters.length; i++) {
 				var filter = {};
 				step.filters.push(filter);
+
+				/* Future use
+				if (steps.filters[i].settings) {
+					step.filters[i].settings = steps.filters[i].settings;
+					singleStepList.push(cloneObject(step));
+				}
+
+				if (steps.filters[i].effects) {
+					step.filters[i].effects = {};
+
+					if (steps.filters[i].effects.paint) {
+						step.filters[i].effects.paint = steps.filters[i].effects.paint;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.grayscale) {
+						step.filters[i].effects.grayscale = steps.filters[i].effects.grayscale;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.mosaic) {
+						step.filters[i].effects.mosaic = steps.filters[i].effects.mosaic;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.negative) {
+						step.filters[i].effects.negative = steps.filters[i].effects.negative;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.solarize) {
+						step.filters[i].effects.solarize = steps.filters[i].effects.solarize;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.monochrome) {
+						step.filters[i].effects.monochrome = steps.filters[i].effects.monochrome;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.swirl) {
+						step.filters[i].effects.swirl = steps.filters[i].effects.swirl;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.wave) {
+						step.filters[i].effects.wave = steps.filters[i].effects.wave;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.spread) {
+						step.filters[i].effects.spread = steps.filters[i].effects.spread;
+						singleStepList.push(cloneObject(step));
+					}
+
+					if (steps.filters[i].effects.charcoal) {
+						step.filters[i].effects.charcoal = steps.filters[i].effects.charcoal;
+						singleStepList.push(cloneObject(step));
+					}
+				}
+				*/
 
 				if (steps.filters[i].type == "preset") {
 					step.filters[i].type = "preset";
@@ -99,7 +144,35 @@ module.exports = {
 			}
 		}
 
-		// Extract DECORATIONS -----------------------------------------------
+		if (steps.artifacts) {
+			step.artifacts = [];
+
+			for (let i = 0; i < steps.artifacts.length; i++) {
+				var artifact = {};
+				step.artifacts.push(artifact);
+
+				if (steps.artifacts[i].type == "preset") {
+					step.artifacts[i].type = "preset";
+
+					if (steps.artifacts[i].preset) {
+						step.artifacts[i].preset = steps.artifacts[i].preset;
+						//Adding caption to account for that in hash generation
+						step.artifacts[i].banner = { caption: title};
+						singleStepList.push(cloneObject(step));
+					}
+				} else if (steps.artifacts[i].type == "custom") {
+					step.artifacts[i].type = "custom";
+
+					if (steps.artifacts[i].banner) {
+						step.artifacts[i].banner = steps.artifacts[i].banner;
+						//Adding caption to account for that in hash generation
+						step.artifacts[i].banner.caption = title;
+						singleStepList.push(cloneObject(step));
+					}
+				}	
+			}
+		}
+
 		if (steps.decorations) {
 			step.decorations = [];
 
@@ -133,7 +206,7 @@ module.exports = {
 			return false;
 		}
 
-		//validate artifacts ******************************************************
+		//validate artifacts
 		if (steps.artifacts) {
 			if (steps.artifacts.constructor !== Array) {
 				return false;
@@ -157,7 +230,7 @@ module.exports = {
 			}
 		}
 
-		//validate layouts ******************************************************
+		//validate layouts
 		if (steps.layouts) {
 			if (steps.layouts.constructor !== Array) {
 				return false;
@@ -192,7 +265,7 @@ module.exports = {
 			}
 		}
 
-		//validate filters ******************************************************
+		//validate filters
 		if (steps.filters) {
 			if (steps.filters.constructor !== Array) {
 				return false;
@@ -212,7 +285,7 @@ module.exports = {
 			}
 		}
 
-		//validate decorations ******************************************************
+		//validate decorations
 		if (steps.decorations) {
 			if (steps.decorations.constructor !== Array) {
 				return false;
@@ -239,28 +312,8 @@ module.exports = {
 		return true;
 	},
 
-	//VALIDATION PARAMETERS
 	params: {
-		//Artifacts ============================================
-		/*
-			//for presets
-			artifact: {
-				type: "preset",
-				preset: "bannerBottom", etc. (one of the values in presets.json)
-			}
-
-			//for custom
-			artifact: {
-				type: "custom",
-				banner: {
-					fontSize: <number>,
-					backgroundColor: #ff00aa, (hex color code)
-					textColor: #ff00aa, (hex color code)
-					fontName: "arial" (fixed for now)
-					location: "bottom", "top", "center", "below", "below", "above"
-				}
-			}
-		*/
+		//Artifacts
 		artifact: [
 			{
 				name: "type",
@@ -303,28 +356,7 @@ module.exports = {
 			}
 		],
 
-		//Layouts ============================================
-		/*
-			layout: {
-				type: "preset",
-				preset: "originalLayout", etc. (one of the values in presets.json)
-			}
-
-			layout: {
-				type: "custom",
-				mirror: "flip" | "flop",
-				rotation: {
-					degrees: <number>
-					color: <color>
-				},
-				crop: {
-					x: <x value of top left coordinate>,
-					y: <y value of top left coordinate>,
-					width: width in pixels
-					height: height in pixels
-				}
-			}
-		*/
+		//Layouts
 		layout: [
 			{
 				name: "type",
@@ -381,13 +413,7 @@ module.exports = {
 			}
 		],
 
-		//Filters ============================================
-		/*
-			filter: {
-				type: "preset",
-				preset: "noFilter", etc. (one of the values in presets.json)
-			}
-		*/
+		//Filters
 		filter: [
 			{
 				name: "type",
@@ -403,21 +429,7 @@ module.exports = {
 			}
 		],
 
-		//Decorations (borders) ============================================
-		/*
-			decoration: {
-				type: "preset",
-				preset: "noBorder", etc. (one of the values in presets.json)
-			}
-
-			decoration: {
-				type: "custom",
-				border: {
-					width: <width in pixels>
-					color: color of border
-				}
-			}
-		*/
+		//Decorations (borders)
 		decoration: [
 			{
 				name: "type",

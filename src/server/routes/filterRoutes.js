@@ -244,7 +244,6 @@ var routes = function() {
 				}
 
 				var sourceImagePath = imageData.sourceImagePath;
-
 	    		filterUtils.normalizeSteps(imageData.steps, function(err, steps){
 	    			if (err) {
 	    				logger.error("normalizeSteps, steps: " + imageDate.steps + ": " + err);
@@ -290,6 +289,7 @@ var routes = function() {
 	    					return res.sendStatus(500);
 	    				}
 
+	    				logger.debug("returning to client: " + JSON.stringify(output));
 						return res.json(output);
 	    			});
 	    		});

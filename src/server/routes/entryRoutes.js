@@ -144,6 +144,11 @@ var routes = function() {
 				steps: req.body.steps
 			};
 
+			if (!filterUtils.validateSteps(req.body.steps)) {
+				logger.error("Invalid steps received from client: " + JSON.stringify(req.body.steps));
+				return res.sendStatus(400);
+			}
+
 			dbEntry.createEntry(entryInfo, function(err, result) {
 				if(err) {
 					logger.error(err);

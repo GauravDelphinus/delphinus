@@ -34,6 +34,40 @@ var routes = function() {
 			});
 		});
 
+	designRouter.route("/:designId") // ROUTER FOR /api/designs/<id>
+
+		.get(function(req, res){
+
+			logger.debug("GET received on /api/designs/" + req.params.designId + ", query: " + JSON.stringify(req.query));
+
+			var validationParams = [
+				{
+					name: "designId",
+					type: "design",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.params, validationParams)) {
+				return res.sendStatus(400);
+			}
+
+			dbDesign.getDesign(req.params.designId, function(err, output) {
+				if (err) {
+					logger.error(err);
+					return res.sendStatus(500);
+				}
+
+				logger.debug("output: " + JSON.stringify(output));
+				
+				if (!serverUtils.validateData(output, serverUtils.prototypes.design)) {
+    				return res.sendStatus(500);
+    			}
+
+    			return res.json(output);
+			});
+		})
+
 		return designRouter;
 };
 

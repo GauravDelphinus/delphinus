@@ -21,12 +21,10 @@
 		"bannerAbove" : "Above"
 	},
 	"presetDecoration" : {
-		"noBorder" : "No border",
-		"whiteBorder10" : "10 Pixels wide White Border",
-		"blackBorder10" : "10 Pixels wide Black Border",
-		"whiteBorder20" : "20 Pixels wide White Border",
-		"blackBorder20" : "20 Pixels wide Black Border",
-		"grayBorder10" : "10 Pixels wide Gray Border",
-		"grayBorder20" : "20 Pixels wide Gray Border"
+		"noBorder" : "No Border",
+		"thinBorderBlack" : "Thin Black",
+		"thickBorderBlack" : "Thick Black",
+		"thinBorderGray" : "Thin Gray",
+		"thickBorderGray" : "Thick Gray"
 	}
 }

@@ -7,7 +7,7 @@ var config = require("./config");
 
 module.exports = {
 	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
-		//logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
+		logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
 		if (targetImage) {
 			if (fs.existsSync(targetImage)) { //check if file already exists in Cache
 				return next(0, targetImage);
@@ -55,7 +55,7 @@ function applySteps(sourceImage, targetImage, steps, caption, next) {
 			}
 
 			if (steps.decorations) {
-				applyDecorations(newSourceImage, steps.decorations, imArgs);
+				applyDecorations(newSourceImage, imageSize, steps.decorations, imArgs);
 			}
 
 			//insert the source and target images into the arguments list
@@ -78,30 +78,23 @@ function applySteps(sourceImage, targetImage, steps, caption, next) {
 	changed in the layout).
 
 	Typical format of layouts array
-	layouts: [
-	{		
-		// one or more of the items below
-		size: {
-			width: <number>,
-			height: <number>, (optional)
-		},
-		rotation: { // Rotate an image by the angle of degrees, and fill the background color with the specified color
-			degrees: <number>,
-			color: <color>
-		},
-		crop: { // Crop the image at the given x,y and width,height
-			width: <number>,
-			height: <number>,
-			x: <number>,
-			y: <number>
-		},
-		mirror: "flip" | "flop" // Mirror the image vertically (flip) or horizontally (flop),
-		shear { // Shear the image
-			xDegrees: <number>,
-			yDegrees: <number>
+
+	//for preset
+	layout: {
+		type: "preset",
+		preset: "originalLayout", etc. (one of the values in presets.json)
+	}
+
+	//for custom
+	layout: {
+		type: "custom",
+		crop: {
+			x: <x value of top left coordinate>,
+			y: <y value of top left coordinate>,
+			width: width in pixels
+			height: height in pixels
 		}
 	}
-	]
 **/
 function applyLayouts (sourceImage, layouts, imArgs, next) {
 	//loop through layouts
@@ -112,32 +105,34 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
 
 		var layout = layouts[i];
 
-		if (layout.crop) {
-			layoutArgs.push("-crop");
-			layoutArgs.push(layout.crop.width + "x" + layout.crop.height + "+" + layout.crop.x + "+" + layout.crop.y);
-		}
-
-		if (layout.preset) {
+		if (layout.type == "preset") {
 			applyPresetLayout(layout.preset, layoutArgs);
-		}
+		} else if (layout.type == "custom") {
+			if (layout.crop) {
+				layoutArgs.push("-crop");
+				layoutArgs.push(layout.crop.width + "x" + layout.crop.height + "+" + layout.crop.x + "+" + layout.crop.y);
+			}
 
+			if (layout.mirror) {
+				if (layout.mirror == "flop") {
+					layoutArgs.push("-flop");
+				}
+
+				if (layout.mirror == "flip") {
+					layoutArgs.push("-flip");
+				}
+			}
+
+			if (layout.rotation) {
+				layoutArgs.push("-background");
+				layoutArgs.push(layout.rotation.color);
+				layoutArgs.push("-rotate");
+				layoutArgs.push(layout.rotation.degrees);
+			}
+		}
+		
 		/* Future support
-		if (layout.mirror) {
-			if (layout.mirror == "flop") {
-				layoutArgs.push("-flop");
-			}
-
-			if (layout.mirror == "flip") {
-				layoutArgs.push("-flip");
-			}
-		}
-
-		if (layout.rotation) {
-			layoutArgs.push("-background");
-			layoutArgs.push(layout.rotation.color);
-			layoutArgs.push("-rotate");
-			layoutArgs.push(layout.rotation.degrees);
-		}
+		
 
 		if (layout.shear) {
 			layoutArgs.push("-background");
@@ -187,6 +182,8 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
 /**
 	Apply the provided Preset Layout on top of the supplied
 	ImageMagick arguments list.
+
+	possible values of preset layotus are in presets.json
 **/
 function applyPresetLayout(presetLayout, imArgs) {
 	switch (presetLayout) {
@@ -220,93 +217,10 @@ function applyPresetLayout(presetLayout, imArgs) {
 	
 	Expected format of input filters
 
-	filters : [
-	{
-		type : preset | custom  // note: types of 'none' and 'user_defined', which are valid types sent up by the client,
-								// will get normalized.  'none' will not reach this function, and 'user_defined' will get
-								// converted to a 'custom' filter
-	},
-	{
-		type : preset,
-		preset :
-				// Exactly one of the following  
-				// refer newentry.js - the list below should be in sync with those listed in that file
-				rainy_day,
-				solaris,
-				nightingale,
-				red_glory,
-				comical
-	},
-	{
-		type : custom,
-		effects : {
-			
-			// One or more of the following
-
-			paint : {
-				radius: <value>
-			},
-			grayscale : "on",
-			mosaic : "on",
-			negative : "on",
-			solarize : {
-				threshold : <value>
-			},
-			monochrome: "on",
-			swirl : {
-				degrees : <value>
-			},
-			wave : {
-				amplitude : <value>,
-				wavelength : <value>
-			},
-			spread : {
-				amount : <value>
-			},
-			charcoal : {
-				factor : <value>
-			}
-		},
-		settings: {
-
-			// One or more of the following
-
-			contrast : {
-				value : <value>
-			},
-			brightness: {
-				value : <value>
-			},
-			hue: {
-				value : <value>
-			},
-			saturation: {
-				value : <value>
-			}
-
-			// TODO - review options below
-			gamma: <0 to 10>,
-			blur : { // Blur the image using the specified radius and optional standard deviation
-				type: default | gaussian | motion, // Type of blur.  In case of motion blur, the angle property is used if specified
-				radius : <number>,
-				sigma : <number>,
-				angle: <number> // used only in case of motion blur
-			},
-
-			sepia: on | off,
-			noise : { // Add or reduce noise in the image.  Expected to result in two commands - first set type, then set Noise radius
-				type: uniform | guassian | multiplicative | impulse | laplacian | poisson // Type of noise
-				radius: <number> // Radius used to adjust the effect of current noise type
-			},
-			sharpen { // Sharpen the given image
-				type: default | gaussian,  // gaussian uses the unsharp option)
-				radius: <number>,
-				sigma : <number> (optional)
-			}
-			// consider adding more options from the "Others" list below
+		filter: {
+			type: "preset",
+			preset: "noFilter", etc. (one of the values in presets.json)
 		}
-	}
-	]
 **/
 function applyFilters (image, filters, imArgs) {
 
@@ -323,8 +237,10 @@ function applyFilters (image, filters, imArgs) {
 		// So the format here skips the custom/preset/user_defined level in the object hierarchy.
 		//console.log("filter is: " + JSON.stringify(filter));
 
-		applyPresetFilter(filter.preset, imArgs);
-
+		if (filter.type == "preset") {
+			applyPresetFilter(filter.preset, imArgs);
+		}
+		
 			/* Future use
 		if (filter.type == "custom") {
 			//Antique -------------
@@ -453,39 +369,25 @@ function applyPresetFilter(presetFilter, imArgs) {
 	provided ImageMagick arguments list and the size information.
 
 	Typical form of the artifacts array:
-
-	artifacts: [
-	{
+	artifact: {
+		type: "preset",
+		preset: "bannerBottom", etc. (one of the values in presets.json)
 		banner: {
-			position: top | bottom,
-			font: {
-				font: "font name",
-				size: <number>,
-				color: <color>,
-				strokeWidth: <number>
-			},
-			text: "text to draw",
-			background: <color> // could set opacity to zero for transparent
-		},
-		callout: {
-			position: {
-				x: <number>,
-				y: <number>,
-				width: <number>,
-				height: <number>
-			},
-			font: <same as banner>,
-			background: <color>, //allow for transparency
-			text: "text to draw"
-		},
-		freetext: {
-			position: <same as callout>,
-			font: <same as banner>,
-			text: "text to draw",
-			background: <color> //allow for transparency
+			caption: <text> //this is only there to allow server to account for caption text when generating image hashes
 		}
 	}
-	]
+
+	artifact: {
+		type: "custom",
+		banner: {
+			fontSize: <number>,
+			backgroundColor: #ff00aa, (hex color code)
+			textColor: #ff00aa, (hex color code)
+			fontName: "arial" (fixed for now)
+			location: "bottom", "top", "center", "below", "below", "above"
+			caption: <text> //this is only there to allow server to account for caption text when generating image hashes
+		}
+	}
 **/
 function applyArtifacts (image, size, artifacts, caption, imArgs) {
 	//loop through artifacts
@@ -496,33 +398,64 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 
 		var artifact = artifacts[i];
 
-		if (artifact.banner) {
-			var placement = "south", extent = null;
-			if (artifact.preset) {
-				if (artifact.preset == "bannerBottom") {
-					placement = "south";
-				} else if (artifact.preset == "bannerTop") {
-					placement = "north";
-				} else if (artifact.preset == "bannerCenter") {
-					placement = "center";
-				} else if (artifact.preset == "bannerAbove") {
-					placement = "north";
-					extent = "north";
-				} else if (artifact.preset == "bannerBelow") {
-					placement = "south";
-					extent = "south";
+		if (artifact.type == "preset") {
+			applyPresetCaption(imArgs, size, caption, artifact.preset);
+		} else if (artifact.type == "custom") {
+			if (artifact.banner) {
+				var placement = "south", extent = null;
+				if (artifact.banner.location) {
+					if (artifact.banner.location == "bottom") {
+						placement = "south";
+					} else if (artifact.banner.location == "top") {
+						placement = "north";
+					} else if (artifact.banner.location == "center") {
+						placement = "center";
+					} else if (artifact.banner.location == "above") {
+						placement = "north";
+						extent = "north";
+					} else if (artifact.banner.location == "below") {
+						placement = "south";
+						extent = "south";
+					}
 				}
-			}
 
-			var backgroundColor = normalizeColorToIM(artifact.banner.backgroundColor);
-			if (artifact.banner.backgroundColor == "transparent") {
-				backgroundColor = "none";
-			}
+				var backgroundColor = normalizeColorToIM(artifact.banner.backgroundColor);
+				if (artifact.banner.backgroundColor == "transparent") {
+					backgroundColor = "none";
+				}
 
-			//finally, apply the caption
-			applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, placement, parseInt(artifact.banner.fontSize), artifact.banner.fontName, extent);
+				//finally, apply the caption
+				applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, placement, parseInt(artifact.banner.fontSize), artifact.banner.fontName, extent);
+			}
 		}
 	}
+}
+
+/**
+	Apply preset caption and determine the best possible settings
+	for the given image
+
+	Possible values of preset are in presets.json
+**/
+function applyPresetCaption(imArgs, size, caption, preset) {
+	var backgroundColor = "none";
+	var foregroundColor = "black";
+	var placement = "south", extent = null;
+	if (preset == "bannerBottom") {
+		placement = "south";
+	} else if (preset == "bannerTop") {
+		placement = "north";
+	} else if (preset == "bannerCenter") {
+		placement = "center";
+	} else if (preset == "bannerAbove") {
+		placement = "north";
+		extent = "north";
+	} else if (preset == "bannerBelow") {
+		placement = "south";
+		extent = "south";
+	}
+	var fontSize = size.height / 7;
+	applyCaption(imArgs, size, backgroundColor, foregroundColor, caption, placement, fontSize, null, extent);
 }
 
 /**
@@ -530,7 +463,7 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 	ImageMagick arguments list.  Be very careful with the order of arguments!
 **/
 function applyCaption(imArgs, size, background, foreground, caption, placement, fontSize, fontName, extent) {
-	var labelHeight = 200; // TODO
+	var labelHeight = size.height / 5;
 
 	//extend the image size in case the user has decided to place the banner above or below the image
 	if (extent) {
@@ -584,26 +517,27 @@ function applyCaption(imArgs, size, background, foreground, caption, placement, 
 
 	Typical format of decorations array:
 
-		decorations: [
-		{
-			type: border,
-			//one of decoration types below
-			border : { //Draw a border around the image, of the specified dimensions and color
-				width : <number>,
-				height : <number>,
-				color : <color>
+		decoration: {
+			type: "custom",
+			border: {
+				width: <width in pixels>
+				color: color of border
 			}
 		}
-		],
 **/
-function applyDecorations (image, decorations, imArgs) {
+function applyDecorations (image, size, decorations, imArgs) {
+	logger.debug("applyDecorations: decorations: " + JSON.stringify(decorations));
 	var numDecorations = decorations.length;
 
 	for (var i = 0; i < numDecorations; i++) {
 		var decoration = decorations[i];
 
-		if (decoration.border && decoration.border.width > 0) {
-			applyBorder(imArgs, decoration.border.width, decoration.border.color);
+		if (decoration.type == "preset") {
+			applyPresetDecoration(imArgs, size, decoration.preset);
+		} else if (decoration.type == "custom") { //currently only support custom decorations (not presets)
+			if (decoration.border && decoration.border.width > 0) {
+				applyBorder(imArgs, decoration.border.width, decoration.border.color);
+			}
 		}
 	}
 
@@ -613,30 +547,29 @@ function applyDecorations (image, decorations, imArgs) {
 	Apply the preset decoration on top of the provided ImageMagick
 	arguments list.
 **/
-function applyPresetDecoration(presetDecoration, imArgs) {
+
+function applyPresetDecoration(imArgs, size, presetDecoration) {
+	let thinBorderWidth = Math.min(size.height / 100, size.width / 100);
+	let thickBorderWidth = thinBorderWidth * 3;
+
 	switch (presetDecoration) {
-		case "whiteBorder10":
-			applyBorder(imArgs, 10, "white");
+		case "thinBorderBlack":
+			applyBorder(imArgs, thinBorderWidth, "black");
 			break;
-		case "blackBorder10":
-			applyBorder(imArgs, 10, "black");
+		case "thickBorderBlack":
+			applyBorder(imArgs, thickBorderWidth, "black");
 			break;
-		case "whiteBorder20":
-			applyBorder(imArgs, 20, "white");
+		case "thinBorderGray":
+			applyBorder(imArgs, thinBorderWidth, "gray");
 			break;
-		case "blackBorder20":
-			applyBorder(imArgs, 20, "black");
-			break;
-		case "grayBorder10":
-			applyBorder(imArgs, 10, "gray");
-			break;
-		case "grayBorder20":
-			applyBorder(imArgs, 20, "gray");
+		case "thickBorderGray":
+			applyBorder(imArgs, thickBorderWidth, "gray");
 			break;
 		default:
 			break;
 	}
 }
+
 
 /**
 	Helper function to apply border arguments on top of the 

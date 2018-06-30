@@ -224,11 +224,77 @@ var defaultArtifactPresetSelectionID = "bannerBottom"; //NOTE: must match one of
 */
 function setupArtifactStep() {
 	//set up the custom settings
+	$("#bannerCustomOptionsCheckbox").click(function() {
+		let checked = $(this).is(':checked');
+		if (checked) {
+			$("#customArtifactsSettingSection").show();
+		} else {
+			$("#customArtifactsSettingSection").hide();
+		}
+
+		applyChanges(true);
+	});
+
 	setupColorButton("#bannerColorButton");
 	setupColorButton("#bannerTextColorButton");
 	setChangeCallback(changeCallback, ["#bannerTextFontSize"], []);
 
 	createPresetsView("artifact", "#presetArtifactSection", defaultArtifactPresetSelectionID, "presets");
+}
+
+/*
+	Generate Artifact object from current UI settings
+
+	artifact: {
+		type: "preset",
+		preset: "bannerBottom", etc. (one of the values in presets.json)
+		banner: {
+			caption: <text> //this is only there to allow server to account for caption text when generating image hashes
+		}
+	}
+
+	artifact: {
+		type: "custom",
+		banner: {
+			fontSize: <number>,
+			backgroundColor: #ff00aa, (hex color code)
+			textColor: #ff00aa, (hex color code)
+			fontName: "arial" (fixed for now)
+			location: "bottom", "top", "center", "below", "below", "above"
+			caption: <text> //this is only there to allow server to account for caption text when generating image hashes
+		}
+	}
+*/
+function generateArtifactObject() {
+	var artifact = {};
+	var presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
+	if (presetValue != undefined) {
+		if (!$("#bannerCustomOptionsCheckbox").is(':checked')) { //preset
+			artifact.type = "preset";
+			artifact.preset = presetValue;
+		} else { //custom
+			artifact.type = "custom";
+			artifact.banner = {};
+			artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
+			artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
+			artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
+			artifact.banner.fontName = "arial"; //font names not supported for now
+			switch (presetValue) {
+				case "bannerBottom":
+					artifact.banner.location = "bottom"; break;
+				case "bannerTop":
+					artifact.banner.location = "top"; break;
+				case "bannerCenter":
+					artifact.banner.location = "center"; break;
+				case "bannerBelow":
+					artifact.banner.location = "below"; break;
+				case "bannerAbove":
+					artifact.banner.location = "above"; break;
+			}
+		}
+	}
+
+	return artifact;
 }
 
 /**************************** (3) LAYOUT STEP **********************************************/
@@ -312,6 +378,56 @@ function endCrop() {
 	$("#cropLabel").hide();
 }
 
+/*
+	Generate the Layout object based on current UI settings
+
+	layout: {
+		type: "preset",
+		preset: "originalLayout", etc. (one of the values in presets.json)
+	}
+
+	layout: {
+		type: "custom",
+		mirror: "flip" | "flop",
+		rotation: {
+			degrees: <number>
+			color: <color>
+		},
+		crop: {
+			x: <x value of top left coordinate>,
+			y: <y value of top left coordinate>,
+			width: width in pixels
+			height: height in pixels
+		}
+	}
+*/
+function generateLayoutObject() {
+	var layout = {};
+	var presetValue = fetchPresetValue("layout", defaultLayoutPresetSelectionID);
+	if (presetValue != undefined) {
+		//check for crop data
+		var cropData = jQuery.data(document.body, "cropData");
+		if (!cropData) { //preset
+			layout.type = "preset";
+			layout.preset = presetValue;
+		} else { //custom
+			layout.type = "custom";
+			if (presetValue == "flipVertical") {
+				layout.mirror = "flip";
+			} else if (presetValue == "flipHorizontal") {
+				layout.mirror = "flop";
+			} else if (presetValue == "rotateClock90White") {
+				layout.rotation = {degrees: -90, color: "0xFFFFFF"};
+			} else if (presetValue == "rotateAnticlock90White") {
+				layout.rotation = {degrees: 90, color: "0xFFFFFF"};
+			}
+			layout.crop = {x: cropData.x, y: cropData.y, width: cropData.width, height: cropData.height};
+		}
+	}
+	
+	return layout;
+}
+
 /**************************** (4) FILTER STEP **********************************************/
 
 var defaultFilterPresetSelectionID = "noFilter"; //NOTE: must match one of the values in presets.json
@@ -320,9 +436,47 @@ function setupFilterStep() {
 	createPresetsView("filter", "#presetFilterSection", defaultFilterPresetSelectionID, "presets");
 }
 
+/*
+	Generate the Filter object from the current UI settings
+
+	filter: {
+		type: "preset",
+		preset: "noFilter", etc. (one of the values in presets.json)
+	}
+*/
+function generateFilterObject() {
+	var filter = {};
+
+	var presetValue = fetchPresetValue("filter", defaultFilterPresetSelectionID);
+	if (presetValue != undefined) {
+		filter.type = "preset";
+		filter.preset = presetValue;
+	}
+
+	return filter;
+}
+
 /**************************** (5) DECORATION STEP **********************************************/
 
+var defaultDecorationPresetSelectionID = "noBorder"; //NOTE: must match one of the values in presets.json
+
 function setupDecorationStep() {
+	//set up the custom settings
+	$("#borderCustomOptionsCheckbox").click(function() {
+		let checked = $(this).is(':checked');
+		if (checked) {
+			$("#customDecorationSettingSection").show();
+			$("#presetDecorationSection").hide();
+		} else {
+			$("#customDecorationSettingSection").hide();
+			$("#presetDecorationSection").show();
+		}
+
+		applyChanges(true);
+	});
+
+	createPresetsView("decoration", "#presetDecorationSection", defaultDecorationPresetSelectionID, "presets");
+
 	setupBorderToggleSection();
 }
 
@@ -330,6 +484,42 @@ function setupBorderToggleSection() {
 	setupColorButton("#borderColor");
 
 	setChangeCallback(changeCallback, ["#borderColor", "#borderWidth"], []);
+}
+
+/*
+	Generate the Decoration object from the current UI settings
+
+	decoration: {
+		type: "preset",
+		preset: "noBorder", etc. (one of the values in presets.json)
+	}
+
+	decoration: {
+		type: "custom",
+		border: {
+			width: <width in pixels>
+			color: color of border
+		}
+	}
+*/
+function generateDecorationObject() {
+	var decoration = {};
+	var presetValue = fetchPresetValue("decoration", defaultDecorationPresetSelectionID);
+	if (presetValue != undefined) {
+		//check for custom options
+		if (!$("#borderCustomOptionsCheckbox").is(':checked')) { //preset
+			decoration.type = "preset";
+			decoration.preset = presetValue;
+		} else { //custom
+			decoration.type = "custom"; //decorations don't have a preset yet
+			decoration.border = {};
+
+			decoration.border.width = $("#borderWidth").val();
+			decoration.border.color = $("#borderColor").css("background-color");
+		}
+	}
+
+	return decoration;
 }
 
 /*****************************************************************************************/
@@ -592,65 +782,26 @@ function constructJSONObject(jsonObj) {
 
 	jsonObj.steps = {}; // the main object that encapsulates filters, layouts, etc.
 
-	// ARTIFACTS -------------------------------------
-	var artifact = {};
-	var presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
-	if (presetValue != undefined) {
-		artifact.preset = presetValue;
-	}
-
-	artifact.banner = {caption: $("#bannerText").prop("value")}; //this is only there to allow server to account for caption text when generating image hashes
-	artifact.banner.fontSize = parseInt($("#bannerTextFontSize").prop("value"));
-	artifact.banner.backgroundColor = $("#bannerColorButton").css("background-color");
-	artifact.banner.textColor = $("#bannerTextColorButton").css("background-color");
-
+	var artifact = generateArtifactObject();
 	if (!$.isEmptyObject(artifact)) {
 		jsonObj.steps.artifacts = [];
 		jsonObj.steps.artifacts.push(artifact);
 	}
 
-	/// LAYOUT -----------------------------------------
-	
-	var layout = {};
-	var presetValue = fetchPresetValue("layout", defaultLayoutPresetSelectionID);
-	if (presetValue != undefined) {
-		layout.preset = presetValue;
-	}
-	
-	//crop
-	var cropData = jQuery.data(document.body, "cropData");
-
-	if (cropData) {
-		layout.crop = {x: cropData.x, y: cropData.y, width: cropData.width, height: cropData.height};
-	}
-
+	var layout = generateLayoutObject();
 	if (!$.isEmptyObject(layout)) {
 		jsonObj.steps.layouts = [];
 		jsonObj.steps.layouts.push(layout);
 	}
-
-	/// FILTERS ----------------------------------------
-	var filter = {};
-
-	var presetValue = fetchPresetValue("filter", defaultFilterPresetSelectionID);
-	if (presetValue != undefined) {
-		filter.preset = presetValue;
-	}
 	
+	var filter = generateFilterObject();
 	if (!$.isEmptyObject(filter)) {
 		jsonObj.steps.filters = [];
 		jsonObj.steps.filters.push(filter);
 	}
 	
-	// DECORATIONS -------------------------------------
-	var decoration = {};
-
-	decoration.border = {};
-
-	decoration.border.width = $("#borderWidth").val();
-	decoration.border.color = $("#borderColor").css("background-color");
-
-	if (!$.isEmptyObject(artifact)) {
+	var decoration = generateDecorationObject();
+	if (!$.isEmptyObject(decoration)) {
 		jsonObj.steps.decorations = [];
 		jsonObj.steps.decorations.push(decoration);
 	}

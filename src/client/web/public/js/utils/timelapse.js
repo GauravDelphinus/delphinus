@@ -27,7 +27,7 @@ var rangeUpdateCountMap = {}; //counter to keep track of range updates, mapped b
 	]
 */
 function startTimelapse(entityId, contentTag, data) {
-	console.log("startTimelapse: data is: " + JSON.stringify(data));
+	//console.log("startTimelapse: entityId = " + entityId + ", data is: " + JSON.stringify(data));
 	$("#" + contentTag + entityId + "TimelapseButton").prop("disabled", true);
 
 	timelapseIndexMap[entityId] = 0;
@@ -37,11 +37,11 @@ function startTimelapse(entityId, contentTag, data) {
 	$("#" + contentTag + entityId + "TimeLapseProgressSection").show();
 	$("#" + contentTag + entityId + "TimelapseRange").attr("max", "" + (data.length - 1) * 2000)
 
-	//start the ball rolling
-	nextTimelapse(entityId, contentTag, data);
-
 	timelapseTimerMap[entityId] = window.setInterval(function() {nextTimelapse(entityId, contentTag, data);}, 2000); //progress frames every 2 seconds
 	rangeUpdateTimerMap[entityId] = window.setInterval(function() {updateTimelapseRange(entityId, contentTag)}, 10); //update range progress every 10 milliseconds (for smoother movement)
+
+	//start the ball rolling
+	nextTimelapse(entityId, contentTag, data);
 }
 
 /*
@@ -63,6 +63,7 @@ function fadeToImage(imageId, newSrc) {
 	Timer callback that updates the frames, and keeps a track of the range progress
 */
 function nextTimelapse(entityId, contentTag, data) {
+	//console.log("nextTimelapse, entityId: " + entityId + ", data: " + JSON.stringify(data));
 	if (data[timelapseIndexMap[entityId]].type == "imageURL") {
 		fadeToImage(contentTag + entityId + "EntityImage", data[timelapseIndexMap[entityId]].imageData);
 	} else if (data[timelapseIndexMap[entityId]].type == "dataURI") {

@@ -78,6 +78,37 @@ function getDesigns(designCategory, done) {
 	});
 }
 
+function getDesign(designId, done) {
+	var cypherQuery = "MATCH (d:Design {id: '" + designId + "'})";
+	
+	cypherQuery += "-[:BELONGS_TO]->(c:DesignCategory) ";
+	cypherQuery += " RETURN d, c;";
+
+	dbUtils.runQuery(cypherQuery, function(err, result){
+		if(err) {
+			return done(err);
+		} else if (result.data.length != 1) {
+			return done(new error.dbResultError(cypherQuery, 1, result.data.length));
+		}
+		
+		logger.debug("result.data = " + JSON.stringify(result.data));
+
+		let designName = result.data[0][0].name;
+		let designId = result.data[0][0].id;
+		let categoryName = result.data[0][1].name;
+		let categoryId = result.data[0][1].id;
+
+		
+		var output = {
+			caption: designName, 
+			id: designId, 
+			image: config.url.designImages + categoryId + "/" + designId + ".jpeg"
+		};
+
+		return done(null, output);
+	});
+}
+
 function getImageDataForDesign(designId, next) {
 	var cypherQuery = "MATCH (d:Design {id: '" + designId + "'})-[:BELONGS_TO]->(c:DesignCategory) RETURN d, c;";
 	dbUtils.runQuery(cypherQuery, function(err, output){
@@ -171,6 +202,7 @@ function createNodeForDesign(designInfo, callback) {
 
 var functions = {
 	getDesigns: getDesigns,
+	getDesign: getDesign,
 	createNodeForDesign: createNodeForDesign,
 	createNodeForDesignCategory: createNodeForDesignCategory,
 	getImageDataForDesign: getImageDataForDesign

@@ -317,7 +317,7 @@ function createEntityImageElement(data, contentTag) {
 }
 
 function createMainImageElement(data) {
-	var mainImage = $("<img>", {id: data.id + "EntityImage", class: "mainImage"});
+	var mainImage = $("<img>", {id: "main" + data.id + "EntityImage", class: "mainImage"});
 	mainImage.prop("src", data.image);
 	return mainImage;
 }

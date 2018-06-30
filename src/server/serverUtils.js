@@ -609,7 +609,7 @@ module.exports = {
 
 		let mimeType = mime.lookup(path);
 		if (mimeType == 'application/octet-stream') {
-			//special handling - in Facebook, the path is without an extension, default to jpeg
+			//HACK special handling - in Facebook, the path is without an extension, default to jpeg
 			mimeType = "image/jpeg";
 		}
 		return mimeType;
@@ -777,8 +777,14 @@ module.exports = {
 			"designList" : ["arrayoftype", "design"]
 		},
 		"design" : {
-			"name" : "string",
-			"id" : "design"
+			"id" : "design",
+			"type" : ["design"],
+			"image": "myURL",
+			"imageType": "imageType",
+			"caption": "string",
+			"link" : "myURL",
+			"categoryName" : "string",
+			"categoryID" : "category"
 		},
 		"metadata" : {
 			"fbAppId": "number",
