@@ -36,22 +36,22 @@
 			<tr>
 				<td width="40%">
 					<div id="dropzone" class="dropZone">
-			
+
 						<div class="dropZoneContent">
-				
+
 					<p class="centerDisplayCaptionCentered">Drop Image here</p><br>
 					<p class="centerDisplayCaptionCentered">OR</p><br>
 					<label for="files" class="btn button-line">
 	    				<i class="fa fa-cloud-upload"></i> Browse
 					</label>
-				
+
 				</div>
-			
-				 <input id="files" type="file" style="display:none;"/> 
-					
-					
-					
-					</div>	
+
+				 <input id="files" type="file" style="display:none;"/>
+
+
+
+					</div>
 				</td>
 				<td class="vertical-center-container horizontal-center-container">
 					OR
@@ -60,7 +60,7 @@
 					<div id="designSelection" class="designSelection">
 						<p class="centerDisplayCaptionCentered">Select a design</p><br>
 						<img src="/images/static/designSelection.jpg" id="selectDesignButton" class="selectDesignButton">
-					</div>	
+					</div>
 				</td>
 			</tr>
 		</table>
@@ -92,13 +92,13 @@
 			<br>
 			<div id="captionSection">
 				<p class="centerDisplayCaption">Entry caption:</p>
-				<table>
+				<table width="100%">
 					<tr>
 						<td width="90%">
 							<input type="text" id="bannerText" class="form-control horizontal-center-container horizontal-center-child" placeholder="Enter your entry caption here.  Press ENTER when done." required>
 						</td>
 						<td>
-							<button type="button" class="btn btn-lg button-setting" id="captionButton">Apply</button>
+							<button type="button" class="btn btn-lg button-setting" id="captionButton" disabled>Apply</button>
 						</td>
 					</tr>
 				</table>
@@ -137,7 +137,7 @@
 									<span class="settingsSubBlockCaption">Text color:</span><button type="button" class="btn button-setting" id="bannerTextColorButton" style="background-color: rgba(255, 255, 255, 1);">Choose</button>
 								</div>
 							</div>
-							
+
 							<!-- PRESET ARTIFACT SUBSECTION -->
 							<div id="presetArtifactSection" class="horizontal-strip-container"></div>
 						</div>
@@ -147,7 +147,7 @@
 								<span class="settingsSubBlockCaption">Crop options:</span><button type="button" class="btn button-setting" id="resetCropButton">Reset Crop</button>
 								<button type="button" class="btn button-setting" id="editCropButton"><i class="fa fa-crop" aria-hidden="true"></i> Edit Crop</button>
 							</div>
-							
+
 
 							<!-- PRESET LAYOUT SUBSECTION -->
 							<div id="presetLayoutSection" class="horizontal-strip-container"></div>
