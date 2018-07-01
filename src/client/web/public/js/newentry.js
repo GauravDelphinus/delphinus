@@ -7,7 +7,7 @@ $(document).ready(function(){
 });
 
 function setupDesignSection() {
-	
+
 	//fetch the list of designs to be shown to the user
 	$.getJSON('/api/designs/', function(result) {
 		$("#designCategories").data("designData", result);
@@ -57,7 +57,7 @@ function refreshDesignView() {
 		//find the selected design, and use that image to pass to the new caption workflow
 		var selectedDesignObj = selectedDesignList.find(checkDesign, selectedDesignId);
 		designId = selectedDesignId; //set design Id to the selected design (see constructJSONObject)
-		
+
 		//set defaults so they can be picked up by the new entry caption workflow
 		defaultArtifactPresetSelectionID = selectedDesignObj.presetArtifactId;
 		$("#bannerTextFontSize").val(selectedDesignObj.captionTextSize);
@@ -84,7 +84,17 @@ function setupHandlers() {
 	    	$("#steps").show();
 	    	setupArtifactStep();
 	    }
+
+	    if ($("#bannerText").val().length == 0) {
+	    	$("#captionButton").prop("disabled", true);
+	    	$("#apply").prop("disabled", true);
+	    }
+	    else {
+	    	$("#captionButton").prop("disabled", false);
+	    	$("#apply").prop("disabled", false);
+	    }
 	});
+
 
 	$("#captionButton").click(function() {
 		$("#steps").show();
@@ -141,7 +151,7 @@ function handleDragOver(evt) {
 
 /**
 	An image was selected, whether by drag/drop or by Browse button
-	Show the image and switch to next step 
+	Show the image and switch to next step
 **/
 function handleFileSelected(data, path, title, type) {
 	switchToStepsView(path, title);
@@ -179,7 +189,7 @@ function setupMainItem() {
 		$("#selectImageSection").show();
 		$("#stepsSection").hide();
 	}
-	
+
 	$("#newentryimage").on("load", function() {
 		$("#newentryimage").data("naturalWidth", this.naturalWidth);
 		$("#newentryimage").data("naturalHeight", this.naturalHeight);
@@ -427,7 +437,7 @@ function generateLayoutObject() {
 			layout.crop = {x: cropData.x, y: cropData.y, width: cropData.width, height: cropData.height};
 		}
 	}
-	
+
 	return layout;
 }
 
@@ -614,7 +624,7 @@ function constructJSONObjectWithPreset(presetType, presetId) {
 			jsonObj.steps.decorations = [{}];
 		}
 
-		jsonObj.steps.decorations[0].preset = presetId;		
+		jsonObj.steps.decorations[0].preset = presetId;
 	}
 
 	return jsonObj;
@@ -647,7 +657,7 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 			var presetsView = createHorizontalStrip("createEntry", contentTag, list, true, true, defaultSelectionID, function(id) {
 				//save the preset value for later use
 				savePresetValue(presetType, id);
-				
+
 				//apply the changes based on the new selection
 				applyChanges(false);
 			});
@@ -705,7 +715,7 @@ function fetchPresetValue(presetType, defaultValue) {
 	} else {
 		value = map.get(presetType);
 	}
-		
+
 	return value;
 }
 
@@ -764,7 +774,7 @@ function constructJSONObject(jsonObj) {
 			imageSrc = $("#newentryimage").prop("src");
 			$("#newentryimage").data("originalSrc", imageSrc);
 		}
-		
+
 		if (imageSrc.startsWith("data:image")) {
 			//data uri
 			jsonObj.sourceType = "dataURI";
@@ -796,13 +806,13 @@ function constructJSONObject(jsonObj) {
 		jsonObj.steps.layouts = [];
 		jsonObj.steps.layouts.push(layout);
 	}
-	
+
 	var filter = generateFilterObject();
 	if (!$.isEmptyObject(filter)) {
 		jsonObj.steps.filters = [];
 		jsonObj.steps.filters.push(filter);
 	}
-	
+
 	var decoration = generateDecorationObject();
 	if (!$.isEmptyObject(decoration)) {
 		jsonObj.steps.decorations = [];
@@ -847,7 +857,7 @@ function generateChanges(id, jsonObj, done) {
 var applyFailCount = 0;
 function applyChanges(refreshPresets, done) {
 	var jsonObj = {};
-	
+
 	console.log("applyChanges called with refreshPresets = " + refreshPresets);
 	constructJSONObject(jsonObj);
 	$.ajax({
@@ -896,7 +906,7 @@ var failCount = 0;
 function postEntry() {
 
 	var jsonObj = {};
-	
+
 	constructJSONObject(jsonObj);
 
 	$.ajax({
