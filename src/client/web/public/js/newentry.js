@@ -184,6 +184,17 @@ function setupMainItem() {
 		.fail(function() {
 			window.location.replace("/error");
 		});
+	} else if (designId != 0) {
+		//since we have the design Id, this is a Design Entry workflow
+		$.getJSON('/api/designs/' + designId, function(result) {
+			$("#newentryimage").prop("src", result.image);
+			$("#newentryimage").data("imageType", result.imageType);
+			$("#selectImageSection").hide();
+			$("#stepsSection").show();
+		})
+		.fail(function() {
+			window.location.replace("/error");
+		});
 	} else {
 		//prompt user to select image that needs to be "captionified"
 		$("#selectImageSection").show();

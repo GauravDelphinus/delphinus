@@ -100,7 +100,8 @@ function getDesign(designId, done) {
 		var output = {
 			caption: designName, 
 			id: designId, 
-			image: config.url.designImages + categoryId + "/" + designId + ".jpeg"
+			image: config.url.designImages + categoryId + "/" + designId + ".jpeg",
+			imageType: "image/jpeg"
 		};
 
 		return done(null, output);

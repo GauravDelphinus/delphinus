@@ -192,8 +192,8 @@ function createChallengeSidebar(challengeId, callback) {
 function createDesignSidebar(designId, callback) {
 	if (designId != 0) {
 		$.getJSON('/api/designs/' + designId, function(data) {
-			var element = createThumbnailElement(data, "challenge", true);
-			var sidebar = createSplitSidebar("challengeSidebar", "Challenge", element);
+			var element = createThumbnailElement(data, "design", true);
+			var sidebar = createSplitSidebar("designSidebar", "Design", element);
 			return callback(sidebar);
 		}).fail(function() {
 			return callback(null);
@@ -214,6 +214,23 @@ function createChallengeCaptionSidebar(challengeId, callback) {
 	content.append(message).append(link);
 
 	var sidebar = createSidebar("createChallengeCaptionSidebar", "Up for the challenge?", content);
+
+	return callback(sidebar);
+}
+
+function createDesignCaptionSidebar(designId, callback) {
+	var content = $("<div>", {class: "wide-container"});
+	var message = $("<div>", {class: "sidebar-item"}).append($("<p>").append("Let your creative juices flow and create your own caption entry for this design now!  It's as simple as Get-Set-Go!"));
+
+	var button = $("<button>").append("Post Caption");
+	button.click(function() {
+		window.open("/newentry?designId=" + designId, "_self");
+	});
+
+	var link = $("<div>", {class: "sidebar-item active hoverable"}).append(button);
+	content.append(message).append(link);
+
+	var sidebar = createSidebar("createCaptionSidebar", "Like this caption?", content);
 
 	return callback(sidebar);
 }

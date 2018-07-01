@@ -43,6 +43,12 @@ function setupSidebars() {
   		createDesignSidebar(entry.sourceId, function(sidebar) {
   			if (sidebar) {
 	  			$("#rightTopSidebar").append(sidebar);
+	  			//add another sidebar element to prompt user to post another entry into that challenge
+		  		createDesignCaptionSidebar(entry.sourceId, function(sidebar) {
+			  		if (sidebar) {
+			  			$("#rightMiddleSidebar").append(sidebar);
+			  		}
+				});
 	  		}
   		});
   	} else {
