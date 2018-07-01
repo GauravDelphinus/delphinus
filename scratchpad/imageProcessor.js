@@ -131,6 +131,17 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
 				layoutArgs.push(layout.rotation.degrees);
 			}
 		}
+		
+		/* Future support
+		
+
+		if (layout.shear) {
+			layoutArgs.push("-background");
+			layoutArgs.push(layout.shear.color);
+			layoutArgs.push("-shear");
+			layoutArgs.push(layout.shear.xDegrees + "x" + layout.shear.yDegrees);
+		}
+		*/
 	}
 
 	if (layoutArgs.length > 0) {
@@ -230,6 +241,92 @@ function applyFilters (image, filters, imArgs) {
 		if (filter.type == "preset") {
 			applyPresetFilter(filter.preset, imArgs);
 		}
+		
+			/* Future use
+		if (filter.type == "custom") {
+			//Antique -------------
+			if (filter.grayscale == "on") {
+				//image.colorspace("GRAY");
+				imArgs.push("-colorspace");
+				imArgs.push("Gray");
+			}
+
+			if (filter.monochrome == "on") {
+				//image.monochrome();
+				imArgs.push("-monochrome");
+			}
+
+			if (filter.negative == "on") {
+				//image.negative();
+				imArgs.push("-negate");
+			}
+
+			if (filter.solarize) {
+				//image.solarize(filter.effects.solarize.threshold);
+				imArgs.push("-solarize");
+				imArgs.push(filter.solarize.threshold);
+			}
+
+			//Distortion --------------
+			if (filter.spread) {
+				//image.spread(filter.effects.spread.amount);
+				imArgs.push("-spread");
+				imArgs.push(filter.spread.amount);
+			}
+			
+			if (filter.swirl) {
+				//image.swirl(filter.effects.swirl.degrees);
+				imArgs.push("-swirl");
+				imArgs.push(filter.swirl.degrees);
+			}
+
+			if (filter.wave) {
+				//image.wave(filter.effects.wave.amplitude, filter.effects.wave.wavelength);
+				imArgs.push("-wave");
+				imArgs.push(filter.wave.amplitude + "x" + filter.wave.wavelength);
+			}
+			
+			//Artistic -----------------
+			if (filter.charcoal) {
+				//image.charcoal(filter.effects.charcoal.factor);
+				imArgs.push("-charcoal");
+				imArgs.push(filter.charcoal.factor);
+			}
+
+			if (filter.mosaic == "on") {
+				//console.log("setting image.mosaic");
+				//image.mosaic();
+				imArgs.push("-mosaic");
+			}
+
+			if (filter.paint) {
+				//image.paint(filter.effects.paint.radius);
+				imArgs.push("-paint");
+				imArgs.push(filter.paint.radius);
+			}
+
+			//Color/Contrast/Brightness
+			if (filter.contrast) {
+				imArgs.push("-brightness-contrast");
+				imArgs.push("0x" + parseInt(filter.contrast.value));
+			}
+
+			if (filter.brightness) {
+				imArgs.push("-brightness-contrast");
+				imArgs.push(parseInt(filter.brightness.value));
+			}
+
+			if (filter.hue) {
+				imArgs.push("-modulate");
+				imArgs.push("100,100," + absoluteToPercentageChangeSigned(parseInt(filter.hue.value)));
+			}
+
+			if (filter.saturation) {
+				imArgs.push("-modulate");
+				imArgs.push("100," + absoluteToPercentageChangeSigned(parseInt(filter.saturation.value)) + ",100");
+			}
+		}
+		*/
 	}
 }
 
