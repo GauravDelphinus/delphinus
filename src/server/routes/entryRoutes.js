@@ -135,33 +135,39 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 			
-			var entryInfo = {
-				created: req.body.created,
-				title: req.body.caption,
-				userId: req.user.id,
-				sourceType: req.body.sourceType,
-				sourceData: req.body.sourceData,
-				steps: req.body.steps
-			};
-
 			if (!filterUtils.validateSteps(req.body.steps)) {
 				logger.error("Invalid steps received from client: " + JSON.stringify(req.body.steps));
 				return res.sendStatus(400);
 			}
 
-			dbEntry.createEntry(entryInfo, function(err, result) {
-				if(err) {
-					logger.error(err);
-					return res.sendStatus(500);
-				}
+			filterUtils.normalizeSteps(req.body.steps, req.body.caption, function(err, steps){
+    			if (err) {
+    				return res.sendStatus(500);
+    			}
 
-				var output = {id: result.id};
-				if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
-					return res.sendStatus(500);
-				}
+				var entryInfo = {
+					created: req.body.created,
+					title: req.body.caption,
+					userId: req.user.id,
+					sourceType: req.body.sourceType,
+					sourceData: req.body.sourceData,
+					steps: steps
+				};
 
-				res.header("Location", "/api/entries/" + result.id);
-				return res.status(201).json(output);
+				dbEntry.createEntry(entryInfo, function(err, result) {
+					if(err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					var output = {id: result.id};
+					if (!serverUtils.validateData(output, serverUtils.prototypes.onlyId)) {
+						return res.sendStatus(500);
+					}
+
+					res.header("Location", "/api/entries/" + result.id);
+					return res.status(201).json(output);
+				});
 			});
 		});
 

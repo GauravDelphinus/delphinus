@@ -452,11 +452,26 @@ module.exports = {
 	},
 
 	/**
-		Normalize / expand the steps array such that all indirect references
-		(such as filter node ids, etc.) are resolved to actual settings that can 
-		be processed by the Image Processor.
+		Normalize / expand the steps array such that the imageprocessor
+		knows how to handle it.
 	**/
-	normalizeSteps: function (steps, next) {
+	normalizeSteps: function (steps, caption, next) {
+
+		/*
+			Add caption back into the steps array, so that it can be
+			accounted for when generating the image hashes
+
+			This isn't really used by the imageprocessor.
+		*/
+		if (steps.artifacts) {
+			for (var i = 0; i < steps.artifacts.length; i++) {
+				var artifact = steps.artifacts[i];
+				if (!artifact.banner) {
+					artifact.banner = {caption: caption};
+				}
+				steps.artifacts[i] = artifact;
+			}
+		}
 		next(0, steps);
 	}
 	

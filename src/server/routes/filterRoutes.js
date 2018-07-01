@@ -128,7 +128,7 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			filterUtils.normalizeSteps(req.body.steps, function(err, steps){
+			filterUtils.normalizeSteps(req.body.steps, req.body.caption, function(err, steps){
     			if (err) {
     				return res.sendStatus(500);
     			}

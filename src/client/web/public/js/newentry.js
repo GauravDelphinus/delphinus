@@ -86,6 +86,11 @@ function setupHandlers() {
 	    }
 	});
 
+	$("#captionButton").click(function() {
+		$("#steps").show();
+	    setupArtifactStep();
+	});
+
 	//handler for file Browse button
 	document.getElementById('files').addEventListener('change', handleFileSelect, false);
 
