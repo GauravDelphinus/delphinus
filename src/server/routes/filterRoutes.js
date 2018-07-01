@@ -152,6 +152,7 @@ var routes = function() {
 						var targetImageUrl = config.url.cacheImages + targetImageName;
     				}
 
+    				logger.debug("now, going to applyStepsToImage...");
     				imageProcessor.applyStepsToImage(info.sourceImagePath, targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePathRaw){
 						if (err) {
 							logger.error("applyStepsToImage failed: " + err);

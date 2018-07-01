@@ -30,7 +30,9 @@ module.exports = {
 
 	addWatermarkToImage: function(sourceImage, targetImage, next) {
 		addWatermark(sourceImage, targetImage, next);
-	}
+	},
+
+	compressImage: compressImage
 };
 
 
@@ -733,4 +735,18 @@ function applyWatermark(imArgs) {
 	imArgs.push("-geometry");
 	imArgs.push("+5+5");
 	
+}
+
+/**
+	Compress the given image to a smaller size as supported by Captionify
+**/
+function compressImage(before, after, callback) {
+	//logger.debug("calling execFile in compressImage");	
+	execFile('convert', [before, "-resize", config.image.maxWidth + "x" + config.image.maxHeight + "\>", after], (error, stdout, stderr) => {
+	  	if (error) {
+	    	return callback(error, 0);
+	  	}
+
+	  	return callback(0);
+	});
 }

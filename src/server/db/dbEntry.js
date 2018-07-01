@@ -745,7 +745,6 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 	}
 **/
 function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
-
 	//logger.debug("processImageDataForEntry: entryData: " + JSON.stringify(serverUtils.makeObjectPrintFriendly(entryData)) + ", createNodesIfNotFound = " + createNodesIfNotFound);
 	async.waterfall([
 	    function(callback) {
@@ -789,7 +788,7 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 		    			return callback(null, {sourceImagePath: sourceImagePath, sourceFileIsTemp: false, imageType: data.imageType, sourceType: "independentImageId", sourceId: data.id});
 		    		});
 	    		} else {
-	    			serverUtils.downloadImage(imageURL, null, function(err, outputPath) {
+	    			serverUtils.downloadImage(imageURL, null, null, true, function(err, outputPath) {
 	    				if (err) {
 	    					return callback(err);
 	    				}
@@ -829,7 +828,7 @@ function processImageDataForEntry (entryData, createNodesIfNotFound, next) {
 						return callback(null, {sourceImagePath: output.imagePath, sourceFileIsTemp: false, imageType: output.imageType, sourceType: "independentImageId", sourceId: output.id});
 					});
 	    		} else {
-	    			serverUtils.writeImageFromDataURI(dataURI, null, function(err, outputPath) {
+	    			serverUtils.writeImageFromDataURI(dataURI, null, null, true, function(err, outputPath) {
 	    				if (err) {
 	    					return callback(err);
 	    				}

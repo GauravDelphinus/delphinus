@@ -38,12 +38,17 @@ mkdir ${PROJECT_ROOT}/../data/cacheImages; # all cache images.  By its very natu
 mkdir ${PROJECT_ROOT}/../data/cacheImagesRaw; # cache images that don't have watermarks (e.g., intermediate filter steps)
 mkdir ${PROJECT_ROOT}/../data/contentImages; # all content images that have watermarks (for public use)
 mkdir ${PROJECT_ROOT}/../data/contentImages/challenges; # challenge images
+mkdir ${PROJECT_ROOT}/../data/contentImages/independent;
 mkdir ${PROJECT_ROOT}/../data/contentImages/entries; # entry images
 mkdir ${PROJECT_ROOT}/../data/contentImages/users; # user images
 mkdir ${PROJECT_ROOT}/../data/contentImagesRaw; # all content images without watermark, should not be accessible publicly
 mkdir ${PROJECT_ROOT}/../data/contentImagesRaw/challenges; # raw challenge images
+mkdir ${PROJECT_ROOT}/../data/contentImagesRaw/independent;
 mkdir ${PROJECT_ROOT}/../data/contentImagesRaw/entries; # raw entry images
 mkdir ${PROJECT_ROOT}/../data/contentImagesRaw/users; # raw user images
+mkdir ${PROJECT_ROOT}/../data/contentImagesOriginal; # original content images, full fidelity, should not be accessible publicly
+mkdir ${PROJECT_ROOT}/../data/contentImagesOriginal/challenges;
+mkdir ${PROJECT_ROOT}/../data/contentImagesOriginal/independent;
 
 ####################################################
 #

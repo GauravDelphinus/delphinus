@@ -8,7 +8,7 @@ var config = require("./config");
 
 module.exports = {
 	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
-		//logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
+		logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
 		if (targetImage) {
 			if (fs.existsSync(targetImage)) { //check if file already exists in Cache
 				return next(0, targetImage);

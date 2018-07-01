@@ -247,27 +247,25 @@ function createChallenge(challengeInfo, done) {
 */
 function createImageForChallenge(challengeId, imageDataURI, done) {
 	// Store the incoming base64 encoded image into a local image file first
-	var fs = require('fs');
 	var parseDataURI = require("parse-data-uri");
 	var parsed = parseDataURI(imageDataURI);
 
 	var imageType = parsed.mimeType;
 
 	//generate path name for challenge image
-	var baseDirRaw = global.appRoot + config.path.challengeImagesRaw;
 	var name = challengeId + "." + mime.extension(imageType); //generate name of image file
-	var fullpathRaw = baseDirRaw + name;
+	var fullpathRaw = global.appRoot + config.path.challengeImagesRaw + name;
+	var fullpathOriginal = global.appRoot + config.path.challengeImagesOriginal + name;
 	
 	//write the data to a file
-	var buffer = parsed.data;
-	fs.writeFile(fullpathRaw, buffer, function(err) {
+	serverUtils.writeImageFromDataURI(imageDataURI, fullpathOriginal, fullpathRaw, true, function(err, pathOriginal, pathRaw) {
 		if (err) {
-			return done(new Error("Failed to write file: " + fullpathRaw));
+			return done(err);
 		}
 
 		var baseDir = global.appRoot + config.path.challengeImages;
 		var fullPath = baseDir + name;
-		imageProcessor.addWatermarkToImage(fullpathRaw, fullPath, function(err, outputPath) {
+		imageProcessor.addWatermarkToImage(pathRaw, fullPath, function(err, outputPath) {
 			if (err) {
 				return done(new Error("Failed to apply watermark: " + fullPath));
 			}

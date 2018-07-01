@@ -5,6 +5,7 @@ var validUrl = require("valid-url");
 var url = require("url");
 var tmp = require("tmp");
 var config = require("./config");
+var imageProcessor = require("./imageProcessor");
 
 module.exports = {
 	/**
@@ -529,19 +530,36 @@ module.exports = {
 	//download from a url to an image.  if filename is null
 	//it will automatically write to a temp file and return the
 	//temp path
-	downloadImage: function(url, filename, callback){
+	/*
+		filenameReduced: specify path to compressed file, optional
+		compress: specify true if you would like to compress the temp file
+	*/
+	downloadImage: function(url, filenameOriginal, filenameReduced, compress, callback){
 		var downloadFile = this.downloadFile;
-		if (filename) {
-			downloadFile(url, filename, function(err) {
+		var createTempFilename = this.createTempFilename;
+		var compressImage = this.compressImage;
+
+		if (filenameOriginal) {
+			downloadFile(url, filenameOriginal, function(err) {
 				if (err) {
 					return callback(err);
 				}
 
-				return callback(0, filename);
+				if (filenameReduced) {
+					compressImage(filenameOriginal, filenameReduced, function(err) {
+						if (err) {
+							return callback(err);
+						}
+
+						return callback(0, filenameOriginal, filenameReduced);
+					});
+				} else {
+					return callback(0, filenameOriginal, filenameReduced);
+				}
 			});
 		} else {
 			//create temp path
-			this.createTempFilename(function(err, tmpPath) {
+			createTempFilename(function(err, tmpPath) {
 				if (err) {
 					return callback(err);
 				}
@@ -549,6 +567,22 @@ module.exports = {
 				downloadFile(url, tmpPath, function(err) {
 					if (err) {
 						return callback(err);
+					}
+
+					if (compress) {
+						createTempFilename(function(err, tmpPath2) {
+							if (err) {
+								return callback(err);
+							}
+
+							compressImage(tmpPath, tmpPath2, function(err) {
+								if (err) {
+									return callback(err);
+								}
+
+								return callback(0, tmpPath2);
+							});
+						});
 					}
 
 					return callback(0, tmpPath);
@@ -560,19 +594,36 @@ module.exports = {
 	//write from a dataURI to an image.  If filename is null
 	//it will automatically write to a temp file and return the
 	//temp path
-	writeImageFromDataURI: function(dataURI, filename, callback) {
+	/*
+		filenameReduced: specify if you would like the reduced/compressed file to be stored there
+		compress: if true, the temp file created will be auto compressed
+	*/
+	writeImageFromDataURI: function(dataURI, filenameOriginal, filenameReduced, compress, callback) {
 		var dataURItoFile = this.dataURItoFile;
-		if (filename) {
-			dataURItoFile(dataURI, filename, function(err) {
+		var createTempFilename = this.createTempFilename;
+		var compressImage = this.compressImage;
+
+		if (filenameOriginal) {
+			dataURItoFile(dataURI, filenameOriginal, function(err) {
 				if (err) {
 					return callback(err);
 				}
 
-				return callback(0, filename);
+				if (filenameReduced) {
+					compressImage(filenameOriginal, filenameReduced, function(err) {
+						if (err) {
+							return callback(err);
+						}
+
+						return callback(0, filenameOriginal, filenameReduced);
+					});
+				} else {
+					return callback(0, filenameOriginal, filenameReduced);
+				}
 			});
 		} else {
 			//create temp path
-			this.createTempFilename(function(err, tmpPath) {
+			createTempFilename(function(err, tmpPath) {
 				if (err) {
 					return callback(err);
 				}
@@ -582,10 +633,36 @@ module.exports = {
 						return callback(err);
 					}
 
-					return callback(0, tmpPath);
+					if (compress) {
+						createTempFilename(function(err, tmpPath2) {
+							if (err) {
+								return callback(err);
+							}
+
+							compressImage(tmpPath, tmpPath2, function(err) {
+								if (err) {
+									return callback(err);
+								}
+
+								return callback(0, tmpPath2);
+							});
+						});
+					} else {
+						return callback(0, tmpPath);
+					}
 				});
 			});
 		}
+	},
+
+	/*
+		Compress the image as supported by Captionify
+		Refer imageProcesser.compressImage
+	*/
+	compressImage(before, after, callback) {
+		imageProcessor.compressImage(before, after, function(err) {
+			return callback(err);
+		});
 	},
 
 	/*

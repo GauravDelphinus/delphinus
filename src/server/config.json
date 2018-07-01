@@ -16,6 +16,7 @@
 	"path" : {
 		"challengeImages" : "../data/contentImages/challenges/",
 		"challengeImagesRaw" : "../data/contentImagesRaw/challenges/",
+		"challengeImagesOriginal" : "../data/contentImagesOriginal/challenges/",
 		"userImages" : "../data/contentImages/users/",
 		"staticImages" : "src/client/web/public/images/static/",
 		"entryImages" : "../data/contentImages/entries/",
@@ -29,6 +30,7 @@
 		"designImagesRaw" : "src/client/web/public/images/designs/",
 		"independentImages" : "../data/contentImages/independent/",
 		"independentImagesRaw" : "../data/contentImagesRaw/independent/",
+		"independentImagesOriginal" : "../data/contentImagesOriginal/independent/", 
 		"watermarkImages" : "assets/watermarks/",
 		"favicon" : "assets/favicon/favicon.ico"
 	},
@@ -66,8 +68,8 @@
 		"defaultProfileImageName" : "default.png"
 	},
 	"image" : {
-		"maxHeight" : 1500,
-		"maxWidth" : 1500
+		"maxHeight" : 1200,
+		"maxWidth" : 1200
 	},
 	"businessLogic" : {
 		"minLikesForPopularity" : 2,

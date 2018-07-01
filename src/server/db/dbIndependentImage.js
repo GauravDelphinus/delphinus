@@ -76,25 +76,27 @@ function createImageForIndependentImage(imageData, callback) {
 	if (imageData.sourceType == "imageURL") {
 		//var extension = imageData.split('.').pop();
 	   	var imageType = mime.lookup(imageData.sourceData);
-		var sourceImagePath = global.appRoot + config.path.independentImages + imageData.id + "." + mime.extension(imageType);
-		serverUtils.downloadImage(imageData.sourceData, sourceImagePath, function(err, outputFile) {
+		var sourceImagePathOriginal = global.appRoot + config.path.independentImagesOriginal + imageData.id + "." + mime.extension(imageType);
+		var sourceImagePathRaw = global.appRoot + config.path.independentImagesRaw + imageData.id + "." + mime.extension(imageType);
+		serverUtils.downloadImage(imageData.sourceData, sourceImagePathOriginal, sourceImagePathRaw, true, function(err, outputFileOriginal, outputFileRaw) {
 			if (err) {
 				return callback(err);
 			}
 
-			return callback(0, {imageType: imageType, imagePath: outputFile});
+			return callback(0, {imageType: imageType, imagePath: outputFileRaw});
 		});
 	} else if (imageData.sourceType == "dataURI") {
 		var parseDataURI = require("parse-data-uri");
 		var parsed = parseDataURI(imageData.sourceData);
 		var imageType = parsed.mimeType;
-		var sourceImagePath = global.appRoot + config.path.independentImages + imageData.id + "." + mime.extension(imageType);
-		serverUtils.writeImageFromDataURI(imageData.sourceData, sourceImagePath, function(err, outputFile) {
+		var sourceImagePathOriginal = global.appRoot + config.path.independentImagesOriginal + imageData.id + "." + mime.extension(imageType);
+		var sourceImagePathRaw = global.appRoot + config.path.independentImagesRaw + imageData.id + "." + mime.extension(imageType);
+		serverUtils.writeImageFromDataURI(imageData.sourceData, sourceImagePathOriginal, sourceImagePathRaw, true, function(err, outputFileOriginal, outputFileRaw) {
 			if (err) {
 				return callback(err);
 			}
 
-			return callback(0, {imageType: imageType, imagePath: outputFile});
+			return callback(0, {imageType: imageType, imagePath: outputFileRaw});
 		});
 	} else {
 		return callback(new Error("Invalid Image Source: " + source));
