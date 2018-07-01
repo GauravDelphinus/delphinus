@@ -166,7 +166,7 @@ var routes = function() {
 
 						imageProcessor.addWatermarkToImage(imagePathRaw, imagePath, function(err, outputPath) {
 							if (err) {
-								logger.error("Failed to apply watermark: " + fullPath);
+								logger.error("Failed to apply watermark: " + imagePath + ", error: " + err);
 								return res.sendStatus(500);
 							}
 

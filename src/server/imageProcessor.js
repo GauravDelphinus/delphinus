@@ -1,13 +1,14 @@
 var tmp = require("tmp");
 var fs = require("fs");
 var execFile = require('child_process').execFile;
+var execFileSync = require("child_process").execFileSync;
 var logger = require("./logger");
 var mime = require("mime");
 var config = require("./config");
 
 module.exports = {
 	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
-		logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
+		//logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
 		if (targetImage) {
 			if (fs.existsSync(targetImage)) { //check if file already exists in Cache
 				return next(0, targetImage);
@@ -372,9 +373,6 @@ function applyPresetFilter(presetFilter, imArgs) {
 	artifact: {
 		type: "preset",
 		preset: "bannerBottom", etc. (one of the values in presets.json)
-		banner: {
-			caption: <text> //this is only there to allow server to account for caption text when generating image hashes
-		}
 	}
 
 	artifact: {
@@ -385,11 +383,11 @@ function applyPresetFilter(presetFilter, imArgs) {
 			textColor: #ff00aa, (hex color code)
 			fontName: "arial" (fixed for now)
 			location: "bottom", "top", "center", "below", "below", "above"
-			caption: <text> //this is only there to allow server to account for caption text when generating image hashes
 		}
 	}
 **/
 function applyArtifacts (image, size, artifacts, caption, imArgs) {
+	//logger.debug("applyArtifacts: artifacts: " + JSON.stringify(artifacts));
 	//loop through artifacts
 
 	var numArtifacts = artifacts.length;
@@ -398,8 +396,26 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 
 		var artifact = artifacts[i];
 
+		var placement = "south", extent = null;
 		if (artifact.type == "preset") {
-			applyPresetCaption(imArgs, size, caption, artifact.preset);
+			if (artifact.preset) {
+				if (artifact.preset == "bannerBottom") {
+					placement = "south";
+				} else if (artifact.preset == "bannerTop") {
+					placement = "north";
+				} else if (artifact.preset == "bannerCenter") {
+					placement = "center";
+				} else if (artifact.preset == "bannerAbove") {
+					placement = "north";
+					extent = "north";
+				} else if (artifact.preset == "bannerBelow") {
+					placement = "south";
+					extent = "south";
+				}
+			}
+
+			var labelGeometry = calculateLabelGeometry(size, placement, extent);
+			applyPresetCaption(imArgs, image, size, caption, placement, extent, labelGeometry);
 		} else if (artifact.type == "custom") {
 			if (artifact.banner) {
 				var placement = "south", extent = null;
@@ -419,13 +435,15 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 					}
 				}
 
+				var labelGeometry = calculateLabelGeometry(size, placement, extent);
+
 				var backgroundColor = normalizeColorToIM(artifact.banner.backgroundColor);
 				if (artifact.banner.backgroundColor == "transparent") {
 					backgroundColor = "none";
 				}
 
 				//finally, apply the caption
-				applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, placement, artifact.banner.fontName, extent);
+				applyCaption(imArgs, size, backgroundColor, artifact.banner.textColor, caption, placement, artifact.banner.fontName, extent, labelGeometry);
 			}
 		}
 	}
@@ -437,35 +455,45 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 
 	Possible values of preset are in presets.json
 **/
-function applyPresetCaption(imArgs, size, caption, preset) {
+function applyPresetCaption(imArgs, image, size, caption, placement, extent, labelGeometry) {
+	//logger.debug("applyPresetCaption: image: " + image + ", size: " + size + ", caption: " + caption + ", labelGeometry: " + JSON.stringify(labelGeometry));
 	var backgroundColor = "none";
 	var foregroundColor = "black";
-	var placement = "south", extent = null;
-	if (preset == "bannerBottom") {
-		placement = "south";
-	} else if (preset == "bannerTop") {
-		placement = "north";
-	} else if (preset == "bannerCenter") {
-		placement = "center";
-	} else if (preset == "bannerAbove") {
-		placement = "north";
-		extent = "north";
-	} else if (preset == "bannerBelow") {
-		placement = "south";
-		extent = "south";
+
+	/*
+		Background and Foreground color prediction
+
+		If the caption is being placed "in" the image, not below or above,
+		meaning the extent is null, the background is defaulted to transparent.
+
+		The foreground is calculated by inverting the "average color" of the section
+		of the image where the caption will be placed. (check findAverageColor)
+
+		If the caption is being placed below or above the image, the background
+		color is set to the average color of the lower or upper region of the image
+		respectively.
+	*/
+	var averageColor = findAverageColor(image, labelGeometry);
+	if (extent) {
+		if (averageColor) {
+			backgroundColor = "rgb(" + averageColor.r + "," + averageColor.g + "," + averageColor.b + ")";
+		}
+	} else {
+		backgroundColor = "none";
 	}
 
-	applyCaption(imArgs, size, backgroundColor, foregroundColor, caption, placement, null, extent);
+	if (averageColor) {
+		foregroundColor = "rgb(" + (255 - averageColor.r) + "," + (255 - averageColor.g) + "," + (255 - averageColor.b) + ")";
+	}
+
+	applyCaption(imArgs, size, backgroundColor, foregroundColor, caption, placement, null, extent, labelGeometry);
 }
 
 /**
 	Helper function to apply the given caption information on top of the provided
 	ImageMagick arguments list.  Be very careful with the order of arguments!
 **/
-function applyCaption(imArgs, size, background, foreground, caption, placement, fontName, extent) {
-	var labelHeight = size.height / 5;
-	var labelWidth = size.width * 0.9;
-
+function applyCaption(imArgs, size, background, foreground, caption, placement, fontName, extent, labelGeometry) {
 	//extend the image size in case the user has decided to place the banner above or below the image
 	if (extent) {
 		if (extent == "south") {
@@ -476,10 +504,10 @@ function applyCaption(imArgs, size, background, foreground, caption, placement, 
 			imArgs.push("south");
 		}
 		imArgs.push("-extent");
-		imArgs.push(size.width + "x" + (size.height + labelHeight));
+		imArgs.push(size.width + "x" + (size.height + labelGeometry.height));
 		
 		//change in height
-		size.height += labelHeight;
+		size.height += labelGeometry.height;
 	}
 
 	//push other arguments
@@ -499,11 +527,39 @@ function applyCaption(imArgs, size, background, foreground, caption, placement, 
 	imArgs.push("-gravity");
 	imArgs.push("center");
 	imArgs.push("-size");
-	imArgs.push(labelWidth + "x" + labelHeight);
+	imArgs.push(labelGeometry.width + "x" + labelGeometry.height);
 	imArgs.push("caption:" + caption);
 	imArgs.push("-gravity");
 	imArgs.push(placement);
 	imArgs.push("-composite");
+}
+
+/**
+	Calculate the geometry/size/locatino of the caption label depending on location of label
+
+	location can be: top, bottom, center, below, above
+**/
+function calculateLabelGeometry(imageSize, placement, extent) {
+	//logger.debug("calculateLabelGeometry: imageSize: " + JSON.stringify(imageSize) + ", placement: " + placement + ", extent: " + extent);
+	var left = 0, top = 0;
+	var width = imageSize.width * 0.9, height = imageSize.height * 0.2;
+
+	if (placement == "north") {
+		left = (imageSize.width - width) / 2;
+		top = 0;
+	} else if (placement == "south") {
+		left = (imageSize.width - width) / 2;
+		top = imageSize.height - height;
+	} else if (placement == "center") {
+		left = (imageSize.width - width) / 2;
+		top = (imageSize.height - height) / 2;
+	}
+
+	if (extent) { //above or below
+		width = imageSize.width; //full width as the background should fill full width for extended image portion
+	}
+
+	return {left: Math.round(left), top: Math.round(top), width: Math.round(width), height: Math.round(height)};
 }
 
 /********************************** DECORATIONS *******************************/
@@ -523,7 +579,7 @@ function applyCaption(imArgs, size, background, foreground, caption, placement, 
 		}
 **/
 function applyDecorations (image, size, decorations, imArgs) {
-	logger.debug("applyDecorations: decorations: " + JSON.stringify(decorations));
+	//logger.debug("applyDecorations: decorations: " + JSON.stringify(decorations));
 	var numDecorations = decorations.length;
 
 	for (var i = 0; i < numDecorations; i++) {
@@ -626,7 +682,25 @@ function compositeImage(sourceImage, targetImage, imArgs, next) {
 	}
 }
 
+/**
+	Find the average color (RGB) in a section of the image
 
+	NOTE: SYNCHRONOUS CALL!!!!
+**/
+function findAverageColor(imagePath, labelGeometry) {
+	//logger.debug("findAverageColor: imagePath: " + imagePath + ", labelGeometry: " + JSON.stringify(labelGeometry));
+	try {
+		var output = execFileSync('convert', [imagePath, "-crop", labelGeometry.width + "x" + labelGeometry.height + "+" + labelGeometry.left + "+" + labelGeometry.top, "-resize", "1x1\!", "-format", "%[fx:int(255*r+.5)],%[fx:int(255*g+.5)],%[fx:int(255*b+.5)]", "info:-"]);
+		var colorArray = output.toString().trim().split(",");
+	  	var color = {r: parseInt(colorArray[0]), g: parseInt(colorArray[1]), b: parseInt(colorArray[2])};
+
+	  	return color;
+	} catch (error) {
+		logger.error("error in determining the average color: " + error);
+	}
+
+	return null;
+}
 
 /**
 	Find the size of the provided image
