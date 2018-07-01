@@ -57,8 +57,6 @@ var routes = function() {
 					logger.error(err);
 					return res.sendStatus(500);
 				}
-
-				logger.debug("output: " + JSON.stringify(output));
 				
 				if (!serverUtils.validateData(output, serverUtils.prototypes.design)) {
     				return res.sendStatus(500);

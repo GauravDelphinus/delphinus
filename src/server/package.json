@@ -19,6 +19,7 @@
   "dependencies": {
     "async": "^1.5.2",
     "body-parser": "^1.14.2",
+    "color-string": "^1.5.2",
     "connect-flash": "^0.1.1",
     "cookie-parser": "^1.4.0",
     "cropper": "^3.0.0-rc.1",

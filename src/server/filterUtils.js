@@ -270,7 +270,7 @@ module.exports = {
 		presetArtifact: [
 			{
 				name: "preset",
-				type: "presetArtifact",
+				type: "artifact",
 				required: "yes"
 			}
 		],
@@ -329,7 +329,7 @@ module.exports = {
 		presetLayout: [
 			{
 				name: "preset",
-				type: "presetLayout",
+				type: "layout",
 				required: "yes"
 			}
 		],
@@ -392,7 +392,7 @@ module.exports = {
 		presetFilter: [
 			{
 				name: "preset",
-				type: "presetFilter",
+				type: "filter",
 				required: "yes"
 			}
 		],
@@ -422,7 +422,7 @@ module.exports = {
 		presetDecoration: [
 			{
 				name: "preset",
-				type: "presetDecoration",
+				type: "decoration",
 				required: "yes"
 			}
 		],

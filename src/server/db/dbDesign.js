@@ -91,8 +91,6 @@ function getDesign(designId, done) {
 			return done(new error.dbResultError(cypherQuery, 1, result.data.length));
 		}
 		
-		logger.debug("result.data = " + JSON.stringify(result.data));
-
 		let designName = result.data[0][0].name;
 		let designId = result.data[0][0].id;
 		let categoryName = result.data[0][1].name;

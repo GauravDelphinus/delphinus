@@ -284,6 +284,20 @@ module.exports = {
 				logger.errorIf(logError, "Invalid Decoration '" + value + "' received for param '" + name + "'");
 				return false;
 			}
+		} else if (type == "color") { //only support this format: rgb(20,3,44)
+			if (value.startsWith("rgb(") && value.endsWith(")")) {
+				var end = value.indexOf(")");
+				var start = 4;
+				var rgbStr = value.substring(start, end);
+				var rgbArray = rgbStr.split(",");
+				if (rgbArray.length != 3 || !validateRGBColorValue(rgbArray[0]) || !validateRGBColorValue(rgbArray[1]) || !validateRGBColorValue(rgbArray[2])) {
+					logger.errorIf(logError, "Invalid Color '" + value + "' received for param '" + name + "'");
+					return false;
+				}
+			} else {
+				logger.errorIf(logError, "Invalid Color '" + value + "' received for param '" + name + "'");
+				return false;
+			}
 		}
 
 		return true;
@@ -372,6 +386,14 @@ module.exports = {
 		}
 
 		return true;
+	},
+
+	validateRGBColorValue: function(colorValue) {
+		if (colorValue >= 0 && colorValue <= 255) {
+			return true;
+		}
+
+		return false;
 	},
 
 	copyFile: function(source, target, cb) {
