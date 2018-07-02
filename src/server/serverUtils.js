@@ -285,16 +285,7 @@ module.exports = {
 				return false;
 			}
 		} else if (type == "color") { //only support this format: rgb(20,3,44)
-			if (value.startsWith("rgb(") && value.endsWith(")")) {
-				var end = value.indexOf(")");
-				var start = 4;
-				var rgbStr = value.substring(start, end);
-				var rgbArray = rgbStr.split(",");
-				if (rgbArray.length != 3 || !validateRGBColorValue(rgbArray[0]) || !validateRGBColorValue(rgbArray[1]) || !validateRGBColorValue(rgbArray[2])) {
-					logger.errorIf(logError, "Invalid Color '" + value + "' received for param '" + name + "'");
-					return false;
-				}
-			} else {
+			if (!this.validateColorValue(value)) {
 				logger.errorIf(logError, "Invalid Color '" + value + "' received for param '" + name + "'");
 				return false;
 			}
@@ -388,8 +379,41 @@ module.exports = {
 		return true;
 	},
 
-	validateRGBColorValue: function(colorValue) {
-		if (colorValue >= 0 && colorValue <= 255) {
+	validateColorValue: function(value) {
+		if (value.startsWith("rgb(") && value.endsWith(")")) {
+			var end = value.indexOf(")");
+			var start = 4;
+			var rgbStr = value.substring(start, end);
+			var rgbArray = rgbStr.split(",");
+			if (rgbArray.length != 3) {
+				return false;
+			}
+
+			var r = parseInt(rgbArray[0]);
+			var g = parseInt(rgbArray[1]);
+			var b = parseInt(rgbArray[2]);
+			if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255) {
+				return false;
+			}
+
+			return true;
+		} else if (value.startsWith("rgba(") && value.endsWith(")")) {
+			var end = value.indexOf(")");
+			var start = 5;
+			var rgbStr = value.substring(start, end);
+			var rgbArray = rgbStr.split(",");
+			if (rgbArray.length != 4) {
+				return false;
+			}
+
+			var r = parseInt(rgbArray[0]);
+			var g = parseInt(rgbArray[1]);
+			var b = parseInt(rgbArray[2]);
+			var a = parseFloat(rgbArray[3]);
+			if (r < 0 || r > 255 || g < 0 || g > 255 || b < 0 || b > 255 || a < 0 || a > 1) {
+				return false;
+			}
+
 			return true;
 		}
 
