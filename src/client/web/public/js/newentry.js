@@ -78,28 +78,7 @@ function setupHandlers() {
 	dropZone.addEventListener('dragover', handleDragOver, false);
 	dropZone.addEventListener('drop', handleFileDropped, false);
 
-	//handler for caption text box
-	$("#bannerText").on('keyup', function (e) {
-	    if (e.keyCode == 13) {
-	    	$("#steps").show();
-	    	setupArtifactStep();
-	    }
-
-	    if ($("#bannerText").val().length == 0) {
-	    	$("#captionButton").prop("disabled", true);
-	    	$("#apply").prop("disabled", true);
-	    }
-	    else {
-	    	$("#captionButton").prop("disabled", false);
-	    	$("#apply").prop("disabled", false);
-	    }
-	});
-
-
-	$("#captionButton").click(function() {
-		$("#steps").show();
-	    setupArtifactStep();
-	});
+	setupCaptionStep();
 
 	//handler for file Browse button
 	document.getElementById('files').addEventListener('change', handleFileSelect, false);
@@ -237,7 +216,36 @@ function showCaptionStep() {
 }
 
 function setupCaptionStep() {
+	//handler for caption text box
+	$("#bannerText").on('keyup', function (e) {
+		//if ENTER is pressed, the steps are shown and the Post button is enabled
+	    if (e.keyCode == 13) {
+	    	if ($("#bannerText").val().length > 0) {
+	    		$("#steps").show();
+		    	$("#apply").prop("disabled", false);
+		    	setupArtifactStep();
+	    	}
+	    } else {
+	    	//for any other changes, disable the Post button until the Apply button is pressed or ENTER is pressed
+	    	//to commit the new caption
+	    	$("#apply").prop("disabled", true);
+	    }
 
+	    //hide the Apply button in case of zero-length text
+	    if ($("#bannerText").val().length == 0) {
+	    	$("#captionButton").prop("disabled", true);
+	    }
+	    else {
+	    	$("#captionButton").prop("disabled", false);
+	    }
+	});
+
+	//if Apply is pressed, the steps are shown and the Post button is enabled
+	$("#captionButton").click(function() {
+		$("#steps").show();
+		$("#apply").prop("disabled", false);
+	    setupArtifactStep();
+	});
 }
 
 /**************************** (2) ARTIFACT STEP **********************************************/
