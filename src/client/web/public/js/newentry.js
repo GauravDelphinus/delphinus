@@ -303,6 +303,7 @@ function generateArtifactObject() {
 	var artifact = {};
 	var presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
 	if (presetValue != undefined) {
+		console.log("presetValue: " + presetValue);
 		if (!$("#bannerCustomOptionsCheckbox").is(':checked')) { //preset
 			artifact.type = "preset";
 			artifact.preset = presetValue;
@@ -326,6 +327,8 @@ function generateArtifactObject() {
 			}
 		}
 	}
+
+	console.log("generated artifact: " + JSON.stringify(artifact));
 
 	return artifact;
 }
@@ -626,25 +629,50 @@ function constructJSONObjectWithPreset(presetType, presetId) {
 			jsonObj.steps.artifacts = [{}];
 		}
 
-		jsonObj.steps.artifacts[0].preset = presetId;
+		for (var i = 0; i < jsonObj.steps.artifacts.length; i++) {
+			var artifact = jsonObj.steps.artifacts[i];
+			artifact.preset = presetId;
+			if (!artifact.banner) {
+				artifact.banner = {};
+			}
+			switch (presetId) {
+				case "bannerBottom":
+					artifact.banner.location = "bottom"; break;
+				case "bannerTop":
+					artifact.banner.location = "top"; break;
+				case "bannerCenter":
+					artifact.banner.location = "center"; break;
+				case "bannerBelow":
+					artifact.banner.location = "below"; break;
+				case "bannerAbove":
+					artifact.banner.location = "above"; break;
+			}
+		}
 	} else if (presetType == "layout") {
 		if (!jsonObj.steps.layouts) {
 			jsonObj.steps.layouts = [{}];
 		}
 
-		jsonObj.steps.layouts[0].preset = presetId;
+		for (var i = 0; i < jsonObj.steps.layouts.length; i++) {
+			jsonObj.steps.layouts[i].preset = presetId;
+		}
+		
 	} else if (presetType == "filter") {
 		if (!jsonObj.steps.filters) {
 			jsonObj.steps.filters = [{}];
 		}
 
-		jsonObj.steps.filters[0].preset = presetId;
+		for (var i = 0; i < jsonObj.steps.filters.length; i++) {
+			jsonObj.steps.filters[i].preset = presetId;
+		}
 	} else if (presetType == "decoration") {
 		if (!jsonObj.steps.decorations) {
 			jsonObj.steps.decorations = [{}];
 		}
 
-		jsonObj.steps.decorations[0].preset = presetId;
+		for (var i = 0; i < jsonObj.steps.decorations.length; i++) {
+			jsonObj.steps.decorations[i].preset = presetId;
+		}
 	}
 
 	return jsonObj;
