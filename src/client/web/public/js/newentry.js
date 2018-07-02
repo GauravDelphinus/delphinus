@@ -162,6 +162,7 @@ function switchToStepsView(imagePath, imageTitle) {
 	$("#newentryimage").prop("title", imageTitle);
 	$("#selectImageSection").hide();
 	$("#selectDesignSection").hide();
+	$("#cancelSection").hide();
 
 	$("#stepsSection").show();
 	$("#bannerText").focus();
