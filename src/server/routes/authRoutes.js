@@ -166,6 +166,7 @@ var routes = function() {
         //in the normal flow, do not ask for any additional permissions.  Default permissions
         //include user_profile and email, and do *not* require Facebook App Review
         .get(passport.authenticate('facebook'), function(req, res) {
+        	logger.debug("requesting for default permissions from Facebook");
         });
 
     //Reauthenticate with Facebook for "share" (aka publish) permissions
