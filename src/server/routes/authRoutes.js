@@ -150,6 +150,7 @@ var routes = function() {
     authRouter.route("/facebook")
         .get(function (req, res, next) {
         	logger.debug("GET received on /auth/facebook, query: " + JSON.stringify(req.query));
+        	logger.debug("Now going to request for default permissions from Facebook ...");
             if (!req.session.redirectTo) {
                 /**
                     If the redirectTo is not set, this means that this wasn't set explicitly
