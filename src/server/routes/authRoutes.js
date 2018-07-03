@@ -163,9 +163,7 @@ var routes = function() {
 
             next();
         })
-        .get(passport.authenticate('facebook', {
-            scope: ['email', 'public_profile']
-        }), function(req, res) {
+        .get(passport.authenticate('facebook'), function(req, res) {
         });
 
     //Reauthenticate with Facebook for "share" (aka publish) permissions
