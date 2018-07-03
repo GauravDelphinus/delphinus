@@ -164,7 +164,7 @@ var routes = function() {
             next();
         })
         .get(passport.authenticate('facebook', {
-            scope: ['email', 'user_friends']
+            scope: ['email', 'public_profile']
         }), function(req, res) {
         });
 
