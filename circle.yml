@@ -7,10 +7,10 @@ general:
   build_dir: src/server
 dependencies:
   override:
-    - npm install
-  post:
     - sudo apt-get update
     - sudo apt-get install npm
+    - npm install
+  post:
     - npm -v
     - npm config set strict-ssl false #temp fix for SSL issue: https://stackoverflow.com/questions/44577368/codeship-basic-npm-install-fails-error-ssl-error-cert-untrusted
     #- sudo npm install -g pm2@latest
