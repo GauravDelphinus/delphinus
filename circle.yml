@@ -13,7 +13,7 @@ dependencies:
   post:
     - npm -v
     - npm config set strict-ssl false #temp fix for SSL issue: https://stackoverflow.com/questions/44577368/codeship-basic-npm-install-fails-error-ssl-error-cert-untrusted
-    #- sudo npm install -g pm2@latest
+    - sudo npm install -g pm2@latest
     - ../../deployment/scripts/setup_dirs.sh
     - ../../deployment/scripts/setup_env.sh
     - node ./index.js:
