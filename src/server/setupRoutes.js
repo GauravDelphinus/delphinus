@@ -76,7 +76,7 @@ function setupRenderRoutes(app) {
 		if (process.env.SITE_REDIRECT) {
 			if (process.env.SITE_ALLOWED_IP) {
 				clientIP = req.ip || req.connection.remoteAddress;
-				console.log("IP is: " + clientIP);
+				logger.debug("IP is: " + clientIP);
 				if (clientIP == process.env.SITE_ALLOWED_IP) {
 					next();
 				} else {
