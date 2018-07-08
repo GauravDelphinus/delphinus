@@ -1,26 +1,104 @@
 {
-	"arts" : {
-		"displayName" : "Arts"
+	"abstract" : {
+		"displayName" : "Abstract"
+	},
+	"animals" : {
+		"displayName" : "Animals"
+	},
+	"architecture" : {
+		"displayName" : "Architecture"
+	},
+	"cityscape" : {
+		"displayName" : "Cityscape"
 	},
 	"family" : {
 		"displayName" : "Family"
 	},
-	"nature" : {
-		"displayName" : "Nature"
+	"fashion" : {
+		"displayName" : "Fashion"
 	},
-	"motivation" : {
-		"displayName" : "Motivation"
+	"film" : {
+		"displayName" : "Film"
 	},
-	"sports" : {
-		"displayName" : "Sports"
+	"fineart" : {
+		"displayName": "Fine Art"
 	},
-	"politics" : {
-		"displayName" : "Politics"
+	"food" : {
+		"displayName": "Food"
 	},
-	"science" : {
-		"displayName" : "Science"
+	"glamour": {
+		"displayName": "Glamour"
 	},
-	"misc" : {
-		"displayName": "Miscelleneous"
+	"humorous": {
+		"displayName": "Humorous"
+	},
+	"industrial": {
+		"displayName": "Industrial"
+	},
+	"inspiration": {
+		"displayName": "Inspiration"
+	},
+	"interior": {
+		"displayName": "Interior"
+	},
+	"journalism": {
+		"displayName": "Journalism"
+	},
+	"landscape": {
+		"displayName": "Landscape"
+	},
+	"nature": {
+		"displayName": "Nature"
+	},
+	"panorama": {
+		"displayName": "Panorama"
+	},
+	"politics": {
+		"displayName": "Politics"
+	},
+	"portrait": {
+		"displayName": "Portrait"
+	},
+	"random": {
+		"displayName": "Random"
+	},
+	"rural": {
+		"displayName": "Rural"
+	},
+	"science": {
+		"displayName": "Science"
+	},
+	"sports": {
+		"displayName": "Sports"
+	},
+	"stilllife": {
+		"displayName": "Still Life"
+	},
+	"streetphotography": {
+		"displayName": "Street Photography"
+	},
+	"suburban": {
+		"displayName": "Suburban"
+	},
+	"travel": {
+		"displayName": "Travel"
+	},
+	"underwater": {
+		"displayName": "Underwater"
+	},
+	"urban": {
+		"displayName": "Urban"
+	},
+	"transportation": {
+		"displayName": "Transportation"
+	},
+	"vintage": {
+		"displayName": "Vintage"
+	},
+	"weather": {
+		"displayName": "Weather"
+	},
+	"wedding" : {
+		"displayName": "Wedding"
 	}
 }
