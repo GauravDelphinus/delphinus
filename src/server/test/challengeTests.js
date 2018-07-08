@@ -104,7 +104,7 @@ describe("Challenges", function() {
 				assert.equal(body.postedDate, "1501996987212");
 				assert.equal(body.caption, "My First Challenge Title");
 				assert.equal(body.link, "/challenge/HkQawQ4PW");
-				assert.equal(body.categoryID, "motivation");
+				assert.equal(body.categoryID, "glamour");
 				assert.equal(body.postedByUser.id, "GkQawQ3PW");
 				return done();
 			});
