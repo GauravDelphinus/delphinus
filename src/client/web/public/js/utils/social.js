@@ -520,6 +520,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 		});
 	}
 
+	/* FUTURE SUPPORT FOR SHARE
 	// SHARE BUTTON ---------------------------------
 	if (data.type == "challenge" || data.type == "entry") {
 		var shareButton = $("<div>", {id: contentTag + data.id + "ShareButton"});
@@ -541,6 +542,7 @@ function createSocialActionsSectionElement(data, contentTag, full /* show full s
 
 		socialActionsSection.append(menu);
 	}
+	*/
 
 	// TIME LAPSE BUTTON
 	if (data.type == "entry") {
