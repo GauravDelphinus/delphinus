@@ -8,17 +8,11 @@ general:
 dependencies:
   override:
     - sudo apt-get update
-    - npm -v
-    - npm prefix -g
-    - which npm
-    - node -v
     - sudo apt-get install npm
     - npm install
   post:
     - npm config set strict-ssl false #temp fix for SSL issue: https://stackoverflow.com/questions/44577368/codeship-basic-npm-install-fails-error-ssl-error-cert-untrusted
-    - npm -v
-    - node -v
-    - sudo env "PATH=$PATH" npm install -g pm2@latest
+    - sudo env "PATH=$PATH" npm install -g pm2@latest #pass path to sudo to make sure it picks the right version of npm
     - ../../deployment/scripts/setup_dirs.sh
     - ../../deployment/scripts/setup_env.sh
     - node ./index.js:
