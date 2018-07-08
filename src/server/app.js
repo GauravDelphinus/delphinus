@@ -53,13 +53,13 @@ module.exports = function(callback) {
 		app.use(bodyParser.urlencoded({limit: "50mb", extended: true, parameterLimit:50000}));
 
 		app.use(helmet()); //for security - https://expressjs.com/en/advanced/best-practice-security.html
-		
-		//set up Routes for APIs as well as HTML Rendering via the views
-		setupRoutes(app);
 
 		//set up Static directory
 		const publicDir = path.normalize(global.appRoot + config.path.publicDir);
 		app.use(express.static(publicDir));
+
+		//set up Routes for APIs as well as HTML Rendering via the views
+		setupRoutes(app);
 		
 		// Finally, start listening for requests
 		app.listen(config.port, function() {

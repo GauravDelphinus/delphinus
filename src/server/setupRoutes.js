@@ -65,6 +65,29 @@ function setupAPIRoutes(app) {
 */
 function setupRenderRoutes(app) {
 
+	let clientIP = "";
+	app.get("*", function(req, res, next) {
+		require("dotenv").config();
+		/*
+			Check for Site redirects - these can be used for site maintenance activities
+			SITE_REDIRECT: name of page at root that we need to redirect to, specified in .env
+			SITE_ALLOWED_IP: ip address of client who should still be allowed to access the site, despite the SITE_REDIRECT clause.  Specified in .env
+		*/
+		if (process.env.SITE_REDIRECT) {
+			if (process.env.SITE_ALLOWED_IP) {
+				clientIP = req.ip || req.connection.remoteAddress;
+				console.log("IP is: " + clientIP);
+				if (clientIP == process.env.SITE_ALLOWED_IP) {
+					next();
+				} else {
+					res.render(process.env.SITE_REDIRECT, {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
+				}
+			}
+		} else {
+			next();
+		}
+	});
+
 	//********* HOME PAGE **********************************************
 	app.get("/", function(req, res) {
 		require("dotenv").config();
