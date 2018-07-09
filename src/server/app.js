@@ -40,6 +40,8 @@ module.exports = function(callback) {
 
 		require('./auth/passport')(app);
 
+		app.enable('trust proxy');
+		
 		// Set the view engine to ejs
 		app.set('view engine', 'ejs');
 		app.set("views", global.appRoot + "/src/server/views");
