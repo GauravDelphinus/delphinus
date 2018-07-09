@@ -71,7 +71,6 @@ function setupImageHandlers(profileType) {
 		If there's a failure, the view remains the same and the user can try clicking on Save again.
 	**/
 	$("#saveImage").click(function() {
-		console.log("saveImage clicked");
 		var selectedImageSrc = $("#profileImage").prop("src");
         //data url
         //upload the image, get a url in response, and set that as the profile link
@@ -79,7 +78,6 @@ function setupImageHandlers(profileType) {
 		var jsonObj = {};
 		jsonObj.imageData = selectedImageSrc;
 
-		console.log("calling PATCH on " + "/api/users/" + userInfo.id + ", jsonObj: " + jsonObj);
 		$.ajax({
 			type: "PATCH",
 			url: "/api/users/" + userInfo.id,
@@ -88,7 +86,6 @@ function setupImageHandlers(profileType) {
 			data: JSON.stringify(jsonObj)
 		})
 		.done(function(data, textStatus, jqXHR) {
-			console.log("successful, image is " + data.image);
 			userInfo.image = data.image;
 
 			$("#profileImage").prop("src", data.image);
@@ -98,8 +95,7 @@ function setupImageHandlers(profileType) {
 			$("#changePicture").show();
 		})
 		.fail(function() {
-			console.log("failed!");
-			//window.location.replace("/error");
+			window.location.replace("/error");
 		});
 	});
 
