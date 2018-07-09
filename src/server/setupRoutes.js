@@ -74,14 +74,13 @@ function setupRenderRoutes(app) {
 			SITE_ALLOWED_IP: ip address of client who should still be allowed to access the site, despite the SITE_REDIRECT clause.  Specified in .env
 		*/
 		if (process.env.SITE_REDIRECT) {
-			if (process.env.SITE_ALLOWED_IP) {
-				clientIP = req.ip || req.connection.remoteAddress;
+			clientIP = req.ip || req.connection.remoteAddress;
+			if (process.env.SITE_ALLOWED_IP && (clientIP == process.env.SITE_ALLOWED_IP)) {
 				logger.debug("IP is: " + clientIP);
-				if (clientIP == process.env.SITE_ALLOWED_IP) {
-					next();
-				} else {
-					res.render(process.env.SITE_REDIRECT, {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
-				}
+				next();
+			}
+			else {
+				res.render(process.env.SITE_REDIRECT, {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
 			}
 		} else {
 			next();
