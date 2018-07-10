@@ -18,7 +18,7 @@ $(document).ready(function(){
 
 function setupMainItem() {
 	var appendCategory = "";
-	if (categoryId != "all") {
+	if (categoryId != 0) {
 		appendCategory = "?category=" + categoryId;
 	}
 	createAndAppendContentContainer($("#challenges"), 0, "challenges", [{type: "filmstrip"}, {type: "thumbnail"}], "/api/challenges" + appendCategory);
