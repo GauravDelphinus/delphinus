@@ -13,6 +13,8 @@ var dbInit = require("../db/dbInit");
 	Called ONCE before starting to run the list of all tests.
 **/
 before(function(done) {
+	this.enableTimeouts(false);
+
 	//first ensure we have the configuration set correctly
 	require("dotenv").config();
 	if (!process.env.NEO4J_USERNAME || !process.env.NEO4J_PASSWORD || !process.env.NEO4J_HOSTNAME || !process.env.HOSTNAME) {
