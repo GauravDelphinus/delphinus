@@ -65,6 +65,11 @@ function setupAPIRoutes(app) {
 */
 function setupRenderRoutes(app) {
 
+	//beta signup page - do this before the 'catch all' to make sure the page can still open	
+	app.get("/betasignup", function(req, res) {
+		res.render("betasignup");
+	});
+
 	let clientIP = "";
 	app.get("*", function(req, res, next) {
 		require("dotenv").config();
@@ -96,10 +101,6 @@ function setupRenderRoutes(app) {
 		} else {
 			res.render("index", {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
 		}
-	});
-
-	app.get("/betasignup", function(req, res) {
-		res.render("betasignup");
 	});
 
 	app.get("/contact", function(req, res) {
