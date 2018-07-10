@@ -66,7 +66,7 @@ function getEntrySocialInfo(entryId, meId, done) {
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-			return done(new DBResultError(cypherQuery, 1, result.data.length));
+			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
 		}
 
 		//social status
@@ -401,7 +401,7 @@ function createEntryNode(entryInfo, done) {
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-			return done(new Error(dbResultError(cypherQuery, 1, result.data.length)));
+			return done(new error.dbResultError(cypherQuery, 1, result.data.length));
 		}
 
 		//now, save the activity in the entity
@@ -668,7 +668,7 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.data.length));
 	        }
 
 	        //now, save the activity in the entry
@@ -697,7 +697,7 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 	        if(err) {
 	        	return done(err);
 	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.data.length));
 	        }
 
 	        //now, reset the activity in the entry, since the person no longer likes this entry
