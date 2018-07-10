@@ -117,7 +117,7 @@ function setupRenderRoutes(app) {
 
 	//render the page for all challenges matching an optional category
 	app.get("/challenges", function(req, res) {
-		res.render("challenges", {metadata: metadata.getGenericMetadata("challenges"), user: normalizeUser(req.user), categoryId: (req.query.categoryId ? req.query.categoryId : 0)});
+		res.render("challenges", {metadata: metadata.getGenericMetadata("challenges"), user: normalizeUser(req.user), categoryId: (req.query.category ? req.query.category : 0)});
 	});
 
 	//render the page for a specific challenge

@@ -52,7 +52,7 @@ var routes = function() {
 					return res.sendStatus(400);
 				}
 
-				dbChallenge.getChallengesSorted(req.query.sortBy, req.query.limit, req.query.postedBy, req.query.categoryId, function(err, result) {
+				dbChallenge.getChallengesSorted(req.query.sortBy, req.query.limit, req.query.postedBy, req.query.category, function(err, result) {
 					if (err) {
 						logger.error(err);
 						return res.sendStatus(500);
@@ -66,7 +66,7 @@ var routes = function() {
 				});
 			} else { //without sortBy flag, we assume "chunked" output based on timestamp
 				var lastFetchedTimestamp = (req.query.ts) ? (req.query.ts) : 0;
-				dbChallenge.getChallenges(req.query.postedBy, req.query.categoryId, lastFetchedTimestamp, function(err, result, newTimeStamp) {
+				dbChallenge.getChallenges(req.query.postedBy, req.query.category, lastFetchedTimestamp, function(err, result, newTimeStamp) {
 					if (err) {
 						logger.error(err);
 						return res.sendStatus(500);
