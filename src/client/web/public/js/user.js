@@ -1,9 +1,11 @@
 $(document).ready(function(){
 	createLoginHeader();
 
+	/* FUTURE
 	createCategorySidebar(function(sidebar) {
 		$("#leftMiddleSidebar").append(sidebar);
 	});
+	*/
 
 	// NOTE:
 	// userInfo - whose page we're looking at

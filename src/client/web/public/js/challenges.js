@@ -1,9 +1,11 @@
 $(document).ready(function(){
 	createLoginHeader();
 
+	/* FUTURE
 	createCategorySidebar(function(sidebar) {
 		$("#leftMiddleSidebar").append(sidebar);
 	});
+	*/
 	
 	createPopularChallengesSidebar(function(sidebar) {
 		$("#rightSidebar").append(sidebar);
