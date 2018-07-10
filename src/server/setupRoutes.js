@@ -80,9 +80,11 @@ function setupRenderRoutes(app) {
 		*/
 		if (process.env.SITE_REDIRECT) {
 			clientIP = req.ip || req.connection.remoteAddress;
-			logger.debug("IP is: " + clientIP);
-			if (process.env.SITE_ALLOWED_IP && (clientIP == process.env.SITE_ALLOWED_IP)) {
-				
+			var ipArray = [];
+			if (process.env.SITE_ALLOWED_IPS) {
+				ipArray = process.env.SITE_ALLOWED_IPS.split(",");
+			}
+			if (ipArray.length > 0 && ipArray.indexOf(clientIP) > -1) {
 				next();
 			}
 			else {
