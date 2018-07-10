@@ -401,7 +401,7 @@ function createEntryNode(entryInfo, done) {
 		if(err) {
 			return done(err);
 		} else if (result.data.length != 1) {
-			return done(new error.dbResultError(cypherQuery, 1, result.data.length));
+			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
 		}
 
 		//now, save the activity in the entity
