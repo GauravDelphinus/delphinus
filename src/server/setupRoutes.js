@@ -72,24 +72,12 @@ function setupRenderRoutes(app) {
 
 	let clientIP = "";
 	app.get("*", function(req, res, next) {
-		require("dotenv").config();
 		/*
-			Check for Site redirects - these can be used for site maintenance activities
-			SITE_REDIRECT: name of page at root that we need to redirect to, specified in .env
-			SITE_ALLOWED_IP: ip address of client who should still be allowed to access the site, despite the SITE_REDIRECT clause.  Specified in .env
+			Check for Site redirects - if not admin, redirect to the page specified
+			Admins can still access the full site
 		*/
-		if (process.env.SITE_REDIRECT) {
-			clientIP = req.ip || req.connection.remoteAddress;
-			var ipArray = [];
-			if (process.env.SITE_ALLOWED_IPS) {
-				ipArray = process.env.SITE_ALLOWED_IPS.split(",");
-			}
-			if (ipArray.length > 0 && ipArray.indexOf(clientIP) > -1) {
-				next();
-			}
-			else {
-				res.render(process.env.SITE_REDIRECT, {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
-			}
+		if (process.env.SITE_REDIRECT && !serverUtils.clientIsAdmin(req)) {
+			res.render(process.env.SITE_REDIRECT, {metadata: metadata.getGenericMetadata("home"), user: normalizeUser(req.user)});
 		} else {
 			next();
 		}

@@ -2,6 +2,7 @@ var express = require("express");
 var passport = require("passport");
 var config = require("../config");
 var logger = require("../logger");
+var serverUtils = require("../serverUtils");
 
 var routes = function() {
 	var authRouter = express.Router();
@@ -20,7 +21,7 @@ var routes = function() {
                 req.session.redirectTo = req.get('Referrer');
             }
 
-			res.render("auth", {pageTitle: "Sign In | " + config.branding.siteName});
+			res.render("auth", {pageTitle: "Sign In | " + config.branding.siteName, isAdmin: serverUtils.clientIsAdmin(req)});
         });
 
     authRouter.route("/login")
