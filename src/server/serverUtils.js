@@ -744,14 +744,14 @@ module.exports = {
 		This is used for different behavior for admins versus non-admins
 		For example, redirecting non-admins to a maintenance page versus admins continue to have access to the full site
 
-		.env/SITE_ALLOWED_IPS is a comma separated list of client IP addresses
+		.env/ADMIN_IPS is a comma separated list of client IP addresses
 	**/
 	clientIsAdmin: function(req) {
 		require("dotenv").config();
 		var clientIP = req.ip || req.connection.remoteAddress;
 		var ipArray = [];
-		if (process.env.SITE_ALLOWED_IPS) {
-			ipArray = process.env.SITE_ALLOWED_IPS.split(",");
+		if (process.env.ADMIN_IPS) {
+			ipArray = process.env.ADMIN_IPS.split(",");
 		}
 		if (ipArray.length > 0 && ipArray.indexOf(clientIP) > -1) {
 			return true;

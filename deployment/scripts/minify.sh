@@ -64,6 +64,7 @@ uglifyjs ${SOURCE_JS_FOLDER}/share.js -o ${MIN_JS_FOLDER}/share.min.js ${MINIFY_
 uglifyjs ${SOURCE_JS_FOLDER}/user.js -o ${MIN_JS_FOLDER}/user.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/users.js -o ${MIN_JS_FOLDER}/users.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/contact.js -o ${MIN_JS_FOLDER}/contact.min.js ${MINIFY_FLAGS}
+uglifyjs ${SOURCE_JS_FOLDER}/auth.js -o ${MIN_JS_FOLDER}/auth.min.js ${MINIFY_FLAGS}
 uglifyjs ${SOURCE_JS_FOLDER}/utils/comments.js \
 	${SOURCE_JS_FOLDER}/utils/deletePost.js \
 	${SOURCE_JS_FOLDER}/utils/general.js \

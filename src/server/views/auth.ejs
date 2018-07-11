@@ -9,7 +9,7 @@
  <title><%=pageTitle%></title>
  <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-46129625-3"></script>
-<script src="/third-party/jquery/js/jquery.min.js"></script>
+
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
@@ -17,10 +17,8 @@
 
   gtag('config', 'UA-46129625-3');
 
-  var isAdmin = "<%=isAdmin%>";
-  if (isAdmin) {
-  	$("#emailLoginLink").show();
-  }
+  var isAdmin = <%=isAdmin%>;
+  
 </script>
   </head>
 
@@ -46,7 +44,8 @@
     </div>
 </div>
 	
-
+<script src="/third-party/jquery/js/jquery.min.js"></script>
+<script src="/js/auth.min.js"></script>
   </body>
 
 </html>
