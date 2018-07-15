@@ -252,7 +252,7 @@ var routes = function() {
 
 	    			//extract the steps (cumulative format) and generate the hash to 
 	    			//look for actual step images
-	    			var singleStepList = filterUtils.extractSingleStepList(steps);
+	    			var singleStepList = filterUtils.extractSingleStepList(steps, imageData.caption);
 	    			var applySingleStepToImageFunctions = [];
 	    			var imageUrlPaths = []; //paths to target urls (to be sent back to client)
 

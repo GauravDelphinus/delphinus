@@ -178,7 +178,7 @@ function getEntrySourceImageData(entryId, next) {
 		}
 
 		if (entry.sourceType == "challengeId") {
-			entry.sourceImagePath = global.appRoot + config.path.challengeImages + entry.sourceId + "." + mime.extension(entry.imageType);
+			entry.sourceImagePath = global.appRoot + config.path.challengeImagesRaw + entry.sourceId + "." + mime.extension(entry.imageType);
 			entry.sourceImageUrl = config.url.challengeImages + entry.sourceId + "." + mime.extension(entry.imageType);
 			return next(null, entry);
 		} else if (entry.sourceType == "designId") {
@@ -192,7 +192,7 @@ function getEntrySourceImageData(entryId, next) {
     			return next(null, entry);
     		});
 		} else if (entry.sourceType == "independentImageId") {
-			entry.sourceImagePath = global.appRoot + config.path.independentImages + entry.sourceId + "." + mime.extension(entry.imageType);
+			entry.sourceImagePath = global.appRoot + config.path.independentImagesRaw + entry.sourceId + "." + mime.extension(entry.imageType);
     		entry.sourceImageUrl = config.url.independentImages + entry.sourceId + "." + mime.extension(entry.imageType);
     		
     		return next(null, entry);

@@ -448,7 +448,8 @@ module.exports = {
 			hash = ((hash<<5)-hash)+char;
 			hash = hash & hash; // Convert to 32bit integer
 		}
-	return hash;
+
+		return hash;
 	},
 
 	/**
@@ -468,6 +469,8 @@ module.exports = {
 				var artifact = steps.artifacts[i];
 				if (!artifact.banner) {
 					artifact.banner = {caption: caption};
+				} else {
+					artifact.banner.caption = caption;
 				}
 				steps.artifacts[i] = artifact;
 			}
