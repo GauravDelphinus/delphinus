@@ -101,6 +101,10 @@ function setupRenderRoutes(app) {
 		res.render("privacy");
 	});
 
+	app.get("/terms", function(req, res) {
+		res.render("terms");
+	});
+
 	//******** CHALLENGES related routes *******************************
 
 	//render the page for all challenges matching an optional category
