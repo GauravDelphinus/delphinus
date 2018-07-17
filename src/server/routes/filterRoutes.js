@@ -86,6 +86,7 @@ var routes = function() {
 		.post(function(req, res){
 
 			logger.debug("POST received on /api/filters/apply, body: " + serverUtils.makePrintFriendly(req.body));
+			const timer = logger.startTimer();
 
 			var validationParams = [
 				{
@@ -201,6 +202,7 @@ var routes = function() {
 										return res.sendStatus(500);
 									}
 
+									timer.done("POST received on /api/filters/apply, sending blob");
 									return res.json(jsonObj);
 								});
 							} else {
@@ -210,7 +212,8 @@ var routes = function() {
 								if (!serverUtils.validateData(jsonObj, serverUtils.prototypes.imageInfo)) {
 									return res.sendStatus(500);
 								}
-																	
+								
+								timer.done("POST received on /api/filters/apply, sending link");								
 								return res.json(jsonObj);
 							}
 						});
