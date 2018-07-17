@@ -552,16 +552,20 @@ function applyBorder(imArgs, borderWidth, borderColor) {
 **/
 function writeImage(sourceImage, targetImage, imArgs, next) {
 	//logger.debug("****************** writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+	const timer = logger.startTimer();
 	if (imArgs.length > 0) {
 		execFile("convert", imArgs, (error, stdout, stderr) => {
 			if (error) {
 		    	next(error, null);
+		    	timer.done("writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 		  	} else {
 		  		next(0, targetImage);
+		  		timer.done("writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 		  	}
 	  	});
 	} else {
 		next(0, sourceImage); // no changes done, so just send back the source image
+		timer.done("writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 	}
 }
 
@@ -572,18 +576,22 @@ function writeImage(sourceImage, targetImage, imArgs, next) {
 	really any change done.
 **/
 function compositeImage(sourceImage, targetImage, imArgs, next) {
+	const timer = logger.startTimer();
 	if (imArgs.length > 0) {
 		//logger.debug("calling composite with imArgs: " + JSON.stringify(imArgs));
 		execFile("composite", imArgs, (error, stdout, stderr) => {
 			//logger.debug("output of composite: error: " + error);
 			if (error) {
 		    	next(error, null);
+		    	timer.done("compositeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 		  	} else {
 		  		next(0, targetImage);
+		  		timer.done("compositeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 		  	}
 	  	});
 	} else {
 		next(0, sourceImage); // no changes done, so just send back the source image
+		timer.done("compositeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 	}
 }
 
@@ -594,14 +602,17 @@ function compositeImage(sourceImage, targetImage, imArgs, next) {
 **/
 function findAverageColor(imagePath, labelGeometry) {
 	//logger.debug("findAverageColor: imagePath: " + imagePath + ", labelGeometry: " + JSON.stringify(labelGeometry));
+	const timer = logger.startTimer();
 	try {
 		var output = execFileSync('convert', [imagePath, "-crop", labelGeometry.width + "x" + labelGeometry.height + "+" + labelGeometry.left + "+" + labelGeometry.top, "-resize", "1x1\!", "-format", "%[fx:int(255*r+.5)],%[fx:int(255*g+.5)],%[fx:int(255*b+.5)]", "info:-"]);
 		var colorArray = output.toString().trim().split(",");
 	  	var color = {r: parseInt(colorArray[0]), g: parseInt(colorArray[1]), b: parseInt(colorArray[2])};
 
+	  	timer.done("findAverageColor, success: imagePath: " + imagePath + ", labelGeometry: " + JSON.stringify(labelGeometry));
 	  	return color;
 	} catch (error) {
 		logger.error("error in determining the average color: " + error);
+		timer.done("findAverageColor, error: imagePath: " + imagePath + ", labelGeometry: " + JSON.stringify(labelGeometry));
 	}
 
 	return null;
@@ -611,14 +622,17 @@ function findAverageColor(imagePath, labelGeometry) {
 	Find the size of the provided image
 **/
 function findImageSize(imagePath, next) {
+	const timer = logger.startTimer();
 	execFile('identify', ["-format", "%Wx%H", imagePath], (error, stdout, stderr) => {
 	  	if (error) {
+	  		timer.done("findImageSize, error: imagePath: " + imagePath);
 	    	return next(error, 0);
 	  	}
 
 	  	var sizeArray = stdout.trim().split("x");
 	  	var newImageSize = {width: parseInt(sizeArray[0]), height: parseInt(sizeArray[1])};
 
+	  	timer.done("findImageSize, success: imagePath: " + imagePath);
 	  	return next(0, newImageSize);
 	});
 }
@@ -741,12 +755,15 @@ function applyWatermark(imArgs) {
 	Compress the given image to a smaller size as supported by Captionify
 **/
 function compressImage(before, after, callback) {
-	//logger.debug("calling execFile in compressImage");	
+	//logger.debug("calling execFile in compressImage");
+	const timer = logger.startTimer();	
 	execFile('convert', [before, "-resize", config.image.maxWidth + "x" + config.image.maxHeight + "\>", after], (error, stdout, stderr) => {
 	  	if (error) {
+	  		timer.done("compressImage, error: before: " + before + ", after: " + after);
 	    	return callback(error, 0);
 	  	}
 
+	  	timer.done("compressImage, success: before: " + before + ", after: " + after);
 	  	return callback(0);
 	});
 }
