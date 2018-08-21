@@ -17,7 +17,7 @@ before(function(done) {
 
 	//first ensure we have the configuration set correctly
 	require("dotenv").config();
-	if (!process.env.NEO4J_USERNAME || !process.env.NEO4J_PASSWORD || !process.env.NEO4J_HOSTNAME || !process.env.HOSTNAME) {
+	if (!process.env.NEO4J_USERNAME || !process.env.NEO4J_PASSWORD || !process.env.NEO4J_HOSTNAME || !process.env.NODE_HOSTNAME) {
 		return done(new Error("Missing NEO4J authentication fields in the .env file, or .env file missing"));
 	}
 
