@@ -37,7 +37,7 @@ jobs:
     - run: sudo env "PATH=$PATH" npm install -g pm2@latest
     - run:
         working_directory: ~/ezeeideas/delphinus/deployment/scripts
-        command: ./setup_dirs.sh
+        command: pwd && ls && ./setup_dirs.sh
     - run: ../../deployment/scripts/setup_env.sh
     - run:
         command: node ./index.js
