@@ -46,6 +46,8 @@ before(function(done) {
 	Called ONCE after all tests have finished executing.
 **/
 after(function(done) {
+	this.enableTimeouts(false);
+	
 	//initialize DB
 	var testData = require("./testData");
 
