@@ -36,6 +36,15 @@ jobs:
     - run: npm config set strict-ssl false
     - run: sudo env "PATH=$PATH" npm install -g pm2@latest
     - run:
+        working_directory: ~/ezeeideas/delphinus/src/server
+        command: pwd && ls
+    - run:
+        working_directory: ~/ezeeideas/delphinus
+        command: pwd && ls
+    - run:
+        working_directory: ~/ezeeideas/delphinus/deployment/scripts
+        command: pwd && ls
+    - run:
         working_directory: ~/ezeeideas/delphinus/deployment/scripts
         command: pwd && ls && ./setup_dirs.sh
     - run: ../../deployment/scripts/setup_env.sh
