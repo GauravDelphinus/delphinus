@@ -1,3 +1,5 @@
+#!/bin/bash
+
 #setup directories
 
 #call from folder src/server (or similar level)

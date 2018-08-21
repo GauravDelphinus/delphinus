@@ -1,3 +1,4 @@
+#!/bin/bash
 #Deploy to production - sync code to latest version.
 #Call manually only after stage deployment has been successful, and after testing stage
 #Note: You should have called setup_prod.sh at least once before this (for one-time setup)

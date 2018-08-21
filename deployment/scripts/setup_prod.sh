@@ -1,3 +1,4 @@
+#!/bin/bash
 #Setup on production - only required once (not for every check-in) for setting up directories, links, etc.
 
 pushd `dirname $0` > /dev/null

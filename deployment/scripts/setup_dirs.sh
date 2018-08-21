@@ -1,3 +1,4 @@
+#!/bin/bash
 #Create necessary directories, links, etc.
 
 #pass one argument using the --projectroot parameter.  This is the directory that

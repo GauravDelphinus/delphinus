@@ -1,3 +1,4 @@
+#!/bin/bash
 #Deploy to dev - call after some code changes and before running dev
 #This will generate 'auto-generated' files such as minified css, js, etc.
 
