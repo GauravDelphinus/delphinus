@@ -8,6 +8,7 @@
 require("../init")();
 
 var dbInit = require("../db/dbInit");
+const dynamicConfig = require("../config/dynamicConfig");
 
 /**
 	Called ONCE before starting to run the list of all tests.
@@ -15,11 +16,9 @@ var dbInit = require("../db/dbInit");
 before(function(done) {
 	this.enableTimeouts(false);
 
-	console.log("before all hook: process.env, HOSTNAME: " + process.env.HOSTNAME + ", NODE_HOSTNAME: " + process.env.NODE_HOSTNAME + ", NEO4J_HOSTNAME: " + process.env.NEO4J_HOSTNAME);
-
 	//first ensure we have the configuration set correctly
 	require("dotenv").config();
-	if (!process.env.NEO4J_USERNAME || !process.env.NEO4J_PASSWORD || !process.env.NEO4J_HOSTNAME || !process.env.NODE_HOSTNAME) {
+	if (!dynamicConfig.dbUsername || !dynamicConfig.dbPassword || !dynamicConfig.dbHostname || !dynamicConfig.nodeHostname) {
 		return done(new Error("Missing NEO4J authentication fields in the .env file, or .env file missing"));
 	}
 
@@ -27,7 +26,7 @@ before(function(done) {
 	var testData = require("./testData");
 	const neo4j = require("node-neo4j");
 
-	const db = new neo4j("http://" + process.env.NEO4J_USERNAME + ":" + process.env.NEO4J_PASSWORD + "@" + process.env.NEO4J_HOSTNAME);
+	const db = new neo4j("http://" + dynamicConfig.dbUsername + ":" + dynamicConfig.dbPassword + "@" + dynamicConfig.dbHostname);
 
 	dbInit.initializeDB(db, function(err) {
 		if (err) {

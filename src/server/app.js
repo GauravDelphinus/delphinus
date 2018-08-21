@@ -24,12 +24,12 @@ module.exports = function(callback) {
 	const serverUtils = require("./serverUtils");
 
 	require("dotenv").config();
-	if (!process.env.NEO4J_USERNAME || !process.env.NEO4J_PASSWORD || !process.env.NEO4J_HOSTNAME) {
+	if (!dynamicConfig.dbUsername || !dynamicConfig.dbPassword || !dynamicConfig.dbHostname) {
 		return callback(new Error("Missing NEO4J authentication fields in the .env file, or .env file missing"));
 	}
 
 	// Initialize the Neo4j Graph Database
-	const db = new neo4j("http://" + process.env.NEO4J_USERNAME + ":" + process.env.NEO4J_PASSWORD + "@" + process.env.NEO4J_HOSTNAME);
+	const db = new neo4j("http://" + dynamicConfig.dbUsername + ":" + dynamicConfig.dbPassword + "@" + dynamicConfig.dbHostname);
 
 	dbInit.initializeDB(db, function(err) {
 		if (err) {
@@ -65,7 +65,7 @@ module.exports = function(callback) {
 		
 		// Finally, start listening for requests
 		app.listen(config.port, function() {
-			logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on " + process.env.NODE_HOSTNAME + ", port " + config.port + ", Connected to Neo4j Database: " + process.env.NEO4J_HOSTNAME);
+			logger.info("Node Server, Environment: " + dynamicConfig.nodeEnv + ", Listening on " + dynamicConfig.nodeHostname + ", port " + config.port + ", Connected to Neo4j Database: " + dynamicConfig.dbHostname);
 			logger.info("Application Root: " + global.appRoot + ", Express Static directory: " + publicDir);
 
 			return callback(null, app);

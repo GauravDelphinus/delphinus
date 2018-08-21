@@ -9,6 +9,7 @@
 var dbInit = require("../db/dbInit");
 var request = require("request");
 var assert = require("chai").assert;
+const dynamicConfig = require("../config/dynamicConfig");
 
 describe("Sanity Tests", function() {
 	this.timeout(10000);
@@ -19,7 +20,7 @@ describe("Sanity Tests", function() {
 
 	describe("Page Endpoints", function() {
 		it("/ should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -29,7 +30,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/privacy should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/privacy", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/privacy", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -39,7 +40,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/contact should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/contact", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/contact", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -49,7 +50,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/auth should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/auth", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/auth", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -59,7 +60,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/newchallenge should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/newchallenge", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/newchallenge", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -69,7 +70,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/newentry should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/newentry", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/newentry", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -81,7 +82,7 @@ describe("Sanity Tests", function() {
 	
 	describe("API Endpoints", function() {
 		it("/api/feeds should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/feeds", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/feeds", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -91,7 +92,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/api/challenges should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/challenges", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -101,7 +102,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/api/entries should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/entries", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/entries", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -111,7 +112,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/api/users should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/users", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/users", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -121,7 +122,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/api/posts should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/posts", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/posts", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -131,7 +132,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/api/comments should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/comments", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/comments", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -141,7 +142,7 @@ describe("Sanity Tests", function() {
 		});
 
 		it("/api/designs should return 200", function(done) {
-			request.get(process.env.HOSTNAME + "/api/designs", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/designs", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}

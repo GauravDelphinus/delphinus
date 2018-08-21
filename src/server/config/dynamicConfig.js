@@ -1,7 +1,11 @@
 require("dotenv").config();
 
 module.exports = {
-	hostname: process.env.NODE_HOSTNAME,
+	nodeHostname: process.env.NODE_HOSTNAME,
+	nodeEnv: process.env.NODE_ENV,
+	dbHostname: process.env.NEO4J_HOSTNAME,
+	dbUsername: process.env.NEO4J_USERNAME,
+	dbPassword: process.env.NEO4J_PASSWORD,
 	facebookClientId: process.env.FACEBOOK_CLIENT_ID,
 	facebookClientSecret: process.env.FACEBOOK_CLIENT_SECRET,
 	twitterClientId: process.env.TWITTER_CLIENT_ID,

@@ -8,17 +8,15 @@ var assert = require("chai").assert;
 var config = require("../config");
 var serverUtils = require("../serverUtils");
 var logger = require("../logger");
-require("dotenv").config();
+const dynamicConfig = require("../config/dynamicConfig");
 
 describe("Challenges", function() {
 	this.timeout(10000);
 
-	console.log("Challenges test: process.env, HOSTNAME: " + process.env.HOSTNAME + ", NODE_HOSTNAME: " + process.env.NODE_HOSTNAME + ", NEO4J_HOSTNAME: " + process.env.NEO4J_HOSTNAME);
-
 	describe("Getting Challenges", function() {
 		//no parameters should default to a chunk being returned
 		it("/api/challenges should return a max limit of challenges", function(done) {
-			request.get(process.env.NODE_HOSTNAME + "/api/challenges", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -34,7 +32,7 @@ describe("Challenges", function() {
 
 		//limit parameter only takes effect if sortBy parameter is also set, otherwise it is ignored
 		it("/api/challenges?limit=2 should return a max limit of challenges", function(done) {
-			request.get(process.env.NODE_HOSTNAME + "/api/challenges?limit=2", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges?limit=2", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -50,7 +48,7 @@ describe("Challenges", function() {
 
 		//sortBy without limit should return 400
 		it("/api/challenges?sortBy=popularity without limit parameter should return 400", function(done) {
-			request.get(process.env.NODE_HOSTNAME + "/api/challenges?sortBy=popularity", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges?sortBy=popularity", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -62,7 +60,7 @@ describe("Challenges", function() {
 
 		//sortBy with limit greater than config.businessLogic.maxCustomSortedLimit should return 400
 		it("/api/challenges?sortBy=popularity with limit greater than config.businessLogic.maxCustomSortedLimit should return 400", function(done) {
-			request.get(process.env.NODE_HOSTNAME + "/api/challenges?sortBy=popularity&limit=20", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges?sortBy=popularity&limit=20", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -74,7 +72,7 @@ describe("Challenges", function() {
 
 		//sortBy with limit less than or equal to config.businessLogic.maxCustomSortedLimit should return a valid chunk
 		it("/api/challenges?sortBy=popularity with limit less than or equal to config.businessLogic.maxCustomSortedLimit should return a valid chunk", function(done) {
-			request.get(process.env.NODE_HOSTNAME + "/api/challenges?sortBy=popularity&limit=2", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges?sortBy=popularity&limit=2", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -92,7 +90,7 @@ describe("Challenges", function() {
 	describe("Getting a specific challenge", function() {
 
 		it("/api/challenges/:challengeId with a valid challenge should return the specific challenge details", function(done) {
-			request.get(process.env.NODE_HOSTNAME + "/api/challenges/" + "HkQawQ4PW", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges/" + "HkQawQ4PW", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -114,7 +112,7 @@ describe("Challenges", function() {
 		});
 
 		it("/api/challenges/:challengeId with an invalid challenge should return 500", function(done) {
-			request.get(process.env.NODE_HOSTNAME + "/api/challenges/" + "GkQawQ4PW", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges/" + "GkQawQ4PW", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -128,7 +126,7 @@ describe("Challenges", function() {
 	describe("Deleting a specific challenge", function() {
 
 		it("/api/challenges/:challengeId should return 401 for a valid challenge (since we are not logged in and user does not match)", function(done) {
-			request.delete(process.env.NODE_HOSTNAME + "/api/challenges/" + "HkQawQ4PW", function(err, res, body) {
+			request.delete(dynamicConfig.nodeHostname + "/api/challenges/" + "HkQawQ4PW", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -139,7 +137,7 @@ describe("Challenges", function() {
 		});
 
 		it("/api/challenges/:challengeId should return 500 if the challenge is not valid", function(done) {
-			request.delete(process.env.NODE_HOSTNAME + "/api/challenges/" + "GkQawQ4PW", function(err, res, body) {
+			request.delete(dynamicConfig.nodeHostname + "/api/challenges/" + "GkQawQ4PW", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
@@ -153,7 +151,7 @@ describe("Challenges", function() {
 	describe("Getting the social info for a specific challenge", function() {
 
 		it("/api/challenges/:challengeId/social with a valid challenge should return the social info", function(done) {
-			request.get(process.env.NODE_HOSTNAME + "/api/challenges/" + "HkQawQ4PW" + "/social", function(err, res, body) {
+			request.get(dynamicConfig.nodeHostname + "/api/challenges/" + "HkQawQ4PW" + "/social", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}
