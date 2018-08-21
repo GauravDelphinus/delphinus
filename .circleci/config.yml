@@ -48,7 +48,7 @@ jobs:
         command: pwd && ls
     - run: 
         working_directory: ~/ezeeideas/delphinus/deployment/scripts
-        comand: ./setup_dirs.sh
+        command: ./setup_dirs.sh
     - run: ./deployment/scripts/setup_env.sh
     - run:
         working_directory: ~/ezeeideas/delphinus/src/server
