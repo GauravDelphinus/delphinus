@@ -13,6 +13,8 @@ require("dotenv").config();
 describe("Challenges", function() {
 	this.timeout(10000);
 
+	console.log("Challenges test: process.env, HOSTNAME: " + process.env.HOSTNAME + ", NODE_HOSTNAME: " + process.env.NODE_HOSTNAME + ", NEO4J_HOSTNAME: " + process.env.NEO4J_HOSTNAME);
+
 	describe("Getting Challenges", function() {
 		//no parameters should default to a chunk being returned
 		it("/api/challenges should return a max limit of challenges", function(done) {
@@ -72,7 +74,7 @@ describe("Challenges", function() {
 
 		//sortBy with limit less than or equal to config.businessLogic.maxCustomSortedLimit should return a valid chunk
 		it("/api/challenges?sortBy=popularity with limit less than or equal to config.businessLogic.maxCustomSortedLimit should return a valid chunk", function(done) {
-			request.get(process.env.HOSTNAME + "/api/challenges?sortBy=popularity&limit=2", function(err, res, body) {
+			request.get(process.env.NODE_HOSTNAME + "/api/challenges?sortBy=popularity&limit=2", function(err, res, body) {
 				if (err) {
 					return done(err);
 				}

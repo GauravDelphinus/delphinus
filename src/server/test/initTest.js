@@ -15,6 +15,8 @@ var dbInit = require("../db/dbInit");
 before(function(done) {
 	this.enableTimeouts(false);
 
+	console.log("before all hook: process.env, HOSTNAME: " + process.env.HOSTNAME + ", NODE_HOSTNAME: " + process.env.NODE_HOSTNAME + ", NEO4J_HOSTNAME: " + process.env.NEO4J_HOSTNAME);
+
 	//first ensure we have the configuration set correctly
 	require("dotenv").config();
 	if (!process.env.NEO4J_USERNAME || !process.env.NEO4J_PASSWORD || !process.env.NEO4J_HOSTNAME || !process.env.NODE_HOSTNAME) {
