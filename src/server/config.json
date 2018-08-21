@@ -68,8 +68,8 @@
 		"defaultProfileImageName" : "default.png"
 	},
 	"image" : {
-		"maxHeight" : 1200,
-		"maxWidth" : 1200
+		"maxHeight" : 800,
+		"maxWidth" : 800
 	},
 	"businessLogic" : {
 		"minLikesForPopularity" : 2,
