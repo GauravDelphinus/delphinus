@@ -64,8 +64,8 @@ module.exports = function(callback) {
 		setupRoutes(app);
 		
 		// Finally, start listening for requests
-		app.listen(config.port, config.development.hostname, function() {
-			logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on " + process.env.HOSTNAME + ", port " + config.port + ", Connected to Neo4j Database: " + process.env.NEO4J_HOSTNAME);
+		app.listen(config.port, function() {
+			logger.info("Node Server, Environment: " + process.env.NODE_ENV + ", Listening on " + process.env.NODE_HOSTNAME + ", port " + config.port + ", Connected to Neo4j Database: " + process.env.NEO4J_HOSTNAME);
 			logger.info("Application Root: " + global.appRoot + ", Express Static directory: " + publicDir);
 
 			return callback(null, app);
