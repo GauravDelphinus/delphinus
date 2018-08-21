@@ -64,15 +64,10 @@ jobs:
         path: /tmp/circleci-artifacts
     - store_artifacts:
         path: /tmp/circleci-test-results
-
-  deploy:
-    steps:
-      - run: ../../deployment/scripts/deploy_stage.sh
+    #deploy
+    - run: ../../deployment/scripts/deploy_stage.sh
 workflows:
     version: 2
     build-and-deploy:
       jobs:
           - build
-          - deploy:
-              requires:
-                - build
