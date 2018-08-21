@@ -35,8 +35,9 @@ jobs:
     - run: npm install
     - run: npm config set strict-ssl false
     - run: sudo env "PATH=$PATH" npm install -g pm2@latest
-    - run: pwd
-    - run: ../../deployment/scripts/setup_dirs.sh
+    - run:
+        working_directory: ~/ezeeideas/delphinus/deployment/scripts
+        command: setup_dirs.sh
     - run: ../../deployment/scripts/setup_env.sh
     - run:
         command: node ./index.js
