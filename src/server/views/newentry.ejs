@@ -100,11 +100,32 @@
 				<table width="100%">
 					<tr>
 						<td width="90%">
-							<input type="text" id="bannerText" class="form-control horizontal-center-container horizontal-center-child" placeholder="Enter your entry caption here.  Press ENTER when done." required>
+							<input type="text" id="bannerText" class="typeahead form-control" placeholder="Enter your entry caption here.  Press ENTER when done." required>
 						</td>
 						<td>
 							<button type="button" class="btn btn-lg button-setting" id="captionButton" disabled>Apply</button>
 						</td>
+						<!--
+						<form id="form-beer_v1" name="form-beer_v1">
+						    <div class="typeahead__container">
+						        <div class="typeahead__field">
+						            <div class="typeahead__query">
+						                <input class="js-typeahead-beer_v1" name="beer_v1[query]" type="search" placeholder="Search" autocomplete="off">
+						            </div>
+						            <div class="typeahead__button">
+						                <button type="submit">
+						                    <i class="typeahead__search-icon"></i>
+						                </button>
+						            </div>
+						        </div>
+						    </div>
+						</form>
+						-->
+						<!--
+						<div id="multiple-datasets">
+						  <input class="typeahead" type="text" placeholder="NBA and NHL teams">
+						</div>
+					-->
 					</tr>
 				</table>
 			</div>
@@ -206,11 +227,13 @@
 	var user = <%- JSON.stringify(user) %>;
 </script>
 <script src="/third-party/jquery/js/jquery.min.js"></script>
-<script src="/third-party/bootstrap/js/bootstrap.min.js"></script>
+<script src="/third-party/typeahead/js/typeahead.bundle.js"></script>
+<!-- <script src="http://www.runningcoder.org/vendor/runningcoder/jquery-typeahead/src/jquery.typeahead.js?v=2.10.5"></script> -->
 <script src="/third-party/bootstrap-colorpicker/js/bootstrap-colorpicker.min.js"></script>
 <script src="/third-party/cropper/js/cropper.min.js"></script>
 <script src="/third-party/chosen/chosen.jquery.min.js"></script>
 <script src="/third-party/chosen/chosen.proto.min.js"></script>
+
 <script src="/js/newentry.min.js"></script>
 <script src="/js/header.min.js"></script>
 <script src="/js/utils.min.js"></script>

@@ -56,6 +56,9 @@ function setupAPIRoutes(app) {
 
 	const contactRouter = require("./routes/contactRoutes")();
 	app.use("/api/contact", contactRouter);
+
+	const typeaheadRouter = require("./routes/typeaheadRoutes")();
+	app.use("/api/typeahead", typeaheadRouter);
 }
 
 /*

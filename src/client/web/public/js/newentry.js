@@ -246,6 +246,196 @@ function setupCaptionStep() {
 		$("#apply").prop("disabled", false);
 	    setupArtifactStep();
 	});
+
+	setupTypeaheadField();
+}
+
+function setupTypeaheadField() {
+	/*
+	var countries = new Bloodhound({
+	  datumTokenizer: Bloodhound.tokenizers.whitespace,
+	  queryTokenizer: Bloodhound.tokenizers.whitespace,
+	  // url points to a json file that contains an array of country names, see
+	  // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
+	  prefetch: '/images/countries.json',
+	  cache: false,
+	  ttl: 1
+	});
+
+	// passing in `null` for the `options` arguments will result in the default
+	// options being used
+	$('#multiple-datasets .typeahead').typeahead(null, {
+	  name: 'countries',
+	  source: countries
+	});
+	*/
+
+	var datumTokenizer = function(d) {
+        var test = Bloodhound.tokenizers.whitespace(d);
+        $.each(test,function(k,v){
+            i = 0;
+            while( (i+1) < v.length ){
+                test.push(v.substr(i,v.length));
+                i++;
+            }
+        })
+        return test;
+    }
+
+	var quotesList = new Bloodhound({
+	  datumTokenizer: datumTokenizer,
+	  queryTokenizer: Bloodhound.tokenizers.whitespace,
+	  prefetch: {
+	  		url: '/api/typeahead?sourceType=quote',
+	  		cache: false //while in dev
+	  		//ttl: 1
+		}
+	});
+
+	var idiomsList = new Bloodhound({
+	  datumTokenizer: datumTokenizer,
+	  queryTokenizer: Bloodhound.tokenizers.whitespace,
+	  prefetch: {
+	  		url: '/api/typeahead?sourceType=idiom',
+	  		cache: false //while in dev
+	  		//ttl: 1
+	  	}
+	});
+
+	$('.typeahead').typeahead({
+	  highlight: true,
+	  hint: true,
+	  minLength: 1
+	},
+	{
+	  name: 'quotes',
+	 // display: 'team',
+	  source: quotesList,
+	  templates: {
+	    header: '<div class="tt-dataset-heading">Quotes</div>'
+	  },
+	  limit: 10
+	},
+	{
+	  name: 'idioms',
+	  //display: 'team',
+	  source: idiomsList,
+	  templates: {
+	    header: '<div class="tt-dataset-heading">Idioms</div>'
+	  },
+	  limit: 10
+	});
+	
+
+	/*
+	$('.typeahead').typeahead({		
+    source: function(query, process) {   
+        console.log(query);
+    }
+});
+	*/
+	
+	/*
+	$('.js-typeahead-beer_v1').typeahead({
+    input: '.js-typeahead-beer_v1',
+    minLength: 1,
+    maxItem: 15,
+    order: "asc",
+    hint: true,
+    group: {
+        template: "{{group}} beers!"
+    },
+    maxItemPerGroup: 5,
+    backdrop: {
+        "background-color": "#fff"
+    },
+    href: "/beers/{{group|slugify}}/{{display|slugify}}/",
+    dropdownFilter: "all beers",
+    emptyTemplate: 'No result for "{{query}}"',
+    source: {
+        "ale": {
+            ajax: {
+                url: "/images/beer.json",
+                path: "data.beer.ale"
+            }
+        },
+        "lager": {
+            ajax: {
+                url: "/images/beer.json",
+                path: "data.beer.lager"
+            }
+        },
+        "stout and porter": {
+            ajax: {
+                url: "/images/beer.json",
+                path: "data.beer.stout"
+            }
+        },
+        "malt": {
+            ajax: {
+                url: "/images/beer.json",
+                path: "data.beer.malt"
+            }
+        }
+    },
+    callback: {
+        onClickAfter: function (node, a, item, event) {
+        	console.log("onClickAfter calld");
+ 
+            event.preventDefault;
+ 
+            // href key gets added inside item from options.href configuration
+            alert(item.href);
+ 
+        }
+    },
+    debug: true
+});
+*/
+
+
+/*
+var cars = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('carName'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  prefetch: '/images/quotes.json' 
+});
+
+var drivers = new Bloodhound({
+  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('driverName'),
+  queryTokenizer: Bloodhound.tokenizers.whitespace,
+  prefetch: '/images/idioms.json'
+});
+
+$('.typeahead').typeahead({
+  highlight: true
+},
+
+{
+  name: 'carName',
+  display: 'name',
+  source: cars,
+  templates: {
+    suggestion: function (data) {
+      return '<p><strong>' + data.name + '</strong> - '+ data.type +'</p>';
+    }
+  },
+
+},
+{
+  name: 'driverName', 
+  display: 'name',
+  source: drivers,
+  templates: {
+    suggestion: function (data) {
+      return '<p><strong>' + data.firstName+ '</strong> - ' + data.lastName +     '</p>';
+    }
+  }
+}
+)
+*/
+
+
 }
 
 /**************************** (2) ARTIFACT STEP **********************************************/
