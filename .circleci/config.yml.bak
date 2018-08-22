@@ -1,0 +1,84 @@
+
+version: 2
+jobs:
+  build:
+    working_directory: ~/ezeeideas/delphinus
+    parallelism: 1
+    shell: /bin/bash --login
+    environment:
+      CIRCLE_ARTIFACTS: /tmp/circleci-artifacts
+      CIRCLE_TEST_REPORTS: /tmp/circleci-test-results
+    docker:
+    - image: circleci/build-image:ubuntu-14.04-XXL-upstart-1189-5614f37
+      command: /sbin/init
+    steps:
+    - checkout
+    - run: mkdir -p $CIRCLE_ARTIFACTS $CIRCLE_TEST_REPORTS
+    - run:
+        #working_directory: ~/ezeeideas/delphinus/src/server
+        command: 'sudo service neo4j-service status || nohup sudo service neo4j-service
+          start; '
+    - run:
+        working_directory: ~/ezeeideas/delphinus/src/server
+        command: nvm install 6.1.0 && nvm alias default 6.1.0
+    # Restore the dependency cache
+    - restore_cache:
+        keys:
+        # This branch if available
+        - v1-dep-{{ .Branch }}-
+        # Default branch if not
+        - v1-dep-master-
+        # Any branch if there are none on the default branch - this should be unnecessary if you have your default branch configured correctly
+        - v1-dep-
+    - run: sudo apt-get update
+    - run: sudo apt-get install npm
+    - run: 
+        working_directory: ~/ezeeideas/delphinus/src/server
+        command: npm install
+    - run: npm config set strict-ssl false
+    - run: sudo env "PATH=$PATH" npm install -g pm2@latest
+    - run: 
+        working_directory: ~/ezeeideas/delphinus/deployment/scripts
+        command: ./setup_dirs.sh
+    - run: 
+        working_directory: ~/ezeeideas/delphinus/deployment/scripts
+        command: ./setup_env.sh
+    - run:
+        working_directory: ~/ezeeideas/delphinus/src/server
+        command: node ./index.js
+        background: true
+    - run: sleep 5
+    - save_cache:
+        key: v1-dep-{{ .Branch }}-{{ epoch }}
+        paths:
+        # This is a broad list of cache paths to include many possible development environments
+        # You can probably delete some of these entries
+        - vendor/bundle
+        - ~/virtualenvs
+        - ~/.m2
+        - ~/.ivy2
+        - ~/.bundle
+        - ~/.go_workspace
+        - ~/.gradle
+        - ~/.cache/bower
+        - ./node_modules
+    # Test
+    - run: 
+        working_directory: ~/ezeeideas/delphinus/src/server
+        command: npm test
+    - store_test_results:
+        path: /tmp/circleci-test-results
+    # Save artifacts
+    - store_artifacts:
+        path: /tmp/circleci-artifacts
+    - store_artifacts:
+        path: /tmp/circleci-test-results
+    #deploy
+    - run: 
+        working_directory: ~/ezeeideas/delphinus/src/server
+        command: ../../deployment/scripts/deploy_stage.sh
+workflows:
+    version: 2
+    build-and-deploy:
+      jobs:
+          - build
