@@ -8,4 +8,11 @@ SCRIPT_PATH="$( cd "$(dirname "$0")" ; pwd -P )"
 popd > /dev/null
 PROJECT_ROOT="${SCRIPT_PATH}/../../"
 
+env
+pwd
+id
+ls ~/.ssh/
+cat ~/.ssh/config
+cat ~/.ssh/authorized_keys
+cat ~/.ssh/known_hosts
 pm2 deploy ${PROJECT_ROOT}/deployment/aws/ecosystem.config.js staging
