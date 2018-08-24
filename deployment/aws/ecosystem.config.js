@@ -111,7 +111,7 @@ module.exports = {
   	staging : {
 		user : 'node',
 		host : 'ec2-18-218-112-190.us-east-2.compute.amazonaws.com',
-		ssh_options: "StrictHostKeyChecking=no",
+		ssh_options: ["StrictHostKeyChecking=no","ForwardAgent=yes"],
 		ref  : 'origin/master',
 		repo : 'git@github.com:ezeeideas/delphinus.git',
 		path : '/var/www/appserver/staging',
