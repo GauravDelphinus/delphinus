@@ -26,9 +26,9 @@ function getChallengeMetadata(challengeId, done) {
 		var metadata = {
 			fbAppId: dynamicConfig.facebookClientId,
 			publisherName : config.branding.siteName,
-			imageURL : dynamicConfig.hostname + config.url.challengeImages + challenge.id + "." + mime.extension(challenge.imageType),
+			imageURL : dynamicConfig.nodeHostname + config.url.challengeImages + challenge.id + "." + mime.extension(challenge.imageType),
 			pageTitle : "Challenge: " + challenge.caption + " | " + config.branding.siteName,
-			pageURL : dynamicConfig.hostname + config.url.challenge + challenge.id,
+			pageURL : dynamicConfig.nodeHostname + config.url.challenge + challenge.id,
 			pageDescription : "Posted by " + challenge.postedByUser.displayName + ".  Up for the challenge?  Check out the challenge and post your entry now, it's free and takes just a few minutes!  Also, check out the awesome entries posted by others :)",
 			imageType : challenge.imageType,
 			authorName : challenge.postedByUser.displayName
@@ -61,9 +61,9 @@ function getEntryMetadata(entryId, done) {
 		var metadata = {
 			fbAppId: dynamicConfig.facebookClientId,
 			publisherName : config.branding.siteName,
-			imageURL : dynamicConfig.hostname + config.url.entryImages + entry.id  + "." + mime.extension(entry.imageType),
+			imageURL : dynamicConfig.nodeHostname + config.url.entryImages + entry.id  + "." + mime.extension(entry.imageType),
 			pageTitle : "Caption Entry: " + entry.caption + " | " + config.branding.siteName,
-			pageURL : dynamicConfig.hostname + config.url.entry + entry.id,
+			pageURL : dynamicConfig.nodeHostname + config.url.entry + entry.id,
 			pageDescription : "Posted by " + entry.postedByUser.displayName + ".  Like this entry?  Check out more such entries, and challenge yourself to post one of your own!  It takes just a few minutes, and it's free :)",
 			imageType : entry.imageType,
 			authorName : entry.postedByUser.displayName
@@ -96,9 +96,9 @@ function getUserMetadata(userId, done) {
 		var metadata = {
 			fbAppId: dynamicConfig.facebookClientId,
 			publisherName : config.branding.siteName,
-			imageURL : dynamicConfig.hostname + user.image,
+			imageURL : dynamicConfig.nodeHostname + user.image,
 			pageTitle : "User: " + user.displayName + " | " + config.branding.siteName,
-			pageURL : dynamicConfig.hostname + config.url.user + user.id,
+			pageURL : dynamicConfig.nodeHostname + config.url.user + user.id,
 			pageDescription : "Captionify User Profile for " + user.displayName,
 			imageType : serverUtils.getMimeTypeForImage(user.image),
 			authorName : config.branding.siteName
@@ -117,7 +117,7 @@ function getGenericMetadata(page) {
 	var data = {
 		fbAppId: dynamicConfig.facebookClientId,
 		publisherName : config.branding.siteName,
-		imageURL: dynamicConfig.hostname + config.url.brandImages + config.branding.shareImage.imageName, //general branding image
+		imageURL: dynamicConfig.nodeHostname + config.url.brandImages + config.branding.shareImage.imageName, //general branding image
 		imageType : config.branding.shareImage.imageType,
 		imageWidth : config.branding.shareImage.imageWidth,
 		imageHeight : config.branding.shareImage.imageHeight,
@@ -126,14 +126,14 @@ function getGenericMetadata(page) {
 
 	if (page == "entries") {
 		data.pageTitle = "Browse Entries" + " | " + config.branding.siteName;
-		data.pageURL = dynamicConfig.hostname + config.url.entries;
+		data.pageURL = dynamicConfig.nodeHostname + config.url.entries;
 		data.pageDescription = "Check out all the awesome entries posted at Captionify.com, and challenge yourself to post your own!";
 	} else if (page == "users") {
 		data.pageTitle = "Users | " + config.branding.siteName;
-		data.pageURL = dynamicConfig.hostname + config.url.users;
+		data.pageURL = dynamicConfig.nodeHostname + config.url.users;
 		data.pageDescription = "Users";
 	} else if (page == "home") { //home page or other generic pages
-		data.pageURL = dynamicConfig.hostname;
+		data.pageURL = dynamicConfig.nodeHostname;
 		data.pageTitle = config.branding.siteName + " | " + config.branding.siteTitle;
 		data.pageDescription = config.branding.siteDescription;
 	}

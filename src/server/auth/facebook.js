@@ -11,7 +11,7 @@ module.exports = function () {
     passport.use(new FacebookStrategy({
             clientID: dynamicConfig.facebookClientId,
             clientSecret: dynamicConfig.facebookClientSecret,
-            callbackURL: dynamicConfig.hostname + config.social.facebook.oauthCallback,
+            callbackURL: dynamicConfig.nodeHostname + config.social.facebook.oauthCallback,
             profileFields: ['id', 'email', 'photos', 'displayName'],
             passReqToCallback: true
         },

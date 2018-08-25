@@ -10,7 +10,7 @@ module.exports = function () {
     passport.use(new TwitterStrategy({
             consumerKey: dynamicConfig.twitterClientId,
             consumerSecret: dynamicConfig.twitterClientSecret,
-            callbackURL: dynamicConfig.hostname + config.social.twitter.oauthCallback,
+            callbackURL: dynamicConfig.nodeHostname + config.social.twitter.oauthCallback,
             passReqToCallback: true
         },
         function(req, token, tokenSecret, profile, done){

@@ -10,7 +10,7 @@ module.exports = function () {
     passport.use(new GoogleStrategy({
             clientID: dynamicConfig.googleClientId,
             clientSecret: dynamicConfig.googleClientSecret,
-            callbackURL: dynamicConfig.hostname + config.social.google.oauthCallback,
+            callbackURL: dynamicConfig.nodeHostname + config.social.google.oauthCallback,
             passReqToCallback: true
         },
         function(req, accessToken, refreshToken, profile, done){
