@@ -74,6 +74,7 @@ jobs:
     - store_artifacts:
         path: /tmp/circleci-test-results
     #deploy
+    - add_ssh_keys
     - run: 
         working_directory: ~/ezeeideas/delphinus/src/server
         command: ../../deployment/scripts/deploy_stage.sh
