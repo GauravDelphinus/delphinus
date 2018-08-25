@@ -745,16 +745,20 @@ module.exports = {
 		For example, redirecting non-admins to a maintenance page versus admins continue to have access to the full site
 
 		.env/ADMIN_IPS is a comma separated list of client IP addresses
+
+		Special case: if 0.0.0.0 is entered as an Admin IP, it is automatically considered as an admin, and so all clients would end up behaving like admins
 	**/
 	clientIsAdmin: function(req) {
 		require("dotenv").config();
 		var clientIP = req.ip || req.connection.remoteAddress;
 		var ipArray = [];
-		logger.debug("clientIP: " + clientIP + ", process.env.ADMIN_IPS: " + process.env.ADMIN_IPS);
 		if (process.env.ADMIN_IPS) {
 			ipArray = process.env.ADMIN_IPS.split(",");
 		}
 		if (ipArray.length > 0 && ipArray.indexOf(clientIP) > -1) {
+			return true;
+		}
+		if (ipArray.indexOf("0.0.0.0")) { //special case
 			return true;
 		}
 
