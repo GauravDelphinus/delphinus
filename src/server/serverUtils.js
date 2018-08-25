@@ -750,6 +750,7 @@ module.exports = {
 		require("dotenv").config();
 		var clientIP = req.ip || req.connection.remoteAddress;
 		var ipArray = [];
+		logger.debug("clientIP: " + clientIP + ", process.env.ADMIN_IPS: " + process.env.ADMIN_IPS);
 		if (process.env.ADMIN_IPS) {
 			ipArray = process.env.ADMIN_IPS.split(",");
 		}
