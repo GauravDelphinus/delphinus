@@ -37,6 +37,19 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
+			/*
+				Prefetch: these are fetched at init time of client page.  Should keep these
+				to a minimum, and these are cached in browser
+
+				Remote: these are fetched at run time as user types, and a query string is passed
+				so server can filter and send appropriate results.
+
+				Refer newentry.js routines related to this (setupTypeaheadField function in particular)
+				Refer data json files under server/data/typeahead/*.json
+
+				For more on the Twitter Typeahead feature, refer: https://github.com/twitter/typeahead.js,
+				https://github.com/twitter/typeahead.js/blob/master/doc/bloodhound.md
+			*/
 			var output = [];
 			if (req.query.queryType == "prefetch") {
 				if (req.query.sourceType == "quote") {

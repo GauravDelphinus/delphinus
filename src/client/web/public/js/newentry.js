@@ -252,22 +252,17 @@ function setupCaptionStep() {
 
 function setupTypeaheadField() {
 	/*
-	var countries = new Bloodhound({
-	  datumTokenizer: Bloodhound.tokenizers.whitespace,
-	  queryTokenizer: Bloodhound.tokenizers.whitespace,
-	  // url points to a json file that contains an array of country names, see
-	  // https://github.com/twitter/typeahead.js/blob/gh-pages/data/countries.json
-	  prefetch: '/images/countries.json',
-	  cache: false,
-	  ttl: 1
-	});
+		Prefetch: these are fetched at init time of client page.  Should keep these
+		to a minimum, and these are cached in browser
 
-	// passing in `null` for the `options` arguments will result in the default
-	// options being used
-	$('#multiple-datasets .typeahead').typeahead(null, {
-	  name: 'countries',
-	  source: countries
-	});
+		Remote: these are fetched at run time as user types, and a query string is passed
+		so server can filter and send appropriate results.
+
+		Refer newentry.js routines related to this (setupTypeaheadField function in particular)
+		Refer data json files under server/data/typeahead/*.json
+
+		For more on the Twitter Typeahead feature, refer: https://github.com/twitter/typeahead.js,
+		https://github.com/twitter/typeahead.js/blob/master/doc/bloodhound.md
 	*/
 
 	var datumTokenizer = function(d) {
@@ -333,136 +328,6 @@ function setupTypeaheadField() {
 	  },
 	  limit: 10
 	});
-	
-
-	/*
-	$('.typeahead').typeahead({		
-    source: function(query, process) {   
-        console.log(query);
-    }
-});
-	*/
-	
-	/*
-	$('.js-typeahead-beer_v1').typeahead({
-    input: '.js-typeahead-beer_v1',
-    minLength: 1,
-    maxItem: 15,
-    order: "asc",
-    hint: true,
-    group: {
-        template: "{{group}} beers!"
-    },
-    maxItemPerGroup: 5,
-    backdrop: {
-        "background-color": "#fff"
-    },
-    href: "/beers/{{group|slugify}}/{{display|slugify}}/",
-    dropdownFilter: "all beers",
-    emptyTemplate: 'No result for "{{query}}"',
-    source: {
-        "ale": {
-            ajax: {
-                url: "/images/beer.json",
-                path: "data.beer.ale"
-            }
-        },
-        "lager": {
-            ajax: {
-                url: "/images/beer.json",
-                path: "data.beer.lager"
-            }
-        },
-        "stout and porter": {
-            ajax: {
-                url: "/images/beer.json",
-                path: "data.beer.stout"
-            }
-        },
-        "malt": {
-            ajax: {
-                url: "/images/beer.json",
-                path: "data.beer.malt"
-            }
-        }
-    },
-    callback: {
-        onClickAfter: function (node, a, item, event) {
-        	console.log("onClickAfter calld");
- 
-            event.preventDefault;
- 
-            // href key gets added inside item from options.href configuration
-            alert(item.href);
- 
-        }
-    },
-    debug: true
-});
-*/
-
-
-/*
-var cars = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('carName'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  prefetch: '/images/quotes.json' 
-});
-
-var drivers = new Bloodhound({
-  datumTokenizer: Bloodhound.tokenizers.obj.whitespace('driverName'),
-  queryTokenizer: Bloodhound.tokenizers.whitespace,
-  prefetch: '/images/idioms.json'
-});
-
-$('.typeahead').typeahead({
-  highlight: true
-},
-
-{
-  name: 'carName',
-  display: 'name',
-  source: cars,
-  templates: {
-    suggestion: function (data) {
-      return '<p><strong>' + data.name + '</strong> - '+ data.type +'</p>';
-    }
-  },
-
-},
-{
-  name: 'driverName', 
-  display: 'name',
-  source: drivers,
-  templates: {
-    suggestion: function (data) {
-      return '<p><strong>' + data.firstName+ '</strong> - ' + data.lastName +     '</p>';
-    }
-  }
-}
-)
-*/
-
-
-}
-
-function getLocalTypeaheadData(sourceType) {
-	if (sourceType == "quote") {
-		return localTypeaheadData.quotes;
-	} else if (sourceType == "idiom") {
-		return localTypeaheadData.idioms;
-	} else {
-		return [];
-	}
-}
-
-const localTypeaheadData = {
-	quotes: [
-
-	],
-
-	idioms: [
-	]
 }
 
 /**************************** (2) ARTIFACT STEP **********************************************/
