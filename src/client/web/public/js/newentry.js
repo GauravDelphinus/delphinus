@@ -287,7 +287,7 @@ function setupTypeaheadField() {
 	  queryTokenizer: Bloodhound.tokenizers.whitespace,
 	  prefetch: {
 	  		url: '/api/typeahead?sourceType=quote',
-	  		cache: false //while in dev
+	  		cache: true
 	  		//ttl: 1
 		}
 	});
@@ -297,7 +297,7 @@ function setupTypeaheadField() {
 	  queryTokenizer: Bloodhound.tokenizers.whitespace,
 	  prefetch: {
 	  		url: '/api/typeahead?sourceType=idiom',
-	  		cache: false //while in dev
+	  		cache: true
 	  		//ttl: 1
 	  	}
 	});
@@ -305,7 +305,7 @@ function setupTypeaheadField() {
 	$('.typeahead').typeahead({
 	  highlight: true,
 	  hint: true,
-	  minLength: 1
+	  minLength: 2
 	},
 	{
 	  name: 'quotes',
