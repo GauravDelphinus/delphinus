@@ -387,8 +387,20 @@ function applyPresetCaption(imArgs, image, size, caption, placement, extent, lab
 		backgroundColor = "none";
 	}
 
+	/*
+		Foreground color.  While theoretically the foreground color to pick should be the exact
+		inverse of the background color, but in practice, this doesn't work as in many cases the
+		colors don't look good to the eye.  So, I've decided to always fall back to either Black or White
+		as the foreground color, depending on what shade the inverse of the background color is.
+	*/
 	if (averageColor) {
-		foregroundColor = "rgb(" + (255 - averageColor.r) + "," + (255 - averageColor.g) + "," + (255 - averageColor.b) + ")";
+		const grayIntensity = ((255 - averageColor.r) * 0.2126 + (255 - averageColor.g) * 0.7152 + (255 - averageColor.b) * 0.0722)/255;
+		if (grayIntensity < 0.5) {
+			foregroundColor = "black";
+		} else {
+			foregroundColor = "white";
+		}
+		//foregroundColor = "rgb(" + (255 - averageColor.r) + "," + (255 - averageColor.g) + "," + (255 - averageColor.b) + ")";
 	}
 
 	applyCaption(imArgs, size, backgroundColor, foregroundColor, caption, placement, null, extent, labelGeometry);
