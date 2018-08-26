@@ -758,7 +758,7 @@ module.exports = {
 		if (ipArray.length > 0 && ipArray.indexOf(clientIP) > -1) {
 			return true;
 		}
-		if (ipArray.indexOf("0.0.0.0")) { //special case
+		if (ipArray.indexOf("0.0.0.0") > -1) { //special case
 			return true;
 		}
 
