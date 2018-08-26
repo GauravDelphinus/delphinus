@@ -19,6 +19,17 @@ var routes = function() {
 				{
 					name: "sourceType",
 					type: ["quote", "idiom"],
+					required: "yes"
+				},
+				{
+					name: "queryType",
+					type: ["prefetch", "remote"],
+					required: "yes"
+				},
+				{
+					name: "query",
+					required: "no",
+					type: "string"
 				}
 			];
 
@@ -27,15 +38,38 @@ var routes = function() {
 			}
 
 			var output = [];
-			if (req.query.sourceType == "quote") {
-				output = require("../data/typeahead/quotes.json");
-			} else if (req.query.sourceType == "idiom") {
-				output = require("../data/typeahead/idioms.json");
+			if (req.query.queryType == "prefetch") {
+				if (req.query.sourceType == "quote") {
+					output = require("../data/typeahead/quotes_prefetch.json");
+				} else if (req.query.sourceType == "idiom") {
+					output = require("../data/typeahead/idioms_prefetch.json");
+				}
+			} else if (req.query.queryType == "remote") {
+				if (!req.query.query) {
+					logger.error("Missing required parameter 'query' in case of queryType = remote");
+					return res.sendStatus(400);
+				}
+
+				if (req.query.sourceType == "quote") {
+					output = require("../data/typeahead/quotes_remote.json");
+				} else if (req.query.sourceType == "idiom") {
+					output = require("../data/typeahead/idioms_remote.json");
+				}
+
+				output = filterTypeaheadData(output, req.query.query);
 			}
+			
+			logger.debug("returning to client: array of size: " + output.length);
 			return res.json(output);
 		});
 
 	return typeaheadRouter;
 };
+
+function filterTypeaheadData(data, query) {
+	return data.filter(function(item) {
+		return item.indexOf(query) !== -1;
+	});
+}
 
 module.exports = routes;

@@ -286,19 +286,27 @@ function setupTypeaheadField() {
 	  datumTokenizer: datumTokenizer,
 	  queryTokenizer: Bloodhound.tokenizers.whitespace,
 	  prefetch: {
-	  		url: '/api/typeahead?sourceType=quote',
+	  		url: '/api/typeahead?sourceType=quote&queryType=prefetch',
 	  		cache: true
 	  		//ttl: 1
-		}
+		},
+	  remote: {
+	  		url: '/api/typeahead?sourceType=quote&queryType=remote&query=%QUERY',
+	  		wildcard: '%QUERY'
+	  }
 	});
 
 	var idiomsList = new Bloodhound({
 	  datumTokenizer: datumTokenizer,
 	  queryTokenizer: Bloodhound.tokenizers.whitespace,
 	  prefetch: {
-	  		url: '/api/typeahead?sourceType=idiom',
+	  		url: '/api/typeahead?sourceType=idiom&queryType=prefetch',
 	  		cache: true
 	  		//ttl: 1
+	  	},
+	  	remote: {
+	  		url: '/api/typeahead?sourceType=idiom&queryType=remote&query=%QUERY',
+	  		wildcard: '%QUERY'
 	  	}
 	});
 
@@ -436,6 +444,25 @@ $('.typeahead').typeahead({
 */
 
 
+}
+
+function getLocalTypeaheadData(sourceType) {
+	if (sourceType == "quote") {
+		return localTypeaheadData.quotes;
+	} else if (sourceType == "idiom") {
+		return localTypeaheadData.idioms;
+	} else {
+		return [];
+	}
+}
+
+const localTypeaheadData = {
+	quotes: [
+
+	],
+
+	idioms: [
+	]
 }
 
 /**************************** (2) ARTIFACT STEP **********************************************/
