@@ -385,7 +385,6 @@ function generateArtifactObject() {
 	var artifact = {};
 	var presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
 	if (presetValue != undefined) {
-		console.log("presetValue: " + presetValue);
 		if (!$("#bannerCustomOptionsCheckbox").is(':checked')) { //preset
 			artifact.type = "preset";
 			artifact.preset = presetValue;
@@ -409,8 +408,6 @@ function generateArtifactObject() {
 			}
 		}
 	}
-
-	console.log("generated artifact: " + JSON.stringify(artifact));
 
 	return artifact;
 }
@@ -988,7 +985,6 @@ var applyFailCount = 0;
 function applyChanges(refreshPresets, done) {
 	var jsonObj = {};
 
-	console.log("applyChanges called with refreshPresets = " + refreshPresets);
 	constructJSONObject(jsonObj);
 	$.ajax({
 		type: "POST",
