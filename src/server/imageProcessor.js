@@ -553,7 +553,29 @@ function applyBorder(imArgs, borderWidth, borderColor) {
 }
 
 
+function getCaptionType(imArgs) {
+	if (imArgs.indexOf("-extent") > -1) {
+		if (imArgs.indexOf("south") > -1) {
+			return "#### BELOW ####";
+		}
+	}
 
+	if (imArgs.indexOf("-extent") > -1) {
+		if (imArgs.indexOf("north") > -1) {
+			return "$$$$ ABOVE $$$$";
+		}
+	}
+
+	if (imArgs.indexOf("south") > -1) {
+			return "vvvv BOTTOM vvvv";
+	}
+
+	if (imArgs.indexOf("north") > -1) {
+			return "^^^^ TOP ^^^^";
+	}
+
+	return "---- CENTER ----";
+}
 /****************** Common Helper Functions *****************/
 
 /**
@@ -563,21 +585,22 @@ function applyBorder(imArgs, borderWidth, borderColor) {
 	really any change done.
 **/
 function writeImage(sourceImage, targetImage, imArgs, next) {
-	//logger.debug("****************** writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+	
+	logger.debug(getCaptionType(imArgs) + " writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 	const timer = logger.startTimer();
 	if (imArgs.length > 0) {
 		execFile("convert", imArgs, (error, stdout, stderr) => {
 			if (error) {
 		    	next(error, null);
-		    	timer.done("writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+		    	timer.done(getCaptionType(imArgs) + "writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 		  	} else {
 		  		next(0, targetImage);
-		  		timer.done("writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+		  		timer.done(getCaptionType(imArgs) + "writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 		  	}
 	  	});
 	} else {
 		next(0, sourceImage); // no changes done, so just send back the source image
-		timer.done("writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+		timer.done(getCaptionType(imArgs) + "writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 	}
 }
 
