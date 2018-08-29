@@ -660,6 +660,7 @@ function createPresetsView(presetType, presetSectionID, defaultPresetID, content
 			return;
 		}
 
+		console.log("  createPresetsViewInternal callback called, appending presetsView to DOM");
 		$(presetSectionID).empty().append(presetsView);
 
 		//apply changes to reflect default selection
