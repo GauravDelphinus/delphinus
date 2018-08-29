@@ -692,8 +692,9 @@ function refreshPresetsView(presetType, presetSectionID) {
 
 		console.log("  calling generateChanges for presetId: " + presetId + ", image index: " + index);
 		generateChanges(presetId, jsonObj, function(id, data) {
-			console.log("  callback for generateChanges, setting image " + id + " path to " + data.imageData);
-			$("img#" + id).prop("src", data.imageData);
+			console.log("  callback for generateChanges, setting image " + id + " path to random " + data.imageData);
+			//$("img#" + id).prop("src", data.imageData);
+			$("img#" + id).prop("src", data.imageData + "?" + Math.random());
 		});
 	});
 }
@@ -781,7 +782,8 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 				var data = {};
 				data.id = a.id;
 				data.caption = a.name;
-				data.image = "/images/static/progress.gif"; //start by showing the progress image
+				//data.image = "/images/static/progress.gif"; //start by showing the progress image
+				data.image = "/images/static/progress.gif?" + Math.random(); //start by showing the progress image
 
 				list.push(data);
 			}
