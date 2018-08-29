@@ -694,7 +694,7 @@ function refreshPresetsView(presetType, presetSectionID) {
 		generateChanges(presetId, jsonObj, function(id, data) {
 			console.log("  callback for generateChanges, setting image " + id + " path to random " + data.imageData);
 			//$("img#" + id).prop("src", data.imageData);
-			$("img#" + id).prop("src", data.imageData + "?" + Math.random());
+			//$("img#" + id).prop("src", data.imageData + "?" + Math.random());
 		});
 	});
 }
@@ -963,7 +963,7 @@ function constructJSONObject(jsonObj) {
 var generateFailCount = 0;
 function generateChanges(id, jsonObj, done) {
 	console.log("generateChanges, id: " + id + ", not calling POST on /api/filters/apply");
-	/*
+	
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -988,7 +988,7 @@ function generateChanges(id, jsonObj, done) {
 			}
 		}
 	});
-	*/
+	
 }
 
 /*
