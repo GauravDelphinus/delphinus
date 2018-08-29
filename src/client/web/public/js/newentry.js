@@ -694,7 +694,10 @@ function refreshPresetsView(presetType, presetSectionID) {
 		generateChanges(presetId, jsonObj, function(id, data) {
 			console.log("  callback for generateChanges, setting image " + id + " path to random " + data.imageData);
 			//$("img#" + id).prop("src", data.imageData);
-			//$("img#" + id).prop("src", data.imageData + "?" + Math.random());
+			$("img#" + id).prop("src", data.imageData + "?" + Math.random());
+			$("img#" + id).load(function() {
+				console.log("** Load called for final image id: " + id);
+			});
 		});
 	});
 }

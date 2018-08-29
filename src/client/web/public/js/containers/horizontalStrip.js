@@ -51,6 +51,9 @@ function createHorizontalStripElement(data, contentTag) {
 	var element = $("<div>", {class: "horizontalStripElement"});
 
 	var imageElement = $("<img>", {id: data.id, src: data.image});
+		imageElement.load(function() {
+		console.log("** Load called for preview image id: " + data.id + ", src: " + data.image);
+	});
 	element.append(imageElement);
 
 	var captionSection = $("<div>", {class: "horizontal-strip-item-caption", id: contentTag + data.id + "CaptionSection"});
