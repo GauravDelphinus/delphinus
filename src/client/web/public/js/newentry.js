@@ -962,7 +962,8 @@ function constructJSONObject(jsonObj) {
 */
 var generateFailCount = 0;
 function generateChanges(id, jsonObj, done) {
-	console.log("generateChanges, id: " + id + ", calling POST on /api/filters/apply, jsonObj = " + JSON.stringify(jsonObj));
+	console.log("generateChanges, id: " + id + ", not calling POST on /api/filters/apply");
+	/*
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -987,6 +988,7 @@ function generateChanges(id, jsonObj, done) {
 			}
 		}
 	});
+	*/
 }
 
 /*
