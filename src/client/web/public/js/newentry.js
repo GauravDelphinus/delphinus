@@ -650,7 +650,6 @@ function generateDecorationObject() {
 	Note: this should be called only once
 **/
 function createPresetsView(presetType, presetSectionID, defaultPresetID, contentTag) {
-	console.log("createPresetsView, presetType: " + presetType + ", presetSectionID: " + presetSectionID);
 	//default selection
 	var defaultSelectionID = fetchPresetValue(presetType, defaultPresetID);
 
@@ -660,15 +659,14 @@ function createPresetsView(presetType, presetSectionID, defaultPresetID, content
 			return;
 		}
 
-		console.log("  createPresetsViewInternal callback called, appending presetsView to DOM");
 		$(presetSectionID).empty().append(presetsView);
 
 		//apply changes to reflect default selection
 		applyChanges(false);
 
 		//refresh the thumbnails in the presets view
+		//but only start that after we've loaded at least one of the preview images (progress.gif)
 		$(presetSectionID + " img:first").one("load", function() {
-			console.log("################################### Calling refreshPresetsView ###########");
 			refreshPresetsView(presetType, presetSectionID);
 		});
 		//refreshPresetsView(presetType, presetSectionID);
@@ -686,7 +684,6 @@ function createPresetsView(presetType, presetSectionID, defaultPresetID, content
 	due to a chance in the selections by the user
 **/
 function refreshPresetsView(presetType, presetSectionID) {
-	console.log("refreshPresetsView, presetType: " + presetType + ", presetSectionID: " + presetSectionID);
 	var images = $(presetSectionID + " img");
 	$(images).each(function(index) {
 		var image = $(this);
@@ -694,17 +691,8 @@ function refreshPresetsView(presetType, presetSectionID) {
 		//update the server with the step information and update the image that is received
 		var jsonObj = constructJSONObjectWithPreset(presetType, presetId);
 
-		console.log("  calling generateChanges for presetId: " + presetId + ", image index: " + index);
 		generateChanges(presetId, jsonObj, function(id, data) {
-			console.log("  callback for generateChanges, setting image " + id + " path to random " + data.imageData);
-			//$("img#" + id).prop("src", data.imageData);
-			$("img#" + id).prop("src", data.imageData + "?" + Math.random());
-
-			$("img#" + id).on('load', function() {
-			  console.log("###### image loaded: " + id + ", src: " + $(this).attr("src"));
-			}).each(function() {
-			  if(this.complete) $(this).load();
-			});
+			$("img#" + id).prop("src", data.imageData);
 		});
 	});
 }
@@ -715,7 +703,6 @@ function refreshPresetsView(presetType, presetSectionID) {
 	Also, add the preset infromation to the object
 **/
 function constructJSONObjectWithPreset(presetType, presetId) {
-	console.log("constructJSONObjectWithPreset, presetType: " + presetType + ", presetId: " + presetId);
 	//construct the jsonObj representing the current steps
 	var jsonObj = {};
 	constructJSONObject(jsonObj);
@@ -780,10 +767,8 @@ function constructJSONObjectWithPreset(presetType, presetId) {
 	on specific preset images.
 **/
 function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, callback) {
-	console.log("createPresetsViewInternal, presetType: " + presetType + ", contentTag: " + contentTag + ", defaultSelectionID: " + defaultSelectionID);
 	//fetch presets for the given type
 	$.getJSON('/api/filters?stepType=' + presetType + "&type=preset", function(presetsList) {
-		console.log("  getJSON callback, presetType: " + presetType + ", presetsList.length: " + presetsList.length);
 		if (presetsList.length > 0) {
 			var list = [];
 			for (var i = 0; i < presetsList.length; i++) {
@@ -792,9 +777,7 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 				var data = {};
 				data.id = a.id;
 				data.caption = a.name;
-				//data.image = "/images/static/progress.gif"; //start by showing the progress image
-				data.image = "/images/static/progress.gif?" + Math.random(); //start by showing the progress image
-
+				data.image = "/images/static/progress.gif"; //start by showing the progress image
 
 				list.push(data);
 			}
@@ -805,7 +788,6 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 				savePresetValue(presetType, id);
 
 				//apply the changes based on the new selection
-				console.log("  createHorizontalStrip callback called, calling applyChanges with false");
 				applyChanges(false);
 			});
 
@@ -973,7 +955,6 @@ function constructJSONObject(jsonObj) {
 */
 var generateFailCount = 0;
 function generateChanges(id, jsonObj, done) {
-	console.log("generateChanges, id: " + id + ", not calling POST on /api/filters/apply");
 	
 	$.ajax({
 		type: "POST",
@@ -982,13 +963,11 @@ function generateChanges(id, jsonObj, done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-				console.log("  ajax success callback, jsonData.id: " + jsonData.id);
 				done(id, jsonData);
 				//$("#newentryimage").data("captionId", jsonData.id);
 				//$("#newentryimage").data("imageType", jsonData.imageType);
 		},
 		error: function(jsonData) {
-			console.log("  ajax failure callback");
 			generateFailCount ++;
 
 			if (generateFailCount == 1) {
@@ -1007,7 +986,6 @@ function generateChanges(id, jsonObj, done) {
 */
 var applyFailCount = 0;
 function applyChanges(refreshPresets, done) {
-	console.log("applyChanges, refreshPresets: " + refreshPresets);
 	var jsonObj = {};
 
 	constructJSONObject(jsonObj);
@@ -1018,14 +996,12 @@ function applyChanges(refreshPresets, done) {
 		contentType: "application/json; charset=UTF-8",
 		data: JSON.stringify(jsonObj),
 		success: function(jsonData) {
-			console.log("  ajax callback for applyChanges");
 			$("#newentryimage").attr("src", jsonData.imageData);
 			if (done) {
 				done();
 			}
 		},
 		error: function(jsonData) {
-			console.log("  ajax failure callback");
 			applyFailCount ++;
 			if (applyFailCount == 1) {
 				//try one more time
