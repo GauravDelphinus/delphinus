@@ -695,8 +695,11 @@ function refreshPresetsView(presetType, presetSectionID) {
 			console.log("  callback for generateChanges, setting image " + id + " path to random " + data.imageData);
 			//$("img#" + id).prop("src", data.imageData);
 			$("img#" + id).prop("src", data.imageData + "?" + Math.random());
-			$("img#" + id).load(function() {
-				console.log("** Load called for final image id: " + id);
+
+			$("img#" + id).on('load', function() {
+			  console.log("###### image loaded: " + id + ", src: " + $(this).attr("src"));
+			}).each(function() {
+			  if(this.complete) $(this).load();
 			});
 		});
 	});
@@ -787,6 +790,7 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 				data.caption = a.name;
 				//data.image = "/images/static/progress.gif"; //start by showing the progress image
 				data.image = "/images/static/progress.gif?" + Math.random(); //start by showing the progress image
+
 
 				list.push(data);
 			}
