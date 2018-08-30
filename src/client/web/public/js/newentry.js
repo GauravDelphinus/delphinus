@@ -667,7 +667,7 @@ function createPresetsView(presetType, presetSectionID, defaultPresetID, content
 		applyChanges(false);
 
 		//refresh the thumbnails in the presets view
-		refreshPresetsView(presetType, presetSectionID);
+		//refreshPresetsView(presetType, presetSectionID);
 	});
 
 }
