@@ -667,6 +667,10 @@ function createPresetsView(presetType, presetSectionID, defaultPresetID, content
 		applyChanges(false);
 
 		//refresh the thumbnails in the presets view
+		$(presetSectionID + " img:first").one("load", function() {
+			console.log("################################### Calling refreshPresetsView ###########");
+			refreshPresetsView(presetType, presetSectionID);
+		});
 		//refreshPresetsView(presetType, presetSectionID);
 	});
 
