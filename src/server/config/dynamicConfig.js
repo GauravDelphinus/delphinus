@@ -6,6 +6,7 @@ module.exports = {
 	dbHostname: process.env.NEO4J_HOSTNAME,
 	dbUsername: process.env.NEO4J_USERNAME,
 	dbPassword: process.env.NEO4J_PASSWORD,
+	imageServiceHostname: process.env.IMAGE_SERVICE_HOSTNAME,
 	facebookClientId: process.env.FACEBOOK_CLIENT_ID,
 	facebookClientSecret: process.env.FACEBOOK_CLIENT_SECRET,
 	twitterClientId: process.env.TWITTER_CLIENT_ID,

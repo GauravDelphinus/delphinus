@@ -5,8 +5,10 @@ var execFileSync = require("child_process").execFileSync;
 var logger = require("./logger");
 var mime = require("mime");
 var config = require("./config");
+var request = require("request");
+var serverUtils = require("./serverUtils");
 
-module.exports = {
+var functions = {
 	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
 		//logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
 		if (targetImage) {
@@ -35,6 +37,10 @@ module.exports = {
 	compressImage: compressImage
 };
 
+for (var key in functions) {
+	module.exports[key] = functions[key];
+}
+
 
 function applySteps(sourceImage, targetImage, steps, caption, next) {
 	//logger.debug("applySteps: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps) + ", caption: " + caption);
@@ -61,9 +67,6 @@ function applySteps(sourceImage, targetImage, steps, caption, next) {
 				applyDecorations(newSourceImage, imageSize, steps.decorations, imArgs);
 			}
 
-			//insert the source and target images into the arguments list
-			imArgs.unshift(newSourceImage);
-			imArgs.push(targetImage);
 			writeImage(newSourceImage, targetImage, imArgs, next);
 		});
 	} else {
@@ -579,11 +582,172 @@ function getCaptionType(imArgs) {
 /****************** Common Helper Functions *****************/
 
 /**
+	Process the image locally using the ImageMagick system commands
+**/
+function processImageSystem(processType, sourceImage, targetImage, imArgs, next) {
+	logger.debug("processImageSystem, processType: " + processType + ", sourceImage: " + sourceImage + ", targetImagePath: " + targetImage);
+	let command = "";
+	switch (processType) {
+		case "convert" : command = "convert"; break;
+		case "identify" : command = "identify"; break;
+		case "compose" : command = "compose"; break;
+		default: return next(new Error("processImageSystem: Invalid processType: " + processType));
+	}
+
+	imArgs.unshift(sourceImage);
+	imArgs.push(targetImage);
+
+	execFile(command, imArgs, (error, stdout, stderr) => {
+		if (error) {
+	    	return next(error);
+	  	} else {
+	  		return next(0, targetImage);
+	  	}
+  	});
+}
+
+/**
+	Send the image processing command to the micro service running on Localhost
+	Check out imageprocessor project
+**/
+function processImageLocalhost(processType, sourceImage, targetImage, imArgs, hostname, next) {
+	logger.debug("processImageLocalhost, hostname: " + hostname);
+
+	request({
+			uri: hostname,
+			method: "POST",
+			body: {
+				sourceImagePath: sourceImage,
+				targetImagePath: targetImage,
+				imArgs: imArgs
+			},
+			json: true
+		},
+		function(err, res, body) {
+			if (err || res.statusCode != 200) {
+		    	return next(err);
+		  	} else {
+		  		return next(0, targetImage);
+		  	}
+		}
+  	);
+}
+
+/**
+	Send the image processing command to the external micro service or AWS Lambda function
+**/
+function processImageExternal(processType, sourceImage, targetImage, imArgs, hostname, next) {
+	logger.debug("processImageExternal, hostname: " + hostname + ", sourceImage: " + sourceImage + ", targetImge: " + targetImage);
+
+	const DataURI = require('datauri');
+	const datauri = new DataURI();
+	datauri.encode(sourceImage, function(err, sourceImageData) {
+		if (err) {
+			return next(err);
+		}
+
+		request({
+				uri: hostname,
+				method: "GET",
+				body: {
+					sourceImageData: sourceImageData,
+					imArgs: imArgs
+				},
+				json: true
+			},
+			function(err, res, body) {
+				if (err || res.statusCode != 200) {
+			    	return next(err);
+			  	} else {
+			  		//extract the targetImageData and write to the targetImage path
+			  		serverUtils.dataURItoFile(body.targetImageData, targetImage, function(err) {
+			  			if (err) {
+			  				return next(err);
+			  			}
+
+			  			return next(0, targetImage);
+			  		});
+			  	}
+			}
+	  	);
+	});
+}
+
+function processImage(processType, sourceImage, targetImage, imArgs, next) {
+	const dynamicConfig = require("./config/dynamicConfig");
+	if (!dynamicConfig || !dynamicConfig.imageServiceHostname) {
+		//Image service not found, just call local ImageMagick commands
+		processImageSystem(processType, sourceImage, targetImage, imArgs, next);
+	} else if (dynamicConfig.imageServiceHostname.startsWith("http://localhost:")) {
+		processImageLocalhost(processType, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
+	} else {
+		processImageExternal(processType, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
+	}
+}
+
+/**
 	Write the given sourceImage to the targetImage after applying the provided
 	ImageMagick arguments.  Then, call the next functin with the error (if any),
 	or with the path to the final image, along with info on whether there was 
 	really any change done.
 **/
+function writeImage(sourceImage, targetImage, imArgs, next) {
+	logger.debug(getCaptionType(imArgs) + " writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+	const timer = logger.startTimer();
+	if (imArgs.length > 0) {
+		processImage("convert", sourceImage, targetImage, imArgs, function(err) {
+			if (err) {
+				next(err, null);
+			    timer.done(getCaptionType(imArgs) + "writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+			} else {
+				next(0, targetImage);
+			  	timer.done(getCaptionType(imArgs) + "writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+			}
+		});
+	} else {
+		next(0, sourceImage); // no changes done, so just send back the source image
+		timer.done(getCaptionType(imArgs) + "writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+	}
+}
+
+/**
+	Write the given sourceImage to the targetImage after applying the provided
+	ImageMagick arguments.  Then, call the next functin with the error (if any),
+	or with the path to the final image, along with info on whether there was 
+	really any change done.
+**/
+/*
+function writeImage(sourceImage, targetImage, imArgs, next) {
+	
+	logger.debug(getCaptionType(imArgs) + " writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+	const timer = logger.startTimer();
+	if (imArgs.length > 0) {
+		request({
+				uri: "http://localhost:5555/api/convert",
+				method: "POST",
+				body: {
+					imArgs: imArgs
+				},
+				json: true
+			},
+			function(err, res, body) {
+				if (err || res.statusCode != 200) {
+			    	next(err, null);
+			    	timer.done(getCaptionType(imArgs) + "writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+			  	} else {
+			  		next(0, targetImage);
+			  		timer.done(getCaptionType(imArgs) + "writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+			  	}
+			}
+	  	);
+	} else {
+		next(0, sourceImage); // no changes done, so just send back the source image
+		timer.done(getCaptionType(imArgs) + "writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+	}
+}
+*/
+
+/*
 function writeImage(sourceImage, targetImage, imArgs, next) {
 	
 	logger.debug(getCaptionType(imArgs) + " writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
@@ -603,6 +767,7 @@ function writeImage(sourceImage, targetImage, imArgs, next) {
 		timer.done(getCaptionType(imArgs) + "writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 	}
 }
+*/
 
 /**
 	Write the given sourceImage to the targetImage after applying the provided

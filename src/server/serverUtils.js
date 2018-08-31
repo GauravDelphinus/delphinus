@@ -7,7 +7,7 @@ var tmp = require("tmp");
 var config = require("./config");
 var imageProcessor = require("./imageProcessor");
 
-module.exports = {
+var functions = {
 	/**
 		Validate Client Query Params
 
@@ -947,6 +947,10 @@ module.exports = {
 			"authorName" : "string"
 		}
 	}
+}
+
+for (var key in functions) {
+	module.exports[key] = functions[key];
 }
 
 function checkIndexRemaining(index) {
