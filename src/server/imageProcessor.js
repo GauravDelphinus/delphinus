@@ -615,7 +615,7 @@ function processImageLocalhost(processType, sourceImage, targetImage, imArgs, ho
 
 	request({
 			uri: hostname,
-			method: "POST",
+			method: "GET",
 			body: {
 				sourceImagePath: sourceImage,
 				targetImagePath: targetImage,
