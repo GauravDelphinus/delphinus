@@ -657,8 +657,10 @@ function processImageExternal(processType, sourceImage, targetImage, imArgs, hos
 			},
 			function(err, res, body) {
 				if (err || res.statusCode != 200) {
+					logger.debug("request, failed: statusCode: " + res.statusCode);
 			    	return next(err);
 			  	} else {
+			  		logger.debug("request success, body: " + JSON.stringify(body));
 			  		//extract the targetImageData and write to the targetImage path
 			  		serverUtils.dataURItoFile(body.targetImageData, targetImage, function(err) {
 			  			if (err) {

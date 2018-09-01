@@ -121,7 +121,7 @@ module.exports = {
     },
     production : {
     	user : 'node',
-    	host : 'ec2-18-222-97-40.us-east-2.compute.amazonaws.com',
+    	host : 'ec2-18-191-132-39.us-east-2.compute.amazonaws.com',
 		ref  : 'origin/master',
 		repo : 'git@github.com:ezeeideas/delphinus.git',
 		path : '/var/www/appserver/production',
