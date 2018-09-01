@@ -147,7 +147,7 @@ var routes = function() {
     				if (info.sourceId) {
     					//sourceId would be set for challenges and designs, but not for independent entries
     					//since we passed 'false' above to the processImageDataForEntry call
-    					var hash = filterUtils.generateHash(JSON.stringify(steps));
+    					var hash = filterUtils.generateHash(steps, req.body.caption);
 						var targetImageName = info.sourceId + "-" + hash + "." + mime.extension(info.imageType);
 						var targetImagePath = global.appRoot + config.path.cacheImagesRaw + targetImageName;
 						var targetImageUrl = config.url.cacheImages + targetImageName;
@@ -255,12 +255,12 @@ var routes = function() {
 
 	    			//extract the steps (cumulative format) and generate the hash to 
 	    			//look for actual step images
-	    			var singleStepList = filterUtils.extractSingleStepList(steps, imageData.caption);
+	    			var singleStepList = filterUtils.extractSingleStepList(steps);
 	    			var applySingleStepToImageFunctions = [];
 	    			var imageUrlPaths = []; //paths to target urls (to be sent back to client)
 
 	    			for (var i = 0; i < singleStepList.length; i++) {
-	    				var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
+	    				var hash = filterUtils.generateHash(singleStepList[i], imageData.caption);
 
 						var targetImageName = imageData.sourceId + "-" + hash + "." + mime.extension(imageData.imageType);
 						var targetImage = global.appRoot + config.path.cacheImages + targetImageName;

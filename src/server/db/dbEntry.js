@@ -491,11 +491,11 @@ function createImagesForEntry(entryData, done) {
 		}
 
 		//now, generate the image(s)
-		var singleStepList = filterUtils.extractSingleStepList(entryData.steps, entryData.title);
+		var singleStepList = filterUtils.extractSingleStepList(entryData.steps);
 		var applySingleStepToImageFunctions = [];
 
 		for (var i = 0; i < singleStepList.length; i++) {
-			var hash = filterUtils.generateHash(JSON.stringify(singleStepList[i]));
+			var hash = filterUtils.generateHash(singleStepList[i], entryData.title);
 			var targetImagePath = global.appRoot + config.path.cacheImages + info.sourceId + "-" + hash + "." + mime.extension(info.imageType);
 
 			applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, info.sourceImagePath, targetImagePath, info.imageType, singleStepList[i], dbUtils.escapeSingleQuotes(entryData.title)));

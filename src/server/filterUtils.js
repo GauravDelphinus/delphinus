@@ -9,7 +9,7 @@ var dbIndependentImage = require("./db/dbIndependentImage");
 var dbUtils = require("./db/dbUtils");	
 
 module.exports = {
-	extractSingleStepList : function(steps, title) {
+	extractSingleStepList : function(steps) {
 		var singleStepList = [];
 
 		var step = {};
@@ -27,8 +27,6 @@ module.exports = {
 
 					if (steps.artifacts[i].preset) {
 						step.artifacts[i].preset = steps.artifacts[i].preset;
-						//Adding caption to account for that in hash generation
-						step.artifacts[i].banner = { caption: title};
 						singleStepList.push(cloneObject(step));
 					}
 				} else if (steps.artifacts[i].type == "custom") {
@@ -36,8 +34,6 @@ module.exports = {
 
 					if (steps.artifacts[i].banner) {
 						step.artifacts[i].banner = steps.artifacts[i].banner;
-						//Adding caption to account for that in hash generation
-						step.artifacts[i].banner.caption = title;
 						singleStepList.push(cloneObject(step));
 					}
 				}	
@@ -440,7 +436,10 @@ module.exports = {
 		],
 	},
 
-	generateHash: function(string) {
+	generateHash: function(steps, caption) {
+
+		var string = this.normalizeStepsForHash(steps, caption);
+
 		var hash = 0;
 		if (string.length == 0) return hash;
 		for (let i = 0; i < string.length; i++) {
@@ -457,25 +456,25 @@ module.exports = {
 		knows how to handle it.
 	**/
 	normalizeSteps: function (steps, caption, next) {
-
-		/*
-			Add caption back into the steps array, so that it can be
-			accounted for when generating the image hashes
-
-			This isn't really used by the imageprocessor.
-		*/
-		if (steps.artifacts) {
-			for (var i = 0; i < steps.artifacts.length; i++) {
-				var artifact = steps.artifacts[i];
-				if (!artifact.banner) {
-					artifact.banner = {caption: caption};
-				} else {
-					artifact.banner.caption = caption;
-				}
-				steps.artifacts[i] = artifact;
-			}
-		}
 		next(0, steps);
+	},
+
+	/**
+		IMPORTANT - DO NOT MODIFY THIS ROUTINE
+		THIS will impact the hash generation
+	**/
+	normalizeStepsForHash: function(steps, caption) {
+		/*
+			Generate an object that can form the input for
+			hash generation.  Include steps and caption information
+			that will vary from image to image
+		*/
+		var hashObject = {
+			steps: steps,
+			caption: caption
+		};
+
+		return JSON.stringify(hashObject);
 	}
 	
 };

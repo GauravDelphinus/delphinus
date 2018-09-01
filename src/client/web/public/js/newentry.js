@@ -206,7 +206,8 @@ function setImageHeight() {
 
 
 function changeCallback(event) {
-	applyChanges(true, null);
+	var jsonObj = constructJSONObject();
+	applyChanges(jsonObj, true, null);
 }
 
 /**************************** (1) CAPTION STEP **********************************************/
@@ -349,7 +350,8 @@ function setupArtifactStep() {
 			$("#customArtifactsSettingSection").hide();
 		}
 
-		applyChanges(true);
+		var jsonObj = constructJSONObject();
+		applyChanges(jsonObj, true);
 	});
 
 	setupColorButton("#bannerColorButton");
@@ -380,10 +382,15 @@ function setupArtifactStep() {
 			caption: <text> //this is only there to allow server to account for caption text when generating image hashes
 		}
 	}
+
+	presetValue is an optional field, and if present, we don't use the current selection but
+	the one provided
 */
-function generateArtifactObject() {
+function generateArtifactObject(presetValue = null) {
 	var artifact = {};
-	var presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
+	if (!presetValue) {
+		presetValue = fetchPresetValue("artifact", defaultArtifactPresetSelectionID);
+	}
 	if (presetValue != undefined) {
 		if (!$("#bannerCustomOptionsCheckbox").is(':checked')) { //preset
 			artifact.type = "preset";
@@ -449,7 +456,8 @@ function setupCropToggleSection() {
 		//first switch off crop and bring image back to original size
 		jQuery.data(document.body, "cropData", null);
 
-		applyChanges(false, function() {
+		var jsonObj = constructJSONObject();
+		applyChanges(jsonObj, false, function() {
 			startCrop(cropData);
 		});
 	});
@@ -515,10 +523,17 @@ function endCrop() {
 			height: height in pixels
 		}
 	}
+
+	presetValue is an optional field, and if present, we don't use the current selection but
+	the one provided
 */
-function generateLayoutObject() {
+function generateLayoutObject(presetValue = null) {
 	var layout = {};
-	var presetValue = fetchPresetValue("layout", defaultLayoutPresetSelectionID);
+
+	if (!presetValue) {
+		presetValue = fetchPresetValue("layout", defaultLayoutPresetSelectionID);
+	}
+
 	if (presetValue != undefined) {
 		//check for crop data
 		var cropData = jQuery.data(document.body, "cropData");
@@ -558,11 +573,17 @@ function setupFilterStep() {
 		type: "preset",
 		preset: "noFilter", etc. (one of the values in presets.json)
 	}
+
+	presetValue is an optional field, and if present, we don't use the current selection but
+	the one provided
 */
-function generateFilterObject() {
+function generateFilterObject(presetValue = null) {
 	var filter = {};
 
-	var presetValue = fetchPresetValue("filter", defaultFilterPresetSelectionID);
+	if (!presetValue) {
+		presetValue = fetchPresetValue("filter", defaultFilterPresetSelectionID);
+	}
+
 	if (presetValue != undefined) {
 		filter.type = "preset";
 		filter.preset = presetValue;
@@ -587,7 +608,8 @@ function setupDecorationStep() {
 			$("#presetDecorationSection").show();
 		}
 
-		applyChanges(true);
+		var jsonObj = constructJSONObject();
+		applyChanges(jsonObj, true);
 	});
 
 	createPresetsView("decoration", "#presetDecorationSection", defaultDecorationPresetSelectionID, "presets");
@@ -616,10 +638,16 @@ function setupBorderToggleSection() {
 			color: color of border
 		}
 	}
+
+	presetValue is an optional field, and if present, we don't use the current selection but
+	the one provided
 */
-function generateDecorationObject() {
+function generateDecorationObject(presetValue = null) {
 	var decoration = {};
-	var presetValue = fetchPresetValue("decoration", defaultDecorationPresetSelectionID);
+	if (!presetValue) {
+		presetValue = fetchPresetValue("decoration", defaultDecorationPresetSelectionID);
+	}
+
 	if (presetValue != undefined) {
 		//check for custom options
 		if (!$("#borderCustomOptionsCheckbox").is(':checked')) { //preset
@@ -662,7 +690,8 @@ function createPresetsView(presetType, presetSectionID, defaultPresetID, content
 		$(presetSectionID).empty().append(presetsView);
 
 		//apply changes to reflect default selection
-		applyChanges(false);
+		var jsonObj = constructJSONObject(presetType, defaultSelectionID);
+		applyChanges(jsonObj, false);
 
 		//refresh the thumbnails in the presets view
 		//but only start that after we've loaded at least one of the preview images (progress.gif)
@@ -689,76 +718,12 @@ function refreshPresetsView(presetType, presetSectionID) {
 		var image = $(this);
 		var presetId = $(image).attr("id");
 		//update the server with the step information and update the image that is received
-		var jsonObj = constructJSONObjectWithPreset(presetType, presetId);
+		var jsonObj = constructJSONObject(presetType, presetId);
 
 		generateChanges(presetId, jsonObj, function(id, data) {
 			$("img#" + id).prop("src", data.imageData);
 		});
 	});
-}
-
-/**
-	Construct the JSON object with all the currently selected settings
-
-	Also, add the preset infromation to the object
-**/
-function constructJSONObjectWithPreset(presetType, presetId) {
-	//construct the jsonObj representing the current steps
-	var jsonObj = {};
-	constructJSONObject(jsonObj);
-
-	if (presetType == "artifact") {
-		if (!jsonObj.steps.artifacts) {
-			jsonObj.steps.artifacts = [{}];
-		}
-
-		for (var i = 0; i < jsonObj.steps.artifacts.length; i++) {
-			var artifact = jsonObj.steps.artifacts[i];
-			artifact.preset = presetId;
-			if (!artifact.banner) {
-				artifact.banner = {};
-			}
-			switch (presetId) {
-				case "bannerBottom":
-					artifact.banner.location = "bottom"; break;
-				case "bannerTop":
-					artifact.banner.location = "top"; break;
-				case "bannerCenter":
-					artifact.banner.location = "center"; break;
-				case "bannerBelow":
-					artifact.banner.location = "below"; break;
-				case "bannerAbove":
-					artifact.banner.location = "above"; break;
-			}
-		}
-	} else if (presetType == "layout") {
-		if (!jsonObj.steps.layouts) {
-			jsonObj.steps.layouts = [{}];
-		}
-
-		for (var i = 0; i < jsonObj.steps.layouts.length; i++) {
-			jsonObj.steps.layouts[i].preset = presetId;
-		}
-		
-	} else if (presetType == "filter") {
-		if (!jsonObj.steps.filters) {
-			jsonObj.steps.filters = [{}];
-		}
-
-		for (var i = 0; i < jsonObj.steps.filters.length; i++) {
-			jsonObj.steps.filters[i].preset = presetId;
-		}
-	} else if (presetType == "decoration") {
-		if (!jsonObj.steps.decorations) {
-			jsonObj.steps.decorations = [{}];
-		}
-
-		for (var i = 0; i < jsonObj.steps.decorations.length; i++) {
-			jsonObj.steps.decorations[i].preset = presetId;
-		}
-	}
-
-	return jsonObj;
 }
 
 /**
@@ -788,7 +753,8 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 				savePresetValue(presetType, id);
 
 				//apply the changes based on the new selection
-				applyChanges(false);
+				var jsonObj = constructJSONObject(presetType, id);
+				applyChanges(jsonObj, false);
 			});
 
 			if (presetsView) {
@@ -818,7 +784,8 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 function setupColorButton(buttonID) {
 	$(buttonID).colorpicker().on('changeColor', function(e) {
         $(buttonID).css("background", e.color.toString("rgba"));
-        applyChanges(true);
+        var jsonObj = constructJSONObject();
+        applyChanges(jsonObj, true);
     });
 }
 
@@ -886,10 +853,19 @@ function setChangeCallback(callback, changeElementIds, clickElementIds) {
 
 	1) To generate intermediate thumbnail preset images based on current selections
 	2) To generate the final steps at the time of Posting the entry
+
+	presetType: one of artifact, layout, decoration, filter
+	presetId: presetId for the presetType (e.g., bannerBottom in case of artifact)
+
+	The presetType and presetId are optional fields, and if present, only for that particular
+	preset type we should use the provided presetId when generating the json object, for all
+	others we should still use the currently selected values.
 */
 /*****************************************************************************************/
 
-function constructJSONObject(jsonObj) {
+function constructJSONObject(presetType = null, presetId = null) {
+
+	var jsonObj = {};
 
 	if (challengeId != 0) {
 		jsonObj.sourceType = "challengeId";
@@ -924,29 +900,31 @@ function constructJSONObject(jsonObj) {
 
 	jsonObj.steps = {}; // the main object that encapsulates filters, layouts, etc.
 
-	var artifact = generateArtifactObject();
+	var artifact = generateArtifactObject((presetType == "artifact") ? presetId : null);
 	if (!$.isEmptyObject(artifact)) {
 		jsonObj.steps.artifacts = [];
 		jsonObj.steps.artifacts.push(artifact);
 	}
 
-	var layout = generateLayoutObject();
+	var layout = generateLayoutObject((presetType == "layout") ? presetId : null);
 	if (!$.isEmptyObject(layout)) {
 		jsonObj.steps.layouts = [];
 		jsonObj.steps.layouts.push(layout);
 	}
 
-	var filter = generateFilterObject();
+	var filter = generateFilterObject((presetType == "filter") ? presetId : null);
 	if (!$.isEmptyObject(filter)) {
 		jsonObj.steps.filters = [];
 		jsonObj.steps.filters.push(filter);
 	}
 
-	var decoration = generateDecorationObject();
+	var decoration = generateDecorationObject((presetType == "decoration") ? presetId : null);
 	if (!$.isEmptyObject(decoration)) {
 		jsonObj.steps.decorations = [];
 		jsonObj.steps.decorations.push(decoration);
 	}
+
+	return jsonObj;
 }
 
 /*
@@ -955,7 +933,7 @@ function constructJSONObject(jsonObj) {
 */
 var generateFailCount = 0;
 function generateChanges(id, jsonObj, done) {
-	
+	//console.log("generateChanges, jsonObj: " + JSON.stringify(jsonObj));
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -985,10 +963,8 @@ function generateChanges(id, jsonObj, done) {
 	Apply changes based on current selection on the main preview image.
 */
 var applyFailCount = 0;
-function applyChanges(refreshPresets, done) {
-	var jsonObj = {};
-
-	constructJSONObject(jsonObj);
+function applyChanges(jsonObj, refreshPresets, done) {
+	//console.log("applyChanges, jsonObj: " + JSON.stringify(jsonObj));
 	$.ajax({
 		type: "POST",
 		url: "/api/filters/apply",
@@ -1005,7 +981,8 @@ function applyChanges(refreshPresets, done) {
 			applyFailCount ++;
 			if (applyFailCount == 1) {
 				//try one more time
-				applyChanges(refreshPresets, done);
+				var jsonObj = constructJSONObject();
+				applyChanges(jsonObj, refreshPresets, done);
 			} else {
 				//if more than once, redirect to error page and restart
 				window.location.replace("/error");
@@ -1034,9 +1011,7 @@ function applyChanges(refreshPresets, done) {
 var failCount = 0;
 function postEntry() {
 
-	var jsonObj = {};
-
-	constructJSONObject(jsonObj);
+	var jsonObj = constructJSONObject();
 
 	$.ajax({
 		type: "POST",
