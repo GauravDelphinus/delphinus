@@ -625,8 +625,10 @@ function processImageLocalhost(processType, sourceImage, targetImage, imArgs, ho
 		},
 		function(err, res, body) {
 			if (err || res.statusCode != 200) {
+				logger.debug("callback from request, err: " + err);
 		    	return next(err);
 		  	} else {
+		  		logger.debug("callback from request, targetImage: " + targetImage);
 		  		return next(0, targetImage);
 		  	}
 		}
