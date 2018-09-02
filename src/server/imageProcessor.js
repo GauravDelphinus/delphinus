@@ -726,7 +726,7 @@ function processImage(command, sourceImage, targetImage, imArgs, next) {
 	if (!dynamicConfig || !dynamicConfig.imageServiceHostname) {
 		//Image service not found, just call local ImageMagick commands
 		processImageSystem(command, sourceImage, targetImage, imArgs, next);
-	} else if (!dynamicConfig.imageServiceHostname.startsWith("http://localhost:")) {
+	} else if (dynamicConfig.imageServiceHostname.startsWith("http://localhost:")) {
 		processImageLocalhost(command, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
 	} else {
 		processImageExternal(command, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
