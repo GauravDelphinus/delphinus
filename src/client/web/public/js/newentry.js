@@ -742,7 +742,7 @@ function createPresetsViewInternal(presetType, contentTag, defaultSelectionID, c
 				var data = {};
 				data.id = a.id;
 				data.caption = a.name;
-				data.image = "/images/static/progress.gif"; //start by showing the progress image
+				data.image = getPresetPreviewImage();
 
 				list.push(data);
 			}
@@ -844,6 +844,19 @@ function setChangeCallback(callback, changeElementIds, clickElementIds) {
 	for (var i = 0; i < clickElementIds.length; i++) {
 		$(clickElementIds[i]).click({callback: null}, callback);
 	}
+}
+
+/**
+	Get an image that we can show as a preview for the preset thumbnails while
+	we're still trying to fetch the actual images.
+**/
+function getPresetPreviewImage() {
+	var previewImageSrc = $("#newentryimage").prop("src");
+	if (previewImageSrc == undefined) {
+		previewImageSrc = "/images/static/progress.gif";
+	}
+
+	return previewImageSrc;
 }
 
 /*****************************************************************************************/
