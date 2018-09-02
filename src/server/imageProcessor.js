@@ -7,6 +7,7 @@ var mime = require("mime");
 var config = require("./config");
 var request = require("request");
 var serverUtils = require("./serverUtils");
+var async = require("async");
 
 var functions = {
 	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
@@ -67,6 +68,8 @@ function applySteps(sourceImage, targetImage, steps, caption, next) {
 				applyDecorations(newSourceImage, imageSize, steps.decorations, imArgs);
 			}
 
+			imArgs.unshift({type: "INPUT_FILE", value: newSourceImage});
+    		imArgs.push({type: "OUTPUT_FILE", value: targetImage});
 			writeImage(newSourceImage, targetImage, imArgs, next);
 		});
 	} else {
@@ -145,8 +148,8 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
     			return next(err, 0, 0);
     		}
 
-    		layoutArgs.unshift(sourceImage);
-    		layoutArgs.push(newSourceImage);
+    		layoutArgs.unshift({type: "INPUT_FILE", value: sourceImage});
+    		layoutArgs.push({type: "OUTPUT_FILE", value: newSourceImage});
     		writeImage(sourceImage, newSourceImage, layoutArgs, function(err, targetImage, changesDone) {
     			if (err) {
     				return next(err, 0, 0);
@@ -555,116 +558,157 @@ function applyBorder(imArgs, borderWidth, borderColor) {
 	imArgs.push(borderWidth);
 }
 
-
-function getCaptionType(imArgs) {
-	if (imArgs.indexOf("-extent") > -1) {
-		if (imArgs.indexOf("south") > -1) {
-			return "#### BELOW ####";
-		}
-	}
-
-	if (imArgs.indexOf("-extent") > -1) {
-		if (imArgs.indexOf("north") > -1) {
-			return "$$$$ ABOVE $$$$";
-		}
-	}
-
-	if (imArgs.indexOf("south") > -1) {
-			return "vvvv BOTTOM vvvv";
-	}
-
-	if (imArgs.indexOf("north") > -1) {
-			return "^^^^ TOP ^^^^";
-	}
-
-	return "---- CENTER ----";
-}
 /****************** Common Helper Functions *****************/
 
+function validateCommand(command) {
+	if (command == "convert" || command == "identify" || command == "composite") {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+	Transform the Image Magick commands list for consumption by the
+	ImageProcessor service.  Note that isLocal is set true for both
+	"system" (i.e. the current process running the ImageMagick commands)
+	as well as "localhost" (i.e., Image Processor service running on
+	localhost).  For external service it is set as false.
+**/
+function transformImArgsForService(imArgs, isLocal, callback) {
+	if (isLocal) {
+		var finalArgs = [];
+
+		for (let i = 0; i < imArgs.length; i++) {
+			if (typeof imArgs[i] === "object") {
+				finalArgs.push(imArgs[i].value);
+			} else {
+				finalArgs.push(imArgs[i]);
+			}
+		}
+
+		return callback(null, finalArgs);
+	} else {
+		var functionList = [];
+		for (let i = 0; i < imArgs.length; i++) {
+			functionList.push(async.apply(function(arg, callback) {
+				if (typeof arg === 'object') {
+					if (arg.type == "INPUT_FILE") {
+						const DataURI = require('datauri');
+						const datauri = new DataURI();
+						datauri.encode(arg.value, function(err, imageData) {
+							if (err) {
+								return next(err);
+							}
+
+							return callback(null, imageData);
+						});
+					} else if (arg.type == "OUTPUT_FILE") {
+						return callback(null, "OUTPUT_FILE");
+					} else {
+						return callback(new Error("Invalid arg type: " + arg.type));
+					}
+				} else {
+					return callback(null, arg);
+				}
+			}, 
+			imArgs[i]));
+		}
+
+		async.series(functionList, function(err, finalArgs) {
+			if (err) {
+				return callback(err);
+			}
+
+			return callback(null, finalArgs);
+		});
+	}
+}
 /**
 	Process the image locally using the ImageMagick system commands
 **/
-function processImageSystem(processType, sourceImage, targetImage, imArgs, next) {
-	logger.debug("processImageSystem, processType: " + processType + ", sourceImage: " + sourceImage + ", targetImagePath: " + targetImage);
-	let command = "";
-	switch (processType) {
-		case "convert" : command = "convert"; break;
-		case "identify" : command = "identify"; break;
-		case "compose" : command = "compose"; break;
-		default: return next(new Error("processImageSystem: Invalid processType: " + processType));
+function processImageSystem(command, sourceImage, targetImage, imArgs, next) {
+	if (!validateCommand(command)) {
+		return next(new Error("Invalid command: " + command));
 	}
 
-	imArgs.unshift(sourceImage);
-	imArgs.push(targetImage);
+	transformImArgsForService(imArgs, true, function(err, finalArgs) {
+		if (err) {
+			return next(err);
+		}
 
-	execFile(command, imArgs, (error, stdout, stderr) => {
-		if (error) {
-	    	return next(error);
-	  	} else {
-	  		return next(0, targetImage);
-	  	}
-  	});
+		execFile(command, finalArgs, (error, stdout, stderr) => {
+			if (error) {
+		    	return next(error);
+		  	} else {
+		  		return next(0, targetImage);
+		  	}
+	  	});
+	});
 }
 
 /**
 	Send the image processing command to the micro service running on Localhost
 	Check out imageprocessor project
 **/
-function processImageLocalhost(processType, sourceImage, targetImage, imArgs, hostname, next) {
-	logger.debug("processImageLocalhost, hostname: " + hostname);
+function processImageLocalhost(command, sourceImage, targetImage, imArgs, hostname, next) {
+	if (!validateCommand(command)) {
+		return next(new Error("Invalid command: " + command));
+	}
 
-	request({
-			uri: hostname,
-			method: "GET",
-			body: {
-				sourceImagePath: sourceImage,
-				targetImagePath: targetImage,
-				imArgs: imArgs
-			},
-			json: true
-		},
-		function(err, res, body) {
-			if (err || res.statusCode != 200) {
-				logger.debug("callback from request, err: " + err);
-		    	return next(err);
-		  	} else {
-		  		logger.debug("callback from request, targetImage: " + targetImage);
-		  		return next(0, targetImage);
-		  	}
-		}
-  	);
-}
-
-/**
-	Send the image processing command to the external micro service or AWS Lambda function
-**/
-function processImageExternal(processType, sourceImage, targetImage, imArgs, hostname, next) {
-	logger.debug("processImageExternal, hostname: " + hostname + ", sourceImage: " + sourceImage + ", targetImge: " + targetImage);
-
-	const DataURI = require('datauri');
-	const datauri = new DataURI();
-	datauri.encode(sourceImage, function(err, sourceImageData) {
+	transformImArgsForService(imArgs, true, function(err, finalArgs) {
 		if (err) {
 			return next(err);
 		}
 
 		request({
-				uri: hostname,
+				uri: hostname + "/api/processimage",
 				method: "GET",
 				body: {
-					sourceImageData: sourceImageData,
-					imArgs: imArgs
+					command: command,
+					imArgs: finalArgs
 				},
 				json: true
 			},
 			function(err, res, body) {
 				if (err || res.statusCode != 200) {
-					logger.debug("request, failed: statusCode: " + res.statusCode);
 			    	return next(err);
 			  	} else {
-			  		logger.debug("request success, body: " + JSON.stringify(body));
+			  		return next(0, targetImage);
+			  	}
+			}
+	  	);
+	});
+}
+
+/**
+	Send the image processing command to the external micro service or AWS Lambda function
+**/
+function processImageExternal(command, sourceImage, targetImage, imArgs, hostname, next) {
+	if (!validateCommand(command)) {
+		return next(new Error("Invalid command: " + command));
+	}
+
+	transformImArgsForService(imArgs, false, function(err, finalArgs) {
+		if (err) {
+			return next(err);
+		}
+
+		request({
+				uri: hostname + "/api/processimage",
+				method: "GET",
+				body: {
+					command: command,
+					imArgs: finalArgs
+				},
+				json: true
+			},
+			function(err, res, body) {
+				if (err || res.statusCode != 200) {
+			    	return next(err);
+			  	} else {
 			  		//extract the targetImageData and write to the targetImage path
-			  		serverUtils.dataURItoFile(body.targetImageData, targetImage, function(err) {
+			  		serverUtils.dataURItoFile(body.outputFileData, targetImage, function(err) {
 			  			if (err) {
 			  				return next(err);
 			  			}
@@ -677,15 +721,15 @@ function processImageExternal(processType, sourceImage, targetImage, imArgs, hos
 	});
 }
 
-function processImage(processType, sourceImage, targetImage, imArgs, next) {
+function processImage(command, sourceImage, targetImage, imArgs, next) {
 	const dynamicConfig = require("./config/dynamicConfig");
 	if (!dynamicConfig || !dynamicConfig.imageServiceHostname) {
 		//Image service not found, just call local ImageMagick commands
-		processImageSystem(processType, sourceImage, targetImage, imArgs, next);
-	} else if (dynamicConfig.imageServiceHostname.startsWith("http://localhost:")) {
-		processImageLocalhost(processType, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
+		processImageSystem(command, sourceImage, targetImage, imArgs, next);
+	} else if (!dynamicConfig.imageServiceHostname.startsWith("http://localhost:")) {
+		processImageLocalhost(command, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
 	} else {
-		processImageExternal(processType, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
+		processImageExternal(command, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
 	}
 }
 
@@ -696,82 +740,22 @@ function processImage(processType, sourceImage, targetImage, imArgs, next) {
 	really any change done.
 **/
 function writeImage(sourceImage, targetImage, imArgs, next) {
-	logger.debug(getCaptionType(imArgs) + " writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 	const timer = logger.startTimer();
 	if (imArgs.length > 0) {
 		processImage("convert", sourceImage, targetImage, imArgs, function(err) {
 			if (err) {
 				next(err, null);
-			    timer.done(getCaptionType(imArgs) + "writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+			    timer.done("writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 			} else {
 				next(0, targetImage);
-			  	timer.done(getCaptionType(imArgs) + "writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+			  	timer.done("writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 			}
 		});
 	} else {
 		next(0, sourceImage); // no changes done, so just send back the source image
-		timer.done(getCaptionType(imArgs) + "writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
+		timer.done("writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 	}
 }
-
-/**
-	Write the given sourceImage to the targetImage after applying the provided
-	ImageMagick arguments.  Then, call the next functin with the error (if any),
-	or with the path to the final image, along with info on whether there was 
-	really any change done.
-**/
-/*
-function writeImage(sourceImage, targetImage, imArgs, next) {
-	
-	logger.debug(getCaptionType(imArgs) + " writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-	const timer = logger.startTimer();
-	if (imArgs.length > 0) {
-		request({
-				uri: "http://localhost:5555/api/convert",
-				method: "POST",
-				body: {
-					imArgs: imArgs
-				},
-				json: true
-			},
-			function(err, res, body) {
-				if (err || res.statusCode != 200) {
-			    	next(err, null);
-			    	timer.done(getCaptionType(imArgs) + "writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-			  	} else {
-			  		next(0, targetImage);
-			  		timer.done(getCaptionType(imArgs) + "writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-			  	}
-			}
-	  	);
-	} else {
-		next(0, sourceImage); // no changes done, so just send back the source image
-		timer.done(getCaptionType(imArgs) + "writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-	}
-}
-*/
-
-/*
-function writeImage(sourceImage, targetImage, imArgs, next) {
-	
-	logger.debug(getCaptionType(imArgs) + " writeImage, sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-	const timer = logger.startTimer();
-	if (imArgs.length > 0) {
-		execFile("convert", imArgs, (error, stdout, stderr) => {
-			if (error) {
-		    	next(error, null);
-		    	timer.done(getCaptionType(imArgs) + "writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-		  	} else {
-		  		next(0, targetImage);
-		  		timer.done(getCaptionType(imArgs) + "writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-		  	}
-	  	});
-	} else {
-		next(0, sourceImage); // no changes done, so just send back the source image
-		timer.done(getCaptionType(imArgs) + "writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-	}
-}
-*/
 
 /**
 	Write the given sourceImage to the targetImage after applying the provided
@@ -782,11 +766,9 @@ function writeImage(sourceImage, targetImage, imArgs, next) {
 function compositeImage(sourceImage, targetImage, imArgs, next) {
 	const timer = logger.startTimer();
 	if (imArgs.length > 0) {
-		//logger.debug("calling composite with imArgs: " + JSON.stringify(imArgs));
-		execFile("composite", imArgs, (error, stdout, stderr) => {
-			//logger.debug("output of composite: error: " + error);
-			if (error) {
-		    	next(error, null);
+		processImage("composite", sourceImage, targetImage, imArgs, function(err) {
+			if (err) {
+		    	next(err, null);
 		    	timer.done("compositeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
 		  	} else {
 		  		next(0, targetImage);
@@ -937,9 +919,9 @@ function addWatermark(sourceImage, targetImage, next) {
 			watermarkImagePath += "captionify_watermark_gray_white_1500x500.png";
 		}
 
-		imArgs.push(watermarkImagePath);
-		imArgs.push(sourceImage);
-		imArgs.push(targetImage);
+		imArgs.push({type: "INPUT_FILE", value: watermarkImagePath});
+		imArgs.push({type: "INPUT_FILE", value: sourceImage});
+		imArgs.push({type: "OUTPUT_FILE", value: targetImage});
 
 		compositeImage(sourceImage, targetImage, imArgs, next);
 	});
