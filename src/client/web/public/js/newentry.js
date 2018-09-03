@@ -547,9 +547,9 @@ function generateLayoutObject(presetValue = null) {
 			} else if (presetValue == "flipHorizontal") {
 				layout.mirror = "flop";
 			} else if (presetValue == "rotateClock90White") {
-				layout.rotation = {degrees: -90, color: "0xFFFFFF"};
+				layout.rotation = {degrees: -90, color: "rgb(255,255,255)"};
 			} else if (presetValue == "rotateAnticlock90White") {
-				layout.rotation = {degrees: 90, color: "0xFFFFFF"};
+				layout.rotation = {degrees: 90, color: "rgb(255,255,255)"};
 			}
 			layout.crop = {x: cropData.x, y: cropData.y, width: cropData.width, height: cropData.height};
 		}
