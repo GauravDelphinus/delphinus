@@ -7,7 +7,7 @@ var logger = require("../logger");
 var error = require("../error");
 var filterUtils = require("../filterUtils");
 var async = require("async");
-var imageProcessor = require("../imageProcessor");
+var stepsHandler = require("../stepsHandler");
 var shortid = require("shortid");
 
 /**

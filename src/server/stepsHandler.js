@@ -570,7 +570,7 @@ function validateCommand(command) {
 
 /**
 	Transform the Image Magick commands list for consumption by the
-	ImageProcessor service.  Note that isLocal is set true for both
+	stepsHandler service.  Note that isLocal is set true for both
 	"system" (i.e. the current process running the ImageMagick commands)
 	as well as "localhost" (i.e., Image Processor service running on
 	localhost).  For external service it is set as false.
@@ -649,7 +649,7 @@ function processImageSystem(command, sourceImage, targetImage, imArgs, next) {
 
 /**
 	Send the image processing command to the micro service running on Localhost
-	Check out imageprocessor project
+	Check out stepsHandler project
 **/
 function processImageLocalhost(command, sourceImage, targetImage, imArgs, hostname, next) {
 	if (!validateCommand(command)) {

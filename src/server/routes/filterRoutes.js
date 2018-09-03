@@ -14,7 +14,7 @@ var filterUtils = require("../filterUtils");
 var routes = function() {
 
 	var filterRouter = express.Router();
-	var imageProcessor = require("../imageProcessor");
+	var stepsHandler = require("../stepsHandler");
 
 	filterRouter.route("/")
 		.get(function(req, res) {
@@ -153,7 +153,7 @@ var routes = function() {
 						var targetImageUrl = config.url.cacheImages + targetImageName;
     				}
 
-    				imageProcessor.applyStepsToImage(info.sourceImagePath, targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePathRaw){
+    				stepsHandler.applyStepsToImage(info.sourceImagePath, targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePathRaw){
 						if (err) {
 							logger.error("applyStepsToImage failed: " + err);
 							return res.sendStatus(500);
@@ -165,7 +165,7 @@ var routes = function() {
 							imagePath = global.appRoot + config.path.cacheImages + targetImageName;
 						}
 
-						imageProcessor.addWatermarkToImage(imagePathRaw, imagePath, function(err, outputPath) {
+						stepsHandler.addWatermarkToImage(imagePathRaw, imagePath, function(err, outputPath) {
 							if (err) {
 								logger.error("Failed to apply watermark: " + imagePath + ", error: " + err);
 								return res.sendStatus(500);
@@ -268,7 +268,7 @@ var routes = function() {
 						imageUrlPaths.push(config.url.cacheImages + targetImageName);
 
 						//apply steps - note that applyStepsToImage first checks for existance of cache image
-	    				applySingleStepToImageFunctions.push(async.apply(imageProcessor.applyStepsToImage, sourceImagePath, targetImage, imageData.imageType, singleStepList[i], imageData.caption));
+	    				applySingleStepToImageFunctions.push(async.apply(stepsHandler.applyStepsToImage, sourceImagePath, targetImage, imageData.imageType, singleStepList[i], imageData.caption));
 	    			}
 
 	    			var imagePaths = []; //list of image paths for each sub step

@@ -452,7 +452,7 @@ module.exports = {
 	},
 
 	/**
-		Normalize / expand the steps array such that the imageprocessor
+		Normalize / expand the steps array such that the stepsHandler
 		knows how to handle it.
 	**/
 	normalizeSteps: function (steps, caption, next) {
