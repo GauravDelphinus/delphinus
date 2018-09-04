@@ -11,6 +11,8 @@ var serverUtils = require("../serverUtils");
 var dbEntry = require("../db/dbEntry");
 var dbUtils = require("../db/dbUtils");
 var filterUtils = require("../filterUtils");
+var imageHandler = require("../imageHandler");
+
 var routes = function() {
 
 	var filterRouter = express.Router();
@@ -153,7 +155,7 @@ var routes = function() {
 						var targetImageUrl = config.url.cacheImages + targetImageName;
     				}
 
-    				stepsHandler.applyStepsToImage(info.sourceImagePath, targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePathRaw){
+    				imageHandler.applyStepsToImage(info.sourceImagePath, targetImagePath, info.imageType, steps, req.body.caption, function(err, imagePathRaw){
 						if (err) {
 							logger.error("applyStepsToImage failed: " + err);
 							return res.sendStatus(500);
@@ -165,7 +167,7 @@ var routes = function() {
 							imagePath = global.appRoot + config.path.cacheImages + targetImageName;
 						}
 
-						stepsHandler.addWatermarkToImage(imagePathRaw, imagePath, function(err, outputPath) {
+						imageHandler.addWatermarkToImage(imagePathRaw, imagePath, function(err, outputPath) {
 							if (err) {
 								logger.error("Failed to apply watermark: " + imagePath + ", error: " + err);
 								return res.sendStatus(500);

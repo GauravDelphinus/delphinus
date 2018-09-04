@@ -6,6 +6,7 @@ var url = require("url");
 var tmp = require("tmp");
 var config = require("./config");
 var stepsHandler = require("./stepsHandler");
+var imageHandler = require("./imageHandler");
 
 var functions = {
 	/**
@@ -706,7 +707,7 @@ var functions = {
 		Refer imageProcesser.compressImage
 	*/
 	compressImage(before, after, callback) {
-		stepsHandler.compressImage(before, after, function(err) {
+		imageHandler.compressImage(before, after, function(err) {
 			return callback(err);
 		});
 	},

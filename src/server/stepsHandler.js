@@ -1,41 +1,16 @@
 var tmp = require("tmp");
 var fs = require("fs");
-var execFile = require('child_process').execFile;
-var execFileSync = require("child_process").execFileSync;
+
 var logger = require("./logger");
 var mime = require("mime");
 var config = require("./config");
 var request = require("request");
 var serverUtils = require("./serverUtils");
 var async = require("async");
+var imageHandler = require("./imageHandler");
 
 var functions = {
-	applyStepsToImage : function(sourceImage, targetImage, imageType, steps, caption, next) {
-		//logger.debug("applyStepsToImage: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", steps: " + JSON.stringify(steps));
-		if (targetImage) {
-			if (fs.existsSync(targetImage)) { //check if file already exists in Cache
-				return next(0, targetImage);
-			} else {
-				applySteps(sourceImage, targetImage, steps, caption, next);
-			}
-		} else {
-			tmp.tmpName(function _tempNameGenerated(err, path) {
-    			if (err) {
-    				return next(err, 0);
-    			}
-    			
-    			applySteps(sourceImage, path + "." + mime.extension(imageType), steps, caption, next);
-			});
-		}
-	},
-
-	findImageSize: findImageSize,
-
-	addWatermarkToImage: function(sourceImage, targetImage, next) {
-		addWatermark(sourceImage, targetImage, next);
-	},
-
-	compressImage: compressImage
+	applySteps: applySteps
 };
 
 for (var key in functions) {
@@ -70,7 +45,7 @@ function applySteps(sourceImage, targetImage, steps, caption, next) {
 
 			imArgs.unshift({type: "INPUT_FILE", value: newSourceImage});
     		imArgs.push({type: "OUTPUT_FILE", value: targetImage});
-			writeImage(newSourceImage, targetImage, imArgs, next);
+			imageHandler.writeImage(newSourceImage, targetImage, imArgs, next);
 		});
 	} else {
 		//since there weren't any changes, just pass along the original image
@@ -150,7 +125,7 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
 
     		layoutArgs.unshift({type: "INPUT_FILE", value: sourceImage});
     		layoutArgs.push({type: "OUTPUT_FILE", value: newSourceImage});
-    		writeImage(sourceImage, newSourceImage, layoutArgs, function(err, targetImage, changesDone) {
+    		imageHandler.writeImage(sourceImage, newSourceImage, layoutArgs, function(err, targetImage, changesDone) {
     			if (err) {
     				return next(err, 0, 0);
     			}
@@ -164,14 +139,14 @@ function applyLayouts (sourceImage, layouts, imArgs, next) {
     				});
     			}
 
-    			findImageSize(targetImage, function(err, newImageSize) {
+    			imageHandler.findImageSize(targetImage, function(err, newImageSize) {
     				return next(err, targetImage, newImageSize);
     			});
     		});
     	});
 	} else {
 		//nothing to layout, so just find the size of original image and pass on to next step
-		findImageSize(sourceImage, function(err, imageSize) {
+		imageHandler.findImageSize(sourceImage, function(err, imageSize) {
 			return next(err, sourceImage, imageSize);
 		});
 	}
@@ -361,6 +336,34 @@ function applyArtifacts (image, size, artifacts, caption, imArgs) {
 }
 
 /**
+	Calculate the geometry/size/locatino of the caption label depending on location of label
+
+	location can be: top, bottom, center, below, above
+**/
+function calculateLabelGeometry(imageSize, placement, extent) {
+	//logger.debug("calculateLabelGeometry: imageSize: " + JSON.stringify(imageSize) + ", placement: " + placement + ", extent: " + extent);
+	var left = 0, top = 0;
+	var width = imageSize.width * 0.9, height = imageSize.height * 0.2;
+
+	if (placement == "north") {
+		left = (imageSize.width - width) / 2;
+		top = 0;
+	} else if (placement == "south") {
+		left = (imageSize.width - width) / 2;
+		top = imageSize.height - height;
+	} else if (placement == "center") {
+		left = (imageSize.width - width) / 2;
+		top = (imageSize.height - height) / 2;
+	}
+
+	if (extent) { //above or below
+		width = imageSize.width; //full width as the background should fill full width for extended image portion
+	}
+
+	return {left: Math.round(left), top: Math.round(top), width: Math.round(width), height: Math.round(height)};
+}
+
+/**
 	Apply preset caption and determine the best possible settings
 	for the given image
 
@@ -384,7 +387,7 @@ function applyPresetCaption(imArgs, image, size, caption, placement, extent, lab
 		color is set to the average color of the lower or upper region of the image
 		respectively.
 	*/
-	var averageColor = findAverageColor(image, labelGeometry);
+	var averageColor = imageHandler.findAverageColor(image, labelGeometry);
 	if (extent) {
 		if (averageColor) {
 			backgroundColor = "rgb(" + averageColor.r + "," + averageColor.g + "," + averageColor.b + ")";
@@ -455,34 +458,6 @@ function applyCaption(imArgs, size, background, foreground, caption, placement, 
 	imArgs.push("-gravity");
 	imArgs.push(placement);
 	imArgs.push("-composite");
-}
-
-/**
-	Calculate the geometry/size/locatino of the caption label depending on location of label
-
-	location can be: top, bottom, center, below, above
-**/
-function calculateLabelGeometry(imageSize, placement, extent) {
-	//logger.debug("calculateLabelGeometry: imageSize: " + JSON.stringify(imageSize) + ", placement: " + placement + ", extent: " + extent);
-	var left = 0, top = 0;
-	var width = imageSize.width * 0.9, height = imageSize.height * 0.2;
-
-	if (placement == "north") {
-		left = (imageSize.width - width) / 2;
-		top = 0;
-	} else if (placement == "south") {
-		left = (imageSize.width - width) / 2;
-		top = imageSize.height - height;
-	} else if (placement == "center") {
-		left = (imageSize.width - width) / 2;
-		top = (imageSize.height - height) / 2;
-	}
-
-	if (extent) { //above or below
-		width = imageSize.width; //full width as the background should fill full width for extended image portion
-	}
-
-	return {left: Math.round(left), top: Math.round(top), width: Math.round(width), height: Math.round(height)};
 }
 
 /********************************** DECORATIONS *******************************/
@@ -560,268 +535,6 @@ function applyBorder(imArgs, borderWidth, borderColor) {
 
 /****************** Common Helper Functions *****************/
 
-function validateCommand(command) {
-	if (command == "convert" || command == "identify" || command == "composite") {
-		return true;
-	}
-
-	return false;
-}
-
-/**
-	Transform the Image Magick commands list for consumption by the
-	stepsHandler service.  Note that isLocal is set true for both
-	"system" (i.e. the current process running the ImageMagick commands)
-	as well as "localhost" (i.e., Image Processor service running on
-	localhost).  For external service it is set as false.
-**/
-function transformImArgsForService(imArgs, isLocal, callback) {
-	if (isLocal) {
-		var finalArgs = [];
-
-		for (let i = 0; i < imArgs.length; i++) {
-			if (typeof imArgs[i] === "object") {
-				finalArgs.push(imArgs[i].value);
-			} else {
-				finalArgs.push(imArgs[i]);
-			}
-		}
-
-		return callback(null, finalArgs);
-	} else {
-		var functionList = [];
-		for (let i = 0; i < imArgs.length; i++) {
-			functionList.push(async.apply(function(arg, callback) {
-				if (typeof arg === 'object') {
-					if (arg.type == "INPUT_FILE") {
-						const DataURI = require('datauri');
-						const datauri = new DataURI();
-						datauri.encode(arg.value, function(err, imageData) {
-							if (err) {
-								return next(err);
-							}
-
-							return callback(null, imageData);
-						});
-					} else if (arg.type == "OUTPUT_FILE") {
-						return callback(null, "OUTPUT_FILE");
-					} else {
-						return callback(new Error("Invalid arg type: " + arg.type));
-					}
-				} else {
-					return callback(null, arg);
-				}
-			}, 
-			imArgs[i]));
-		}
-
-		async.series(functionList, function(err, finalArgs) {
-			if (err) {
-				return callback(err);
-			}
-
-			return callback(null, finalArgs);
-		});
-	}
-}
-/**
-	Process the image locally using the ImageMagick system commands
-**/
-function processImageSystem(command, sourceImage, targetImage, imArgs, next) {
-	if (!validateCommand(command)) {
-		return next(new Error("Invalid command: " + command));
-	}
-
-	transformImArgsForService(imArgs, true, function(err, finalArgs) {
-		if (err) {
-			return next(err);
-		}
-
-		execFile(command, finalArgs, (error, stdout, stderr) => {
-			if (error) {
-		    	return next(error);
-		  	} else {
-		  		return next(0, targetImage);
-		  	}
-	  	});
-	});
-}
-
-/**
-	Send the image processing command to the micro service running on Localhost
-	Check out stepsHandler project
-**/
-function processImageLocalhost(command, sourceImage, targetImage, imArgs, hostname, next) {
-	if (!validateCommand(command)) {
-		return next(new Error("Invalid command: " + command));
-	}
-
-	transformImArgsForService(imArgs, true, function(err, finalArgs) {
-		if (err) {
-			return next(err);
-		}
-
-		request({
-				uri: hostname + "/api/processimage",
-				method: "GET",
-				body: {
-					command: command,
-					imArgs: finalArgs
-				},
-				json: true
-			},
-			function(err, res, body) {
-				if (err || res.statusCode != 200) {
-			    	return next(err);
-			  	} else {
-			  		return next(0, targetImage);
-			  	}
-			}
-	  	);
-	});
-}
-
-/**
-	Send the image processing command to the external micro service or AWS Lambda function
-**/
-function processImageExternal(command, sourceImage, targetImage, imArgs, hostname, next) {
-	if (!validateCommand(command)) {
-		return next(new Error("Invalid command: " + command));
-	}
-
-	transformImArgsForService(imArgs, false, function(err, finalArgs) {
-		if (err) {
-			return next(err);
-		}
-
-		request({
-				uri: hostname + "/api/processimage",
-				method: "GET",
-				body: {
-					command: command,
-					imArgs: finalArgs
-				},
-				json: true
-			},
-			function(err, res, body) {
-				if (err || res.statusCode != 200) {
-			    	return next(err);
-			  	} else {
-			  		//extract the targetImageData and write to the targetImage path
-			  		serverUtils.dataURItoFile(body.outputFileData, targetImage, function(err) {
-			  			if (err) {
-			  				return next(err);
-			  			}
-
-			  			return next(0, targetImage);
-			  		});
-			  	}
-			}
-	  	);
-	});
-}
-
-function processImage(command, sourceImage, targetImage, imArgs, next) {
-	const dynamicConfig = require("./config/dynamicConfig");
-	if (!dynamicConfig || !dynamicConfig.imageServiceHostname) {
-		//Image service not found, just call local ImageMagick commands
-		processImageSystem(command, sourceImage, targetImage, imArgs, next);
-	} else if (dynamicConfig.imageServiceHostname.startsWith("http://localhost:")) {
-		processImageLocalhost(command, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
-	} else {
-		processImageExternal(command, sourceImage, targetImage, imArgs, dynamicConfig.imageServiceHostname, next);
-	}
-}
-
-/**
-	Write the given sourceImage to the targetImage after applying the provided
-	ImageMagick arguments.  Then, call the next functin with the error (if any),
-	or with the path to the final image, along with info on whether there was 
-	really any change done.
-**/
-function writeImage(sourceImage, targetImage, imArgs, next) {
-	const timer = logger.startTimer();
-	if (imArgs.length > 0) {
-		processImage("convert", sourceImage, targetImage, imArgs, function(err) {
-			if (err) {
-				next(err, null);
-			    timer.done("writeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-			} else {
-				next(0, targetImage);
-			  	timer.done("writeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-			}
-		});
-	} else {
-		next(0, sourceImage); // no changes done, so just send back the source image
-		timer.done("writeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-	}
-}
-
-/**
-	Write the given sourceImage to the targetImage after applying the provided
-	ImageMagick arguments.  Then, call the next functin with the error (if any),
-	or with the path to the final image, along with info on whether there was 
-	really any change done.
-**/
-function compositeImage(sourceImage, targetImage, imArgs, next) {
-	const timer = logger.startTimer();
-	if (imArgs.length > 0) {
-		processImage("composite", sourceImage, targetImage, imArgs, function(err) {
-			if (err) {
-		    	next(err, null);
-		    	timer.done("compositeImage, error: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-		  	} else {
-		  		next(0, targetImage);
-		  		timer.done("compositeImage, success: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-		  	}
-	  	});
-	} else {
-		next(0, sourceImage); // no changes done, so just send back the source image
-		timer.done("compositeImage, no changes: sourceImage: " + sourceImage + ", targetImage: " + targetImage + ", imArgs: " + JSON.stringify(imArgs));
-	}
-}
-
-/**
-	Find the average color (RGB) in a section of the image
-
-	NOTE: SYNCHRONOUS CALL!!!!
-**/
-function findAverageColor(imagePath, labelGeometry) {
-	//logger.debug("findAverageColor: imagePath: " + imagePath + ", labelGeometry: " + JSON.stringify(labelGeometry));
-	const timer = logger.startTimer();
-	try {
-		var output = execFileSync('convert', [imagePath, "-crop", labelGeometry.width + "x" + labelGeometry.height + "+" + labelGeometry.left + "+" + labelGeometry.top, "-resize", "1x1\!", "-format", "%[fx:int(255*r+.5)],%[fx:int(255*g+.5)],%[fx:int(255*b+.5)]", "info:-"]);
-		var colorArray = output.toString().trim().split(",");
-	  	var color = {r: parseInt(colorArray[0]), g: parseInt(colorArray[1]), b: parseInt(colorArray[2])};
-
-	  	timer.done("findAverageColor, success: imagePath: " + imagePath + ", labelGeometry: " + JSON.stringify(labelGeometry));
-	  	return color;
-	} catch (error) {
-		logger.error("error in determining the average color: " + error);
-		timer.done("findAverageColor, error: imagePath: " + imagePath + ", labelGeometry: " + JSON.stringify(labelGeometry));
-	}
-
-	return null;
-}
-
-/**
-	Find the size of the provided image
-**/
-function findImageSize(imagePath, next) {
-	const timer = logger.startTimer();
-	execFile('identify', ["-format", "%Wx%H", imagePath], (error, stdout, stderr) => {
-	  	if (error) {
-	  		timer.done("findImageSize, error: imagePath: " + imagePath);
-	    	return next(error, 0);
-	  	}
-
-	  	var sizeArray = stdout.trim().split("x");
-	  	var newImageSize = {width: parseInt(sizeArray[0]), height: parseInt(sizeArray[1])};
-
-	  	timer.done("findImageSize, success: imagePath: " + imagePath);
-	  	return next(0, newImageSize);
-	});
-}
 
 /**
 	Convert from the -100 to 100 range to a %age change.
@@ -839,20 +552,6 @@ function absoluteToPercentageChangeSigned(absoluteValue) {
 
 	return percentageChange;
 }
-
-/*
-function absoluteToMultiplierSigned(absoluteValue) {
-	if (absoluteValue < -100) {
-		absoluteValue = -100;
-	} else if (absoluteValue > 100) {
-		absoluteValue = 100;
-	}
-
-	var multiplierValue = absoluteValue;
-
-	return multiplierValue;
-}
-*/
 
 /*
 	Convert color coming in from client to a format that ImageMagick
@@ -887,69 +586,4 @@ function normalizeFontNameToIM(fontName) {
 	return fontName; // TODO
 }
 
-/************************** WATERMARK RELATED ***************************/
 
-/**
-	Add a watermark to the SourceImage, and save that to the TargetImage
-**/
-function addWatermark(sourceImage, targetImage, next) {
-	var imArgs = []; //imageMagickArgs
-
-	applyWatermark(imArgs);
-
-	findImageSize(sourceImage, function(err, imageSize) {
-		if (err) {
-			return next(err);
-		}
-
-		let watermarkImagePath = global.appRoot + config.path.watermarkImages + "/";
-		if (imageSize.width < 600) {
-			watermarkImagePath += "captionify_watermark_gray_white_150x50.png";
-		} else if (imageSize.width < 1200) {
-			watermarkImagePath += "captionify_watermark_gray_white_300x100.png";
-		} else if (imageSize.width < 1800) {
-			watermarkImagePath += "captionify_watermark_gray_white_450x150.png";
-		} else if (imageSize.width < 2400) {
-			watermarkImagePath += "captionify_watermark_gray_white_600x200.png";
-		} else if (imageSize.width < 3600) {
-			watermarkImagePath += "captionify_watermark_gray_white_900x300.png";
-		} else if (imageSize.width < 4800) {
-			watermarkImagePath += "captionify_watermark_gray_white_1200x400.png";
-		} else {
-			watermarkImagePath += "captionify_watermark_gray_white_1500x500.png";
-		}
-
-		imArgs.push({type: "INPUT_FILE", value: watermarkImagePath});
-		imArgs.push({type: "INPUT_FILE", value: sourceImage});
-		imArgs.push({type: "OUTPUT_FILE", value: targetImage});
-
-		compositeImage(sourceImage, targetImage, imArgs, next);
-	});
-}
-
-function applyWatermark(imArgs) {
-	imArgs.push("-compose");
-	imArgs.push("multiply");
-	imArgs.push("-gravity");
-	imArgs.push("SouthWest");
-	imArgs.push("-geometry");
-	imArgs.push("+5+5");
-	
-}
-
-/**
-	Compress the given image to a smaller size as supported by Captionify
-**/
-function compressImage(before, after, callback) {
-	//logger.debug("calling execFile in compressImage");
-	const timer = logger.startTimer();	
-	execFile('convert', [before, "-resize", config.image.maxWidth + "x" + config.image.maxHeight + "\>", after], (error, stdout, stderr) => {
-	  	if (error) {
-	  		timer.done("compressImage, error: before: " + before + ", after: " + after);
-	    	return callback(error, 0);
-	  	}
-
-	  	timer.done("compressImage, success: before: " + before + ", after: " + after);
-	  	return callback(0);
-	});
-}
