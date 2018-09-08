@@ -139,6 +139,42 @@ function getUsers(meId, followedId, followingId, likedEntityId, lastFetchedTimes
 	});
 }
 
+function getLocalUsers(done) {
+	
+	var cypherQuery = "";
+  
+	cypherQuery += " MATCH (u:User) WHERE exists(u.local_email) " +
+		" WITH u " +
+  		" RETURN u; ";
+
+	dbUtils.runQuery(cypherQuery, function(err, result) {
+		if (err) {
+			return done(err, 0);
+		}
+
+		var output = [];
+		for (var i = 0; i < result.data.length; i++) {
+			var data = {};
+
+			var user = result.data[i];
+
+			var data = {
+				type: "user",
+	        	id: user.id,
+	        	image: user.image,
+	        	displayName: user.display_name,
+	        	link: config.url.user + user.id
+	        }
+
+	        output.activity = {lastSeen: user.activity_last_seen};
+
+			output.push(data);
+		}
+
+		return done(null, output);
+	});
+}
+
 /*
 	Fetch all entries from the DB matching the provided criteria, and sorted by the given sort flag.
 
@@ -720,6 +756,7 @@ module.exports = {
 	getUserSocialInfo : getUserSocialInfo,
 	getUsers: getUsers,
 	getUsersSorted: getUsersSorted,
+	getLocalUsers: getLocalUsers,
 	findUser: findUser,
 	saveUser: saveUser,
 	removeAccessForUser: removeAccessForUser,

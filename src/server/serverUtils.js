@@ -7,6 +7,7 @@ var tmp = require("tmp");
 var config = require("./config");
 var stepsHandler = require("./stepsHandler");
 var imageHandler = require("./imageHandler");
+var dynamicConfig = require("./config/dynamicConfig");
 
 var functions = {
 	/**
@@ -947,6 +948,36 @@ var functions = {
 			"imageType" : "imageType",
 			"authorName" : "string"
 		}
+	},
+
+	/**
+		Verify the digital signature provided against the data provided, using the client's
+		public key
+
+		Refer ClientAuthentication.docx for more information
+
+		Refer generateDigitalSignature in content generator code base
+	**/
+	verifyDigitalSignature: function(data, signature_base64) {
+		logger.debug("verifyDigitalSignature, data: " + data);
+		const crypto = require('crypto')
+		const fs = require('fs')
+
+		//fetch public key of client
+		const public_key = fs.readFileSync(dynamicConfig.contentGeneratorPublicKeyFile, 'utf-8')
+		const message = JSON.stringify(data);
+
+		const verifier = crypto.createVerify('sha256');
+		verifier.update(message);
+		verifier.end();
+
+		//extract signature
+		const signature = Buffer.from(signature_base64, "base64");
+
+		//verify/match the signature
+		const verified = verifier.verify(public_key, signature);
+
+		return verified;
 	}
 }
 

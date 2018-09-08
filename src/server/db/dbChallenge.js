@@ -5,6 +5,7 @@ var config = require("../config");
 var mime = require("mime");
 var logger = require("../logger");
 var stepsHandler = require("../stepsHandler");
+var imageHandler = require("../imageHandler");
 var error = require("../error");
 
 /*
@@ -265,7 +266,7 @@ function createImageForChallenge(challengeId, imageDataURI, done) {
 
 		var baseDir = global.appRoot + config.path.challengeImages;
 		var fullPath = baseDir + name;
-		stepsHandler.addWatermarkToImage(pathRaw, fullPath, function(err, outputPath) {
+		imageHandler.addWatermarkToImage(pathRaw, fullPath, function(err, outputPath) {
 			if (err) {
 				return done(new Error("Failed to apply watermark: " + fullPath));
 			}

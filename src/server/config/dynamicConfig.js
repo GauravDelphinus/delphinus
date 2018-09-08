@@ -12,5 +12,6 @@ module.exports = {
 	twitterClientId: process.env.TWITTER_CLIENT_ID,
 	twitterClientSecret: process.env.TWITTER_CLIENT_SECRET,
 	googleClientId: process.env.GOOGLE_CLIENT_ID,
-	googleClientSecret: process.env.GOOGLE_CLIENT_SECRET
+	googleClientSecret: process.env.GOOGLE_CLIENT_SECRET,
+	contentGeneratorPublicKeyFile: process.env.CONTENT_GENERATOR_PUBLIC_KEY_FILE
 };

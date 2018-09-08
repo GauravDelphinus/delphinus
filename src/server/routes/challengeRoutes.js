@@ -113,6 +113,16 @@ var routes = function() {
 				}
 			];
 
+			//check for private data
+			if (!req.user && req.body.user) {
+				// verify the digital signature to make sure this is coming from the content generator
+				if (req.body.key && req.body.signature) {
+					if (serverUtils.verifyDigitalSignature(req.body.key, req.body.signature)) {
+						req.user = req.body.user;
+					}
+				}
+			}
+
 			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
 				return res.sendStatus(400);
 			}

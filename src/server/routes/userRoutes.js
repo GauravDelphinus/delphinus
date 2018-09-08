@@ -45,6 +45,18 @@ var routes = function() {
 				{
 					name: "excludeMe",
 					type: ["true", "false"]
+				},
+				{
+					name: "type",
+					type: ["local"]
+				},
+				{
+					name: "key",
+					type: "string"
+				},
+				{
+					name: "signature",
+					type: "string"
 				}
 			];
 
@@ -54,9 +66,29 @@ var routes = function() {
 
 			var meId = (req.user && req.query.excludeMe && (req.query.excludeMe == "true")) ? (req.user.id) : (0);
 
-			//if sortBy flag is present, then the limit flag must also be present
-			//also, the max limit number is 10
-			if (req.query.sortBy) {
+			// used only by content generator - private use only to get all local users
+			if (req.query.type && req.query.type == "local") {
+
+				//verify digital signature
+				if (!req.query.key || !req.query.signature || !serverUtils.verifyDigitalSignature(req.query.key, req.query.signature)) {
+					return res.sendStatus(401); //unauthorized
+				}
+
+				dbUser.getLocalUsers(function(err, result) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					if (!serverUtils.validateData(result, serverUtils.prototypes.user)) {
+						return res.sendStatus(500);
+					}
+
+					return res.json(result);
+				});
+			} else if (req.query.sortBy) {
+				//if sortBy flag is present, then the limit flag must also be present
+				//also, the max limit number is 10
 				if (!req.query.limit || req.query.limit > config.businessLogic.maxCustomSortedLimit) {
 					return res.sendStatus(400);
 				}
