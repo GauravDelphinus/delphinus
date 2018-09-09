@@ -34,6 +34,34 @@ function getChallenge(challengeId, done) {
 }
 
 /*
+	For private use only - return a random challenge
+*/
+function getRandomChallenge(notPostedBy, done) {
+	var cypherQuery = "MATCH (category:Category)<-[:POSTED_IN]-(c:Challenge)-[r:POSTED_BY]->(poster:User) " +
+		" WHERE (poster.id <> '" + notPostedBy + "') " +
+		" WITH c, category, poster, rand() AS number " +
+		" RETURN c, poster, category " +
+		" ORDER BY number " +
+		" LIMIT 1 ;";
+
+	dbUtils.runQuery(cypherQuery, function(err, result){
+		if(err) {
+			return done(err);
+		} else if (result.data.length != 1) {
+			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		}
+
+		var challenge = result.data[0][0];
+		var poster = result.data[0][1];
+		var category = result.data[0][2];
+
+		output = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
+
+		return done(null, output);
+	});
+}
+
+/*
 	Get info about the social info about a Challenge from the DB
 */
 function getChallengeSocialInfo(challengeId, meId, done) {
@@ -445,5 +473,6 @@ module.exports = {
 	deleteChallenge: deleteChallenge,
 	createCategoryNode: createCategoryNode,
 	createChallengeNode: createChallengeNode,
-	canDeleteChallenge: canDeleteChallenge
+	canDeleteChallenge: canDeleteChallenge,
+	getRandomChallenge: getRandomChallenge
 };

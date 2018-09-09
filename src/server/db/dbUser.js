@@ -33,6 +33,37 @@ function getUser(userId, done) {
 	});
 }
 
+function getRandomUser(done) {
+	var cypherQuery = "MATCH (u:User) " + 
+		" WHERE exists(u.local_email) " + 
+		" WITH u, rand() AS number " +
+  		" RETURN u " + 
+  		" ORDER BY number " +
+		" LIMIT 1 ;";
+
+	dbUtils.runQuery(cypherQuery, function(err, result) {
+		if (err) {
+			return done(err);
+		} else if (result.data.length != 1) {
+        	return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+        }
+
+        var user = result.data[0];
+
+        var output = {
+        	type: "user",
+        	id: user.id,
+        	image: user.image,
+        	displayName: user.display_name,
+        	link: config.url.user + user.id
+        }
+
+        output.activity = {lastSeen: user.activity_last_seen};
+		
+		return done(null, output);
+	});
+}
+
 function getUserSocialInfo(userId, meId, done) {
 	var cypherQuery = "MATCH (u:User{id: '" + userId + "'}) WITH u " +
   		" OPTIONAL MATCH (u)<-[:FOLLOWING]-(follower:User) " +
@@ -744,6 +775,71 @@ function removeAccessForUser(userId, provider, callback) {
 
 }
 
+function createUser(email, password, displayName, signedInUser, done) {
+	var query = {};
+    query.localEmail = email;
+    query.type = "extended"; // search emails not just in local, but other social accounts
+
+    var self = this;
+    this.findUser(query, function(err, user) {
+    	if (err) {
+    		return done(err, null);
+    	}
+
+        if (user) {
+            //user already exists
+            return done(new Error("An account with that email address already exists.  Try signing in."));
+        } else {
+            //console.log("user not found, req.user is " + req.user);
+            if (signedInUser) { //user already signed in with other social accounts
+                if (signedInUser.google) {
+                    query.googleID = signedInUser.google.id;
+                }
+
+                if (signedInUser.twitter) {
+                    query.twitterID = signedInUser.twitter.id;
+                }
+
+                if (signedInUser.facebook) {
+                    query.facebookID = signedInUser.facebook.id;
+                }
+            }
+
+            self.findUser(query, function (error, user) {
+            	if (error) {
+            		return done(error);
+            	}
+
+                if (!user) {
+                    if (signedInUser) {
+                        user = signedInUser;
+                    } else {
+                        user = {};
+                    }
+                }
+
+                user.local = {};
+                user.local.email = email;
+                user.local.password = password;
+                user.local.displayName = displayName;
+                user.displayName = displayName;
+                user.image = config.url.staticImages + config.name.defaultProfileImageName;
+
+                // set last seen
+            	user.activity = {lastSeen : (new Date()).getTime()};
+                
+                self.saveUser(user, function(err, user) {
+                    if (err) {
+                    	return done(err, null);
+                    }
+
+                    return done(null, user);
+                });
+            });
+        }
+    });
+}
+
 var userPrototypeBasic = {
 	"id" : "id",
 	"image": ["oneoftypes", "url", "myURL"],
@@ -763,5 +859,7 @@ module.exports = {
 	followUser: followUser,
 	userPrototypeBasic : userPrototypeBasic,
 	createUserNode: createUserNode,
-	deleteUser: deleteUser
+	deleteUser: deleteUser,
+	createUser: createUser,
+	getRandomUser: getRandomUser
 };

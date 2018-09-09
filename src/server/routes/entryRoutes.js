@@ -41,6 +41,22 @@ var routes = function() {
 				{
 					name: "limit",
 					type: "number"
+				},
+				{
+					name: "key",
+					type: "string"
+				},
+				{
+					name: "signature",
+					type: "string"
+				},
+				{
+					name: "random",
+					type: ["true"]
+				},
+				{
+					name: "notPostedBy",
+					type: "id"
 				}
 			];
 
@@ -48,9 +64,28 @@ var routes = function() {
 				return res.sendStatus(400);
 			}
 
-			//if sortBy flag is present, then the limit flag must also be present
-			//also, the max limit number is 10
-			if (req.query.sortBy) {
+			if (req.query.random && req.query.random == "true") {
+				//verify digital signature
+				if (!req.query.key || !req.query.signature || !serverUtils.verifyDigitalSignature(req.query.key, req.query.signature)) {
+					return res.sendStatus(401); //unauthorized
+				}
+
+				dbEntry.getRandomEntry(req.query.notPostedBy, function(err, result) {
+					if (err) {
+						logger.error(err);
+						return res.sendStatus(500);
+					}
+
+					if (!serverUtils.validateData(result, serverUtils.prototypes.entry)) {
+						return res.sendStatus(500);
+					}
+
+					return res.json(result);
+				});
+			} else if (req.query.sortBy) {
+				//if sortBy flag is present, then the limit flag must also be present
+				//also, the max limit number is 10
+			
 				if (!req.query.limit || req.query.limit > config.businessLogic.maxCustomSortedLimit) {
 					return res.sendStatus(400);
 				}
@@ -299,6 +334,16 @@ var routes = function() {
 					required: "yes"
 				}
 			];
+
+			//check for digital signature data
+			if (!req.user && req.body.user) {
+				// verify the digital signature to make sure this is coming from the content generator
+				if (req.body.key && req.body.signature) {
+					if (serverUtils.verifyDigitalSignature(req.body.key, req.body.signature)) {
+						req.user = req.body.user;
+					}
+				}
+			}
 
 			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
 				return res.sendStatus(400);

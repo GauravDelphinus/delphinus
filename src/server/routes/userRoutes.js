@@ -47,16 +47,16 @@ var routes = function() {
 					type: ["true", "false"]
 				},
 				{
-					name: "type",
-					type: ["local"]
-				},
-				{
 					name: "key",
 					type: "string"
 				},
 				{
 					name: "signature",
 					type: "string"
+				},
+				{
+					name: "random",
+					type: ["true"]
 				}
 			];
 
@@ -67,14 +67,14 @@ var routes = function() {
 			var meId = (req.user && req.query.excludeMe && (req.query.excludeMe == "true")) ? (req.user.id) : (0);
 
 			// used only by content generator - private use only to get all local users
-			if (req.query.type && req.query.type == "local") {
+			if (req.query.random && req.query.random == "true") {
 
 				//verify digital signature
 				if (!req.query.key || !req.query.signature || !serverUtils.verifyDigitalSignature(req.query.key, req.query.signature)) {
 					return res.sendStatus(401); //unauthorized
 				}
 
-				dbUser.getLocalUsers(function(err, result) {
+				dbUser.getRandomUser(function(err, result) {
 					if (err) {
 						logger.error(err);
 						return res.sendStatus(500);
@@ -170,6 +170,16 @@ var routes = function() {
 					type: "string"
 				}
 			];
+
+			//check for private data
+			if (!req.user && req.body.user) {
+				// verify the digital signature to make sure this is coming from the content generator
+				if (req.body.key && req.body.signature) {
+					if (serverUtils.verifyDigitalSignature(req.body.key, req.body.signature)) {
+						req.user = req.body.user;
+					}
+				}
+			}
 
 			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
 				return res.sendStatus(400);

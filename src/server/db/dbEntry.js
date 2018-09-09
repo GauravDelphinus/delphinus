@@ -43,6 +43,35 @@ function getEntry(entryId, done) {
 	});
 }
 
+/*
+	For private use only - return a random entry
+*/
+function getRandomEntry(notPostedBy, done) {
+	var cypherQuery = "MATCH (source)<-[:PART_OF]-(e:Entry)-[:POSTED_BY]->(poster:User) " +
+		" WHERE (poster.id <> '" + notPostedBy + "') " +
+		" WITH e, poster, source, labels(source) AS source_labels, rand() AS number " + 
+		" RETURN e, poster, source_labels, source " +
+		" ORDER BY number " +
+		" LIMIT 1 ;";
+
+	dbUtils.runQuery(cypherQuery, function(err, result){
+		if(err) {
+			return done(err);
+		} else if (result.data.length != 1) {
+			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		}
+
+		var entry = result.data[0][0];
+		var poster = result.data[0][1];
+		var sourceLabel = result.data[0][2];
+		var source = result.data[0][3];
+
+		output = dbUtils.entityNodeToClientData("Entry", entry, poster, null, sourceLabel, source);
+
+		return done(null ,output);
+	});
+}
+
 /**
 	Get the Social Info associated with an entry
 
@@ -898,5 +927,6 @@ module.exports = {
 	deleteEntry: deleteEntry,
 	likeEntry: likeEntry,
 	processImageDataForEntry: processImageDataForEntry,
-	createEntryNode: createEntryNode
+	createEntryNode: createEntryNode,
+	getRandomEntry: getRandomEntry
 };

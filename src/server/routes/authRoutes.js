@@ -3,6 +3,7 @@ var passport = require("passport");
 var config = require("../config");
 var logger = require("../logger");
 var serverUtils = require("../serverUtils");
+var dbUser = require("../db/dbUser");
 
 var routes = function() {
 	var authRouter = express.Router();
@@ -67,6 +68,60 @@ var routes = function() {
             } else {
                 res.redirect("/"); // redirect to home page by default
             }
+        });
+
+    // Private API path - not used by web client, only used by Content Generator
+    authRouter.route("/signup-api") 
+       
+        .post(function(req, res, next) {
+        	logger.debug("POST received on /auth/signup-api, body: " + JSON.stringify(req.body));
+
+        	var validationParams = [
+				{
+					name: "email",
+					required: "yes",
+					type: "email"
+				},
+				{
+					name: "password",
+					type: "string",
+					required: "yes"
+				},
+				{
+					name: "displayName",
+					type: "string",
+					required: "yes"
+				},
+				{
+					name: "key",
+					type: "string",
+					required: "yes"
+				},
+				{
+					name: "signature",
+					type: "string",
+					required: "yes"
+				}
+			];
+
+			if (!serverUtils.validateQueryParams(req.body, validationParams)) {
+				return res.sendStatus(400);
+			}
+
+			//check for private data
+				// verify the digital signature to make sure this is coming from the content generator
+			if (!serverUtils.verifyDigitalSignature(req.body.key, req.body.signature)) {
+				return res.sendStatus(401); //not authorized
+			}
+
+			dbUser.createUser(req.body.email, req.body.password, req.body.displayName, req.user, function(err, user) {
+				logger.debug("createUser callback, err: " + err);
+        		if (err) {
+        			return res.sendStatus(500);
+        		}
+
+        		return res.status(201).json(user);
+        	});
         });
 
 	authRouter.route("/google")
