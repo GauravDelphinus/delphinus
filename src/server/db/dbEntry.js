@@ -12,6 +12,7 @@ var dbIndependentImage = require("./dbIndependentImage");
 var dbChallenge = require("./dbChallenge");
 var dbDesign = require("./dbDesign");
 var dbFilter = require("./dbFilter");
+var imageHandler = require("../imageHandler");
 
 /*
 	Get Info about an Entry by looking up the DB
@@ -527,7 +528,7 @@ function createImagesForEntry(entryData, done) {
 			var hash = filterUtils.generateHash(singleStepList[i], entryData.title);
 			var targetImagePath = global.appRoot + config.path.cacheImages + info.sourceId + "-" + hash + "." + mime.extension(info.imageType);
 
-			applySingleStepToImageFunctions.push(async.apply(stepsHandler.applyStepsToImage, info.sourceImagePath, targetImagePath, info.imageType, singleStepList[i], dbUtils.escapeSingleQuotes(entryData.title)));
+			applySingleStepToImageFunctions.push(async.apply(imageHandler.applyStepsToImage, info.sourceImagePath, targetImagePath, info.imageType, singleStepList[i], dbUtils.escapeSingleQuotes(entryData.title)));
 		}
 
 		var imagePaths = []; //list of image paths for each sub step
@@ -538,7 +539,7 @@ function createImagesForEntry(entryData, done) {
 
 			//create a copy of the final cumulative/combined (i.e., last step in the array) to the entry image
 			var entryImagePath = global.appRoot + config.path.entryImages + entryData.id + "." + mime.extension(info.imageType);
-			stepsHandler.addWatermarkToImage(imagePaths[imagePaths.length - 1], entryImagePath, function(err) {
+			imageHandler.addWatermarkToImage(imagePaths[imagePaths.length - 1], entryImagePath, function(err) {
 				if (err) {
 					return done(new Error("Error creating the final Entry Image: " + err));
 				}

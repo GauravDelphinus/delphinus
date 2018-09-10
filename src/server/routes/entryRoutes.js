@@ -166,11 +166,21 @@ var routes = function() {
 				});
 			}
 
+			//check for digital signature data
+			if (!req.user && req.body.user) {
+				// verify the digital signature to make sure this is coming from the content generator
+				if (req.body.key && req.body.signature) {
+					if (serverUtils.verifyDigitalSignature(req.body.key, req.body.signature)) {
+						req.user = req.body.user;
+					}
+				}
+			}
+
 			if (!serverUtils.validateQueryParams(req.body, validationParams) || !req.user) {
 				return res.sendStatus(400);
 			}
 			
-			if (!filterUtils.validateSteps(req.body.steps)) {
+			if (!req.body.steps || !filterUtils.validateSteps(req.body.steps)) {
 				logger.error("Invalid steps received from client: " + JSON.stringify(req.body.steps));
 				return res.sendStatus(400);
 			}

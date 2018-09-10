@@ -57,6 +57,10 @@ var routes = function() {
 				{
 					name: "random",
 					type: ["true"]
+				},
+				{
+					name: "forChallenge",
+					type: "id"
 				}
 			];
 
@@ -74,7 +78,7 @@ var routes = function() {
 					return res.sendStatus(401); //unauthorized
 				}
 
-				dbUser.getRandomUser(function(err, result) {
+				dbUser.getRandomUser(req.query.forChallenge, function(err, result) {
 					if (err) {
 						logger.error(err);
 						return res.sendStatus(500);

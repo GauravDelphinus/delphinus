@@ -33,13 +33,28 @@ function getUser(userId, done) {
 	});
 }
 
-function getRandomUser(done) {
-	var cypherQuery = "MATCH (u:User) " + 
+function getRandomUser(forChallenge, done) {
+
+	//If there's a valid challenge id, make sure the user isn't the one who posted that challenge
+	//and hasn't already posted an entry to that challenge
+	var cypherquery = "";
+	if (forChallenge != undefined) {
+		cypherQuery = "MATCH (u:User) " + 
+		" WHERE NOT (u)<-[:POSTED_BY]-(:Challenge{id: '" + forChallenge + "'}) " +
+		"   AND exists(u.local_email) " +
+		"   AND NOT (u)<-[:POSTED_BY]-(:Entry)-[:PART_OF]->(:Challenge{id: '" + forChallenge + "'}) " +
+		" WITH u, rand() AS number " +
+		" RETURN u " + 
+		" ORDER by number " + 
+		" LIMIT 1;";
+	} else {
+		cypherQuery = "MATCH (u:User) " + 
 		" WHERE exists(u.local_email) " + 
 		" WITH u, rand() AS number " +
   		" RETURN u " + 
   		" ORDER BY number " +
 		" LIMIT 1 ;";
+	}
 
 	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
