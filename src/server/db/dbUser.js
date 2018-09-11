@@ -282,7 +282,7 @@ function getUsersSorted(sortBy, limit, meId, done) {
 function followUser(followerId, followedId, follow, done) {
 	if (follow) {
 		var cypherQuery = "MATCH (u1:User {id: '" + followerId + "'}), (u2:User {id: '" + followedId + "'}) " +
-			" CREATE (u1)-[r:FOLLOWING]->(u2) " +
+			" MERGE (u1)-[r:FOLLOWING]->(u2) " +
 			" RETURN r;";
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {

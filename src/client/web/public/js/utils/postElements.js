@@ -337,7 +337,7 @@ function createActivitySectionElement(data, contentTag) {
 			//Fetch the like info (user name, link, image)
 			$.getJSON("/api/users/" + data.activity.userId, function(userData) {
 				var userLink = $("<a>", {href: userData.link}).append(userData.displayName);
-				activityText.append(userLink).append(" likes this " + formatDate(data.activity.timestamp));
+				activityText.append(userLink).append(" liked this " + formatDate(data.activity.timestamp));
 			})
 			.fail(function() {
 				//eat this

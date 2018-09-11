@@ -55,6 +55,28 @@ function extractImage(files, callback) {
     }
 }
 
+function formatTime(type, value) {
+	if (type == "day") {
+		if (value == 1) {
+			return "a day ago";
+		} else if (value > 1) {
+			return value + " days ago";
+		}
+	} else if (type == "hour") {
+		if (value == 1) {
+			return "an hour ago";
+		} else if (value > 1) {
+			return value + " hours ago";
+		}
+	} else if (type == "minute") {
+		if (value == 1) {
+			return "a minute ago";
+		} else if (value > 1) {
+			return value + " minutes ago";
+		}
+	}
+}
+
 function formatDate(input) {
 	var date = new Date(parseInt(input));
 
@@ -64,13 +86,20 @@ function formatDate(input) {
 	var today = new Date();
 	var numHours = numHoursBetween(today, date);
 	var numDays = numDaysBetween(today, date);
+	var numMinutes = numHours * 60;
 	var output;
-	if (numHours < 30) {
+	if (numMinutes < 2) {
+		output = "just now";
+	} else if (numMinutes < 5) {
+		output = "moments ago";
+	} else if (numMinutes < 60) {
+		output = formatTime("minute", Math.floor(numMinutes));
+	} else if (numHours < 30) {
 		// show in hours ago format
-		output = Math.floor(numHours) + " hours ago";
+		output = formatTime("hour", Math.floor(numHours));
 	} else if (numDays < 5) {
 		//if posted less than 5 days ago, say something like "4 days ago"
-		output = Math.floor(numDays) + " days ago";
+		output = formatTime("day", Math.floor(numDays));
 	} else {
 		//post something like "Sunday, May 12, 2017"
 		var day = dayList[date.getDay()];

@@ -391,7 +391,9 @@ function deleteChallenge(challengeId, done) {
 function likeChallenge(challengeId, like, userId, timestamp, done) {
 	if (like) {
 		var cypherQuery = "MATCH (u:User {id: '" + userId + "'}), (c:Challenge {id: '" + challengeId + "'}) " +
-			" CREATE (u)-[r:LIKES {created: '" + timestamp + "'}]->(c) " +
+			" MERGE (u)-[r:LIKES]->(c) " +
+			" ON CREATE SET r.created = '" + timestamp + "' " +
+			" ON MATCH SET r.created = '" + timestamp + "' " +
 			" RETURN r;";
 
 		dbUtils.runQuery(cypherQuery, function(err, result){
