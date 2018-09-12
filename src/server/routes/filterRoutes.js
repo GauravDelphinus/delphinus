@@ -270,7 +270,7 @@ var routes = function() {
 						imageUrlPaths.push(config.url.cacheImages + targetImageName);
 
 						//apply steps - note that applyStepsToImage first checks for existance of cache image
-	    				applySingleStepToImageFunctions.push(async.apply(stepsHandler.applyStepsToImage, sourceImagePath, targetImage, imageData.imageType, singleStepList[i], imageData.caption));
+	    				applySingleStepToImageFunctions.push(async.apply(imageHandler.applyStepsToImage, sourceImagePath, targetImage, imageData.imageType, singleStepList[i], imageData.caption));
 	    			}
 
 	    			var imagePaths = []; //list of image paths for each sub step
