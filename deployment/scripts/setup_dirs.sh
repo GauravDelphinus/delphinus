@@ -72,7 +72,7 @@ ln -s ${PROJECT_ROOT}/../data/cacheImages ${PROJECT_ROOT}/../public/cacheImages;
 ln -s ${PROJECT_ROOT}/../current/src/client/web/public/images ${PROJECT_ROOT}/../public/images; # static images, maps to /images
 ln -s ${PROJECT_ROOT}/../current/src/client/web/public/third-party ${PROJECT_ROOT}/../public/third-party; # third-party js/css/font files, maps to /third-party/...
 ln -s ${PROJECT_ROOT}/../current/src/client/web/public/pages ${PROJECT_ROOT}/../public/pages; # static pages, maps to /pages/...
-
+ls
 
 ######################################################
 #
