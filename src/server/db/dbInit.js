@@ -6,8 +6,8 @@ const dbUser = require("./dbUser");
 const dbEntry = require("./dbEntry");
 
 module.exports = {
-	initializeDB :function(db, callback) {
-		this.myDB = db;
+	initializeDB :function(dbsession, callback) {
+		this.myDBsession = dbsession;
 		const dbUtils = require("./dbUtils");
 		const dbChallenge = require("./dbChallenge");
 		const dbDesign = require("./dbDesign");
@@ -49,6 +49,7 @@ module.exports = {
 			
 			functions.push(async.apply(dbUtils.runQuery, cypherQuery));
 		}
+		
 		
 		
 		//enumerate and create nodes for the categories and subcategories
@@ -97,8 +98,8 @@ module.exports = {
 		});
 	},
 
-	getDB : function() {
-		return this.myDB;
+	getDBsession : function() {
+		return this.myDBsession;
 	},
 
 	initializeDBWithData: function(data, callback) {

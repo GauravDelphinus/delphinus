@@ -168,14 +168,30 @@ function sanitizeStringForCypher(str) {
 
 function runQuery(cypherQuery, callback) {
 	const dbInit = require("./dbInit");
-	var db = dbInit.getDB();
+	var dbsession = dbInit.getDBsession();
+
+	logger.debug("Running cypherQuery: " + cypherQuery); //temporary - remove later
+	dbsession
+		.run(cypherQuery)
+		.then(result => {
+			return callback(null, result);
+		})
+		.catch(error => {
+			logger.dbError(error, cypherQuery);
+			return callback(error);
+		});
+/*
+
 	db.cypherQuery(cypherQuery, function(err, result) {
+		logger.debug("Ran cypherQuery: " + cypherQuery + ", err: " + err + ", result: " + result);
 		if (err) {
 			logger.dbError(err, cypherQuery);
 			return callback(err);
 		}
 		return callback(null, result);
 	});
+	*/
+	
 }
 
 var activityPrototype = {

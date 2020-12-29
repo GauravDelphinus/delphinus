@@ -19,7 +19,8 @@ module.exports = function(callback) {
 	
 	const express = require('express');
 	const bodyParser = require('body-parser');
-	const neo4j = require("node-neo4j");
+	const neo4j = require('neo4j-driver'); //officially supported JS driver
+	//const neo4j = require('node-neo4j'); //deprecated
 
 	const serverUtils = require("./serverUtils");
 
@@ -29,9 +30,12 @@ module.exports = function(callback) {
 	}
 
 	// Initialize the Neo4j Graph Database
-	const db = new neo4j("http://" + dynamicConfig.dbUsername + ":" + dynamicConfig.dbPassword + "@" + dynamicConfig.dbHostname);
+	//const db = new neo4j("http://" + dynamicConfig.dbUsername + ":" + dynamicConfig.dbPassword + "@" + dynamicConfig.dbHostname);
+	const uri = 'neo4j://localhost';
+	const dbdriver = neo4j.driver(uri, neo4j.auth.basic(dynamicConfig.dbUsername, dynamicConfig.dbPassword))
+	const dbsession = dbdriver.session();
 
-	dbInit.initializeDB(db, function(err) {
+	dbInit.initializeDB(dbsession, function(err) {
 		if (err) {
 			return callback(err);
 		}

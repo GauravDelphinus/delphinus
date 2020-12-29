@@ -235,7 +235,7 @@ function getChallengesSorted(sortBy, limit, postedBy, categoryId, done) {
 **/
 function createCategoryNode(nodeInfo, callback) {
 	if (!serverUtils.validateData(nodeInfo, categoryPrototype)) {
-		return done(new Error("Invalid category info"));
+		return callback(new Error("Invalid category info"));
 	}
 
 	var cypherQuery = " MERGE (c:Category {id: '" + nodeInfo.id + "'}) " +
@@ -246,7 +246,7 @@ function createCategoryNode(nodeInfo, callback) {
 			return callback(err);
 		}
 
-		return callback(0, {id: result.data[0].id});
+		return callback(0, {id: result.records[0].id});
 	});
 }
 
