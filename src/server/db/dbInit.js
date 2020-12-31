@@ -6,8 +6,8 @@ const dbUser = require("./dbUser");
 const dbEntry = require("./dbEntry");
 
 module.exports = {
-	initializeDB :function(dbsession, callback) {
-		this.myDBsession = dbsession;
+	initializeDB :function(dbdriver, callback) {
+		this.myDBdriver = dbdriver;
 		const dbUtils = require("./dbUtils");
 		const dbChallenge = require("./dbChallenge");
 		const dbDesign = require("./dbDesign");
@@ -98,8 +98,8 @@ module.exports = {
 		});
 	},
 
-	getDBsession : function() {
-		return this.myDBsession;
+	getDBdriver : function() {
+		return this.myDBdriver;
 	},
 
 	initializeDBWithData: function(data, callback) {

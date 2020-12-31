@@ -16,12 +16,14 @@ function getComment(commentId, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new DBResultError(cypherQuery, 1, result.records.length));
 		}
 
-		var comment = result.data[0][0];
-		var poster = result.data[0][1];
+		var record = result.records[0];
+
+		var comment = dbUtils.recordGetField(record, "c");
+		var poster = dbUtils.recordGetField(record, "poster");
 
 		var output = {
 			type: "comment",
@@ -69,11 +71,12 @@ function getComments(postedBy, entityId, done) {
 		}
 
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
+			var record = result.records[i];
 			var data = {};
 
-			var comment = result.data[i][0];
-			var poster = result.data[i][1];
+			var comment = dbUtils.recordGetField(record, "c");
+			var poster = dbUtils.recordGetField(record, "poster");
 
 			var data = {
 				type: "comment",
@@ -109,13 +112,15 @@ function getCommentSocialInfo(commentId, meId, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new DBResultError(cypherQuery, 1, result.records.length));
 		}
 
 		//social status
-		var numLikes = result.data[0][0];
-		var amLiking = result.data[0][1] > 0;
+		var record = result.records[0];
+
+		var numLikes = dbUtils.recordGetField(record, "like_count");
+		var amLiking = dbUtils.recordGetField(record, "amLiking") > 0;
 		var output = {
 			likes : {
 				numLikes : numLikes,
@@ -142,8 +147,8 @@ function createComment(commentInfo, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new Error(dbResultError(cypherQuery, 1, result.data.length)));
+		} else if (result.records.length != 1) {
+			return done(new Error(dbResultError(cypherQuery, 1, result.records.length)));
 		}
 
 		//now, save the activity in the entity
@@ -197,11 +202,11 @@ function likeComment(commentId, like, userId, timestamp, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
-	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        } else if (!(result.records.length == 0 || result.records.length == 1)) {
+	        	return done(new DBResultError(cypherQuery, "0 or 1", result.records.length));
 	        }
 
-			return done(null, result.data.length == 1);
+			return done(null, result.records.length == 1);
 		});
 	} else {
 		var cypherQuery = "MATCH (u:User {id: '" + userId + "'})-[r:LIKES]->(c:Comment {id: '" + commentId + "'}) " +
@@ -211,11 +216,11 @@ function likeComment(commentId, like, userId, timestamp, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
-	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        } else if (!(result.records.length == 0 || result.records.length == 1)) {
+	        	return done(new DBResultError(cypherQuery, "0 or 1", result.records.length));
 	        }
 
-			return done(null, result.data.length == 0);
+			return done(null, result.records.length == 0);
 		});
 	}
 }

@@ -48,16 +48,21 @@ function getDesigns(designCategory, done) {
 
 		var output = {};
 		for (var i = 0; i < result.records.length; i++) {
-			let designName = result.records[i][0].name;
-			let designId = result.records[i][0].id;
-			let categoryName = result.records[i][1].name;
-			let categoryId = result.records[i][1].id;
+			var record = result.records[i];
+
+			let design = dbUtils.recordGetField(record, "d");
+			let category = dbUtils.recordGetField(record, "c");
+
+			let designName = design.name;
+			let designId = design.id;
+			let categoryName = category.name;
+			let categoryId = category.id;
 
 			//fetch preset values for caption
-			let presetArtifactId = result.records[i][0].caption_preset_id;
-			let captionTextSize = result.records[i][0].caption_default_text_size;
-			let captionTextColor = result.records[i][0].caption_default_text_color;
-			let captionBackgroundColor = result.records[i][0].caption_default_background_color;
+			let presetArtifactId = design.caption_preset_id;
+			let captionTextSize = design.caption_default_text_size;
+			let captionTextColor = design.caption_default_text_color;
+			let captionBackgroundColor = design.caption_default_background_color;
 
 
 			if (!output.hasOwnProperty(categoryId)) {
@@ -91,10 +96,15 @@ function getDesign(designId, done) {
 			return done(new error.dbResultError(cypherQuery, 1, result.records.length));
 		}
 		
-		let designName = result.records[0][0].name;
-		let designId = result.records[0][0].id;
-		let categoryName = result.records[0][1].name;
-		let categoryId = result.records[0][1].id;
+		var record = result.records[0];
+
+		var design = dbUtils.recordGetField(record, "d");
+		var category = dbUtils.recordGetField(record, "c");
+
+		let designName = design.name;
+		let designId = design.id;
+		let categoryName = category.name;
+		let categoryId = category.id;
 
 		
 		var output = {
@@ -115,8 +125,11 @@ function getImageDataForDesign(designId, next) {
     		return next(err, null);
     	}
 
-    	var d = output.records[0][0];
-    	var c = output.records[0][1];
+    	var record = output.records[0];
+
+    	var d = dbUtils.recordGetField(record, "d");
+    	var c = dbUtils.recordGetField(record, "c");
+
     	var imageData = {id: d.id, imageType: "image/jpeg", categoryId: c.id};
 
     	return next(0, imageData);
@@ -150,7 +163,10 @@ function createNodeForDesignCategory(categoryId, categoryName, callback) {
 					return callback(err, 0);
 				}
 
-				return callback(0, {id: result.records[0].id});
+				var record = result.records[0];
+				var category = dbUtils.recordGetField(record, "c");
+
+				return callback(0, {id: category.id});
 			});
 		});
 	}
@@ -194,7 +210,10 @@ function createNodeForDesign(designInfo, callback) {
 				return callback(err, 0);
 			}
 
-			return callback(0, {id: result.records[0].id});
+			var record = result.records[0];
+			var design = dbUtils.recordGetField(record, "d");
+
+			return callback(0, {id: design.id});
 		});
 	});
 }

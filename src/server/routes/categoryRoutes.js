@@ -35,14 +35,16 @@ var routes = function() {
 			dbUtils.runQuery(cypherQuery, function(err, result){
     			if(err) {
     				return res.sendStatus(500);
-    			} else if (result.data.length <= 0) {
-    				logger.dbResultError(cypherQuery, "> 0", result.data.length);
+    			} else if (result.records.length <= 0) {
+    				logger.dbResultError(cypherQuery, "> 0", result.records.length);
     				return res.sendStatus(500);
     			}
 
     			var output = [];
-    			for (var i = 0; i < result.data.length; i++) {
-    				output.push({name: result.data[i].name, id: result.data[i].id});
+    			for (var i = 0; i < result.records.length; i++) {
+    				var record = result.records[i];
+    				var category = dbUtils.recordGetField(record, "c");
+    				output.push({name: category.name, id: category.id});
     			}
 
     			if (!serverUtils.validateData(output, serverUtils.prototypes.category)) {

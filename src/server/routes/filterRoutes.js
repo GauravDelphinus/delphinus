@@ -44,16 +44,16 @@ var routes = function() {
 
 			if (req.query.type && req.query.type == "preset") {
 				if (req.query.stepType == "filter") {
-					cypherQuery = "MATCH (f:Filter {filter_type : 'preset'}) RETURN f;";
+					cypherQuery = "MATCH (e:Filter {filter_type : 'preset'}) RETURN e;";
 					prototype = serverUtils.prototypes.filter;
 				} else if (req.query.stepType == "layout") {
-					cypherQuery = "MATCH (l:Layout {layout_type : 'preset'}) RETURN l;";
+					cypherQuery = "MATCH (e:Layout {layout_type : 'preset'}) RETURN e;";
 					prototype = serverUtils.prototypes.layout;
 				} else if (req.query.stepType == "artifact") {
-					cypherQuery = "MATCH (a:Artifact {artifact_type : 'preset'}) RETURN a;";
+					cypherQuery = "MATCH (e:Artifact {artifact_type : 'preset'}) RETURN e;";
 					prototype = serverUtils.prototypes.artifact;
 				} else if (req.query.stepType == "decoration") {
-					cypherQuery = "MATCH (d:Decoration {decoration_type : 'preset'}) RETURN d;";
+					cypherQuery = "MATCH (e:Decoration {decoration_type : 'preset'}) RETURN e;";
 					prototype = serverUtils.prototypes.decoration;
 				} else {
 					logger.error("Invalid request received");
@@ -65,14 +65,16 @@ var routes = function() {
 			dbUtils.runQuery(cypherQuery, function(err, result){
 				if(err) {
 					return res.sendStatus(500);
-				} else if (result.data.length <= 0) {
-    				logger.dbResultError(cypherQuery, "> 0", result.data.length);
+				} else if (result.records.length <= 0) {
+    				logger.dbResultError(cypherQuery, "> 0", result.records.length);
     				return res.sendStatus(500);
     			}
 
 				var output = [];
-				for (var i = 0; i < result.data.length; i++) {
-					output.push({id: result.data[i].id, name: result.data[i].name});
+				for (var i = 0; i < result.records.length; i++) {
+					var record = result.records[i];
+					var entity = dbUtils.recordGetField(record, "e");
+					output.push({id: entity.id, name: entity.name});
 				}
 			
 				if (!serverUtils.validateData(output, prototype)) {

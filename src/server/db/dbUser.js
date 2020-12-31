@@ -13,11 +13,12 @@ function getUser(userId, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-        	return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+        	return done(new error.DBResultError(cypherQuery, 1, result.records.length));
         }
 
-        var user = result.data[0];
+        var record = result.records[0];
+        var user = dbUtils.recordGetField(record, "u");
 
         var output = {
         	type: "user",
@@ -59,11 +60,12 @@ function getRandomUser(forChallenge, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-        	return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+        	return done(new error.DBResultError(cypherQuery, 1, result.records.length));
         }
 
-        var user = result.data[0];
+        var record = result.records[0];
+        var user = dbUtils.recordGetField(record, "u");
 
         var output = {
         	type: "user",
@@ -90,16 +92,17 @@ function getUserSocialInfo(userId, meId, done) {
   		" OPTIONAL MATCH (u)<-[:POSTED_BY]-(e:Entry) " +
   		" WITH u, numFollowers, numFollowing, challengesPosted, COLLECT(e) AS entriesPosted " +
   		" OPTIONAL MATCH (u)<-[following:FOLLOWING]-(me:User {id: '" + meId + "'}) " +
-  		" RETURN u, numFollowers, numFollowing, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following), (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
+  		" RETURN u, numFollowers, numFollowing, size(challengesPosted) + size(entriesPosted) AS numPosts, COUNT(following) AS amFollowing, (numFollowers + size(challengesPosted) + size(entriesPosted)) AS popularity_count  ";
 
 	dbUtils.runQuery(cypherQuery, function(err, result) {
 		if (err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-        	return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+        	return done(new error.DBResultError(cypherQuery, 1, result.records.length));
         }
 
-        var user = result.data[0][0];
+        var record = result.records[0];
+        var user = dbUtils.recordGetField(record, "u");
 
         var output = {};
 
@@ -113,10 +116,10 @@ function getUserSocialInfo(userId, meId, done) {
 			output.google = {profileLink: user.google_profile_link};
 		}
 
-		var numFollowers = result.data[0][1];
-		var numPosts = result.data[0][3];
-		var numFollowing = result.data[0][2];
-		var amFollowing = result.data[0][4] > 0;
+		var numFollowers = dbUtils.recordGetField(record, "numFollowers");
+		var numPosts = dbUtils.recordGetField(record, "numPosts");
+		var numFollowing = dbUtils.recordGetField(record, "numFollowing");
+		var amFollowing = dbUtils.recordGetField(record, "amFollowing") > 0;
 
 		output.follows = {numFollowers: numFollowers, amFollowing: amFollowing, numFollowing: numFollowing};
 
@@ -160,10 +163,11 @@ function getUsers(meId, followedId, followingId, likedEntityId, lastFetchedTimes
 
 		var newTimeStamp = 0;
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
+			var record = result.records[i];
 			var data = {};
 
-			var user = result.data[i];
+			var user = dbUtils.recordGetField(record, "u");
 
 			var data = {
 				type: "user",
@@ -199,10 +203,11 @@ function getLocalUsers(done) {
 		}
 
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
+			var record = result.records[i];
 			var data = {};
 
-			var user = result.data[i];
+			var user = dbUtils.recordGetField(record, "u");
 
 			var data = {
 				type: "user",
@@ -256,10 +261,11 @@ function getUsersSorted(sortBy, limit, meId, done) {
 		}
 
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
+			var record = result.records[i];
 			var data = {};
 
-			var user = result.data[i][0];
+			var user = dbUtils.recordGetField(record, "u");
 
 			var data = {
 				type: "user",
@@ -287,11 +293,11 @@ function followUser(followerId, followedId, follow, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
-	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        } else if (!(result.records.length == 0 || result.records.length == 1)) {
+	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.records.length));
 	        }
 
-	        return done(null, result.data.length == 1);
+	        return done(null, result.records.length == 1);
 		});
 	} else {
 		var cypherQuery = "MATCH (u1:User {id: '" + followerId + "'})-[r:FOLLOWING]->(u2:User {id: '" + followedId + "'}) " +
@@ -300,11 +306,11 @@ function followUser(followerId, followedId, follow, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
-	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        } else if (!(result.records.length == 0 || result.records.length == 1)) {
+	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.records.length));
 	        }
 
-			return done(null, result.data.length == 0);
+			return done(null, result.records.length == 0);
 		});
 	}	
 }
@@ -362,11 +368,12 @@ function findUser (query, callback) {
 			return callback(err, null);
 		}
 
-		if (result.data.length == 0) {
+		if (result.records.length == 0) {
 			// no user found
 			callback(null, null);
 		} else {
-			var userFromDB = result.data[0];
+			var record = result.records[0];
+			var userFromDB = dbUtils.recordGetField(record, "u");
 
 			var user = {};
 
@@ -750,7 +757,10 @@ function createUserNode(user, done) {
 		if (err) {
 			return done(err);
 		}
-		return done(null, {id: result.id});
+
+		var record = result.records[0];
+		var u = dbUtils.recordGetField(record, "u");
+		return done(null, {id: u.id});
 	});
 }
 

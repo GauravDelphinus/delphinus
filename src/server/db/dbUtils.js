@@ -33,11 +33,14 @@ function saveActivity(activityInfo, done) {
 	this.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new Error(dbResultError(cypherQuery, 1, result.data.length)));
+		} else if (result.records.length != 1) {
+			return done(new Error(dbResultError(cypherQuery, 1, result.records.length)));
 		}
 
-		return done(null, {id: result.data[0].id});
+		var record = result.records[0];
+		var entity = dbUtils.recordGetField(record, "e");
+
+		return done(null, {id: entity.id});
 	});
 }
 
@@ -80,13 +83,14 @@ function getPosts(postedBy, lastFetchedTimestamp, done) {
 
 		var newTimeStamp = 0;
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
+			var record = result.records[i];
 			var data = {};
 
-			var label = result.data[i][0];
-			var entity = result.data[i][1];
-			var poster = result.data[i][2];
-			var category = result.data[i][3];
+			var label = dbUtils.recordGetField(record, "labels(e)");
+			var entity = dbUtils.recordGetField(record, "e");
+			var poster = dbUtils.recordGetField(record, "poster");
+			var category = dbUtils.recordGetField(record, "category");
 
 			data = entityNodeToClientData(label, entity, poster, category);
 
@@ -166,31 +170,71 @@ function sanitizeStringForCypher(str) {
 	return out;
 }
 
+/*
+	Get a field from the record returned by the cypherquery
+	fieldname could be the name of the field, or even the index (Refer: https://neo4j.com/docs/api/javascript-driver/current/class/src/record.js~Record.html)
+	In case the field is an object or node, it returns the properties object
+	Otherwise, it returns the field value itself (e.g., a label)
+*/
+function recordGetField(record, fieldname) {
+	var field = record.get(fieldname);
+	if (typeof field === 'object' && field !== null && typeof field.properties === 'object' && field.properties !== null) {
+			var properties = field.properties;
+			return properties;
+		} else {
+			return field;
+		}
+}
+
+function printRecord(record) {
+	logger.debug("record.length: " + record.length);
+	for (var i = 0; i < record.length; i++) {
+		var field = record.get(i);
+		if (typeof field === 'object' && field !== null && typeof field.properties === 'object' && field.properties !== null) {
+			var properties = field.properties;
+			logger.debug("Type is Node, properties: " + JSON.stringify(properties));
+		} else {
+			logger.debug("Type is not Node, value: " + field);
+		}
+		
+	}
+	logger.debug("record.keys: " + record.keys);
+	for (const entry of record.entries()) {
+		logger.debug("Entry: " + entry);
+	}
+	for (const value of record.values()) {
+		logger.debug("Value: " + value);
+	}
+	record.forEach(function(value, key, rec) {
+		logger.debug("value: " + value);
+		logger.debug("key: " + key);
+		logger.debug("record: " + JSON.stringify(rec));
+	});
+	logger.debug("full json: " + JSON.stringify(record));
+
+}
+
 function runQuery(cypherQuery, callback) {
 	const dbInit = require("./dbInit");
-	var dbsession = dbInit.getDBsession();
+	var dbdriver = dbInit.getDBdriver();
+	var dbsession = dbdriver.session();
 
-	logger.debug("Running cypherQuery: " + cypherQuery); //temporary - remove later
+	//logger.debug("Running cypherQuery: " + cypherQuery); //temporary - remove later
 	dbsession
 		.run(cypherQuery)
 		.then(result => {
 			return callback(null, result);
 		})
+		
 		.catch(error => {
-			logger.dbError(error, cypherQuery);
+			//throw new Error(error);
+			//logger.dbError(error, cypherQuery);
 			return callback(error);
+		})
+		
+		.then(() => {
+			dbsession.close();
 		});
-/*
-
-	db.cypherQuery(cypherQuery, function(err, result) {
-		logger.debug("Ran cypherQuery: " + cypherQuery + ", err: " + err + ", result: " + result);
-		if (err) {
-			logger.dbError(err, cypherQuery);
-			return callback(err);
-		}
-		return callback(null, result);
-	});
-	*/
 	
 }
 
@@ -209,7 +253,9 @@ var functions = {
 	getPosts: getPosts,
 	sanitizeStringForCypher: sanitizeStringForCypher,
 	escapeSingleQuotes: escapeSingleQuotes,
-	runQuery: runQuery
+	runQuery: runQuery,
+	printRecord: printRecord,
+	recordGetField: recordGetField
 };
 
 for(var key in functions) {

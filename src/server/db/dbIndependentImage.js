@@ -133,13 +133,15 @@ function createIndependentImageNode(nodeInfo, callback) {
 		if(err) {
 			logger.dbError(err, cypherQuery);
 			return callback(err);
-		} else if (result.data.length != 1) {
-			logger.dbResultError(cypherQuery, 1, result.data.length);
+		} else if (result.records.length != 1) {
+			logger.dbResultError(cypherQuery, 1, result.records.length);
 			return callback(new Error("cypherQuery returned invalid response."));
 		}
 
 		logger.debug("result is: " + JSON.stringify(result));
-		return callback(null, {id: result.data[0].id});
+		let record = result.records[0];
+		let independentImage = dbUtils.recordGetField(record, "i");
+		return callback(null, {id: independentImage.id});
 	});
 }
 

@@ -33,9 +33,8 @@ module.exports = function(callback) {
 	//const db = new neo4j("http://" + dynamicConfig.dbUsername + ":" + dynamicConfig.dbPassword + "@" + dynamicConfig.dbHostname);
 	const uri = 'neo4j://localhost';
 	const dbdriver = neo4j.driver(uri, neo4j.auth.basic(dynamicConfig.dbUsername, dynamicConfig.dbPassword))
-	const dbsession = dbdriver.session();
 
-	dbInit.initializeDB(dbsession, function(err) {
+	dbInit.initializeDB(dbdriver, function(err) {
 		if (err) {
 			return callback(err);
 		}

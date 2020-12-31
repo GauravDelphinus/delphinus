@@ -19,13 +19,15 @@ function getChallenge(challengeId, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new error.DBResultError(cypherQuery, 1, result.records.length));
 		}
 
-		var challenge = result.data[0][0];
-		var poster = result.data[0][1];
-		var category = result.data[0][2];
+		var record = result.records[0];
+
+		var challenge = dbUtils.recordGetField(record, "c");
+		var poster = dbUtils.recordGetField(record, "poster");
+		var category = dbUtils.recordGetField(record, "category");
 
 		output = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
 
@@ -47,13 +49,15 @@ function getRandomChallenge(notPostedBy, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new error.DBResultError(cypherQuery, 1, result.records.length));
 		}
 
-		var challenge = result.data[0][0];
-		var poster = result.data[0][1];
-		var category = result.data[0][2];
+		var record = result.records[0];
+
+		var challenge = dbUtils.recordGetField(record, "c");
+		var poster = dbUtils.recordGetField(record, "poster");
+		var category = dbUtils.recordGetField(record, "category");
 
 		output = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
 
@@ -80,15 +84,17 @@ function getChallengeSocialInfo(challengeId, meId, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new DBResultError(cypherQuery, 1, result.records.length));
 		}
 
 		//social status
-		var numLikes = result.data[0][0];
-		var numComments = result.data[0][1];
-		var numEntries = result.data[0][2];
-		var amLiking = result.data[0][3] > 0;
+		var record = result.records[0];
+
+		var numLikes = dbUtils.recordGetField(record, "like_count");
+		var numComments = dbUtils.recordGetField(record, "comment_count");
+		var numEntries = dbUtils.recordGetField(record, "entry_count");
+		var amLiking = dbUtils.recordGetField(record, "amLiking") > 0;
 		var numShares = 0; //no yet implemented
 		var output = {
 			likes : {
@@ -147,12 +153,14 @@ function getChallenges(postedBy, categoryId, lastFetchedTimestamp, done) {
 
 		var newTimeStamp = 0;
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
 			var data = {};
 
-			var challenge = result.data[i][0];
-			var poster = result.data[i][1];
-			var category = result.data[i][2];
+			var record = result.records[i];
+
+			var challenge = dbUtils.recordGetField(record, "e");
+			var poster = dbUtils.recordGetField(record, "poster");
+			var category = dbUtils.recordGetField(record, "category");
 
 			data = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
 
@@ -207,12 +215,13 @@ function getChallengesSorted(sortBy, limit, postedBy, categoryId, done) {
 		}
 
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
+			var record = result.records[i];
 			var data = {};
 
-			var challenge = result.data[i][0];
-			var poster = result.data[i][1];
-			var category = result.data[i][2];
+			var challenge = dbUtils.recordGetField(record, "e");
+			var poster = dbUtils.recordGetField(record, "poster");
+			var category = dbUtils.recordGetField(record, "category");
 
 			data = dbUtils.entityNodeToClientData("Challenge", challenge, poster, category);
 
@@ -246,7 +255,9 @@ function createCategoryNode(nodeInfo, callback) {
 			return callback(err);
 		}
 
-		return callback(0, {id: result.records[0].id});
+		var record = result.records[0];
+		var category = dbUtils.recordGetField(record, "c");
+		return callback(0, {id: category.id});
 	});
 }
 
@@ -324,13 +335,15 @@ function createChallengeNode(challengeInfo, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new Error(dbResultError(cypherQuery, 1, result.data.length)));
+		} else if (result.records.length != 1) {
+			return done(new Error(dbResultError(cypherQuery, 1, result.records.length)));
 		}
 
 		//now, save the activity in the entity
+		var record = result.records[0];
+		var challenge = dbUtils.recordGetField(record, "n");
         var activityInfo = {
-        	entityId: result.data[0].id,
+        	entityId: challenge.id,
         	type: "post",
         	timestamp: challengeInfo.created,
         	userId: challengeInfo.userId
@@ -399,8 +412,8 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
-	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        } else if (!(result.records.length == 0 || result.records.length == 1)) {
+	        	return done(new DBResultError(cypherQuery, "0 or 1", result.records.length));
 	        }
 
 	        //now, save the activity in the challenge
@@ -415,7 +428,7 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 	        		return done(err);
 	        	}
 
-	        	return done(null, result.data.length == 1);
+	        	return done(null, result.records.length == 1);
 	        });
 
 		});
@@ -427,8 +440,8 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
-	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        } else if (!(result.records.length == 0 || result.records.length == 1)) {
+	        	return done(new DBResultError(cypherQuery, "0 or 1", result.records.length));
 	        }
 
 	        //now, reset the activity in the challenge, since the person no longer likes this challenge
@@ -443,7 +456,7 @@ function likeChallenge(challengeId, like, userId, timestamp, done) {
 	        		return done(err);
 	        	}
 
-				return done(null, result.data.length == 0);
+				return done(null, result.records.length == 0);
 	        });
 			
 		});

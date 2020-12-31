@@ -29,14 +29,16 @@ function getEntry(entryId, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new error.DBResultError(cypherQuery, 1, result.records.length));
 		}
 
-		var entry = result.data[0][0];
-		var poster = result.data[0][1];
-		var sourceLabel = result.data[0][2];
-		var source = result.data[0][3];
+		var record = result.records[0];
+
+		var entry = dbUtils.recordGetField(record, "e");
+		var poster = dbUtils.recordGetField(record, "poster");
+		var sourceLabel = dbUtils.recordGetField(record, "source_labels");
+		var source = dbUtils.recordGetField(record, "source");
 
 		output = dbUtils.entityNodeToClientData("Entry", entry, poster, null, sourceLabel, source);
 
@@ -58,14 +60,16 @@ function getRandomEntry(notPostedBy, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new error.DBResultError(cypherQuery, 1, result.records.length));
 		}
 
-		var entry = result.data[0][0];
-		var poster = result.data[0][1];
-		var sourceLabel = result.data[0][2];
-		var source = result.data[0][3];
+		var record = result.records[0];
+
+		var entry = dbUtils.recordGetField(record, "e");
+		var poster = dbUtils.recordGetField(record, "poster");
+		var sourceLabel = dbUtils.recordGetField(record, "source_labels");
+		var source = dbUtils.recordGetField(record, "source");
 
 		output = dbUtils.entityNodeToClientData("Entry", entry, poster, null, sourceLabel, source);
 
@@ -95,14 +99,16 @@ function getEntrySocialInfo(entryId, meId, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new error.DBResultError(cypherQuery, 1, result.records.length));
 		}
 
 		//social status
-		var numLikes = result.data[0][0];
-		var numComments = result.data[0][1];
-		var amLiking = result.data[0][2] > 0;
+		var record = result.records[0];
+
+		var numLikes = dbUtils.recordGetField(record, "like_count");
+		var numComments = dbUtils.recordGetField(record, "comment_count");
+		var amLiking = dbUtils.recordGetField(record, "amLiking") > 0;
 		var numShares = 0; //no yet implemented
 
 		var output = {
@@ -168,13 +174,15 @@ function getEntries(postedBy, challengeId, lastFetchedTimestamp, done) {
 
 		var newTimeStamp = 0;
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
 			var data = {};
 
-			var entry = result.data[i][0];
-			var poster = result.data[i][1];
-			var sourceLabel = result.data[i][2];
-			var source = result.data[i][3];
+			var record = result.records[i];
+
+			var entry = dbUtils.recordGetField(record, "e");
+			var poster = dbUtils.recordGetField(record, "poster");
+			var sourceLabel = dbUtils.recordGetField(record, "source_labels");
+			var source = dbUtils.recordGetField(record, "source");
 
 			data = dbUtils.entityNodeToClientData("Entry", entry, poster, null, sourceLabel, source);
 
@@ -305,13 +313,15 @@ function getEntriesSorted(sortBy, limit, postedBy, done) {
 		}
 
 		var output = [];
-		for (var i = 0; i < result.data.length; i++) {
+		for (var i = 0; i < result.records.length; i++) {
 			var data = {};
 
-			var entry = result.data[i][0];
-			var poster = result.data[i][1];
-			var sourceLabel = result.data[i][2];
-			var source = result.data[i][3];
+			var record = result.records[i];
+
+			var entry = dbUtils.recordGetField(record, "e");
+			var poster = dbUtils.recordGetField(record, "poster");
+			var sourceLabel = dbUtils.recordGetField(record, "source_labels");
+			var source = dbUtils.recordGetField(record, "source");
 
 			data = dbUtils.entityNodeToClientData("Entry", entry, poster, null, sourceLabel, source);
 
@@ -430,13 +440,16 @@ function createEntryNode(entryInfo, done) {
 	dbUtils.runQuery(cypherQuery, function(err, result){
 		if(err) {
 			return done(err);
-		} else if (result.data.length != 1) {
-			return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+		} else if (result.records.length != 1) {
+			return done(new error.DBResultError(cypherQuery, 1, result.records.length));
 		}
 
 		//now, save the activity in the entity
+		var record = result.records[0];
+		var entry = dbUtils.recordGetField(record, "e");
+
         var activityInfo = {
-        	entityId: result.data[0].id,
+        	entityId: entry.id,
         	type: "post",
         	timestamp: entryInfo.created,
         	userId: entryInfo.userId
@@ -638,8 +651,8 @@ function createFilterNodesForEntry(entryId, steps, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 			if(err) {
 				return done(err);
-			} else if (result.data.length != 1) {
-				return done(new error.DBResultError(cypherQuery, 1, result.data.length));
+			} else if (result.records.length != 1) {
+				return done(new error.DBResultError(cypherQuery, 1, result.records.length));
 			}
 
 			return done(null);
@@ -699,8 +712,8 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
-	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        } else if (!(result.records.length == 0 || result.records.length == 1)) {
+	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.records.length));
 	        }
 
 	        //now, save the activity in the entry
@@ -715,7 +728,7 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 	        		return done(err);
 	        	}
 
-	        	return done(null, result.data.length == 1);
+	        	return done(null, result.records.length == 1);
 	        });
 
 		});
@@ -728,8 +741,8 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 		dbUtils.runQuery(cypherQuery, function(err, result){
 	        if(err) {
 	        	return done(err);
-	        } else if (!(result.data.length == 0 || result.data.length == 1)) {
-	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.data.length));
+	        } else if (!(result.records.length == 0 || result.records.length == 1)) {
+	        	return done(new error.DBResultError(cypherQuery, "0 or 1", result.records.length));
 	        }
 
 	        //now, reset the activity in the entry, since the person no longer likes this entry
@@ -744,7 +757,7 @@ function likeEntry(entryId, like, userId, timestamp, done) {
 	        		return done(err);
 	        	}
 
-				return done(null, result.data.length == 0);
+				return done(null, result.records.length == 0);
 	        });
 			
 		});

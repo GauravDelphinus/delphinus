@@ -55,19 +55,22 @@ function createMainFeed(userId, lastFetchedTimestamp, done) {
 
 		var output = [];
 		var newTimeStamp = 0;
-		for (var i = 0; i < result.data.length; i++) {
+
+		for (var i = 0; i < result.records.length; i++) {
+			var record = result.records[i];
 			var data = {};
 
-			if (result.data[i][0] == "Entry")
+			var label = dbUtils.recordGetField(record, "labels(e)");
+			if (label == "Entry")
 			{
 				data.type = "entry";
-			} else if (result.data[i][0] == "Challenge") {
+			} else if (label == "Challenge") {
 				data.type = "challenge";
 			}
 
-			var entity = result.data[i][1];
-			var poster = result.data[i][3];
-			var category = result.data[i][2];
+			var entity = dbUtils.recordGetField(record, "e");
+			var poster = dbUtils.recordGetField(record, "poster");
+			var category = dbUtils.recordGetField(record, "category");
 
 			data.id = entity.id;
 

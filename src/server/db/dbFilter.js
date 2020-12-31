@@ -339,26 +339,30 @@ function getEntrySteps(entryId, callback) {
 		var filters = [], layouts = [], artifacts = [], decorations = [];
 
 		// Now construct the filters array in the JSON format
-		for (var i = 0; i < result.data.length; i++) {
-			var stepFromDB = result.data[i];
+		for (var i = 0; i < result.records.length; i++) {
+			var record = result.records[i];
 
-			if (stepFromDB[0][0] == "Artifact") {
-				var artifact = getArtifactFromNode(stepFromDB[1]);
+
+			var label = dbUtils.recordGetField(record, "LABELS(s)");
+			var step = dbUtils.recordGetField(record, "s");
+
+			if (label == "Artifact") {
+				var artifact = getArtifactFromNode(step);
 				if (artifact) {
 					artifacts.push(artifact);
 				}
-			} else if (stepFromDB[0][0] == "Layout") {
-				var layout = getLayoutFromNode(stepFromDB[1]);
+			} else if (label == "Layout") {
+				var layout = getLayoutFromNode(step);
 				if (layout) {
 					layouts.push(layout);
 				}
-			} else if (stepFromDB[0][0] == "Filter") {
-				var filter = getFilterFromNode(stepFromDB[1]);
+			} else if (label == "Filter") {
+				var filter = getFilterFromNode(step);
 				if (filter) {
 					filters.push(filter);
 				}
-			} else if (stepFromDB[0][0] == "Decoration") {
-				var decoration = getDecorationFromNode(stepFromDB[1]);
+			} else if (label == "Decoration") {
+				var decoration = getDecorationFromNode(step);
 				if (decoration) {
 					decorations.push(decoration);
 				}
