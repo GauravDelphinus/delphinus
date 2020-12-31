@@ -98,7 +98,7 @@
 }
 
 .centerDisplayContentLeft {
-	.centerDisplayContent;
+	.centerDisplayContent();
 	text-align: left;
 }
 
@@ -153,8 +153,8 @@
 }
 
 .low-top-bottom-margin {
-	.low-top-margin;
-	.low-bottom-margin;
+	.low-top-margin();
+	.low-bottom-margin();
 }
 
 /********************************** BUTTON MODIFIERS *****************************/
@@ -187,14 +187,14 @@
 	background-color: @theme-colored-bg-color-normal;
 	color: white;
 	font-size: 16px;
-	.low-top-bottom-margin;
+	.low-top-bottom-margin();
 }
 
 .button-full:hover {
 	background-color: @theme-colored-bg-color-strong;
 	color: white;
 	font-size: 16px;
-	.low-top-bottom-margin;
+	.low-top-bottom-margin();
 }
 
 /*
@@ -531,7 +531,7 @@ a:hover {
 body {
 	font-family: Source Sans Pro,Helvetica,Arial,sans-serif;
 	padding-top: 60px; /* Push content below the navbar */
-    .page-background;
+    .page-background();
 
 }
 
@@ -580,8 +580,8 @@ img {
 }
 
 .mediumRoundedCorners {
-	.mediumRoundedTopCorners;
-	.mediumRoundedBottomCorners;
+	.mediumRoundedTopCorners();
+	.mediumRoundedBottomCorners();
 }
 
 .mediumRoundedTopCorners {
@@ -640,11 +640,11 @@ img {
 }
 
 .mainElement > *:first-child {
-	.mediumRoundedTopCorners;
+	.mediumRoundedTopCorners();
 }
 
 .mainElement > *:last-child {
-	.mediumRoundedBottomCorners;
+	.mediumRoundedBottomCorners();
 }
 
 /*
@@ -657,11 +657,11 @@ img {
 
 
 .feedElement > *:first-child {
-	.mediumRoundedTopCorners;
+	.mediumRoundedTopCorners();
 }
 
 .feedElement > *:last-child {
-	.mediumRoundedBottomCorners;
+	.mediumRoundedBottomCorners();
 }
 
 
@@ -682,11 +682,11 @@ img {
 
 
 .scrollableElement > *:first-child {
-	.mediumRoundedTopCorners;
+	.mediumRoundedTopCorners();
 }
 
 .scrollableElement > *:last-child {
-	.mediumRoundedBottomCorners;
+	.mediumRoundedBottomCorners();
 }
 
 /* Add left/right margins around the thumbnail elements */
@@ -703,15 +703,15 @@ img {
 }
 
 .thumbnailElement > *:first-child {
-	.mediumRoundedTopCorners;
+	.mediumRoundedTopCorners();
 }
 
 .thumbnailElement > a:first-child > img {
-	.mediumRoundedTopCorners;
+	.mediumRoundedTopCorners();
 }
 
 .thumbnailElement > *:last-child {
-	.mediumRoundedBottomCorners;
+	.mediumRoundedBottomCorners();
 }
 
 .thumbnailElement.active {
@@ -1370,7 +1370,7 @@ input[type=range] .range-setting {
 	font-weight: bold;
 	letter-spacing: 1px;
 	
-	.mediumRoundedTopCorners;
+	.mediumRoundedTopCorners();
 	background-color: @theme-dark-bg-color-normal;
 	color: @theme-light-fg-color-strong;
 }
@@ -1384,7 +1384,7 @@ input[type=range] .range-setting {
 	font-weight: bold;
 	letter-spacing: 1px;
 	
-	.mediumRoundedCorners; //rounded corners on all four sides because the heading is split
+	.mediumRoundedCorners(); //rounded corners on all four sides because the heading is split
 	background-color: @theme-dark-bg-color-normal;
 	color: @theme-light-fg-color-strong;
 }
@@ -1401,14 +1401,14 @@ input[type=range] .range-setting {
 }
 
 .sidebar-item:last-child {
-	.mediumRoundedBottomCorners;
+	.mediumRoundedBottomCorners();
 }
 
 .sidebar-item a {
 	padding: 10px 20px 10px 20px;
 	display: block;
 	text-decoration: none;
-	.text-all-caps;
+	.text-all-caps();
 	letter-spacing: 1px;
 	color: @theme-light-fg-color-normal;
 }
@@ -1441,7 +1441,7 @@ input[type=range] .range-setting {
 	background-color: transparent;
 	padding: 10px 20px 10px 20px;
 	display: block;
-	.text-all-caps;
+	.text-all-caps();
 	letter-spacing: 1px;
 	width: 100%;
 	border: 0px;
@@ -1499,12 +1499,12 @@ input[type=range] .range-setting {
 
 /* Override bootstrap nav bar */
 .navbar-fixed-top {
-	.page-background;
+	.page-background();
 }
 
 /* Override bootstrap color.  Custom color for all links in navbar */
 .navbar-nav a {
-	.navbar-link;
+	.navbar-link();
 }
 
 /* Override bootstrap value of padding.  The brand image on navbar should start at top as the height
