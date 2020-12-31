@@ -32,7 +32,9 @@ module.exports = function(callback) {
 	// Initialize the Neo4j Graph Database
 	//const db = new neo4j("http://" + dynamicConfig.dbUsername + ":" + dynamicConfig.dbPassword + "@" + dynamicConfig.dbHostname);
 	const uri = 'neo4j://localhost';
-	const dbdriver = neo4j.driver(uri, neo4j.auth.basic(dynamicConfig.dbUsername, dynamicConfig.dbPassword))
+
+	//set the disablelosslessinteger parameter to avoid the issue mentioned here: https://stackoverflow.com/questions/42645342/neo4j-return-an-integer-instead-of-high-0-low-10
+	const dbdriver = neo4j.driver(uri, neo4j.auth.basic(dynamicConfig.dbUsername, dynamicConfig.dbPassword), { disableLosslessIntegers: true });
 
 	dbInit.initializeDB(dbdriver, function(err) {
 		if (err) {

@@ -38,7 +38,7 @@ function saveActivity(activityInfo, done) {
 		}
 
 		var record = result.records[0];
-		var entity = dbUtils.recordGetField(record, "e");
+		var entity = recordGetField(record, "e");
 
 		return done(null, {id: entity.id});
 	});
@@ -87,10 +87,10 @@ function getPosts(postedBy, lastFetchedTimestamp, done) {
 			var record = result.records[i];
 			var data = {};
 
-			var label = dbUtils.recordGetField(record, "labels(e)");
-			var entity = dbUtils.recordGetField(record, "e");
-			var poster = dbUtils.recordGetField(record, "poster");
-			var category = dbUtils.recordGetField(record, "category");
+			var label = recordGetField(record, "labels(e)");
+			var entity = recordGetField(record, "e");
+			var poster = recordGetField(record, "poster");
+			var category = recordGetField(record, "category");
 
 			data = entityNodeToClientData(label, entity, poster, category);
 

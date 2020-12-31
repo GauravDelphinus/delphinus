@@ -102,7 +102,9 @@ function createMainFeed(userId, lastFetchedTimestamp, done) {
 				data.activity.commentId = entity.activity_commentid;
 			}
 
+
 			newTimeStamp = data.activity.timestamp;
+
 			output.push(data);
 		}
 

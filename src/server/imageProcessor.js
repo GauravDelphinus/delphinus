@@ -1,6 +1,7 @@
 var async = require("async");
 var request = require("request");
 var serverUtils = require("./serverUtils");
+var logger = require("./logger");
 
 var functions = {
 	processImage: function (command, targetImage, imArgs, next) {
@@ -88,6 +89,7 @@ function transformImArgsForService(imArgs, isLocal, callback) {
 	Process the image locally using the ImageMagick system commands
 **/
 function processImageSystem(command, targetImage, imArgs, next) {
+	const { execFile } = require('child_process');
 	if (!validateCommand(command)) {
 		return next(new Error("Invalid command: " + command));
 	}
