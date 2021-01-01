@@ -1,7 +1,7 @@
 require("dotenv").config();
 
 module.exports = {
-	nodeHostname: process.env.NODE_HOSTNAME,
+	nodeHostname: process.env.HOSTNAME,
 	nodeEnv: process.env.NODE_ENV,
 	dbHostname: process.env.NEO4J_HOSTNAME,
 	dbUsername: process.env.NEO4J_USERNAME,

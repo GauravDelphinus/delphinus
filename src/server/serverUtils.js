@@ -238,11 +238,13 @@ var functions = {
 		} else if (type == "url") {
 			if (!validUrl.isUri(value)) {
 				logger.errorIf(logError, "Invalid URL '" + value + "' received for param '" + name + "'");
+				
 				return false;
 			}
 		} else if (type == "myURL") {
 			if (!(value.startsWith("/") || url.parse(value).hostname == global.hostname)) {
 				logger.errorIf(logError, "Invalid URL '" + value + "' received for param '" + name + "'");
+				
 				return false;
 			}
 		} else if (type == "category") {
